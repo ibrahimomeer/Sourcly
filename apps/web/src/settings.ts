@@ -1,5 +1,9 @@
 import type { FactorId, FactorSetting, LabelOverride, ScoringSettings } from "@sourcly/core";
 
+/** How many results each source is asked for. Some sources return fewer (see the provider notes). */
+export const PER_SOURCE_CHOICES = [25, 50, 100] as const;
+export const DEFAULT_PER_SOURCE = 100;
+
 /** Adds the value if it is missing, removes it if present. Returns a new list. */
 export function toggleInList<T>(list: readonly T[], value: T): T[] {
   return list.includes(value) ? list.filter((item) => item !== value) : [...list, value];

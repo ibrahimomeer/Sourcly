@@ -14,8 +14,8 @@ import { useState } from "react";
 import { maskApiKey } from "./apiKey";
 import { valueName } from "./format";
 import { NumberInput } from "./NumberInput";
-import { PROVIDER_OPTIONS } from "./providers";
-import { toggleInList, withFactor } from "./settings";
+import { PROVIDER_OPTIONS, UNAVAILABLE_PROVIDERS } from "./providers";
+import { PER_SOURCE_CHOICES, toggleInList, withFactor } from "./settings";
 
 const OPENALEX_KEY_URL = "https://openalex.org/settings/api";
 
@@ -35,6 +35,11 @@ export interface SettingsPanelProps {
   onFiltersChange: (filters: ResultFilters) => void;
   enabledProviders: readonly ProviderId[];
   onToggleProvider: (id: ProviderId) => void;
+  /** How many results each source is asked for. */
+  perSource: number;
+  onPerSourceChange: (count: number) => void;
+  /** Forgets this visit's remembered answers. */
+  onClearCache: () => void;
   apiKey: string;
   onApiKeyChange: (key: string) => void;
   /** False when the browser refused to store the key. */
@@ -67,11 +72,14 @@ export function SettingsPanel(props: SettingsPanelProps) {
   );
 }
 
-function SourcesSection({ enabledProviders, onToggleProvider }: SettingsPanelProps) {
+function SourcesSection({ enabledProviders, onToggleProvider, perSource, onPerSourceChange, onClearCache }: SettingsPanelProps) {
   return (
     <fieldset>
       <legend>Sources</legend>
-      <p className="muted">Choose which databases are searched. Every type of source they return is shown and labelled.</p>
+      <p className="muted">
+        Choose which databases are searched. They are asked at the same time, and every type of source they return is
+        shown and labelled.
+      </p>
       {PROVIDER_OPTIONS.map((option) => (
         <label key={option.id} className="check">
           <input
@@ -84,6 +92,38 @@ function SourcesSection({ enabledProviders, onToggleProvider }: SettingsPanelPro
           </span>
         </label>
       ))}
+      {UNAVAILABLE_PROVIDERS.map((provider) => (
+        <label key={provider.id} className="check check-unavailable">
+          <input type="checkbox" checked={false} disabled readOnly />
+          <span>
+            <strong>{provider.name}</strong> (not available) <span className="muted">{provider.reason}</span>
+          </span>
+        </label>
+      ))}
+
+      <div className="field-row">
+        <label htmlFor="per-source">Results per source</label>
+        <select
+          id="per-source"
+          value={perSource}
+          onChange={(event) => onPerSourceChange(Number(event.target.value))}
+        >
+          {PER_SOURCE_CHOICES.map((count) => (
+            <option key={count} value={count}>
+              {count}
+            </option>
+          ))}
+        </select>
+        <span className="muted help">A source that allows fewer per search returns fewer. Applies to your next search.</span>
+      </div>
+
+      <p className="muted">
+        Each source's answer is remembered for this visit only, so searching the same words again does not use up its
+        limit twice. Nothing is saved to your device.{" "}
+        <button type="button" className="link-button" onClick={onClearCache}>
+          Forget remembered results
+        </button>
+      </p>
     </fieldset>
   );
 }

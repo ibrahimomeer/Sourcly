@@ -1,11 +1,15 @@
-import { describe, expect, it, vi } from "vitest";
-import { searchProviders } from "./search";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { createSearchCache } from "./cache";
+import { DEFAULT_TIMEOUT_MS, searchProviders, type ProviderUpdate } from "./search";
 import { makeResult } from "./testing/make-result";
 import { ProviderError, type Provider, type ProviderId, type Result } from "./types";
 
 function provider(id: ProviderId, behaviour: (query: string) => Promise<Result[]>): Provider {
   return { id, name: id, search: behaviour };
 }
+
+/** A provider that never answers and never looks at its cancellation signal. */
+const silent = (id: ProviderId): Provider => provider(id, () => new Promise<Result[]>(() => {}));
 
 describe("searchProviders", () => {
   it("collects results and an 'ok' status from every provider that answers", async () => {
@@ -63,7 +67,9 @@ describe("searchProviders", () => {
       limit: 25,
       signal: controller.signal,
     });
-    expect(search).toHaveBeenCalledWith("sleep", { limit: 25, signal: controller.signal });
+    // Each provider gets the trimmed query and the limit, plus a signal of its own that
+    // follows the caller's (so a per-provider timeout can cancel just that provider).
+    expect(search).toHaveBeenCalledWith("sleep", { limit: 25, signal: expect.any(AbortSignal) });
   });
 
   it("does not call any provider for a blank query", async () => {
@@ -87,5 +93,221 @@ describe("searchProviders", () => {
     });
     await searchProviders([slow, fast], "q", { limit: 10 });
     expect(order).toEqual(["slow:start", "fast", "slow:end"]);
+  });
+});
+
+describe("searchProviders: time limits", () => {
+  beforeEach(() => void vi.useFakeTimers());
+  afterEach(() => void vi.useRealTimers());
+
+  it("defaults to 15 seconds per provider", () => {
+    expect(DEFAULT_TIMEOUT_MS).toBe(15_000);
+  });
+
+  it("gives up on a provider that never answers, without holding back the others", async () => {
+    const good = makeResult({ id: "10.1000/good" });
+    const run = searchProviders([silent("openalex"), provider("crossref", async () => [good])], "q", {
+      limit: 5,
+      timeoutMs: 3_000,
+    });
+    await vi.advanceTimersByTimeAsync(3_000);
+    const outcome = await run;
+
+    expect(outcome.results).toEqual([good]);
+    expect(outcome.statuses).toEqual([
+      { provider: "openalex", state: "failed", message: "openalex did not answer within 3 s" },
+      { provider: "crossref", state: "ok", count: 1 },
+    ]);
+  });
+
+  it("does not time out a provider that answers in time", async () => {
+    const slowButFine = provider("openalex", () => new Promise<Result[]>((resolve) => setTimeout(() => resolve([makeResult()]), 2_000)));
+    const run = searchProviders([slowButFine], "q", { limit: 5, timeoutMs: 3_000 });
+    await vi.advanceTimersByTimeAsync(2_000);
+    expect((await run).statuses).toEqual([{ provider: "openalex", state: "ok", count: 1 }]);
+  });
+
+  it("also cancels the slow provider's own request when its time is up", async () => {
+    let seen: AbortSignal | undefined;
+    const watching: Provider = {
+      id: "openalex",
+      name: "OpenAlex",
+      search: (_query, { signal }) => {
+        seen = signal;
+        return new Promise<Result[]>(() => {});
+      },
+    };
+    const run = searchProviders([watching], "q", { limit: 5, timeoutMs: 1_000 });
+    await vi.advanceTimersByTimeAsync(999);
+    expect(seen?.aborted).toBe(false);
+    await vi.advanceTimersByTimeAsync(1);
+    await run;
+    expect(seen?.aborted).toBe(true);
+  });
+
+  it("cancels every provider's request when the caller cancels", async () => {
+    const controller = new AbortController();
+    const signals: AbortSignal[] = [];
+    const watching = (id: ProviderId): Provider => ({
+      id,
+      name: id,
+      search: (_query, { signal }) => {
+        if (signal) signals.push(signal);
+        return new Promise<Result[]>(() => {});
+      },
+    });
+    const run = searchProviders([watching("openalex"), watching("crossref")], "q", {
+      limit: 5,
+      signal: controller.signal,
+      timeoutMs: 1_000,
+    });
+    await vi.advanceTimersByTimeAsync(0);
+    expect(signals.map((s) => s.aborted)).toEqual([false, false]);
+    controller.abort();
+    expect(signals.map((s) => s.aborted)).toEqual([true, true]);
+    await vi.advanceTimersByTimeAsync(1_000);
+    await run;
+  });
+
+  it("starts out cancelled if the caller had already cancelled", async () => {
+    const controller = new AbortController();
+    controller.abort();
+    let aborted: boolean | undefined;
+    const watching: Provider = {
+      id: "openalex",
+      name: "OpenAlex",
+      search: async (_query, { signal }) => {
+        aborted = signal?.aborted;
+        return [];
+      },
+    };
+    await searchProviders([watching], "q", { limit: 5, signal: controller.signal });
+    expect(aborted).toBe(true);
+  });
+});
+
+describe("searchProviders: progressive results", () => {
+  beforeEach(() => void vi.useFakeTimers());
+  afterEach(() => void vi.useRealTimers());
+
+  const after = (ms: number, results: Result[]) =>
+    new Promise<Result[]>((resolve) => setTimeout(() => resolve(results), ms));
+
+  it("reports each provider the moment it finishes, fastest first", async () => {
+    const seen: string[] = [];
+    const run = searchProviders(
+      [
+        provider("openalex", () => after(300, [makeResult({ id: "10.1/slow" })])),
+        provider("crossref", () => after(100, [makeResult({ id: "10.1/fast" })])),
+        provider("pubmed", async () => {
+          throw new ProviderError("rate-limited", "busy");
+        }),
+      ],
+      "q",
+      { limit: 5, onProviderDone: (update) => void seen.push(`${update.provider}:${update.status.state}`) },
+    );
+
+    await vi.advanceTimersByTimeAsync(0);
+    expect(seen).toEqual(["pubmed:rate-limited"]);
+    await vi.advanceTimersByTimeAsync(100);
+    expect(seen).toEqual(["pubmed:rate-limited", "crossref:ok"]);
+    await vi.advanceTimersByTimeAsync(200);
+    expect(seen).toEqual(["pubmed:rate-limited", "crossref:ok", "openalex:ok"]);
+
+    // The final outcome is still in the order the providers were given.
+    const outcome = await run;
+    expect(outcome.statuses.map((s) => s.provider)).toEqual(["openalex", "crossref", "pubmed"]);
+  });
+
+  it("hands over the results with each update", async () => {
+    const updates: ProviderUpdate[] = [];
+    const answer = makeResult({ id: "10.1/answer" });
+    await searchProviders([provider("openalex", async () => [answer])], "q", { limit: 5, onProviderDone: (u) => void updates.push(u) });
+    expect(updates).toEqual([
+      { provider: "openalex", status: { provider: "openalex", state: "ok", count: 1 }, results: [answer] },
+    ]);
+  });
+
+  it("is not broken by a listener that throws", async () => {
+    const outcome = await searchProviders([provider("openalex", async () => [makeResult()])], "q", {
+      limit: 5,
+      onProviderDone: () => {
+        throw new Error("listener bug");
+      },
+    });
+    expect(outcome.statuses).toEqual([{ provider: "openalex", state: "ok", count: 1 }]);
+  });
+});
+
+describe("searchProviders: caching", () => {
+  it("answers a repeated search from memory, and says so", async () => {
+    const search = vi.fn(async () => [makeResult({ id: "10.1/a" })]);
+    const cache = createSearchCache();
+    const providers = [{ id: "openalex" as const, name: "OpenAlex", search }];
+
+    const first = await searchProviders(providers, "sleep", { limit: 50, cache });
+    const second = await searchProviders(providers, "  sleep ", { limit: 50, cache });
+
+    expect(search).toHaveBeenCalledTimes(1);
+    expect(first.statuses).toEqual([{ provider: "openalex", state: "ok", count: 1 }]);
+    expect(second.statuses).toEqual([{ provider: "openalex", state: "ok", count: 1, cached: true }]);
+    expect(second.results).toEqual(first.results);
+  });
+
+  it("also reports a cached answer through the progress callback", async () => {
+    const cache = createSearchCache();
+    const providers = [provider("openalex", async () => [makeResult()])];
+    await searchProviders(providers, "q", { limit: 5, cache });
+    const updates: ProviderUpdate[] = [];
+    await searchProviders(providers, "q", { limit: 5, cache, onProviderDone: (u) => void updates.push(u) });
+    expect(updates).toHaveLength(1);
+    expect(updates[0]?.status).toMatchObject({ state: "ok", cached: true });
+  });
+
+  it("asks again for a different query or a different number of results", async () => {
+    const search = vi.fn(async () => []);
+    const cache = createSearchCache();
+    const providers = [{ id: "openalex" as const, name: "OpenAlex", search }];
+    await searchProviders(providers, "sleep", { limit: 50, cache });
+    await searchProviders(providers, "memory", { limit: 50, cache });
+    await searchProviders(providers, "sleep", { limit: 100, cache });
+    expect(search).toHaveBeenCalledTimes(3);
+  });
+
+  it("never remembers a failure, so a retry really retries", async () => {
+    let calls = 0;
+    const flaky = provider("openalex", async () => {
+      calls += 1;
+      if (calls === 1) throw new ProviderError("rate-limited", "busy");
+      return [makeResult()];
+    });
+    const cache = createSearchCache();
+    const first = await searchProviders([flaky], "q", { limit: 5, cache });
+    const second = await searchProviders([flaky], "q", { limit: 5, cache });
+    expect(first.statuses[0]?.state).toBe("rate-limited");
+    expect(second.statuses[0]).toEqual({ provider: "openalex", state: "ok", count: 1 });
+    expect(cache.size).toBe(1);
+  });
+
+  it("caches each provider separately", async () => {
+    const cache = createSearchCache();
+    const a = vi.fn(async () => [makeResult({ id: "10.1/a" })]);
+    const b = vi.fn(async () => [makeResult({ id: "10.1/b" })]);
+    const providers = [
+      { id: "openalex" as const, name: "A", search: a },
+      { id: "crossref" as const, name: "B", search: b },
+    ];
+    await searchProviders(providers, "q", { limit: 5, cache });
+    await searchProviders([providers[0] as Provider], "q", { limit: 5, cache });
+    expect(a).toHaveBeenCalledTimes(1);
+    expect(b).toHaveBeenCalledTimes(1);
+  });
+
+  it("works without a cache", async () => {
+    const search = vi.fn(async () => []);
+    const providers = [{ id: "openalex" as const, name: "OpenAlex", search }];
+    await searchProviders(providers, "q", { limit: 5 });
+    await searchProviders(providers, "q", { limit: 5 });
+    expect(search).toHaveBeenCalledTimes(2);
   });
 });

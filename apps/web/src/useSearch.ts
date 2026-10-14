@@ -1,43 +1,54 @@
-import { searchProviders, type Provider, type ProviderStatus, type Result } from "@sourcly/core";
-import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  searchProviders,
+  type Provider,
+  type ProviderStatus,
+  type SearchCache,
+} from "@sourcly/core";
+import { useCallback, useEffect, useReducer, useRef } from "react";
+import { idleSearch, searchReducer, type SearchState } from "./searchState";
 
-/** How many results to ask each source for. OpenAlex allows at most 100 per request. */
-export const RESULTS_PER_SOURCE = 50;
-
-export type SearchState =
-  | { phase: "idle" }
-  | { phase: "searching"; query: string }
-  | {
-      phase: "done";
-      query: string;
-      results: Result[];
-      statuses: ProviderStatus[];
-      searchedAt: Date;
-    };
+export interface SearchRequestOptions {
+  /** How many results to ask each source for. */
+  limit: number;
+  /** This visit's memory of earlier answers. */
+  cache: SearchCache;
+  /** Sources that cannot be asked; reported in the status list. */
+  skipped: ProviderStatus[];
+}
 
 /**
- * Runs searches and keeps the latest one's outcome. Starting a new search
- * cancels the previous one, and a cancelled search can never overwrite the
- * newer results.
+ * Runs searches and keeps the latest one's progress. Each source's answer is
+ * added the moment it arrives. Starting a new search cancels the previous one,
+ * and a cancelled search can never change the newer results.
  */
-export function useSearch(): { state: SearchState; search: (query: string, providers: readonly Provider[]) => void } {
-  const [state, setState] = useState<SearchState>({ phase: "idle" });
+export function useSearch(): {
+  state: SearchState;
+  search: (query: string, providers: readonly Provider[], options: SearchRequestOptions) => void;
+} {
+  const [state, dispatch] = useReducer(searchReducer, idleSearch);
   const current = useRef<AbortController | null>(null);
+  const counter = useRef(0);
 
   useEffect(() => () => current.current?.abort(), []);
 
-  const search = useCallback((query: string, providers: readonly Provider[]) => {
+  const search = useCallback((query: string, providers: readonly Provider[], options: SearchRequestOptions) => {
     current.current?.abort();
     const controller = new AbortController();
     current.current = controller;
+    counter.current += 1;
+    const id = counter.current;
 
-    setState({ phase: "searching", query });
-    void searchProviders(providers, query, { limit: RESULTS_PER_SOURCE, signal: controller.signal }).then(
-      (outcome) => {
-        if (controller.signal.aborted) return;
-        setState({ phase: "done", query, ...outcome, searchedAt: new Date() });
+    dispatch({ type: "start", id, query, order: providers.map((provider) => provider.id), skipped: options.skipped });
+    void searchProviders(providers, query, {
+      limit: options.limit,
+      signal: controller.signal,
+      cache: options.cache,
+      onProviderDone: (update) => {
+        if (!controller.signal.aborted) dispatch({ type: "provider-done", id, update });
       },
-    );
+    }).then(() => {
+      if (!controller.signal.aborted) dispatch({ type: "finish", id, at: new Date() });
+    });
   }, []);
 
   return { state, search };

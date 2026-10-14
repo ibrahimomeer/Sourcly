@@ -1,0 +1,559 @@
+{
+  "total": 650,
+  "page": 1,
+  "pageSize": 6,
+  "timestamp": "2026-10-14T21:54:25.105412Z",
+  "query": "sleep memory consolidation",
+  "results": [
+    {
+      "last_updated": "2026-07-27T13:27:28Z",
+      "bibjson": {
+        "identifier": [
+          {
+            "id": "10.3390/children13070940",
+            "type": "doi"
+          },
+          {
+            "id": "2227-9067",
+            "type": "eissn"
+          }
+        ],
+        "journal": {
+          "volume": "13",
+          "number": "7",
+          "country": "CH",
+          "issns": [
+            "2227-9067"
+          ],
+          "publisher": "MDPI AG",
+          "language": [
+            "EN"
+          ],
+          "title": "Children"
+        },
+        "month": "07",
+        "keywords": [
+          "handwriting",
+          "children",
+          "mental health",
+          "neurodevelopment",
+          "learning processes",
+          "emotional regulation"
+        ],
+        "year": "2026",
+        "start_page": "940",
+        "subject": [
+          {
+            "code": "RJ1-570",
+            "scheme": "LCC",
+            "term": "Pediatrics"
+          }
+        ],
+        "author": [
+          {
+            "affiliation": "Department of Neuroscience, Head-Neck and Chest, Section of Psychiatry, Fondazione Policlinico Universitario Agostino Gemelli IRCCS, Largo Agostino Gemelli 8, 00168 Rome, Italy",
+            "name": "Giuseppe Marano"
+          },
+          {
+            "affiliation": "Department of Neuroscience, Head-Neck and Chest, Section of Psychiatry, Fondazione Policlinico Universitario Agostino Gemelli IRCCS, Largo Agostino Gemelli 8, 00168 Rome, Italy",
+            "name": "Oksana Di Giacomi"
+          },
+          {
+            "affiliation": "Department of Neuroscience, Head-Neck and Chest, Section of Psychiatry, Fondazione Policlinico Universitario Agostino Gemelli IRCCS, Largo Agostino Gemelli 8, 00168 Rome, Italy",
+            "name": "Senad Hasaj"
+          },
+          {
+            "affiliation": "Unit of Medical Genetics, Department of Laboratory Medicine, Ospedale Isola Tiberina-Gemelli Isola, 00186 Rome, Italy",
+            "name": "Gianandrea Traversi"
+          },
+          {
+            "affiliation": "Spine Surgery Department, Bambino Gesù Children’s Hospital IRCCS, 00168 Rome, Italy",
+            "name": "Osvaldo Mazza"
+          },
+          {
+            "affiliation": "Fondazione Luigi Einaudi, 00193 Rome, Italy",
+            "name": "Andrea Cangini"
+          },
+          {
+            "affiliation": "Department of Neuroscience, Head-Neck and Chest, Section of Psychiatry, Fondazione Policlinico Universitario Agostino Gemelli IRCCS, Largo Agostino Gemelli 8, 00168 Rome, Italy",
+            "name": "Marianna Mazza"
+          }
+        ],
+        "link": [
+          {
+            "content_type": "text/html",
+            "type": "fulltext",
+            "url": "https://www.mdpi.com/2227-9067/13/7/940"
+          }
+        ],
+        "abstract": "Background/Objectives: The digital transition in school settings is reshaping children’s learning, writing practices, and mental health trajectories. This narrative review examines whether handwriting still matters in contemporary hybrid educational environments from a multidisciplinary perspective. Methods: Evidence from neuroscience, developmental psychology, educational sciences, pediatrics, and child psychiatry was narratively synthesized, with attention to handwriting, digital exposure, learning, emotional regulation, and vulnerable populations. Results: Handwriting uniquely integrates fine motor control, visuomotor coordination, orthographic processing, attention, and embodied cognition, supporting early literacy, memory consolidation, conceptual learning, and reflective writing. Conversely, excessive or poorly mediated digital exposure may interact with attentional fragmentation, sleep disruption, online stressors, problematic use, and internalizing symptoms, particularly in vulnerable children and adolescents. Digital tools remain essential for personalization, accessibility, and compensatory support, especially for students with neurodevelopmental or learning difficulties. Conclusions: Handwriting and digital technologies should not be framed as competing educational paradigms. A developmentally sensitive hybrid model is needed, preserving handwriting during key stages of literacy and self-regulation while integrating digital tools as purposeful, individualized resources for learning, inclusion, and school mental health promotion.",
+        "title": "Digital Transition and Mental Health in School Settings: Does Handwriting Still Matter? A Multidisciplinary Perspective"
+      },
+      "id": "001453be75e641fdbc92b318fa111272",
+      "created_date": "2026-07-27T13:27:27Z"
+    },
+    {
+      "last_updated": "2025-08-19T20:13:48Z",
+      "bibjson": {
+        "identifier": [
+          {
+            "id": "1095-9572",
+            "type": "eissn"
+          },
+          {
+            "id": "10.1016/j.neuroimage.2022.119055",
+            "type": "doi"
+          }
+        ],
+        "journal": {
+          "volume": "253",
+          "number": "",
+          "country": "US",
+          "issns": [
+            "1053-8119",
+            "1095-9572"
+          ],
+          "publisher": "Elsevier",
+          "language": [
+            "EN"
+          ],
+          "title": "NeuroImage"
+        },
+        "month": "06",
+        "end_page": "",
+        "keywords": [
+          "Slow waves",
+          "Sleep",
+          "Spindles",
+          "Acoustic stimulation",
+          "CLAS",
+          "Classifiers"
+        ],
+        "year": "2022",
+        "start_page": "119055",
+        "subject": [
+          {
+            "code": "RC321-571",
+            "scheme": "LCC",
+            "term": "Neurosciences. Biological psychiatry. Neuropsychiatry"
+          }
+        ],
+        "author": [
+          {
+            "affiliation": "Cardiff University Brain Research Imaging Center (CUBRIC), School of Psychology, Cardiff University, Maindy Rd, Cardiff CF24 4HQ, UK; Corresponding authors.",
+            "name": "Miguel Navarrete"
+          },
+          {
+            "affiliation": "School of Computer Science and Informatics, Cardiff University, Queen's Buildings, 5 The Parade, Roath, Cardiff CF24 3AA, UK",
+            "name": "Steven Arthur"
+          },
+          {
+            "affiliation": "School of Computer Science and Informatics, Cardiff University, Queen's Buildings, 5 The Parade, Roath, Cardiff CF24 3AA, UK",
+            "name": "Matthias S. Treder"
+          },
+          {
+            "affiliation": "Cardiff University Brain Research Imaging Center (CUBRIC), School of Psychology, Cardiff University, Maindy Rd, Cardiff CF24 4HQ, UK; Corresponding authors.",
+            "name": "Penelope A. Lewis"
+          }
+        ],
+        "link": [
+          {
+            "type": "fulltext",
+            "url": "http://www.sciencedirect.com/science/article/pii/S1053811922001847"
+          }
+        ],
+        "abstract": "Large slow oscillations (SO, 0.5–2 Hz) characterise slow-wave sleep and are crucial to memory consolidation and other physiological functions. Manipulating slow oscillations may enhance sleep and memory, as well as benefitting the immune system. Closed-loop auditory stimulation (CLAS) has been demonstrated to increase the SO amplitude and to boost fast sleep spindle activity (11–16 Hz). Nevertheless, not all such stimuli are effective in evoking SOs, even when they are precisely phase locked. Here, we studied what factors of the ongoing activity patterns may help to determine what oscillations to stimulate to effectively enhance SOs or SO-locked spindle activity. Hence, we trained classifiers using the morphological characteristics of the ongoing SO, as measured by electroencephalography (EEG), to predict whether stimulation would lead to a benefit in terms of the resulting SO and spindle amplitude. Separate classifiers were trained using trials from spontaneous control and stimulated datasets, and we evaluated their performance by applying them to held-out data both within and across conditions. We were able to predict both when large SOs occurred spontaneously, and whether a phase-locked auditory click effectively enlarged them with good accuracy for predicting the SO trough (∼70%) and SO peak values (∼80%). Also, we were able to predict when stimulation would elicit spindle activity with an accuracy of ∼60%. Finally, we evaluate the importance of the various SO features used to make these predictions. Our results offer new insight into SO and spindle dynamics and may suggest techniques for developing future methods for online optimization of stimulation.",
+        "title": "Ongoing neural oscillations predict the post-stimulus outcome of closed loop auditory stimulation during slow-wave sleep"
+      },
+      "id": "001a8fbe854449688e14d1e563deebf6",
+      "created_date": "2022-03-16T04:44:30Z"
+    },
+    {
+      "last_updated": "2025-08-19T20:10:49Z",
+      "bibjson": {
+        "identifier": [
+          {
+            "id": "1664-1078",
+            "type": "eissn"
+          },
+          {
+            "id": "10.3389/fpsyg.2015.01439",
+            "type": "doi"
+          }
+        ],
+        "journal": {
+          "volume": "6",
+          "country": "CH",
+          "issns": [
+            "1664-1078"
+          ],
+          "publisher": "Frontiers Media S.A.",
+          "language": [
+            "EN"
+          ],
+          "title": "Frontiers in Psychology"
+        },
+        "month": "10",
+        "keywords": [
+          "Acetylcholine",
+          "Emotional Memory",
+          "habituation",
+          "encoding",
+          "REM sleep",
+          "theta activity"
+        ],
+        "year": "2015",
+        "subject": [
+          {
+            "code": "BF1-990",
+            "scheme": "LCC",
+            "term": "Psychology"
+          }
+        ],
+        "author": [
+          {
+            "affiliation": "University of Manchester",
+            "name": "Isabel Camilla Hutchison"
+          },
+          {
+            "affiliation": "University College London",
+            "name": "Shailendra eRathore"
+          }
+        ],
+        "link": [
+          {
+            "content_type": "HTML",
+            "type": "fulltext",
+            "url": "http://journal.frontiersin.org/Journal/10.3389/fpsyg.2015.01439/full"
+          }
+        ],
+        "abstract": "While NREM sleep has been strongly implicated in the reactivation and consolidation of memory traces, the role of REM sleep remains unclear. A growing body of research on humans and animals provide behavioral evidence for a role of REM sleep in the strengthening and modulation of emotional memories. Theta activity – which describes low frequency oscillations in the local field potential within the hippocampus, amygdala and neocortex – is a prominent feature of both wake and REM sleep in humans and rodents. Theta coherence between the hippocampus and amygdala drives large-scale PGO waves, the density of which predicts increases in plasticity-related gene expression. This could potentially facilitate the processing of emotional memory traces within the hippocampus during REM sleep. Further, the timing of hippocampal activity in relation to theta phase is vital in determining subsequent potentiation of neuronal activity. This could allow the emotionally modulated strengthening of novel and the gradual weakening of consolidated hippocampal memory traces observed in both wake and REM sleep. Hippocampal theta activity is also correlated with REM sleep acetylcholine levels – which are thought to reduce hippocampal afferent inputs in the neocortex. The additional low levels of noradrenaline during REM sleep, which facilitate recurrent activation within the neocortex, could allow the integration of novel memory traces previously consolidated during NREM sleep. We therefore propose that REM sleep mediates the prioritized processing of emotional memories within the hippocampus, the integration of previously consolidated memory traces within the neocortex, as well as the disengagement of consolidated neocortical memory traces from the hippocampus.",
+        "title": "The role of REM theta activity in emotional memory"
+      },
+      "created_date": "2016-07-04T07:49:41Z",
+      "id": "00d25c68863d4300b3a0d18e2bf935e2"
+    },
+    {
+      "last_updated": "2025-08-19T21:51:13Z",
+      "bibjson": {
+        "identifier": [
+          {
+            "id": "1099-4300",
+            "type": "eissn"
+          },
+          {
+            "id": "10.3390/e21111072",
+            "type": "doi"
+          }
+        ],
+        "journal": {
+          "volume": "21",
+          "number": "11",
+          "country": "CH",
+          "issns": [
+            "1099-4300"
+          ],
+          "publisher": "MDPI AG",
+          "language": [
+            "EN"
+          ],
+          "title": "Entropy"
+        },
+        "month": "11",
+        "keywords": [
+          "aging",
+          "consolidation",
+          "default mode network",
+          "episodic memory",
+          "fmri",
+          "multiscale entropy",
+          "network complexity",
+          "resting state"
+        ],
+        "year": "2019",
+        "start_page": "1072",
+        "subject": [
+          {
+            "code": "Q",
+            "scheme": "LCC",
+            "term": "Science"
+          },
+          {
+            "code": "QB460-466",
+            "scheme": "LCC",
+            "term": "Astrophysics"
+          },
+          {
+            "code": "QC1-999",
+            "scheme": "LCC",
+            "term": "Physics"
+          }
+        ],
+        "author": [
+          {
+            "affiliation": "Department of Psychology, The University of Alabama, Tuscaloosa, AL 35487, USA",
+            "name": "Ian  M. McDonough"
+          },
+          {
+            "affiliation": "Department of Psychology, The University of Alabama, Tuscaloosa, AL 35487, USA",
+            "name": "Sarah  K. Letang"
+          },
+          {
+            "affiliation": "Department of Psychology, The University of Alabama, Tuscaloosa, AL 35487, USA",
+            "name": "Hillary  B. Erwin"
+          },
+          {
+            "affiliation": "Department of Psychology, The University of Alabama, Tuscaloosa, AL 35487, USA",
+            "name": "Rajesh  K. Kana"
+          }
+        ],
+        "link": [
+          {
+            "content_type": "pdf",
+            "type": "fulltext",
+            "url": "https://www.mdpi.com/1099-4300/21/11/1072"
+          }
+        ],
+        "abstract": "Memory consolidation is well known to occur during sleep, but might start immediately after encoding new information while awake. While consolidation processes are important across the lifespan, they may be even more important to maintain memory functioning in old age. We tested whether a novel measure of information processing known as network complexity might be sensitive to post-encoding consolidation mechanisms in a sample of young, middle-aged, and older adults. Network complexity was calculated by assessing the irregularity of brain signals within a network over time using multiscale entropy. To capture post-encoding mechanisms, network complexity was estimated using functional magnetic resonance imaging (fMRI) during rest before and after encoding of picture pairs, and subtracted between the two rest periods. Participants received a five-alternative-choice memory test to assess associative memory performance. Results indicated that aging was associated with an increase in network complexity from pre- to post-encoding in the default mode network (DMN). Increases in network complexity in the DMN also were associated with better subsequent memory across all age groups. These findings suggest that network complexity is sensitive to post-encoding consolidation mechanisms that enhance memory performance. These post-encoding mechanisms may represent a pathway to support memory performance in the face of overall memory declines.",
+        "title": "Evidence for Maintained Post-Encoding Memory Consolidation Across the Adult Lifespan Revealed by Network Complexity"
+      },
+      "created_date": "2019-11-12T08:43:48Z",
+      "id": "01180e7e94974c37a43b2b477b050b01"
+    },
+    {
+      "last_updated": "2025-08-19T21:13:40Z",
+      "bibjson": {
+        "identifier": [
+          {
+            "id": "2080-2234",
+            "type": "eissn"
+          },
+          {
+            "id": "10.2478/bhk-2022-0011",
+            "type": "doi"
+          }
+        ],
+        "journal": {
+          "volume": "14",
+          "number": "1",
+          "country": "PL",
+          "issns": [
+            "2080-2234"
+          ],
+          "publisher": "Sciendo",
+          "language": [
+            "EN"
+          ],
+          "title": "Biomedical Human Kinetics"
+        },
+        "month": "1",
+        "end_page": "94",
+        "keywords": [
+          "consolidation",
+          "children",
+          "offline learning",
+          "passage of time",
+          "explicit knowledge"
+        ],
+        "year": "2022",
+        "start_page": "83",
+        "subject": [
+          {
+            "code": "RC1200-1245",
+            "scheme": "LCC",
+            "term": "Sports medicine"
+          },
+          {
+            "code": "QP1-981",
+            "scheme": "LCC",
+            "term": "Physiology"
+          }
+        ],
+        "author": [
+          {
+            "affiliation": "Department of Motor Behavior, Faculty of Sport Sciences, Ferdowsi University of Mashhad, Mashhad, Iran",
+            "name": "Iranmanesh Hamideh"
+          },
+          {
+            "affiliation": "Department of Motor Behavior, Faculty of Sport Sciences, Ferdowsi University of Mashhad, Mashhad, Iran",
+            "name": "Kakhki Alireza Saberi"
+          },
+          {
+            "affiliation": "Department of Motor Behavior, Faculty of Sport Sciences, Ferdowsi University of Mashhad, Mashhad, Iran",
+            "name": "Taheri Hamidreza"
+          },
+          {
+            "affiliation": "Department of Health and Kinesiology, Texas A&M University, College Station, TX 77843-4243, Texas, USA",
+            "name": "Shea Charles H."
+          }
+        ],
+        "link": [
+          {
+            "type": "fulltext",
+            "url": "https://doi.org/10.2478/bhk-2022-0011"
+          }
+        ],
+        "abstract": "Study aim: The purpose of this study was to investigate the role of sleep and awareness on consolidation of general and Sequence-Specific learning in children.",
+        "title": "Motor memory consolidation in children: The role of awareness and sleep on offline general and sequence-specific learning"
+      },
+      "created_date": "2022-03-01T19:03:13Z",
+      "id": "01557e1fba92442db22351ee62522c96"
+    },
+    {
+      "last_updated": "2025-08-19T17:23:44Z",
+      "bibjson": {
+        "identifier": [
+          {
+            "id": "1662-453X",
+            "type": "eissn"
+          },
+          {
+            "id": "10.3389/fnins.2022.908268",
+            "type": "doi"
+          }
+        ],
+        "journal": {
+          "volume": "16",
+          "country": "CH",
+          "issns": [
+            "1662-453X",
+            "1662-4548"
+          ],
+          "publisher": "Frontiers Media S.A.",
+          "language": [
+            "EN"
+          ],
+          "title": "Frontiers in Neuroscience"
+        },
+        "month": "9",
+        "keywords": [
+          "breast cancer",
+          "cognition",
+          "sleep",
+          "polysomnography",
+          "prospective memory",
+          "memory consolidation"
+        ],
+        "year": "2022",
+        "subject": [
+          {
+            "code": "RC321-571",
+            "scheme": "LCC",
+            "term": "Neurosciences. Biological psychiatry. Neuropsychiatry"
+          }
+        ],
+        "author": [
+          {
+            "affiliation": "Neuropsychologie et Imagerie de la Mémoire Humaine, U1077, Normandie University, UNICAEN, PSL Université, EPHE, INSERM, CHU de Caen, GIP Cyceron, Caen, France",
+            "name": "Mylène Duivon"
+          },
+          {
+            "affiliation": "Neuropsychologie et Imagerie de la Mémoire Humaine, U1077, Normandie University, UNICAEN, PSL Université, EPHE, INSERM, CHU de Caen, GIP Cyceron, Caen, France",
+            "name": "Joy Perrier"
+          },
+          {
+            "affiliation": "Department of Clinical Research Unit and Medical Oncology, Caen, France",
+            "name": "Carine Segura-Djezzar"
+          },
+          {
+            "affiliation": "Institut Normand du Sein, Centre François Baclesse, Caen, France",
+            "name": "Carine Segura-Djezzar"
+          },
+          {
+            "affiliation": "Department of Clinical Research Unit and Medical Oncology, Caen, France",
+            "name": "Florence Joly"
+          },
+          {
+            "affiliation": "Institut Normand du Sein, Centre François Baclesse, Caen, France",
+            "name": "Florence Joly"
+          },
+          {
+            "affiliation": "U1086 ANTICIPE, INSERM, Normandie University, UNICAEN, Caen, France",
+            "name": "Florence Joly"
+          },
+          {
+            "affiliation": "Cancer and Cognition Platform, Ligue Nationale Contre le Cancer, Caen, France",
+            "name": "Florence Joly"
+          },
+          {
+            "affiliation": "Neuropsychologie et Imagerie de la Mémoire Humaine, U1077, Normandie University, UNICAEN, PSL Université, EPHE, INSERM, CHU de Caen, GIP Cyceron, Caen, France",
+            "name": "Stéphane Rehel"
+          },
+          {
+            "affiliation": "Physip, Paris, France",
+            "name": "Christian Berthomier"
+          },
+          {
+            "affiliation": "Department of Clinical Research Unit and Medical Oncology, Caen, France",
+            "name": "Jean-Michel Grellard"
+          },
+          {
+            "affiliation": "Department of Clinical Research Unit and Medical Oncology, Caen, France",
+            "name": "Bénédicte Clarisse"
+          },
+          {
+            "affiliation": "Department of Clinical Research Unit and Medical Oncology, Caen, France",
+            "name": "Julien Geffrelot"
+          },
+          {
+            "affiliation": "Institut Normand du Sein, Centre François Baclesse, Caen, France",
+            "name": "Julien Geffrelot"
+          },
+          {
+            "affiliation": "Department of Clinical Research Unit and Medical Oncology, Caen, France",
+            "name": "George Emile"
+          },
+          {
+            "affiliation": "Institut Normand du Sein, Centre François Baclesse, Caen, France",
+            "name": "George Emile"
+          },
+          {
+            "affiliation": "Department of Clinical Research Unit and Medical Oncology, Caen, France",
+            "name": "Christelle Lévy"
+          },
+          {
+            "affiliation": "Institut Normand du Sein, Centre François Baclesse, Caen, France",
+            "name": "Christelle Lévy"
+          },
+          {
+            "affiliation": "Neuropsychologie et Imagerie de la Mémoire Humaine, U1077, Normandie University, UNICAEN, PSL Université, EPHE, INSERM, CHU de Caen, GIP Cyceron, Caen, France",
+            "name": "Fausto Viader"
+          },
+          {
+            "affiliation": "Neuropsychologie et Imagerie de la Mémoire Humaine, U1077, Normandie University, UNICAEN, PSL Université, EPHE, INSERM, CHU de Caen, GIP Cyceron, Caen, France",
+            "name": "Francis Eustache"
+          },
+          {
+            "affiliation": "Neuropsychologie et Imagerie de la Mémoire Humaine, U1077, Normandie University, UNICAEN, PSL Université, EPHE, INSERM, CHU de Caen, GIP Cyceron, Caen, France",
+            "name": "Béatrice Desgranges"
+          },
+          {
+            "affiliation": "Neuropsychologie et Imagerie de la Mémoire Humaine, U1077, Normandie University, UNICAEN, PSL Université, EPHE, INSERM, CHU de Caen, GIP Cyceron, Caen, France",
+            "name": "Géraldine Rauchs"
+          },
+          {
+            "affiliation": "Neuropsychologie et Imagerie de la Mémoire Humaine, U1077, Normandie University, UNICAEN, PSL Université, EPHE, INSERM, CHU de Caen, GIP Cyceron, Caen, France",
+            "name": "Bénédicte Giffard"
+          },
+          {
+            "affiliation": "Cancer and Cognition Platform, Ligue Nationale Contre le Cancer, Caen, France",
+            "name": "Bénédicte Giffard"
+          }
+        ],
+        "link": [
+          {
+            "content_type": "HTML",
+            "type": "fulltext",
+            "url": "https://www.frontiersin.org/articles/10.3389/fnins.2022.908268/full"
+          }
+        ],
+        "abstract": "BackgroundPrevious studies have revealed both sleep alterations and prospective memory (PM) impairments in breast cancer (BC) patients. PM refers to memory of intended actions and is crucial for daily living tasks and treatment compliance. As sleep is known to favor memory consolidation, one may expect that changes in sleep quality related to BC would have an impact on PM performance. This study aimed at assessing sleep-dependent consolidation of intentions using an ecological, virtual reality-based PM task in BC patients not treated with chemotherapy.Materials and methodsThirty-seven early stages BC patients and 21 healthy controls (HC) participated in this study. PM was assessed using a virtual reality task, during which participants learnt a list of intentions and recalled them after a retention interval filled with a day awake or a night of sleep monitored by polysomnography. Sleep spindles and slow waves, brain oscillations involved in sleep-dependent memory consolidation, were quantified automatically using the Aseega software (Physip). Subjective sleep disturbances and markers of quality of life (psychological distress, fatigue, and well-being) were assessed by questionnaires.ResultsGreater PM performance was observed after sleep than after an equivalent period of daytime wakefulness for both groups (HC and BC). PM performance after sleep did not differ significantly between groups. Yet, BC patients reported greater sleep disturbances than HC which were related with poorer intentions retrieval, greater psychological distress, fatigue and poorer well-being. The frequency of spindles was higher and the amplitude of slow waves lower in BC patients compared to HC. However, no significant association was observed between polysomnography parameters and PM scores in the whole sample of participants.ConclusionAlthough subtle changes in brain oscillations involved in sleep-dependent memory consolidation were observed, these changes did not significantly impair overnight PM consolidation in BC patients. Nevertheless, poorer PM performance was associated with greater sleep complaints which in turn were related to poorer quality of life. Overall, these data suggest that sleep-dependent PM consolidation mechanisms are not altered in early stages BC patients not treated with chemotherapy. Further investigations are needed to understand the association between markers of quality of life and sleep-dependent memory consolidation.",
+        "title": "Sleep-dependent memory consolidation in breast cancer: Use of a virtual reality prospective memory task"
+      },
+      "id": "0193be0cdb14462e89e5c844580f257e",
+      "created_date": "2022-09-07T05:10:52Z"
+    }
+  ],
+  "next": "https://doaj.org/api/v4/search/articles/sleep%20memory%20consolidation?page=2&pageSize=6",
+  "last": "https://doaj.org/api/v4/search/articles/sleep%20memory%20consolidation?page=109&pageSize=6"
+}

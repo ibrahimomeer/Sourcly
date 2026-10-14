@@ -2,15 +2,29 @@
  * Search providers. Unpaywall is not listed because it is not searched: it is
  * only used later to look up open-access PDFs for results we already have.
  */
-export type ProviderId = "openalex" | "crossref" | "pubmed" | "europepmc" | "arxiv" | "wikipedia";
+export type ProviderId =
+  | "openalex"
+  | "crossref"
+  | "pubmed"
+  | "europepmc"
+  | "doaj"
+  | "datacite"
+  | "zenodo"
+  | "wikipedia"
+  | "semanticscholar"
+  | "arxiv";
 
 export const PROVIDER_NAMES: Record<ProviderId, string> = {
   openalex: "OpenAlex",
   crossref: "Crossref",
   pubmed: "PubMed",
   europepmc: "Europe PMC",
-  arxiv: "arXiv",
+  doaj: "DOAJ",
+  datacite: "DataCite",
+  zenodo: "Zenodo",
   wikipedia: "Wikipedia",
+  semanticscholar: "Semantic Scholar",
+  arxiv: "arXiv",
 };
 
 /**
@@ -150,7 +164,11 @@ export class ProviderError extends Error {
   }
 }
 
-/** What the UI shows per provider after a search. */
+/**
+ * What the UI shows per provider after a search. "skipped" means the provider
+ * was not asked at all, and `message` says why (for example: browsers cannot
+ * call it).
+ */
 export type ProviderStatus =
-  | { provider: ProviderId; state: "ok"; count: number }
-  | { provider: ProviderId; state: ProviderFailureKind; message: string };
+  | { provider: ProviderId; state: "ok"; count: number; /** True when the answer came from this visit's cache. */ cached?: boolean }
+  | { provider: ProviderId; state: ProviderFailureKind | "skipped"; message: string };

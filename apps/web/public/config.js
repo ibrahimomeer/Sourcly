@@ -37,6 +37,14 @@ window.SOURCLY_CONFIG = {
   // end it in "qurl=" rather than "url=", because the address is sent encoded.
   libraryProxyPrefix: "https://go.openathens.net/redirector/ubc.ca?url=",
 
+  // Library search address for the "UBC Library search" link in the "Search elsewhere"
+  // row: this value followed by the percent-encoded query. Leave it empty ("") to hide
+  // the link. UBC Library publishes no official search-link pattern; this is the address
+  // its own search box submits to (a plain GET with the query in `s.q`), checked on
+  // 2026-10-14 in a browser. Do not use https://search.library.ubc.ca/?q=, which does
+  // not run a search.
+  librarySearchUrl: "https://ubc.summon.serialssolutions.com/search?s.q=",
+
   // Target of the footer "Download" link.
   downloadUrl: "https://github.com/ibrahimomeer/Sourcly/releases/latest",
 };

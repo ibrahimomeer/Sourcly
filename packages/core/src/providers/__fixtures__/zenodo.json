@@ -1,0 +1,1372 @@
+{
+  "hits": {
+    "hits": [
+      {
+        "created": "2024-01-02T19:21:08.126211+00:00",
+        "modified": "2024-01-02T19:21:08.407323+00:00",
+        "id": 10009232,
+        "conceptrecid": "10009231",
+        "doi": "10.5281/zenodo.10009232",
+        "conceptdoi": "10.5281/zenodo.10009231",
+        "doi_url": "https://doi.org/10.5281/zenodo.10009232",
+        "metadata": {
+          "title": "Temporal cluster-based organisation of sleep spindles underlies motor memory consolidation",
+          "doi": "10.5281/zenodo.10009232",
+          "publication_date": "2024-01-02",
+          "description": "<p><span>Sleep benefits motor memory consolidation, which is mediated by sleep spindle activity and associated memory reactivations during non-rapid eye movement (NREM) sleep. However, the particular role of NREM2 and NREM3 sleep spindles and the mechanisms triggering this memory consolidation process remai<span>n unclear. Here, sim</span>ultaneous electroencephalographic and functional magnetic resonance imaging (EEG-fMRI) recordings were collected during night-time sleep following the learning of a motor sequence task. Adopting a time-based clustering approach, we provide evidence that spindles iteratively occur within clustered and temporally organised patterns during both NREM2 and NREM3 sleep. However, the clustering of spindles in trains is related to motor memory consolidation during NREM2 sleep only</span><span>. Altogether</span><span>,</span><span> our findings suggest t</span><span>hat</span><span> spindles' clustering and </span><span>rhythmic occurrence </span><span>during NREM2 sleep may serve as an intrinsic rhythmic sleep mechanism for the timed reactivation and subsequent consolidation of motor memories, through synchronised oscillatory activity within a subcortical-cortical network involved during learning</span>.</p>",
+          "access_right": "open",
+          "creators": [
+            {
+              "name": "Boutin, Arnaud",
+              "affiliation": "University of Paris-Saclay",
+              "orcid": "0000-0002-5696-2626"
+            },
+            {
+              "name": "Gabitov, Ella",
+              "affiliation": "Montreal Neurological Institute and Hospital"
+            },
+            {
+              "name": "Pinsard, Basile",
+              "affiliation": "CRIUGM*"
+            },
+            {
+              "name": "Boré, Arnaud",
+              "affiliation": "Institut Universitaire De Gériatrie De Montréal"
+            },
+            {
+              "name": "Carrier, Julie",
+              "affiliation": "Hôpital du Sacré-Cœur de Montréal"
+            },
+            {
+              "name": "Doyon, Julien",
+              "affiliation": "Montreal Neurological Institute and Hospital"
+            }
+          ],
+          "keywords": [
+            "sleep spindle",
+            "Memory consolidation",
+            "motor sequence learning",
+            "striatum",
+            "Hippocampus",
+            "EEG-fMRI"
+          ],
+          "related_identifiers": [
+            {
+              "identifier": "10.1101/2022.11.29.518200",
+              "relation": "isCitedBy",
+              "scheme": "doi"
+            },
+            {
+              "identifier": "10.5061/dryad.nk98sf7xx",
+              "relation": "isSourceOf",
+              "scheme": "doi"
+            }
+          ],
+          "resource_type": {
+            "title": "Software",
+            "type": "software"
+          },
+          "license": {
+            "id": "mit-license"
+          },
+          "communities": [
+            {
+              "id": "dryad"
+            }
+          ],
+          "relations": {
+            "version": [
+              {
+                "index": 0,
+                "is_last": true,
+                "parent": {
+                  "pid_type": "recid",
+                  "pid_value": "10009231"
+                }
+              }
+            ]
+          },
+          "notes": "<p>Funding provided by: Canadian Institutes of Health Research<br>Crossref Funder Registry ID: https://ror.org/01gavpb45<br>Award Number: PJT 173533</p>",
+          "method": "<p><span>Sleep EEG data were processed using the MATLAB R2019b software from The MathWorks (Natick, MA) and the open-source Brainstorm and EEGLAB softwares. The codes for the detection and clustering of sleep spindles are available at the following GitHub repositories: </span><span><a href=\"https://github.com/labdoyon/spindlesDetection\"><span>https://github.com/labdoyon/spindlesDetection</span></a></span><span> and </span><span><a href=\"https://github.com/arnaudboutin/Spindle-clustering\"><span>https://github.com/arnaudboutin/Spindle-clustering</span></a></span></p>"
+        },
+        "title": "Temporal cluster-based organisation of sleep spindles underlies motor memory consolidation",
+        "links": {
+          "self": "https://zenodo.org/api/records/10009232",
+          "self_html": "https://zenodo.org/records/10009232",
+          "preview_html": "https://zenodo.org/records/10009232?preview=1",
+          "doi": "https://doi.org/10.5281/zenodo.10009232",
+          "self_doi": "https://doi.org/10.5281/zenodo.10009232",
+          "self_doi_html": "https://zenodo.org/doi/10.5281/zenodo.10009232",
+          "reserve_doi": "https://zenodo.org/api/records/10009232/draft/pids/doi",
+          "parent": "https://zenodo.org/api/records/10009231",
+          "parent_html": "https://zenodo.org/records/10009231",
+          "parent_doi": "https://doi.org/10.5281/zenodo.10009231",
+          "parent_doi_html": "https://zenodo.org/doi/10.5281/zenodo.10009231",
+          "self_iiif_manifest": "https://zenodo.org/api/iiif/record:10009232/manifest",
+          "self_iiif_sequence": "https://zenodo.org/api/iiif/record:10009232/sequence/default",
+          "files": "https://zenodo.org/api/records/10009232/files",
+          "media_files": "https://zenodo.org/api/records/10009232/media-files",
+          "latest": "https://zenodo.org/api/records/10009232/versions/latest",
+          "latest_html": "https://zenodo.org/records/10009232/latest",
+          "versions": "https://zenodo.org/api/records/10009232/versions",
+          "draft": "https://zenodo.org/api/records/10009232/draft",
+          "access_links": "https://zenodo.org/api/records/10009232/access/links",
+          "access_grants": "https://zenodo.org/api/records/10009232/access/grants",
+          "access_users": "https://zenodo.org/api/records/10009232/access/users",
+          "access_request": "https://zenodo.org/api/records/10009232/access/request",
+          "access": "https://zenodo.org/api/records/10009232/access",
+          "communities": "https://zenodo.org/api/records/10009232/communities",
+          "communities-suggestions": "https://zenodo.org/api/records/10009232/communities-suggestions",
+          "request_deletion": "https://zenodo.org/api/records/10009232/request-deletion",
+          "file_modification": "https://zenodo.org/api/records/10009232/file-modification",
+          "quota_increase": "https://zenodo.org/api/records/10009232/quota-increase",
+          "requests": "https://zenodo.org/api/records/10009232/requests"
+        },
+        "updated": "2024-01-02T19:21:08.407323+00:00",
+        "recid": "10009232",
+        "revision": 5,
+        "files": [
+          {
+            "id": "e58a60db-4a8d-4155-abd7-fdd5f940ab8c",
+            "key": "Boutin_SpindlesDetection.zip",
+            "size": 36955,
+            "checksum": "md5:e1b1a1aca1316fc12755ac788e5e1a9d",
+            "links": {
+              "self": "https://zenodo.org/api/records/10009232/files/Boutin_SpindlesDetection.zip/content"
+            }
+          },
+          {
+            "id": "b66481ba-4eb7-4302-8dea-2dd7a1b9190e",
+            "key": "Boutin_SpindleClustering.zip",
+            "size": 20467,
+            "checksum": "md5:f33e00ec7beb6a25933802ae0bde2756",
+            "links": {
+              "self": "https://zenodo.org/api/records/10009232/files/Boutin_SpindleClustering.zip/content"
+            }
+          }
+        ],
+        "swh": null,
+        "owners": [
+          {
+            "id": "90070"
+          }
+        ],
+        "status": "published",
+        "stats": {
+          "downloads": 44,
+          "unique_downloads": 42,
+          "views": 161,
+          "unique_views": 159,
+          "version_downloads": 44,
+          "version_unique_downloads": 42,
+          "version_unique_views": 159,
+          "version_views": 161
+        },
+        "state": "done",
+        "submitted": true
+      },
+      {
+        "created": "2024-01-02T19:21:41.311456+00:00",
+        "modified": "2024-01-02T19:21:42.235397+00:00",
+        "id": 10452356,
+        "conceptrecid": "10452355",
+        "doi": "10.5061/dryad.nk98sf7xx",
+        "doi_url": "https://doi.org/10.5061/dryad.nk98sf7xx",
+        "metadata": {
+          "title": "Temporal cluster-based organisation of sleep spindles underlies motor memory consolidation",
+          "doi": "10.5061/dryad.nk98sf7xx",
+          "publication_date": "2024-01-02",
+          "description": "<p><span>Sleep benefits motor memory consolidation, which is mediated by sleep spindle activity and associated memory reactivations during non-rapid eye movement (NREM) sleep. However, the particular role of NREM2 and NREM3 sleep spindles and the mechanisms triggering this memory consolidation process remai<span>n unclear. Here, sim</span>ultaneous electroencephalographic and functional magnetic resonance imaging (EEG-fMRI) recordings were collected during night-time sleep following the learning of a motor sequence task. Adopting a time-based clustering approach, we provide evidence that spindles iteratively occur within clustered and temporally organised patterns during both NREM2 and NREM3 sleep. However, the clustering of spindles in trains is related to motor memory consolidation during NREM2 sleep only</span><span>. Altogether</span><span>,</span><span> our findings suggest t</span><span>hat</span><span> spindles' clustering and </span><span>rhythmic occurrence </span><span>during NREM2 sleep may serve as an intrinsic rhythmic sleep mechanism for the timed reactivation and subsequent consolidation of motor memories, through synchronised oscillatory activity within a subcortical-cortical network involved during learning</span>.</p>",
+          "access_right": "open",
+          "creators": [
+            {
+              "name": "Boutin, Arnaud",
+              "affiliation": "University of Paris-Saclay",
+              "orcid": "0000-0002-5696-2626"
+            },
+            {
+              "name": "Gabitov, Ella",
+              "affiliation": "Montreal Neurological Institute and Hospital"
+            },
+            {
+              "name": "Pinsard, Basile",
+              "affiliation": "CRIUGM*"
+            },
+            {
+              "name": "Boré, Arnaud",
+              "affiliation": "Institut Universitaire De Gériatrie De Montréal"
+            },
+            {
+              "name": "Carrier, Julie",
+              "affiliation": "Hôpital du Sacré-Cœur de Montréal"
+            },
+            {
+              "name": "Doyon, Julien",
+              "affiliation": "Montreal Neurological Institute and Hospital"
+            }
+          ],
+          "keywords": [
+            "sleep spindle",
+            "Memory consolidation",
+            "motor sequence learning",
+            "striatum",
+            "Hippocampus",
+            "EEG-fMRI"
+          ],
+          "related_identifiers": [
+            {
+              "identifier": "10.1101/2022.11.29.518200",
+              "relation": "isCitedBy",
+              "scheme": "doi"
+            },
+            {
+              "identifier": "10.5281/zenodo.10009232",
+              "relation": "isDerivedFrom",
+              "scheme": "doi"
+            }
+          ],
+          "resource_type": {
+            "title": "Dataset",
+            "type": "dataset"
+          },
+          "license": {
+            "id": "cc-zero"
+          },
+          "communities": [
+            {
+              "id": "dryad"
+            }
+          ],
+          "relations": {
+            "version": [
+              {
+                "index": 0,
+                "is_last": true,
+                "parent": {
+                  "pid_type": "recid",
+                  "pid_value": "10452355"
+                }
+              }
+            ]
+          },
+          "notes": "<p>Funding provided by: Canadian Institutes of Health Research<br>Crossref Funder Registry ID: https://ror.org/01gavpb45<br>Award Number: PJT 173533</p>",
+          "method": "<p><span>Sleep EEG data were processed using the MATLAB R2019b software from The MathWorks (Natick, MA) and the open-source Brainstorm and EEGLAB softwares. The codes for the detection and clustering of sleep spindles are available at the following GitHub repositories: </span><span><a href=\"https://github.com/labdoyon/spindlesDetection\"><span>https://github.com/labdoyon/spindlesDetection</span></a></span><span> and </span><span><a href=\"https://github.com/arnaudboutin/Spindle-clustering\"><span>https://github.com/arnaudboutin/Spindle-clustering</span></a></span></p>"
+        },
+        "title": "Temporal cluster-based organisation of sleep spindles underlies motor memory consolidation",
+        "links": {
+          "self": "https://zenodo.org/api/records/10452356",
+          "self_html": "https://zenodo.org/records/10452356",
+          "preview_html": "https://zenodo.org/records/10452356?preview=1",
+          "doi": "https://doi.org/10.5061/dryad.nk98sf7xx",
+          "self_doi": "https://doi.org/10.5061/dryad.nk98sf7xx",
+          "self_doi_html": "https://zenodo.org/doi/10.5061/dryad.nk98sf7xx",
+          "reserve_doi": "https://zenodo.org/api/records/10452356/draft/pids/doi",
+          "parent": "https://zenodo.org/api/records/10452355",
+          "parent_html": "https://zenodo.org/records/10452355",
+          "self_iiif_manifest": "https://zenodo.org/api/iiif/record:10452356/manifest",
+          "self_iiif_sequence": "https://zenodo.org/api/iiif/record:10452356/sequence/default",
+          "files": "https://zenodo.org/api/records/10452356/files",
+          "media_files": "https://zenodo.org/api/records/10452356/media-files",
+          "latest": "https://zenodo.org/api/records/10452356/versions/latest",
+          "latest_html": "https://zenodo.org/records/10452356/latest",
+          "versions": "https://zenodo.org/api/records/10452356/versions",
+          "draft": "https://zenodo.org/api/records/10452356/draft",
+          "access_links": "https://zenodo.org/api/records/10452356/access/links",
+          "access_grants": "https://zenodo.org/api/records/10452356/access/grants",
+          "access_users": "https://zenodo.org/api/records/10452356/access/users",
+          "access_request": "https://zenodo.org/api/records/10452356/access/request",
+          "access": "https://zenodo.org/api/records/10452356/access",
+          "communities": "https://zenodo.org/api/records/10452356/communities",
+          "communities-suggestions": "https://zenodo.org/api/records/10452356/communities-suggestions",
+          "request_deletion": "https://zenodo.org/api/records/10452356/request-deletion",
+          "file_modification": "https://zenodo.org/api/records/10452356/file-modification",
+          "quota_increase": "https://zenodo.org/api/records/10452356/quota-increase",
+          "requests": "https://zenodo.org/api/records/10452356/requests"
+        },
+        "updated": "2024-01-02T19:21:42.235397+00:00",
+        "recid": "10452356",
+        "revision": 6,
+        "files": [
+          {
+            "id": "5a69ad2c-1ade-4c3d-876b-a30a2cea4d88",
+            "key": "Dataset_SpindleClustering.xlsx",
+            "size": 18267,
+            "checksum": "md5:81c4f70e9df1016c26a742230ff1b2a8",
+            "links": {
+              "self": "https://zenodo.org/api/records/10452356/files/Dataset_SpindleClustering.xlsx/content"
+            }
+          },
+          {
+            "id": "518d891a-ba96-4b21-90b9-7a6f5d644121",
+            "key": "README.md",
+            "size": 3003,
+            "checksum": "md5:6a5b91c8a99434533eddc0351eb7c148",
+            "links": {
+              "self": "https://zenodo.org/api/records/10452356/files/README.md/content"
+            }
+          }
+        ],
+        "swh": null,
+        "owners": [
+          {
+            "id": "90070"
+          }
+        ],
+        "status": "published",
+        "stats": {
+          "downloads": 71,
+          "unique_downloads": 69,
+          "views": 174,
+          "unique_views": 171,
+          "version_downloads": 71,
+          "version_unique_downloads": 69,
+          "version_unique_views": 171,
+          "version_views": 174
+        },
+        "state": "done",
+        "submitted": true
+      },
+      {
+        "created": "2022-05-23T01:42:27.974392+00:00",
+        "modified": "2022-05-23T01:50:20.730953+00:00",
+        "id": 6571022,
+        "conceptrecid": "6571021",
+        "doi": "10.5281/zenodo.6571022",
+        "conceptdoi": "10.5281/zenodo.6571021",
+        "doi_url": "https://doi.org/10.5281/zenodo.6571022",
+        "metadata": {
+          "title": "Odor cueing during sleep improves consolidation of a history lesson in a school setting",
+          "doi": "10.5281/zenodo.6571022",
+          "publication_date": "2022-05-23",
+          "description": "<p>Sleep is a key factor in memory consolidation. During sleep, information is reactivated, transferred, and redistributed to neocortical areas, thus favoring memory consolidation and integration. Although these reactivations occur spontaneously, they can also be induced using external cues, such as sound or odor cues, linked to the acquired information. Hence, targeted memory reactivation during sleep represents an advantageous tool for improving memory consolidation in real-life settings. In this study, our goal was to improve the consolidation of complex information such as that of a history lesson, using a school study session in the presence of an odor, and a reactivation round while sleeping at home on the same night of the acquisition, without using additional study sessions. We found that complex information can be associated with an odor in the classroom and that one session of reactivation during the first night of sleep in the students&rsquo; houses improves its consolidation. These results bring new evidence for the implementation of reactivation during sleep in real-life settings.</p>",
+          "access_right": "open",
+          "creators": [
+            {
+              "name": "Vanessa Vidal",
+              "affiliation": "Laboratorio de Sueño y Memoria, Departamento de Ciencias de la Vida, Instituto Tecnológico (ITBA)."
+            },
+            {
+              "name": "Alejo R. Barbuzza",
+              "affiliation": "Instituto de Biología Celular y Neurociencias \"Prof. E. De Robertis\" (IBCN), Facultad de Medicina, Universidad de Buenos Aires, Buenos Aires, Argentina."
+            },
+            {
+              "name": "Leonela M. Tassone",
+              "affiliation": "Laboratorio de Sueño y Memoria, Departamento de Ciencias de la Vida, Instituto Tecnológico (ITBA)"
+            },
+            {
+              "name": "Luis I. Brusco",
+              "affiliation": "Centro de Neuropsiquiatría y Neurología de la Conducta-CENECON, Facultad de Ciencias Médicas, Universidad de Buenos Aires, Buenos Aires, Argentina."
+            },
+            {
+              "name": "Fabricio M. Ballarini",
+              "affiliation": "Instituto de Biología Celular y Neurociencias \"Prof. E. De Robertis\" (IBCN), Facultad de Medicina, Universidad de Buenos Aires, Buenos Aires, Argentina."
+            },
+            {
+              "name": "Cecilia Forcato",
+              "affiliation": "Laboratorio de Sueño y Memoria, Departamento de Ciencias de la Vida, Instituto Tecnológico (ITBA)."
+            }
+          ],
+          "resource_type": {
+            "title": "Dataset",
+            "type": "dataset"
+          },
+          "license": {
+            "id": "cc-by-4.0"
+          },
+          "relations": {
+            "version": [
+              {
+                "index": 0,
+                "is_last": true,
+                "parent": {
+                  "pid_type": "recid",
+                  "pid_value": "6571021"
+                }
+              }
+            ]
+          }
+        },
+        "title": "Odor cueing during sleep improves consolidation of a history lesson in a school setting",
+        "links": {
+          "self": "https://zenodo.org/api/records/6571022",
+          "self_html": "https://zenodo.org/records/6571022",
+          "preview_html": "https://zenodo.org/records/6571022?preview=1",
+          "doi": "https://doi.org/10.5281/zenodo.6571022",
+          "self_doi": "https://doi.org/10.5281/zenodo.6571022",
+          "self_doi_html": "https://zenodo.org/doi/10.5281/zenodo.6571022",
+          "reserve_doi": "https://zenodo.org/api/records/6571022/draft/pids/doi",
+          "parent": "https://zenodo.org/api/records/6571021",
+          "parent_html": "https://zenodo.org/records/6571021",
+          "parent_doi": "https://doi.org/10.5281/zenodo.6571021",
+          "parent_doi_html": "https://zenodo.org/doi/10.5281/zenodo.6571021",
+          "self_iiif_manifest": "https://zenodo.org/api/iiif/record:6571022/manifest",
+          "self_iiif_sequence": "https://zenodo.org/api/iiif/record:6571022/sequence/default",
+          "files": "https://zenodo.org/api/records/6571022/files",
+          "media_files": "https://zenodo.org/api/records/6571022/media-files",
+          "latest": "https://zenodo.org/api/records/6571022/versions/latest",
+          "latest_html": "https://zenodo.org/records/6571022/latest",
+          "versions": "https://zenodo.org/api/records/6571022/versions",
+          "draft": "https://zenodo.org/api/records/6571022/draft",
+          "access_links": "https://zenodo.org/api/records/6571022/access/links",
+          "access_grants": "https://zenodo.org/api/records/6571022/access/grants",
+          "access_users": "https://zenodo.org/api/records/6571022/access/users",
+          "access_request": "https://zenodo.org/api/records/6571022/access/request",
+          "access": "https://zenodo.org/api/records/6571022/access",
+          "communities": "https://zenodo.org/api/records/6571022/communities",
+          "communities-suggestions": "https://zenodo.org/api/records/6571022/communities-suggestions",
+          "request_deletion": "https://zenodo.org/api/records/6571022/request-deletion",
+          "file_modification": "https://zenodo.org/api/records/6571022/file-modification",
+          "quota_increase": "https://zenodo.org/api/records/6571022/quota-increase",
+          "requests": "https://zenodo.org/api/records/6571022/requests"
+        },
+        "updated": "2022-05-23T01:50:20.730953+00:00",
+        "recid": "6571022",
+        "revision": 2,
+        "files": [
+          {
+            "id": "45afec88-a3da-4efb-bd0a-61a469095783",
+            "key": "Vidal data 2022.xlsx",
+            "size": 11102,
+            "checksum": "md5:a53d665e4877a9bd5c7c16dc67049121",
+            "links": {
+              "self": "https://zenodo.org/api/records/6571022/files/Vidal%20data%202022.xlsx/content"
+            }
+          }
+        ],
+        "swh": null,
+        "owners": [
+          {
+            "id": "353444"
+          }
+        ],
+        "status": "published",
+        "stats": {
+          "downloads": 127,
+          "unique_downloads": 124,
+          "views": 555,
+          "unique_views": 527,
+          "version_downloads": 124,
+          "version_unique_downloads": 121,
+          "version_unique_views": 524,
+          "version_views": 551
+        },
+        "state": "done",
+        "submitted": true
+      },
+      {
+        "created": "2023-08-17T11:17:16.983127+00:00",
+        "modified": "2024-07-11T12:29:46.205460+00:00",
+        "id": 8255931,
+        "conceptrecid": "8255930",
+        "doi": "10.5281/zenodo.8255931",
+        "conceptdoi": "10.5281/zenodo.8255930",
+        "doi_url": "https://doi.org/10.5281/zenodo.8255931",
+        "metadata": {
+          "title": "From Dreams to Dementia: Shedding Light on the Sleep-Lewy Body Dementia Connection",
+          "doi": "10.5281/zenodo.8255931",
+          "publication_date": "2023-08-17",
+          "description": "<p>Sleep constitutes a significant portion of human<br>\nlife, with individuals spending approximately one-third of<br>\ntheir existence either sleeping or attempting to do so.1<br>\nSleep is critical not only for its comforting effects but also<br>\nfor the maintenance of normal cognitive functioning and<br>\nhuman survival. The phenomenon of sleep is complex, with<br>\nthe body unresponsive to cognitive impulses from external<br>\nstimuli whilst the brain continues to function within<br>\nvarious learning and memory-related regions. The time<br>\nspent sleeping is vital for retaining memory, as it helps to<br>\nstabilize and improve associations between synapses and<br>\nvarious areas of the brain. Sleep is divided into two distinct</p>\n\n<p>stages, namely rapid-eye movement (REM) sleep and non-<br>\nrapid-eye movement (NREM) sleep. Slow-wave sleep, the</p>\n\n<p>fourth stage of NREM sleep, is the deepest stage of sleep<br>\nand promotes muscle and mental health restoration, as<br>\nwell as memory consolidation. 2<br>\nAcquisition, consolidation, and review are the three<br>\nprimary phases of learning and memory. Acquisition<br>\nrefers to the influx of new information into the brain,<br>\nconsolidation to the preservation of memory, and review to<br>\nthe ability to retrieve stored information. Consolidation of<br>\nmemories can only occur during sleep, according to<br>\nnumerous studies, and it does so through the neural<br>\nnetworks that control memory. Additionally, different<br>\nbrainwave patterns are associated with the formation of<br>\ndifferent types of memories.</p>",
+          "access_right": "open",
+          "creators": [
+            {
+              "name": "Dr. Niladri Dutta",
+              "affiliation": null
+            }
+          ],
+          "keywords": [
+            "Sleep-Lewy Body Dementia Connection, Disrupted Sleep, Lewy Body Dementia, Neurodegenerative Syndromes."
+          ],
+          "resource_type": {
+            "title": "Journal article",
+            "type": "publication",
+            "subtype": "article"
+          },
+          "license": {
+            "id": "cc-by-4.0"
+          },
+          "relations": {
+            "version": [
+              {
+                "index": 0,
+                "is_last": true,
+                "parent": {
+                  "pid_type": "recid",
+                  "pid_value": "8255930"
+                }
+              }
+            ]
+          }
+        },
+        "title": "From Dreams to Dementia: Shedding Light on the Sleep-Lewy Body Dementia Connection",
+        "links": {
+          "self": "https://zenodo.org/api/records/8255931",
+          "self_html": "https://zenodo.org/records/8255931",
+          "preview_html": "https://zenodo.org/records/8255931?preview=1",
+          "doi": "https://doi.org/10.5281/zenodo.8255931",
+          "self_doi": "https://doi.org/10.5281/zenodo.8255931",
+          "self_doi_html": "https://zenodo.org/doi/10.5281/zenodo.8255931",
+          "reserve_doi": "https://zenodo.org/api/records/8255931/draft/pids/doi",
+          "parent": "https://zenodo.org/api/records/8255930",
+          "parent_html": "https://zenodo.org/records/8255930",
+          "parent_doi": "https://doi.org/10.5281/zenodo.8255930",
+          "parent_doi_html": "https://zenodo.org/doi/10.5281/zenodo.8255930",
+          "self_iiif_manifest": "https://zenodo.org/api/iiif/record:8255931/manifest",
+          "self_iiif_sequence": "https://zenodo.org/api/iiif/record:8255931/sequence/default",
+          "files": "https://zenodo.org/api/records/8255931/files",
+          "media_files": "https://zenodo.org/api/records/8255931/media-files",
+          "thumbnails": {
+            "10": "https://zenodo.org/api/iiif/record:8255931:IJISRT23AUG424.pdf/full/%5E10,/0/default.jpg",
+            "50": "https://zenodo.org/api/iiif/record:8255931:IJISRT23AUG424.pdf/full/%5E50,/0/default.jpg",
+            "100": "https://zenodo.org/api/iiif/record:8255931:IJISRT23AUG424.pdf/full/%5E100,/0/default.jpg",
+            "250": "https://zenodo.org/api/iiif/record:8255931:IJISRT23AUG424.pdf/full/%5E250,/0/default.jpg",
+            "750": "https://zenodo.org/api/iiif/record:8255931:IJISRT23AUG424.pdf/full/%5E750,/0/default.jpg",
+            "1200": "https://zenodo.org/api/iiif/record:8255931:IJISRT23AUG424.pdf/full/%5E1200,/0/default.jpg"
+          },
+          "latest": "https://zenodo.org/api/records/8255931/versions/latest",
+          "latest_html": "https://zenodo.org/records/8255931/latest",
+          "versions": "https://zenodo.org/api/records/8255931/versions",
+          "draft": "https://zenodo.org/api/records/8255931/draft",
+          "access_links": "https://zenodo.org/api/records/8255931/access/links",
+          "access_grants": "https://zenodo.org/api/records/8255931/access/grants",
+          "access_users": "https://zenodo.org/api/records/8255931/access/users",
+          "access_request": "https://zenodo.org/api/records/8255931/access/request",
+          "access": "https://zenodo.org/api/records/8255931/access",
+          "communities": "https://zenodo.org/api/records/8255931/communities",
+          "communities-suggestions": "https://zenodo.org/api/records/8255931/communities-suggestions",
+          "request_deletion": "https://zenodo.org/api/records/8255931/request-deletion",
+          "file_modification": "https://zenodo.org/api/records/8255931/file-modification",
+          "quota_increase": "https://zenodo.org/api/records/8255931/quota-increase",
+          "requests": "https://zenodo.org/api/records/8255931/requests"
+        },
+        "updated": "2024-07-11T12:29:46.205460+00:00",
+        "recid": "8255931",
+        "revision": 5,
+        "files": [
+          {
+            "id": "ab2c396a-c3d0-453f-86fe-0836cd480887",
+            "key": "IJISRT23AUG424.pdf",
+            "size": 285059,
+            "checksum": "md5:8128181f3b907b0892cbf597654da070",
+            "links": {
+              "self": "https://zenodo.org/api/records/8255931/files/IJISRT23AUG424.pdf/content"
+            }
+          }
+        ],
+        "swh": null,
+        "owners": [
+          {
+            "id": "355829"
+          }
+        ],
+        "status": "published",
+        "stats": {
+          "downloads": 95,
+          "unique_downloads": 94,
+          "views": 163,
+          "unique_views": 163,
+          "version_downloads": 95,
+          "version_unique_downloads": 94,
+          "version_unique_views": 163,
+          "version_views": 163
+        },
+        "state": "done",
+        "submitted": true
+      },
+      {
+        "created": "2025-03-14T09:31:15.897906+00:00",
+        "modified": "2025-03-14T09:37:05.204128+00:00",
+        "id": 15023885,
+        "conceptrecid": "15023884",
+        "doi": "10.5281/zenodo.15023885",
+        "conceptdoi": "10.5281/zenodo.15023884",
+        "doi_url": "https://doi.org/10.5281/zenodo.15023885",
+        "metadata": {
+          "title": "Konsolidace paměti ve spánku",
+          "doi": "10.5281/zenodo.15023885",
+          "publication_date": "2024-11-22",
+          "description": "<p>Člověk tráví ve spánku asi 30% života. Není to jenom čas bez aktivity, naopak, spánek plní mnoho životně důležitých funkcí. Je potřebný pro správnou funkci imunitního systému, pro metabolismus i pro kognitivní procesy. Mozek ve spánku pracuje, pracuje ovšem jinak než během bdění. Intenzivní výzkum ukazuje, že spánek pomáhá při správné funkci paměti.</p><p>Humans spend about 30% of their lives asleep. It's not just time without activity, on the contrary, sleep fulfills many vital important functions. It is necessary for the proper functioning of the immune system, for metabolism and for cognitive processes. The brain works in sleep, but it works differently than during wakefulness. Intensive research shows that sleep helps memory function.</p>",
+          "access_right": "open",
+          "creators": [
+            {
+              "name": "Kelemen, Eduard",
+              "affiliation": "National Institute of Mental Health: Klecany, CZ",
+              "orcid": "0000-0002-2101-6314"
+            },
+            {
+              "name": "Kopřivová, Jana",
+              "affiliation": "National Institute of Mental Health: Klecany, CZ",
+              "orcid": "0000-0002-3626-5372"
+            }
+          ],
+          "keywords": [
+            "sleeping",
+            "consolidation memory",
+            "memory"
+          ],
+          "related_identifiers": [
+            {
+              "identifier": "978-80-7492-283-1",
+              "relation": "isNewVersionOf",
+              "resource_type": "publication-book",
+              "scheme": "isbn"
+            }
+          ],
+          "language": "ces",
+          "resource_type": {
+            "title": "Book chapter",
+            "type": "publication",
+            "subtype": "section"
+          },
+          "imprint": {
+            "place": "Prague",
+            "isbn": "978-80-7492-738-6"
+          },
+          "license": {
+            "id": "cc-by-4.0"
+          },
+          "grants": [
+            {
+              "code": "CZ.02.01.01/00/22_008/0004643",
+              "internal_id": "037n8p820::CZ.02.01.01/00/22_008/0004643",
+              "funder": {
+                "name": "Ministry of Education Youth and Sports"
+              },
+              "title": "Brain Dynamics"
+            }
+          ],
+          "communities": [
+            {
+              "id": "brady"
+            }
+          ],
+          "relations": {
+            "version": [
+              {
+                "index": 0,
+                "is_last": true,
+                "parent": {
+                  "pid_type": "recid",
+                  "pid_value": "15023884"
+                }
+              }
+            ]
+          }
+        },
+        "title": "Konsolidace paměti ve spánku",
+        "links": {
+          "self": "https://zenodo.org/api/records/15023885",
+          "self_html": "https://zenodo.org/records/15023885",
+          "preview_html": "https://zenodo.org/records/15023885?preview=1",
+          "doi": "https://doi.org/10.5281/zenodo.15023885",
+          "self_doi": "https://doi.org/10.5281/zenodo.15023885",
+          "self_doi_html": "https://zenodo.org/doi/10.5281/zenodo.15023885",
+          "reserve_doi": "https://zenodo.org/api/records/15023885/draft/pids/doi",
+          "parent": "https://zenodo.org/api/records/15023884",
+          "parent_html": "https://zenodo.org/records/15023884",
+          "parent_doi": "https://doi.org/10.5281/zenodo.15023884",
+          "parent_doi_html": "https://zenodo.org/doi/10.5281/zenodo.15023884",
+          "self_iiif_manifest": "https://zenodo.org/api/iiif/record:15023885/manifest",
+          "self_iiif_sequence": "https://zenodo.org/api/iiif/record:15023885/sequence/default",
+          "files": "https://zenodo.org/api/records/15023885/files",
+          "media_files": "https://zenodo.org/api/records/15023885/media-files",
+          "thumbnails": {
+            "10": "https://zenodo.org/api/iiif/record:15023885:4_Konsolidace_pam%C4%9Bti_ve_sp%C3%A1nku.pdf/full/%5E10,/0/default.jpg",
+            "50": "https://zenodo.org/api/iiif/record:15023885:4_Konsolidace_pam%C4%9Bti_ve_sp%C3%A1nku.pdf/full/%5E50,/0/default.jpg",
+            "100": "https://zenodo.org/api/iiif/record:15023885:4_Konsolidace_pam%C4%9Bti_ve_sp%C3%A1nku.pdf/full/%5E100,/0/default.jpg",
+            "250": "https://zenodo.org/api/iiif/record:15023885:4_Konsolidace_pam%C4%9Bti_ve_sp%C3%A1nku.pdf/full/%5E250,/0/default.jpg",
+            "750": "https://zenodo.org/api/iiif/record:15023885:4_Konsolidace_pam%C4%9Bti_ve_sp%C3%A1nku.pdf/full/%5E750,/0/default.jpg",
+            "1200": "https://zenodo.org/api/iiif/record:15023885:4_Konsolidace_pam%C4%9Bti_ve_sp%C3%A1nku.pdf/full/%5E1200,/0/default.jpg"
+          },
+          "latest": "https://zenodo.org/api/records/15023885/versions/latest",
+          "latest_html": "https://zenodo.org/records/15023885/latest",
+          "versions": "https://zenodo.org/api/records/15023885/versions",
+          "draft": "https://zenodo.org/api/records/15023885/draft",
+          "access_links": "https://zenodo.org/api/records/15023885/access/links",
+          "access_grants": "https://zenodo.org/api/records/15023885/access/grants",
+          "access_users": "https://zenodo.org/api/records/15023885/access/users",
+          "access_request": "https://zenodo.org/api/records/15023885/access/request",
+          "access": "https://zenodo.org/api/records/15023885/access",
+          "communities": "https://zenodo.org/api/records/15023885/communities",
+          "communities-suggestions": "https://zenodo.org/api/records/15023885/communities-suggestions",
+          "request_deletion": "https://zenodo.org/api/records/15023885/request-deletion",
+          "file_modification": "https://zenodo.org/api/records/15023885/file-modification",
+          "quota_increase": "https://zenodo.org/api/records/15023885/quota-increase",
+          "requests": "https://zenodo.org/api/records/15023885/requests"
+        },
+        "updated": "2025-03-14T09:37:05.204128+00:00",
+        "recid": "15023885",
+        "revision": 7,
+        "files": [
+          {
+            "id": "8be28522-13db-4792-8871-b14776b9e80c",
+            "key": "4_Konsolidace_paměti_ve_spánku.pdf",
+            "size": 202780,
+            "checksum": "md5:1613baed9285d642063822507b10d398",
+            "links": {
+              "self": "https://zenodo.org/api/records/15023885/files/4_Konsolidace_pam%C4%9Bti_ve_sp%C3%A1nku.pdf/content"
+            }
+          }
+        ],
+        "swh": null,
+        "owners": [
+          {
+            "id": "1196315"
+          }
+        ],
+        "status": "published",
+        "stats": {
+          "downloads": 195,
+          "unique_downloads": 179,
+          "views": 188,
+          "unique_views": 179,
+          "version_downloads": 195,
+          "version_unique_downloads": 179,
+          "version_unique_views": 179,
+          "version_views": 188
+        },
+        "state": "done",
+        "submitted": true
+      },
+      {
+        "created": "2017-09-19T15:53:12.785301+00:00",
+        "modified": "2024-08-03T07:41:52.027212+00:00",
+        "id": 896686,
+        "conceptrecid": "896685",
+        "doi": "10.1038/nature04286",
+        "doi_url": "https://doi.org/10.1038/nature04286",
+        "metadata": {
+          "title": "Stickgold R. Sleep-dependent memory consolidation. Nature 437: 1272-1278",
+          "doi": "10.1038/nature04286",
+          "publication_date": "2005-11-01",
+          "description": "The concept of 'sleeping on a problem' is familiar to most of us. But with myriad stages of sleep, forms of memory and processes of memory encoding and consolidation, sorting out how sleep contributes to memory has been anything but straightforward. Nevertheless, converging evidence, from the molecular to the phenomenological, leaves little doubt that offline memory reprocessing during sleep is an important component of how our memories are formed and ultimately shaped.",
+          "access_right": "open",
+          "creators": [
+            {
+              "name": "Stickgold, Robert",
+              "affiliation": null
+            }
+          ],
+          "resource_type": {
+            "title": "Journal article",
+            "type": "publication",
+            "subtype": "article"
+          },
+          "license": {
+            "id": "other-open"
+          },
+          "relations": {
+            "version": [
+              {
+                "index": 0,
+                "is_last": true,
+                "parent": {
+                  "pid_type": "recid",
+                  "pid_value": "896685"
+                }
+              }
+            ]
+          }
+        },
+        "title": "Stickgold R. Sleep-dependent memory consolidation. Nature 437: 1272-1278",
+        "links": {
+          "self": "https://zenodo.org/api/records/896686",
+          "self_html": "https://zenodo.org/records/896686",
+          "preview_html": "https://zenodo.org/records/896686?preview=1",
+          "doi": "https://doi.org/10.1038/nature04286",
+          "self_doi": "https://doi.org/10.1038/nature04286",
+          "self_doi_html": "https://zenodo.org/doi/10.1038/nature04286",
+          "reserve_doi": "https://zenodo.org/api/records/896686/draft/pids/doi",
+          "parent": "https://zenodo.org/api/records/896685",
+          "parent_html": "https://zenodo.org/records/896685",
+          "self_iiif_manifest": "https://zenodo.org/api/iiif/record:896686/manifest",
+          "self_iiif_sequence": "https://zenodo.org/api/iiif/record:896686/sequence/default",
+          "files": "https://zenodo.org/api/records/896686/files",
+          "media_files": "https://zenodo.org/api/records/896686/media-files",
+          "thumbnails": {
+            "10": "https://zenodo.org/api/iiif/record:896686:article.pdf/full/%5E10,/0/default.jpg",
+            "50": "https://zenodo.org/api/iiif/record:896686:article.pdf/full/%5E50,/0/default.jpg",
+            "100": "https://zenodo.org/api/iiif/record:896686:article.pdf/full/%5E100,/0/default.jpg",
+            "250": "https://zenodo.org/api/iiif/record:896686:article.pdf/full/%5E250,/0/default.jpg",
+            "750": "https://zenodo.org/api/iiif/record:896686:article.pdf/full/%5E750,/0/default.jpg",
+            "1200": "https://zenodo.org/api/iiif/record:896686:article.pdf/full/%5E1200,/0/default.jpg"
+          },
+          "latest": "https://zenodo.org/api/records/896686/versions/latest",
+          "latest_html": "https://zenodo.org/records/896686/latest",
+          "versions": "https://zenodo.org/api/records/896686/versions",
+          "draft": "https://zenodo.org/api/records/896686/draft",
+          "access_links": "https://zenodo.org/api/records/896686/access/links",
+          "access_grants": "https://zenodo.org/api/records/896686/access/grants",
+          "access_users": "https://zenodo.org/api/records/896686/access/users",
+          "access_request": "https://zenodo.org/api/records/896686/access/request",
+          "access": "https://zenodo.org/api/records/896686/access",
+          "communities": "https://zenodo.org/api/records/896686/communities",
+          "communities-suggestions": "https://zenodo.org/api/records/896686/communities-suggestions",
+          "request_deletion": "https://zenodo.org/api/records/896686/request-deletion",
+          "file_modification": "https://zenodo.org/api/records/896686/file-modification",
+          "quota_increase": "https://zenodo.org/api/records/896686/quota-increase",
+          "requests": "https://zenodo.org/api/records/896686/requests"
+        },
+        "updated": "2024-08-03T07:41:52.027212+00:00",
+        "recid": "896686",
+        "revision": 9,
+        "files": [
+          {
+            "id": "3b67e1fa-6c6f-4d0c-8cf2-42f7db235e63",
+            "key": "article.pdf",
+            "size": 504560,
+            "checksum": "md5:883c68142d547a0f410528468a7c5e0f",
+            "links": {
+              "self": "https://zenodo.org/api/records/896686/files/article.pdf/content"
+            }
+          }
+        ],
+        "swh": null,
+        "owners": [
+          {
+            "id": "13380"
+          }
+        ],
+        "status": "published",
+        "stats": {
+          "downloads": 3943,
+          "unique_downloads": 3799,
+          "views": 402,
+          "unique_views": 367,
+          "version_downloads": 3930,
+          "version_unique_downloads": 3786,
+          "version_unique_views": 367,
+          "version_views": 402
+        },
+        "state": "done",
+        "submitted": true
+      }
+    ],
+    "total": 80092
+  },
+  "aggregations": {
+    "publication_date": {
+      "buckets": [
+        {
+          "key": "2000",
+          "doc_count": 39,
+          "label": "2000",
+          "is_selected": false
+        },
+        {
+          "key": "2001",
+          "doc_count": 49,
+          "label": "2001",
+          "is_selected": false
+        },
+        {
+          "key": "2002",
+          "doc_count": 53,
+          "label": "2002",
+          "is_selected": false
+        },
+        {
+          "key": "2003",
+          "doc_count": 72,
+          "label": "2003",
+          "is_selected": false
+        },
+        {
+          "key": "2004",
+          "doc_count": 66,
+          "label": "2004",
+          "is_selected": false
+        },
+        {
+          "key": "2005",
+          "doc_count": 100,
+          "label": "2005",
+          "is_selected": false
+        },
+        {
+          "key": "2006",
+          "doc_count": 98,
+          "label": "2006",
+          "is_selected": false
+        },
+        {
+          "key": "2007",
+          "doc_count": 211,
+          "label": "2007",
+          "is_selected": false
+        },
+        {
+          "key": "2008",
+          "doc_count": 233,
+          "label": "2008",
+          "is_selected": false
+        },
+        {
+          "key": "2009",
+          "doc_count": 257,
+          "label": "2009",
+          "is_selected": false
+        },
+        {
+          "key": "2010",
+          "doc_count": 261,
+          "label": "2010",
+          "is_selected": false
+        },
+        {
+          "key": "2011",
+          "doc_count": 325,
+          "label": "2011",
+          "is_selected": false
+        },
+        {
+          "key": "2012",
+          "doc_count": 376,
+          "label": "2012",
+          "is_selected": false
+        },
+        {
+          "key": "2013",
+          "doc_count": 516,
+          "label": "2013",
+          "is_selected": false
+        },
+        {
+          "key": "2014",
+          "doc_count": 590,
+          "label": "2014",
+          "is_selected": false
+        },
+        {
+          "key": "2015",
+          "doc_count": 640,
+          "label": "2015",
+          "is_selected": false
+        },
+        {
+          "key": "2016",
+          "doc_count": 846,
+          "label": "2016",
+          "is_selected": false
+        },
+        {
+          "key": "2017",
+          "doc_count": 1139,
+          "label": "2017",
+          "is_selected": false
+        },
+        {
+          "key": "2018",
+          "doc_count": 1417,
+          "label": "2018",
+          "is_selected": false
+        },
+        {
+          "key": "2019",
+          "doc_count": 1826,
+          "label": "2019",
+          "is_selected": false
+        },
+        {
+          "key": "2020",
+          "doc_count": 2165,
+          "label": "2020",
+          "is_selected": false
+        },
+        {
+          "key": "2021",
+          "doc_count": 2786,
+          "label": "2021",
+          "is_selected": false
+        },
+        {
+          "key": "2022",
+          "doc_count": 3078,
+          "label": "2022",
+          "is_selected": false
+        },
+        {
+          "key": "2023",
+          "doc_count": 4068,
+          "label": "2023",
+          "is_selected": false
+        },
+        {
+          "key": "2024",
+          "doc_count": 5196,
+          "label": "2024",
+          "is_selected": false
+        },
+        {
+          "key": "2025",
+          "doc_count": 15763,
+          "label": "2025",
+          "is_selected": false
+        },
+        {
+          "key": "2026",
+          "doc_count": 37499,
+          "label": "2026",
+          "is_selected": false
+        }
+      ],
+      "label": "Publication date"
+    },
+    "access_status": {
+      "buckets": [
+        {
+          "key": "open",
+          "doc_count": 76957,
+          "label": "Open",
+          "is_selected": false
+        },
+        {
+          "key": "restricted",
+          "doc_count": 3011,
+          "label": "Restricted",
+          "is_selected": false
+        },
+        {
+          "key": "embargoed",
+          "doc_count": 124,
+          "label": "Embargoed",
+          "is_selected": false
+        }
+      ],
+      "label": "Access status"
+    },
+    "resource_type": {
+      "buckets": [
+        {
+          "key": "publication",
+          "doc_count": 64579,
+          "label": "Publication",
+          "is_selected": false,
+          "inner": {
+            "buckets": [
+              {
+                "key": "publication-article",
+                "doc_count": 26180,
+                "label": "Journal article",
+                "is_selected": false
+              },
+              {
+                "key": "publication-preprint",
+                "doc_count": 14677,
+                "label": "Preprint",
+                "is_selected": false
+              },
+              {
+                "key": "publication-conferencepaper",
+                "doc_count": 3173,
+                "label": "Conference paper",
+                "is_selected": false
+              },
+              {
+                "key": "publication-report",
+                "doc_count": 2213,
+                "label": "Report",
+                "is_selected": false
+              },
+              {
+                "key": "publication-workingpaper",
+                "doc_count": 1930,
+                "label": "Working paper",
+                "is_selected": false
+              },
+              {
+                "key": "publication-book",
+                "doc_count": 1637,
+                "label": "Book",
+                "is_selected": false
+              },
+              {
+                "key": "publication-taxonomictreatment",
+                "doc_count": 1348,
+                "label": "Taxonomic treatment",
+                "is_selected": false
+              },
+              {
+                "key": "publication-other",
+                "doc_count": 1203,
+                "label": "Other",
+                "is_selected": false
+              },
+              {
+                "key": "publication-dissertation",
+                "doc_count": 1110,
+                "label": "Thesis",
+                "is_selected": false
+              },
+              {
+                "key": "publication-journal",
+                "doc_count": 925,
+                "label": "Journal",
+                "is_selected": false
+              }
+            ]
+          }
+        },
+        {
+          "key": "dataset",
+          "doc_count": 6193,
+          "label": "Dataset",
+          "is_selected": false,
+          "inner": {
+            "buckets": []
+          }
+        },
+        {
+          "key": "software",
+          "doc_count": 4976,
+          "label": "Software",
+          "is_selected": false,
+          "inner": {
+            "buckets": [
+              {
+                "key": "software-computationalnotebook",
+                "doc_count": 199,
+                "label": "Computational notebook",
+                "is_selected": false
+              }
+            ]
+          }
+        },
+        {
+          "key": "other",
+          "doc_count": 1179,
+          "label": "Other",
+          "is_selected": false,
+          "inner": {
+            "buckets": []
+          }
+        },
+        {
+          "key": "presentation",
+          "doc_count": 881,
+          "label": "Presentation",
+          "is_selected": false,
+          "inner": {
+            "buckets": []
+          }
+        },
+        {
+          "key": "image",
+          "doc_count": 656,
+          "label": "Image",
+          "is_selected": false,
+          "inner": {
+            "buckets": [
+              {
+                "key": "image-figure",
+                "doc_count": 405,
+                "label": "Figure",
+                "is_selected": false
+              },
+              {
+                "key": "image-diagram",
+                "doc_count": 69,
+                "label": "Diagram",
+                "is_selected": false
+              },
+              {
+                "key": "image-photo",
+                "doc_count": 34,
+                "label": "Photo",
+                "is_selected": false
+              },
+              {
+                "key": "image-plot",
+                "doc_count": 19,
+                "label": "Plot",
+                "is_selected": false
+              },
+              {
+                "key": "image-other",
+                "doc_count": 16,
+                "label": "Other",
+                "is_selected": false
+              },
+              {
+                "key": "image-drawing",
+                "doc_count": 13,
+                "label": "Drawing",
+                "is_selected": false
+              }
+            ]
+          }
+        },
+        {
+          "key": "poster",
+          "doc_count": 408,
+          "label": "Poster",
+          "is_selected": false,
+          "inner": {
+            "buckets": []
+          }
+        },
+        {
+          "key": "event",
+          "doc_count": 352,
+          "label": "Event",
+          "is_selected": false,
+          "inner": {
+            "buckets": []
+          }
+        },
+        {
+          "key": "model",
+          "doc_count": 330,
+          "label": "Model",
+          "is_selected": false,
+          "inner": {
+            "buckets": []
+          }
+        },
+        {
+          "key": "lesson",
+          "doc_count": 223,
+          "label": "Lesson",
+          "is_selected": false,
+          "inner": {
+            "buckets": []
+          }
+        }
+      ],
+      "label": "Resource types"
+    },
+    "subject": {
+      "buckets": [
+        {
+          "key": "Biodiversity",
+          "doc_count": 2598,
+          "label": "Biodiversity",
+          "is_selected": false
+        },
+        {
+          "key": "Taxonomy",
+          "doc_count": 2473,
+          "label": "Taxonomy",
+          "is_selected": false
+        },
+        {
+          "key": "Animalia",
+          "doc_count": 1984,
+          "label": "Animalia",
+          "is_selected": false
+        },
+        {
+          "key": "Arthropoda",
+          "doc_count": 1323,
+          "label": "Arthropoda",
+          "is_selected": false
+        },
+        {
+          "key": "artificial intelligence",
+          "doc_count": 1205,
+          "label": "artificial intelligence",
+          "is_selected": false
+        },
+        {
+          "key": "Artificial Intelligence",
+          "doc_count": 1092,
+          "label": "Artificial Intelligence",
+          "is_selected": false
+        },
+        {
+          "key": "Insecta",
+          "doc_count": 971,
+          "label": "Insecta",
+          "is_selected": false
+        },
+        {
+          "key": "Artificial intelligence",
+          "doc_count": 894,
+          "label": "Artificial intelligence",
+          "is_selected": false
+        },
+        {
+          "key": "quantum computing",
+          "doc_count": 825,
+          "label": "quantum computing",
+          "is_selected": false
+        },
+        {
+          "key": "independent research",
+          "doc_count": 803,
+          "label": "independent research",
+          "is_selected": false
+        }
+      ],
+      "label": "Subjects"
+    },
+    "file_type": {
+      "buckets": [
+        {
+          "key": "pdf",
+          "doc_count": 59875,
+          "label": "PDF",
+          "is_selected": false
+        },
+        {
+          "key": "zip",
+          "doc_count": 7884,
+          "label": "ZIP",
+          "is_selected": false
+        },
+        {
+          "key": "docx",
+          "doc_count": 3163,
+          "label": "DOCX",
+          "is_selected": false
+        },
+        {
+          "key": "txt",
+          "doc_count": 2582,
+          "label": "TXT",
+          "is_selected": false
+        },
+        {
+          "key": "md",
+          "doc_count": 2108,
+          "label": "MD",
+          "is_selected": false
+        },
+        {
+          "key": "html",
+          "doc_count": 1952,
+          "label": "HTML",
+          "is_selected": false
+        },
+        {
+          "key": "png",
+          "doc_count": 1806,
+          "label": "PNG",
+          "is_selected": false
+        },
+        {
+          "key": "jpg",
+          "doc_count": 1098,
+          "label": "JPG",
+          "is_selected": false
+        },
+        {
+          "key": "bin",
+          "doc_count": 1088,
+          "label": "BIN",
+          "is_selected": false
+        },
+        {
+          "key": "csv",
+          "doc_count": 1052,
+          "label": "CSV",
+          "is_selected": false
+        }
+      ],
+      "label": "File type"
+    }
+  },
+  "links": {
+    "self": "https://zenodo.org/api/records?page=1&q=sleep+memory+consolidation&size=6&sort=bestmatch",
+    "next": "https://zenodo.org/api/records?page=2&q=sleep+memory+consolidation&size=6&sort=bestmatch"
+  }
+}

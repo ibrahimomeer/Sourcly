@@ -9,7 +9,7 @@ import { doiUrl, type Result } from "@sourcly/core";
 // the link. See docs/methodology.md.
 
 /** Pages that describe a work rather than hold it; a library cannot open these for you. */
-const RECORD_PAGE_HOSTS = ["openalex.org"];
+const RECORD_PAGE_HOSTS = ["openalex.org", "pubmed.ncbi.nlm.nih.gov", "europepmc.org", "semanticscholar.org"];
 
 function isUsableLandingPage(address: string): boolean {
   if (!/^https?:\/\//i.test(address)) return false;

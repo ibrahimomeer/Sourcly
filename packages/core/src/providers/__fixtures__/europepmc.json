@@ -1,0 +1,2169 @@
+{
+  "search": {
+    "version": "6.9",
+    "hitCount": 18661,
+    "nextCursorMark": "AoIIQLsauCg1NjM3MzQ3Ng==",
+    "nextPageUrl": "https://www.ebi.ac.uk/europepmc/webservices/rest/search?query=sleep+memory+consolidation&cursorMark=AoIIQLsauCg1NjM3MzQ3Ng%3D%3D&resultType=core&pageSize=6&format=json",
+    "request": {
+      "queryString": "sleep memory consolidation",
+      "resultType": "core",
+      "cursorMark": "*",
+      "pageSize": 6,
+      "sort": "",
+      "synonym": false
+    },
+    "resultList": {
+      "result": [
+        {
+          "id": "38834064",
+          "source": "MED",
+          "pmid": "38834064",
+          "pmcid": "PMC11233241",
+          "fullTextIdList": {
+            "fullTextId": [
+              "PMC11233241"
+            ]
+          },
+          "doi": "10.1016/j.cub.2024.05.018",
+          "title": "Prefrontal cortical ripples mediate top-down suppression of hippocampal reactivation during sleep memory consolidation.",
+          "authorString": "Shin JD, Jadhav SP.",
+          "authorList": {
+            "author": [
+              {
+                "fullName": "Shin JD",
+                "lastName": "Shin",
+                "firstName": "Justin D",
+                "initials": "JD",
+                "authorAffiliationDetailsList": {
+                  "authorAffiliation": [
+                    {
+                      "affiliation": "Neuroscience Program, Department of Psychology, and Volen National Center for Complex Systems, Brandeis University, 415 South Street, Waltham, MA 02453, USA."
+                    }
+                  ]
+                }
+              },
+              {
+                "fullName": "Jadhav SP",
+                "lastName": "Jadhav",
+                "firstName": "Shantanu P",
+                "initials": "SP",
+                "authorId": {
+                  "type": "ORCID",
+                  "value": "0000-0001-5821-0551"
+                },
+                "authorAffiliationDetailsList": {
+                  "authorAffiliation": [
+                    {
+                      "affiliation": "Neuroscience Program, Department of Psychology, and Volen National Center for Complex Systems, Brandeis University, 415 South Street, Waltham, MA 02453, USA. Electronic address: redacted@example.org."
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          "authorIdList": {
+            "authorId": [
+              {
+                "type": "ORCID",
+                "value": "0000-0001-5821-0551"
+              }
+            ]
+          },
+          "dataLinksTagsList": {
+            "dataLinkstag": [
+              "altmetrics"
+            ]
+          },
+          "journalInfo": {
+            "issue": "13",
+            "volume": "34",
+            "journalIssueId": 3798072,
+            "dateOfPublication": "2024 Jul",
+            "monthOfPublication": 7,
+            "yearOfPublication": 2024,
+            "journal": {
+              "medlineAbbreviation": "Curr Biol",
+              "title": "Current biology : CB",
+              "essn": "1879-0445",
+              "issn": "0960-9822",
+              "isoabbreviation": "Curr Biol",
+              "nlmid": "9107782"
+            },
+            "printPublicationDate": "2024-07-01"
+          },
+          "pubYear": "2024",
+          "pageInfo": "2801-2811.e9",
+          "abstractText": "Consolidation of initially encoded hippocampal representations in the neocortex through reactivation is crucial for long-term memory formation and is facilitated by the coordination of hippocampal sharp-wave ripples (SWRs) with cortical slow and spindle oscillations during non-REM sleep. Recent evidence suggests that high-frequency cortical ripples can also coordinate with hippocampal SWRs in support of consolidation; however, the contribution of cortical ripples to reactivation remains unclear. We used high-density, continuous recordings in the hippocampus (area CA1) and prefrontal cortex (PFC) over the course of spatial learning and show that independent PFC ripples dissociated from SWRs are prevalent in NREM sleep and predominantly suppress hippocampal activity. PFC ripples paradoxically mediate top-down suppression of hippocampal reactivation rather than coordination, and this suppression is stronger for assemblies that are reactivated during coordinated CA1-PFC ripples for consolidation of recent experiences. Further, we show non-canonical, serial coordination of independent cortical ripples with slow and spindle oscillations, which are known signatures of memory consolidation. These results establish a role for prefrontal cortical ripples in top-down regulation of behaviorally relevant hippocampal representations during consolidation.",
+          "affiliation": "Neuroscience Program, Department of Psychology, and Volen National Center for Complex Systems, Brandeis University, 415 South Street, Waltham, MA 02453, USA.",
+          "publicationStatus": "ppublish",
+          "language": "eng",
+          "pubModel": "Print-Electronic",
+          "pubTypeList": {
+            "pubType": [
+              "research-article",
+              "Journal Article"
+            ]
+          },
+          "grantsList": {
+            "grant": [
+              {
+                "agency": "NIMH NIH HHS",
+                "acronym": "MH",
+                "grantId": "R01 MH112661",
+                "orderIn": 0
+              },
+              {
+                "agency": "NIMH NIH HHS",
+                "acronym": "MH",
+                "grantId": "R01 MH120228",
+                "orderIn": 0
+              },
+              {
+                "agency": "National Institutes of Health",
+                "grantId": "2T32NS007292-36",
+                "orderIn": 0
+              },
+              {
+                "agency": "National Institutes of Health",
+                "grantId": "R01MH112661",
+                "orderIn": 0
+              },
+              {
+                "agency": "NINDS NIH HHS",
+                "acronym": "NS",
+                "grantId": "T32 NS007292",
+                "orderIn": 0
+              }
+            ]
+          },
+          "meshHeadingList": {
+            "meshHeading": [
+              {
+                "majorTopic_YN": "N",
+                "descriptorName": "Hippocampus",
+                "meshQualifierList": {
+                  "meshQualifier": [
+                    {
+                      "majorTopic_YN": "N",
+                      "abbreviation": "PH",
+                      "qualifierName": "physiology"
+                    }
+                  ]
+                }
+              },
+              {
+                "majorTopic_YN": "Y",
+                "descriptorName": "Prefrontal Cortex",
+                "meshQualifierList": {
+                  "meshQualifier": [
+                    {
+                      "majorTopic_YN": "N",
+                      "abbreviation": "PH",
+                      "qualifierName": "physiology"
+                    }
+                  ]
+                }
+              },
+              {
+                "majorTopic_YN": "N",
+                "descriptorName": "Animals"
+              },
+              {
+                "majorTopic_YN": "N",
+                "descriptorName": "Sleep",
+                "meshQualifierList": {
+                  "meshQualifier": [
+                    {
+                      "majorTopic_YN": "N",
+                      "abbreviation": "PH",
+                      "qualifierName": "physiology"
+                    }
+                  ]
+                }
+              },
+              {
+                "majorTopic_YN": "N",
+                "descriptorName": "Male"
+              },
+              {
+                "majorTopic_YN": "N",
+                "descriptorName": "CA1 Region, Hippocampal",
+                "meshQualifierList": {
+                  "meshQualifier": [
+                    {
+                      "majorTopic_YN": "N",
+                      "abbreviation": "PH",
+                      "qualifierName": "physiology"
+                    }
+                  ]
+                }
+              },
+              {
+                "majorTopic_YN": "N",
+                "descriptorName": "Spatial Learning",
+                "meshQualifierList": {
+                  "meshQualifier": [
+                    {
+                      "majorTopic_YN": "N",
+                      "abbreviation": "PH",
+                      "qualifierName": "physiology"
+                    }
+                  ]
+                }
+              },
+              {
+                "majorTopic_YN": "Y",
+                "descriptorName": "Memory Consolidation",
+                "meshQualifierList": {
+                  "meshQualifier": [
+                    {
+                      "majorTopic_YN": "N",
+                      "abbreviation": "PH",
+                      "qualifierName": "physiology"
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          "keywordList": {
+            "keyword": [
+              "Hippocampus",
+              "Suppression",
+              "Sleep",
+              "Reactivation",
+              "prefrontal cortex",
+              "Consolidation",
+              "Top-down",
+              "Replay",
+              "Ripples",
+              "Non-rem"
+            ]
+          },
+          "subsetList": {
+            "subset": [
+              {
+                "code": "IM",
+                "name": "Index Medicus"
+              }
+            ]
+          },
+          "fullTextUrlList": {
+            "fullTextUrl": [
+              {
+                "availability": "Subscription required",
+                "availabilityCode": "S",
+                "documentStyle": "doi",
+                "site": "DOI",
+                "url": "https://doi.org/10.1016/j.cub.2024.05.018"
+              },
+              {
+                "availability": "Free",
+                "availabilityCode": "F",
+                "documentStyle": "html",
+                "site": "Europe_PMC",
+                "url": "https://europepmc.org/articles/PMC11233241"
+              },
+              {
+                "availability": "Free",
+                "availabilityCode": "F",
+                "documentStyle": "pdf",
+                "site": "Europe_PMC",
+                "url": "https://europepmc.org/articles/PMC11233241?pdf=render"
+              },
+              {
+                "availability": "Free",
+                "availabilityCode": "F",
+                "documentStyle": "doi",
+                "site": "DOI",
+                "url": "https://doi.org/10.1016/j.cub.2024.05.018"
+              }
+            ]
+          },
+          "commentCorrectionList": {
+            "commentCorrection": [
+              {
+                "source": "MED",
+                "id": "38168420",
+                "reference": "bioRxiv. 2023 Dec 13:2023.12.12.571373. doi: 10.1101/2023.12.12.571373.",
+                "type": "Update of",
+                "orderIn": 1
+              }
+            ]
+          },
+          "isOpenAccess": "N",
+          "inEPMC": "Y",
+          "inPMC": "Y",
+          "citedByCount": 20,
+          "hasReferences": "Y",
+          "hasTextMinedTerms": "Y",
+          "hasDbCrossReferences": "N",
+          "hasPDF": "Y",
+          "hasBook": "N",
+          "hasSuppl": "Y",
+          "hasLabsLinks": "Y",
+          "hasData": "Y",
+          "authMan": "Y",
+          "epmcAuthMan": "N",
+          "nihAuthMan": "Y",
+          "manuscriptId": "NIHMS1999677",
+          "hasTMAccessionNumbers": "N",
+          "dateOfCompletion": "2024-07-09",
+          "dateOfCreation": "2024-06-04",
+          "dateOfRevision": "2025-07-09",
+          "electronicPublicationDate": "2024-06-03",
+          "firstPublicationDate": "2024-06-03",
+          "firstIndexDate": "2024-06-05",
+          "fullTextReceivedDate": "2025-12-02",
+          "embargoDate": "2025-07-08",
+          "hasEvaluations": "N"
+        },
+        {
+          "id": "PPR773737",
+          "source": "PPR",
+          "doi": "10.1101/2023.12.12.571373",
+          "title": "Cortical ripples mediate top-down suppression of hippocampal reactivation during sleep memory consolidation",
+          "authorString": "Shin JD, Jadhav SP.",
+          "authorList": {
+            "author": [
+              {
+                "fullName": "Shin JD",
+                "lastName": "Shin",
+                "firstName": "Justin",
+                "initials": "JD"
+              },
+              {
+                "fullName": "Jadhav SP",
+                "lastName": "Jadhav",
+                "firstName": "Shantanu",
+                "initials": "SP"
+              }
+            ]
+          },
+          "pubYear": "2023",
+          "abstractText": "Consolidation of initially encoded hippocampal representations in the neocortex through reactivation is crucial for long-term memory formation, and is facilitated by the coordination of hippocampal sharp-wave ripples (SWRs) with cortical oscillations during non-REM sleep. However, the contribution of high-frequency cortical ripples to consolidation is still unclear. We used continuous recordings in the hippocampus and prefrontal cortex (PFC) over the course of spatial learning and show that independent PFC ripples, when dissociated from SWRs, predominantly suppress hippocampal activity in non-REM sleep. PFC ripples paradoxically mediate top-down suppression of hippocampal reactivation, which is inversely related to reactivation strength during coordinated CA1-PFC ripples. Further, we show non-canonical, serial coordination of ripples with cortical slow and spindle oscillations. These results establish a role for cortical ripples in regulating consolidation.",
+          "pubTypeList": {
+            "pubType": [
+              "Preprint"
+            ]
+          },
+          "bookOrReportDetails": {
+            "publisher": "bioRxiv",
+            "yearOfPublication": 2023
+          },
+          "fullTextUrlList": {
+            "fullTextUrl": [
+              {
+                "availability": "Free",
+                "availabilityCode": "F",
+                "documentStyle": "doi",
+                "site": "DOI",
+                "url": "https://doi.org/10.1101/2023.12.12.571373"
+              }
+            ]
+          },
+          "isOpenAccess": "N",
+          "inEPMC": "N",
+          "inPMC": "N",
+          "citedByCount": 0,
+          "hasReferences": "Y",
+          "hasTextMinedTerms": "Y",
+          "hasDbCrossReferences": "N",
+          "hasPDF": "N",
+          "hasBook": "N",
+          "hasSuppl": "N",
+          "hasLabsLinks": "N",
+          "hasData": "N",
+          "authMan": "N",
+          "epmcAuthMan": "N",
+          "nihAuthMan": "N",
+          "hasTMAccessionNumbers": "N",
+          "dateOfCreation": "2023-12-15",
+          "firstPublicationDate": "2023-12-13",
+          "firstIndexDate": "2023-12-15",
+          "hasEvaluations": "N"
+        },
+        {
+          "id": "42775636",
+          "source": "MED",
+          "pmid": "42775636",
+          "pmcid": "PMC13600697",
+          "fullTextIdList": {
+            "fullTextId": [
+              "PMC13600697"
+            ]
+          },
+          "doi": "10.7554/elife.104862",
+          "title": "Brief disruption of activity in a subset of dopaminergic neurons during consolidation impairs long-term memory by fragmenting sleep.",
+          "authorString": "Yan L, Wu L, Wiggin TD, Su X, Yan W, Li H, Li L, Lu Z, Guo F, Meng Z, Li Y, Li F, Griffith LC, Liu C.",
+          "authorList": {
+            "author": [
+              {
+                "fullName": "Yan L",
+                "lastName": "Yan",
+                "firstName": "Lin",
+                "initials": "L",
+                "authorId": {
+                  "type": "ORCID",
+                  "value": "0000-0001-8186-9864"
+                },
+                "authorAffiliationDetailsList": {
+                  "authorAffiliation": [
+                    {
+                      "affiliation": "Department of Anesthesiology, Shenzhen Maternity and Child Healthcare Hospital, Shenzhen, China."
+                    },
+                    {
+                      "affiliation": "Shenzhen-Hong Kong Institute of Brain Science, Shenzhen Institute of Advanced Technology, Chinese Academy of Sciences, Shenzhen, China."
+                    }
+                  ]
+                }
+              },
+              {
+                "fullName": "Wu L",
+                "lastName": "Wu",
+                "firstName": "Litao",
+                "initials": "L",
+                "authorAffiliationDetailsList": {
+                  "authorAffiliation": [
+                    {
+                      "affiliation": "Shenzhen-Hong Kong Institute of Brain Science, Shenzhen Institute of Advanced Technology, Chinese Academy of Sciences, Shenzhen, China."
+                    },
+                    {
+                      "affiliation": "Faculty of Life and Health Science, Shenzhen University of Advanced Technology, Shenzhen, China."
+                    }
+                  ]
+                }
+              },
+              {
+                "fullName": "Wiggin TD",
+                "lastName": "Wiggin",
+                "firstName": "Timothy D",
+                "initials": "TD",
+                "authorAffiliationDetailsList": {
+                  "authorAffiliation": [
+                    {
+                      "affiliation": "Department of Biology, Volen National Center for Complex Systems, Brandeis University, Waltham, United States."
+                    }
+                  ]
+                }
+              },
+              {
+                "fullName": "Su X",
+                "lastName": "Su",
+                "firstName": "Xiaojuan",
+                "initials": "X",
+                "authorAffiliationDetailsList": {
+                  "authorAffiliation": [
+                    {
+                      "affiliation": "Shenzhen-Hong Kong Institute of Brain Science, Shenzhen Institute of Advanced Technology, Chinese Academy of Sciences, Shenzhen, China."
+                    }
+                  ]
+                }
+              },
+              {
+                "fullName": "Yan W",
+                "lastName": "Yan",
+                "firstName": "Wei",
+                "initials": "W",
+                "authorAffiliationDetailsList": {
+                  "authorAffiliation": [
+                    {
+                      "affiliation": "Shenzhen-Hong Kong Institute of Brain Science, Shenzhen Institute of Advanced Technology, Chinese Academy of Sciences, Shenzhen, China."
+                    }
+                  ]
+                }
+              },
+              {
+                "fullName": "Li H",
+                "lastName": "Li",
+                "firstName": "Hailiang",
+                "initials": "H",
+                "authorId": {
+                  "type": "ORCID",
+                  "value": "0009-0008-1458-8577"
+                },
+                "authorAffiliationDetailsList": {
+                  "authorAffiliation": [
+                    {
+                      "affiliation": "School of Brain Science and Brain Medicine, Zhejiang University, Hangzhou, China."
+                    }
+                  ]
+                }
+              },
+              {
+                "fullName": "Li L",
+                "lastName": "Li",
+                "firstName": "Lei",
+                "initials": "L",
+                "authorAffiliationDetailsList": {
+                  "authorAffiliation": [
+                    {
+                      "affiliation": "Shenzhen-Hong Kong Institute of Brain Science, Shenzhen Institute of Advanced Technology, Chinese Academy of Sciences, Shenzhen, China."
+                    },
+                    {
+                      "affiliation": "Faculty of Life and Health Science, Shenzhen University of Advanced Technology, Shenzhen, China."
+                    }
+                  ]
+                }
+              },
+              {
+                "fullName": "Lu Z",
+                "lastName": "Lu",
+                "firstName": "Zhonghua",
+                "initials": "Z",
+                "authorAffiliationDetailsList": {
+                  "authorAffiliation": [
+                    {
+                      "affiliation": "Shenzhen-Hong Kong Institute of Brain Science, Shenzhen Institute of Advanced Technology, Chinese Academy of Sciences, Shenzhen, China."
+                    }
+                  ]
+                }
+              },
+              {
+                "fullName": "Guo F",
+                "lastName": "Guo",
+                "firstName": "Fang",
+                "initials": "F",
+                "authorId": {
+                  "type": "ORCID",
+                  "value": "0000-0002-0433-9808"
+                },
+                "authorAffiliationDetailsList": {
+                  "authorAffiliation": [
+                    {
+                      "affiliation": "School of Brain Science and Brain Medicine, Zhejiang University, Hangzhou, China."
+                    }
+                  ]
+                }
+              },
+              {
+                "fullName": "Meng Z",
+                "lastName": "Meng",
+                "firstName": "Zhiqiang",
+                "initials": "Z",
+                "authorAffiliationDetailsList": {
+                  "authorAffiliation": [
+                    {
+                      "affiliation": "Shenzhen-Hong Kong Institute of Brain Science, Shenzhen Institute of Advanced Technology, Chinese Academy of Sciences, Shenzhen, China."
+                    },
+                    {
+                      "affiliation": "Shenzhen Key Laboratory of Drug Addiction, Shenzhen Institute of Advanced Technology, Chinese Academy of Sciences, Shenzhen, China."
+                    }
+                  ]
+                }
+              },
+              {
+                "fullName": "Li Y",
+                "lastName": "Li",
+                "firstName": "Yuantao",
+                "initials": "Y",
+                "authorAffiliationDetailsList": {
+                  "authorAffiliation": [
+                    {
+                      "affiliation": "Department of Anesthesiology, Shenzhen Maternity and Child Healthcare Hospital, Shenzhen, China."
+                    }
+                  ]
+                }
+              },
+              {
+                "fullName": "Li F",
+                "lastName": "Li",
+                "firstName": "Fan",
+                "initials": "F",
+                "authorId": {
+                  "type": "ORCID",
+                  "value": "0000-0002-7566-2151"
+                },
+                "authorAffiliationDetailsList": {
+                  "authorAffiliation": [
+                    {
+                      "affiliation": "Department of Pathophysiology, Shantou University Medical College, Shantou, China."
+                    }
+                  ]
+                }
+              },
+              {
+                "fullName": "Griffith LC",
+                "lastName": "Griffith",
+                "firstName": "Leslie C",
+                "initials": "LC",
+                "authorId": {
+                  "type": "ORCID",
+                  "value": "0000-0003-3164-9876"
+                },
+                "authorAffiliationDetailsList": {
+                  "authorAffiliation": [
+                    {
+                      "affiliation": "Department of Biology, Volen National Center for Complex Systems, Brandeis University, Waltham, United States."
+                    }
+                  ]
+                }
+              },
+              {
+                "fullName": "Liu C",
+                "lastName": "Liu",
+                "firstName": "Chang",
+                "initials": "C",
+                "authorId": {
+                  "type": "ORCID",
+                  "value": "0000-0001-6755-4831"
+                },
+                "authorAffiliationDetailsList": {
+                  "authorAffiliation": [
+                    {
+                      "affiliation": "Shenzhen-Hong Kong Institute of Brain Science, Shenzhen Institute of Advanced Technology, Chinese Academy of Sciences, Shenzhen, China."
+                    },
+                    {
+                      "affiliation": "Faculty of Life and Health Science, Shenzhen University of Advanced Technology, Shenzhen, China."
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          "authorIdList": {
+            "authorId": [
+              {
+                "type": "ORCID",
+                "value": "0000-0001-6755-4831"
+              },
+              {
+                "type": "ORCID",
+                "value": "0000-0001-8186-9864"
+              },
+              {
+                "type": "ORCID",
+                "value": "0000-0002-0433-9808"
+              },
+              {
+                "type": "ORCID",
+                "value": "0000-0002-7566-2151"
+              },
+              {
+                "type": "ORCID",
+                "value": "0000-0003-3164-9876"
+              },
+              {
+                "type": "ORCID",
+                "value": "0009-0008-1458-8577"
+              }
+            ]
+          },
+          "dataLinksTagsList": {
+            "dataLinkstag": [
+              "supporting_data"
+            ]
+          },
+          "journalInfo": {
+            "volume": "14",
+            "journalIssueId": 4253338,
+            "dateOfPublication": "2026 Sep",
+            "monthOfPublication": 9,
+            "yearOfPublication": 2026,
+            "journal": {
+              "medlineAbbreviation": "Elife",
+              "title": "eLife",
+              "essn": "2050-084X",
+              "issn": "2050-084X",
+              "isoabbreviation": "Elife",
+              "nlmid": "101579614"
+            },
+            "printPublicationDate": "2026-09-01"
+          },
+          "pubYear": "2026",
+          "pageInfo": "RP104862",
+          "abstractText": "Sleep disturbances are associated with poor long-term memory (LTM) formation, yet the underlying cell types and neural circuits involved have not been fully decoded. Dopamine neurons (DANs) are involved in memory processing at multiple stages. Here, using both male and female flies, <i>Drosophila melanogaster</i>, we show that, during the first few hours of memory consolidation, disruption of basal activity of a small subset of protocerebral anterior medial DANs (PAM-DANs), by either brief activation or inhibition of the two dorsal posterior medial (DPM) neurons, impairs 24 hr LTM. Interestingly, these brief changes in activity using female flies result in sleep loss and fragmentation, especially at night. Importantly, pharmacological rescue of sleep after manipulation restores LTM. A specific subset of PAM-DANs (PAM-α1) that synapse onto DPM neurons specify the microcircuit that links sleep and memory. MBON-α1 also contributes to the integration of sleep and memory by acting as an additional parallel circuit. PAM-DANs, including PAM-α1, form functional synapses onto DPM mainly via two dopamine receptor subtypes. Dop1R1 primarily mediates the link between sleep and memory. This PAM-α1 to DPM microcircuit exhibits a synchronized, transient, post-training change in activity during the critical memory consolidation window, suggesting an effect of this microcircuit on maintaining the sleep necessary for LTM consolidation. Our results provide a new molecular and circuit basis for the complex relationship between sleep and memory.",
+          "affiliation": "Department of Anesthesiology, Shenzhen Maternity and Child Healthcare Hospital, Shenzhen, China.",
+          "publicationStatus": "epublish",
+          "language": "eng",
+          "pubModel": "Electronic",
+          "pubTypeList": {
+            "pubType": [
+              "research-article",
+              "Journal Article"
+            ]
+          },
+          "grantsList": {
+            "grant": [
+              {
+                "agency": "Guangdong Basic and Applied Basic Research Foundation",
+                "grantId": "2025A1515011127",
+                "orderIn": 0
+              },
+              {
+                "agency": "National Natural Science Foundation of China",
+                "grantId": "32071009",
+                "orderIn": 0
+              },
+              {
+                "agency": "NIMH NIH HHS",
+                "acronym": "MH",
+                "grantId": "R01 MH067284",
+                "orderIn": 0
+              },
+              {
+                "agency": "National Natural Science Foundation of China",
+                "grantId": "82341248",
+                "orderIn": 0
+              },
+              {
+                "agency": "CAS Key Laboratory of Brain Connectome and Manipulation",
+                "grantId": "2019DP173024",
+                "orderIn": 0
+              },
+              {
+                "agency": "NIH HHS",
+                "acronym": "NH",
+                "grantId": "R01MH67284",
+                "orderIn": 0
+              },
+              {
+                "agency": "Guangdong Basic and Applied Basic Research Foundation",
+                "grantId": "2024A151501150",
+                "orderIn": 0
+              },
+              {
+                "agency": "National Natural Science Foundation of China",
+                "grantId": "32371063",
+                "orderIn": 0
+              },
+              {
+                "agency": "National Natural Science Foundation of China",
+                "grantId": "82171430",
+                "orderIn": 0
+              },
+              {
+                "agency": "Shenzhen Science and Technology Program",
+                "grantId": "KQTD20221101093608028",
+                "orderIn": 0
+              }
+            ]
+          },
+          "meshHeadingList": {
+            "meshHeading": [
+              {
+                "majorTopic_YN": "N",
+                "descriptorName": "Animals"
+              },
+              {
+                "majorTopic_YN": "Y",
+                "descriptorName": "Drosophila melanogaster",
+                "meshQualifierList": {
+                  "meshQualifier": [
+                    {
+                      "majorTopic_YN": "N",
+                      "abbreviation": "PH",
+                      "qualifierName": "physiology"
+                    }
+                  ]
+                }
+              },
+              {
+                "majorTopic_YN": "N",
+                "descriptorName": "Drosophila Proteins",
+                "meshQualifierList": {
+                  "meshQualifier": [
+                    {
+                      "majorTopic_YN": "N",
+                      "abbreviation": "ME",
+                      "qualifierName": "metabolism"
+                    }
+                  ]
+                }
+              },
+              {
+                "majorTopic_YN": "N",
+                "descriptorName": "Receptors, Dopamine"
+              },
+              {
+                "majorTopic_YN": "N",
+                "descriptorName": "Receptors, Dopamine D1",
+                "meshQualifierList": {
+                  "meshQualifier": [
+                    {
+                      "majorTopic_YN": "N",
+                      "abbreviation": "ME",
+                      "qualifierName": "metabolism"
+                    }
+                  ]
+                }
+              },
+              {
+                "majorTopic_YN": "Y",
+                "descriptorName": "Sleep",
+                "meshQualifierList": {
+                  "meshQualifier": [
+                    {
+                      "majorTopic_YN": "N",
+                      "abbreviation": "PH",
+                      "qualifierName": "physiology"
+                    }
+                  ]
+                }
+              },
+              {
+                "majorTopic_YN": "N",
+                "descriptorName": "Female"
+              },
+              {
+                "majorTopic_YN": "N",
+                "descriptorName": "Male"
+              },
+              {
+                "majorTopic_YN": "Y",
+                "descriptorName": "Memory, Long-Term",
+                "meshQualifierList": {
+                  "meshQualifier": [
+                    {
+                      "majorTopic_YN": "N",
+                      "abbreviation": "PH",
+                      "qualifierName": "physiology"
+                    }
+                  ]
+                }
+              },
+              {
+                "majorTopic_YN": "Y",
+                "descriptorName": "Dopaminergic Neurons",
+                "meshQualifierList": {
+                  "meshQualifier": [
+                    {
+                      "majorTopic_YN": "N",
+                      "abbreviation": "PH",
+                      "qualifierName": "physiology"
+                    }
+                  ]
+                }
+              },
+              {
+                "majorTopic_YN": "Y",
+                "descriptorName": "Memory Consolidation",
+                "meshQualifierList": {
+                  "meshQualifier": [
+                    {
+                      "majorTopic_YN": "N",
+                      "abbreviation": "PH",
+                      "qualifierName": "physiology"
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          "keywordList": {
+            "keyword": [
+              "Dopamine",
+              "Sleep",
+              "Neuroscience",
+              "Dopamine receptor",
+              "Memory Consolidation",
+              "Neural Circuit",
+              "D. Melanogaster",
+              "Internal State"
+            ]
+          },
+          "chemicalList": {
+            "chemical": [
+              {
+                "name": "Receptors, Dopamine",
+                "registryNumber": "0"
+              },
+              {
+                "name": "Drosophila Proteins",
+                "registryNumber": "0"
+              },
+              {
+                "name": "Receptors, Dopamine D1",
+                "registryNumber": "0"
+              },
+              {
+                "name": "Dop1R1 protein, Drosophila",
+                "registryNumber": "0"
+              }
+            ]
+          },
+          "subsetList": {
+            "subset": [
+              {
+                "code": "IM",
+                "name": "Index Medicus"
+              }
+            ]
+          },
+          "fullTextUrlList": {
+            "fullTextUrl": [
+              {
+                "availability": "Subscription required",
+                "availabilityCode": "S",
+                "documentStyle": "doi",
+                "site": "DOI",
+                "url": "https://doi.org/10.7554/eLife.104862"
+              },
+              {
+                "availability": "Open access",
+                "availabilityCode": "OA",
+                "documentStyle": "html",
+                "site": "Europe_PMC",
+                "url": "https://europepmc.org/articles/PMC13600697"
+              },
+              {
+                "availability": "Open access",
+                "availabilityCode": "OA",
+                "documentStyle": "pdf",
+                "site": "Europe_PMC",
+                "url": "https://europepmc.org/articles/PMC13600697?pdf=render"
+              }
+            ]
+          },
+          "commentCorrectionList": {
+            "commentCorrection": [
+              {
+                "source": "MED",
+                "id": "37961167",
+                "reference": "bioRxiv. 2024 Oct 27:2023.10.23.563499. doi: 10.1101/2023.10.23.563499.",
+                "type": "Update of",
+                "orderIn": 1
+              },
+              {
+                "source": "PPR",
+                "id": "PPR747582",
+                "type": "Preprint in",
+                "note": "Link created based on a title-first author match",
+                "orderIn": 10002
+              }
+            ]
+          },
+          "isOpenAccess": "Y",
+          "inEPMC": "Y",
+          "inPMC": "Y",
+          "citedByCount": 0,
+          "hasReferences": "Y",
+          "hasTextMinedTerms": "Y",
+          "hasDbCrossReferences": "N",
+          "hasPDF": "Y",
+          "hasBook": "N",
+          "hasSuppl": "Y",
+          "hasLabsLinks": "N",
+          "hasData": "Y",
+          "license": "cc by",
+          "authMan": "N",
+          "epmcAuthMan": "N",
+          "nihAuthMan": "N",
+          "hasTMAccessionNumbers": "Y",
+          "tmAccessionTypeList": {
+            "accessionType": [
+              "doi"
+            ]
+          },
+          "dateOfCompletion": "2026-09-23",
+          "dateOfCreation": "2026-09-23",
+          "dateOfRevision": "2026-09-26",
+          "electronicPublicationDate": "2026-09-23",
+          "firstPublicationDate": "2026-09-23",
+          "firstIndexDate": "2026-09-24",
+          "fullTextReceivedDate": "2026-09-25",
+          "hasEvaluations": "N"
+        },
+        {
+          "id": "PPR1330764",
+          "source": "PPR",
+          "doi": "10.64898/2026.09.21.753161",
+          "title": "A systems-level model of sleep-dependent memory-consolidation failure in neurodegeneration: the spindle–slow-oscillation decoupling cascade dissociates amyloid and tau",
+          "authorString": "Masry B, Shahin A, Malek ZS.",
+          "authorList": {
+            "author": [
+              {
+                "fullName": "Masry B",
+                "lastName": "Masry",
+                "firstName": "Bahaa",
+                "initials": "B"
+              },
+              {
+                "fullName": "Shahin A",
+                "lastName": "Shahin",
+                "firstName": "Anas",
+                "initials": "A"
+              },
+              {
+                "fullName": "Malek ZS",
+                "lastName": "Malek",
+                "firstName": "Zeina",
+                "initials": "ZS"
+              }
+            ]
+          },
+          "pubYear": "2026",
+          "abstractText": "During non-rapid-eye-movement (NREM) sleep, the temporal coupling of cortical slow oscillations (SOs), thalamic spindles, and hippocampal sharp-wave ripples drives the consolidation of declarative memories. This coupling degrades in ageing and Alzheimer’s disease (AD), and although A  β and tau leave dissociable signatures in human sleep, the mechanisms by which progressive pathology dismantles the consolidation machinery are difficult to isolate experimentally, and have not to our knowledge been reproduced in a model that can be perturbed directly. We built a systems-level model in which cortical SOs and thalamic spindles are generated by reduced oscillators, hippocampal ripples replay encoded spike sequences, and the  measured per-event SO–spindle timing alignment causally gates spike-timing-dependent plasticity on cortical sequence synapses. A post-sleep cued-recall test reads out consolidation. Five neurodegeneration parameters (amyloid, tau, synaptic density, GABAergic inhibition, cholinergic tone) map to distinct mechanisms grounded in the human and animal literature. The model reproduces graded healthy consolidation and a progressive collapse in which coupling, slow-wave power, spindle power and recall fall monotonically and the overnight memory effect flips from consolidation to net forgetting, with weak memories failing first. Scrambling SO–spindle timing while holding oscillation power fixed abolishes consolidation, establishing that coupling timing, rather than oscillation power, is what the plasticity gate depends on within the model. A  β and tau impair memory through orthogonal signatures (A  β collapses slow-wave power while sparing replay order, tau the reverse) and this orthogonality holds across the entire A  β × tau plane and survives simultaneous ±50% resampling of every mapping coefficient (40/40 samples), so it is not an artefact of a single calibration point. The model yields a falsifiable clinical prediction: closed-loop slow-oscillation enhancement rescues memory only when the deficit is amplitude/coupling-dominated, not when it is replay(tau)-dominated, despite normalising slow-wave power in both cases. Because the therapy arms dissociate coupling from memory benefit, the model also cautions against adopting SO–spindle coupling as a standalone surrogate endpoint.  <h4>Author summary</h4>  Sleep strengthens new memories through a precisely timed dialogue between three brain rhythms: cortical slow waves, thalamic sleep spindles, and hippocampal ripples. This timing breaks down in Alzheimer’s disease, but it has been unclear how the two hallmark pathologies of the disease (amyloid plaques and tau tangles) each contribute, and whether the same treatment would help both. We built a computer model that reproduces the rhythms and, crucially, lets the  measured timing between slow waves and spindles control how strongly memories are written into cortex. As we gradually increase simulated pathology, the rhythms uncouple, memory consolidation fails, and overnight the model begins to  forget rather than remember, exactly the trajectory seen in patients. When we scramble only the timing of the rhythms while leaving their strength untouched, consolidation collapses, showing that timing itself carries the memory benefit. The model separates amyloid (which weakens slow waves) from tau (which corrupts the hippocampal replay that timing is supposed to gate), and predicts that a leading experimental therapy (slow-wave stimulation during sleep) will help amyloid-dominated patients but fail tau-dominated patients even though it restores their slow waves. This prediction is directly testable and could guide patient selection for sleep-based interventions.",
+          "pubTypeList": {
+            "pubType": [
+              "Preprint"
+            ]
+          },
+          "bookOrReportDetails": {
+            "publisher": "bioRxiv",
+            "yearOfPublication": 2026
+          },
+          "fullTextUrlList": {
+            "fullTextUrl": [
+              {
+                "availability": "Free",
+                "availabilityCode": "F",
+                "documentStyle": "doi",
+                "site": "DOI",
+                "url": "https://doi.org/10.64898/2026.09.21.753161"
+              }
+            ]
+          },
+          "isOpenAccess": "N",
+          "inEPMC": "N",
+          "inPMC": "N",
+          "citedByCount": 0,
+          "hasReferences": "N",
+          "hasTextMinedTerms": "Y",
+          "hasDbCrossReferences": "N",
+          "hasPDF": "N",
+          "hasBook": "N",
+          "hasSuppl": "N",
+          "hasLabsLinks": "N",
+          "hasData": "N",
+          "authMan": "N",
+          "epmcAuthMan": "N",
+          "nihAuthMan": "N",
+          "hasTMAccessionNumbers": "N",
+          "dateOfCreation": "2026-09-30",
+          "firstPublicationDate": "2026-09-29",
+          "firstIndexDate": "2026-09-30",
+          "hasEvaluations": "N"
+        },
+        {
+          "id": "PPR1338423",
+          "source": "PPR",
+          "doi": "10.64898/2026.10.02.756363",
+          "title": "Using the aperiodic slope across learning to predict sleep-based memory consolidation",
+          "authorString": "Anesbury A, Caldwell HB, Lushington K, Al Safadi M, Chatburn A.",
+          "authorList": {
+            "author": [
+              {
+                "fullName": "Anesbury A",
+                "lastName": "Anesbury",
+                "firstName": "Annaliese",
+                "initials": "A"
+              },
+              {
+                "fullName": "Caldwell HB",
+                "lastName": "Caldwell",
+                "firstName": "Hayley Bree",
+                "initials": "HB"
+              },
+              {
+                "fullName": "Lushington K",
+                "lastName": "Lushington",
+                "firstName": "Kurt",
+                "initials": "K"
+              },
+              {
+                "fullName": "Al Safadi M",
+                "lastName": "Al Safadi",
+                "firstName": "Maya",
+                "initials": "M"
+              },
+              {
+                "fullName": "Chatburn A",
+                "lastName": "Chatburn",
+                "firstName": "Alex",
+                "initials": "A"
+              }
+            ]
+          },
+          "pubYear": "2026",
+          "abstractText": "Homeostatic mechanisms adjust synaptic strengths to regulate neuronal activity across wake-sleep cycles. Although sleep supports memory consolidation, limited research has explored how sleep-induced homeostatic changes influence memory outcomes in humans. The EEG-derived aperiodic slope (1/f) could be a candidate measure of homeostatic memory processes through its reflection of neural excitation-inhibition balance. In this study, 27 participants learned object-word pairs, and completed an immediate recognition test before either a nap or equivalent wakeful period. Resting-state EEG was recorded, both before and after learning and the interval, to derive changes in aperiodic slope values. A delayed recognition test then assessed whether changes in the aperiodic slope (i.e., homeostatic activity) across learning and the interval predicted memory accuracy and N400 amplitude, an index of stimulus expectancy and recognition. Our study found evidence to suggest homeostatic renormalisation, for the nap condition only, indicated by a shift towards inhibition across sleep which was inversely related to the slope change across learning. Although the aperiodic slope change across the nap and wake intervals did not predict delayed memory accuracy, a shift towards inhibition during learning was beneficial for memory accuracy, only in the nap condition. Similarly, a shift towards inhibition across learning, followed by a shift towards excitation in the nap condition, predicted reduced N400 amplitudes. This suggests that homeostatic renormalisation across the nap influenced model updating and stimulus expectancy. This study provides evidence for a link between synaptic homeostatic processes and memory consolidation, emphasising the importance of encoding-related aperiodic activity in this relationship.",
+          "pubTypeList": {
+            "pubType": [
+              "Preprint"
+            ]
+          },
+          "bookOrReportDetails": {
+            "publisher": "bioRxiv",
+            "yearOfPublication": 2026
+          },
+          "fullTextUrlList": {
+            "fullTextUrl": [
+              {
+                "availability": "Free",
+                "availabilityCode": "F",
+                "documentStyle": "doi",
+                "site": "DOI",
+                "url": "https://doi.org/10.64898/2026.10.02.756363"
+              }
+            ]
+          },
+          "isOpenAccess": "N",
+          "inEPMC": "N",
+          "inPMC": "N",
+          "citedByCount": 0,
+          "hasReferences": "N",
+          "hasTextMinedTerms": "N",
+          "hasDbCrossReferences": "N",
+          "hasPDF": "N",
+          "hasBook": "N",
+          "hasSuppl": "N",
+          "hasLabsLinks": "N",
+          "hasData": "N",
+          "authMan": "N",
+          "epmcAuthMan": "N",
+          "nihAuthMan": "N",
+          "hasTMAccessionNumbers": "N",
+          "dateOfCreation": "2026-10-11",
+          "firstPublicationDate": "2026-10-10",
+          "firstIndexDate": "2026-10-11",
+          "hasEvaluations": "N"
+        },
+        {
+          "id": "PPR1314966",
+          "source": "PPR",
+          "doi": "10.64898/2026.09.02.748785",
+          "title": "Hippocampal CA1 neurons are crucial for sleep-associated memory formation in humans: The role of theta power during NREM sleep",
+          "authorString": "Hanert A, Kurz E, Weber F, Döhring J, Pedersen A, Burgalossi A, Born J, Bartsch T.",
+          "authorList": {
+            "author": [
+              {
+                "fullName": "Hanert A",
+                "lastName": "Hanert",
+                "initials": "A"
+              },
+              {
+                "fullName": "Kurz E",
+                "lastName": "Kurz",
+                "firstName": "E.M.",
+                "initials": "E"
+              },
+              {
+                "fullName": "Weber F",
+                "lastName": "Weber",
+                "firstName": "F.D.",
+                "initials": "F"
+              },
+              {
+                "fullName": "Döhring J",
+                "lastName": "Döhring",
+                "initials": "J"
+              },
+              {
+                "fullName": "Pedersen A",
+                "lastName": "Pedersen",
+                "initials": "A"
+              },
+              {
+                "fullName": "Burgalossi A",
+                "lastName": "Burgalossi",
+                "initials": "A"
+              },
+              {
+                "fullName": "Born J",
+                "lastName": "Born",
+                "initials": "J"
+              },
+              {
+                "fullName": "Bartsch T",
+                "lastName": "Bartsch",
+                "initials": "T"
+              }
+            ]
+          },
+          "pubYear": "2026",
+          "abstractText": "The formation of long-term memory during sleep depends on the reactivation and redistribution of recently acquired mnemonic information during non-rapid eye movement (NREM) sleep. Animal studies suggest that hippocampal memory replay during slow-wave sleep is coordinated through the interaction of sharp-wave ripples, thalamocortical sleep spindles, and neocortical slow oscillations (SOs). However, direct evidence for the contribution of hippocampal network dynamics to sleep-dependent memory consolidation in humans remains limited. Here, we investigated sleep-dependent memory consolidation in patients (n=13) with transient global amnesia (TGA), a clinical syndrome associated with focal and transient lesions of the hippocampal CA1 region. Patients completed a verbal paired-associative learning task followed by nocturnal polysomnography and subsequent memory retrieval during the acute phase of TGA (acute condition) and again after clinical recovery (follow-up condition). Overnight memory consolidation was significantly impaired during the acute phase compared with the follow-up session. NREM EEG theta power (4-8 Hz) was reduced during the acute phase of TGA. Importantly, increases in theta power from the acute to the follow-up session predicted corresponding improvements in memory consolidation within individuals. In contrast, established NREM markers of sleep-dependent memory consolidation, including sleep spindle density, SO density, and SO-spindle coupling, did not differ between the acute and follow-up conditions. These findings suggest that transient hippocampal CA1 dysfunction disrupts sleep-related hippocampal network dynamics reflected in reduced NREM theta activity, which in turn is associated with impaired memory consolidation. Sleep-related theta oscillations may therefore represent a functional marker of hippocampal network integrity during sleep-dependent memory consolidation in humans.",
+          "pubTypeList": {
+            "pubType": [
+              "Preprint"
+            ]
+          },
+          "bookOrReportDetails": {
+            "publisher": "bioRxiv",
+            "yearOfPublication": 2026
+          },
+          "fullTextUrlList": {
+            "fullTextUrl": [
+              {
+                "availability": "Free",
+                "availabilityCode": "F",
+                "documentStyle": "doi",
+                "site": "DOI",
+                "url": "https://doi.org/10.64898/2026.09.02.748785"
+              }
+            ]
+          },
+          "isOpenAccess": "N",
+          "inEPMC": "N",
+          "inPMC": "N",
+          "citedByCount": 0,
+          "hasReferences": "N",
+          "hasTextMinedTerms": "Y",
+          "hasDbCrossReferences": "N",
+          "hasPDF": "N",
+          "hasBook": "N",
+          "hasSuppl": "N",
+          "hasLabsLinks": "N",
+          "hasData": "N",
+          "authMan": "N",
+          "epmcAuthMan": "N",
+          "nihAuthMan": "N",
+          "hasTMAccessionNumbers": "N",
+          "dateOfCreation": "2026-09-09",
+          "firstPublicationDate": "2026-09-08",
+          "firstIndexDate": "2026-09-09",
+          "hasEvaluations": "N"
+        }
+      ]
+    }
+  },
+  "retracted": {
+    "version": "6.9",
+    "hitCount": 1,
+    "request": {
+      "queryString": "EXT_ID:32450107 AND SRC:MED",
+      "internalQuery": "EXT_ID:32450107 AND SRC:MED",
+      "resultType": "CORE",
+      "cursorMark": "*",
+      "pageSize": 1,
+      "sort": "",
+      "synonym": false
+    },
+    "resultList": {
+      "result": [
+        {
+          "id": "32450107",
+          "source": "MED",
+          "pmid": "32450107",
+          "pmcid": "PMC7255293",
+          "fullTextIdList": {
+            "fullTextId": [
+              "PMC7255293"
+            ]
+          },
+          "doi": "10.1016/s0140-6736(20)31180-6",
+          "title": "RETRACTED: Hydroxychloroquine or chloroquine with or without a macrolide for treatment of COVID-19: a multinational registry analysis.",
+          "authorString": "Mehra MR, Desai SS, Ruschitzka F, Patel AN.",
+          "authorList": {
+            "author": [
+              {
+                "fullName": "Mehra MR",
+                "lastName": "Mehra",
+                "firstName": "Mandeep R",
+                "initials": "MR",
+                "authorAffiliationDetailsList": {
+                  "authorAffiliation": [
+                    {
+                      "affiliation": "Brigham and Women's Hospital Heart and Vascular Center and Harvard Medical School, Boston, MA, USA. Electronic address: redacted@example.org."
+                    }
+                  ]
+                }
+              },
+              {
+                "fullName": "Desai SS",
+                "lastName": "Desai",
+                "firstName": "Sapan S",
+                "initials": "SS",
+                "authorAffiliationDetailsList": {
+                  "authorAffiliation": [
+                    {
+                      "affiliation": "Surgisphere Corporation, Chicago, IL, USA."
+                    }
+                  ]
+                }
+              },
+              {
+                "fullName": "Ruschitzka F",
+                "lastName": "Ruschitzka",
+                "firstName": "Frank",
+                "initials": "F",
+                "authorAffiliationDetailsList": {
+                  "authorAffiliation": [
+                    {
+                      "affiliation": "University Heart Center, University Hospital Zurich, Zurich, Switzerland."
+                    }
+                  ]
+                }
+              },
+              {
+                "fullName": "Patel AN",
+                "lastName": "Patel",
+                "firstName": "Amit N",
+                "initials": "AN",
+                "authorAffiliationDetailsList": {
+                  "authorAffiliation": [
+                    {
+                      "affiliation": "Department of Biomedical Engineering, University of Utah, Salt Lake City, UT, USA; HCA Research Institute, Nashville, TN, USA."
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          "dataLinksTagsList": {
+            "dataLinkstag": [
+              "supporting_data",
+              "recommended_reviews"
+            ]
+          },
+          "journalInfo": {
+            "journalIssueId": 2952915,
+            "dateOfPublication": "2020 May",
+            "monthOfPublication": 5,
+            "yearOfPublication": 2020,
+            "journal": {
+              "medlineAbbreviation": "Lancet",
+              "title": "Lancet (London, England)",
+              "essn": "1474-547X",
+              "issn": "0140-6736",
+              "isoabbreviation": "Lancet",
+              "nlmid": "2985213R"
+            },
+            "printPublicationDate": "2020-05-01"
+          },
+          "pubYear": "2020",
+          "pageInfo": "S0140-6736(20)31180-6",
+          "abstractText": "<h4>Background</h4>Hydroxychloroquine or chloroquine, often in combination with a second-generation macrolide, are being widely used for treatment of COVID-19, despite no conclusive evidence of their benefit. Although generally safe when used for approved indications such as autoimmune disease or malaria, the safety and benefit of these treatment regimens are poorly evaluated in COVID-19.<h4>Methods</h4>We did a multinational registry analysis of the use of hydroxychloroquine or chloroquine with or without a macrolide for treatment of COVID-19. The registry comprised data from 671 hospitals in six continents. We included patients hospitalised between Dec 20, 2019, and April 14, 2020, with a positive laboratory finding for SARS-CoV-2. Patients who received one of the treatments of interest within 48 h of diagnosis were included in one of four treatment groups (chloroquine alone, chloroquine with a macrolide, hydroxychloroquine alone, or hydroxychloroquine with a macrolide), and patients who received none of these treatments formed the control group. Patients for whom one of the treatments of interest was initiated more than 48 h after diagnosis or while they were on mechanical ventilation, as well as patients who received remdesivir, were excluded. The main outcomes of interest were in-hospital mortality and the occurrence of de-novo ventricular arrhythmias (non-sustained or sustained ventricular tachycardia or ventricular fibrillation).<h4>Findings</h4>96 032 patients (mean age 53·8 years, 46·3% women) with COVID-19 were hospitalised during the study period and met the inclusion criteria. Of these, 14 888 patients were in the treatment groups (1868 received chloroquine, 3783 received chloroquine with a macrolide, 3016 received hydroxychloroquine, and 6221 received hydroxychloroquine with a macrolide) and 81 144 patients were in the control group. 10 698 (11·1%) patients died in hospital. After controlling for multiple confounding factors (age, sex, race or ethnicity, body-mass index, underlying cardiovascular disease and its risk factors, diabetes, underlying lung disease, smoking, immunosuppressed condition, and baseline disease severity), when compared with mortality in the control group (9·3%), hydroxychloroquine (18·0%; hazard ratio 1·335, 95% CI 1·223-1·457), hydroxychloroquine with a macrolide (23·8%; 1·447, 1·368-1·531), chloroquine (16·4%; 1·365, 1·218-1·531), and chloroquine with a macrolide (22·2%; 1·368, 1·273-1·469) were each independently associated with an increased risk of in-hospital mortality. Compared with the control group (0·3%), hydroxychloroquine (6·1%; 2·369, 1·935-2·900), hydroxychloroquine with a macrolide (8·1%; 5·106, 4·106-5·983), chloroquine (4·3%; 3·561, 2·760-4·596), and chloroquine with a macrolide (6·5%; 4·011, 3·344-4·812) were independently associated with an increased risk of de-novo ventricular arrhythmia during hospitalisation.<h4>Interpretation</h4>We were unable to confirm a benefit of hydroxychloroquine or chloroquine, when used alone or with a macrolide, on in-hospital outcomes for COVID-19. Each of these drug regimens was associated with decreased in-hospital survival and an increased frequency of ventricular arrhythmias when used for treatment of COVID-19.<h4>Funding</h4>William Harvey Distinguished Chair in Advanced Cardiovascular Medicine at Brigham and Women's Hospital.",
+          "affiliation": "Brigham and Women's Hospital Heart and Vascular Center and Harvard Medical School, Boston, MA, USA. Electronic address: redacted@example.org.",
+          "publicationStatus": "aheadofprint",
+          "language": "eng",
+          "pubModel": "Print-Electronic",
+          "pubTypeList": {
+            "pubType": [
+              "Retracted Publication",
+              "research-article",
+              "Journal Article"
+            ]
+          },
+          "subsetList": {
+            "subset": [
+              {
+                "code": "IM",
+                "name": "Index Medicus"
+              }
+            ]
+          },
+          "fullTextUrlList": {
+            "fullTextUrl": [
+              {
+                "availability": "Subscription required",
+                "availabilityCode": "S",
+                "documentStyle": "doi",
+                "site": "DOI",
+                "url": "https://doi.org/10.1016/S0140-6736(20)31180-6"
+              },
+              {
+                "availability": "Open access",
+                "availabilityCode": "OA",
+                "documentStyle": "html",
+                "site": "Europe_PMC",
+                "url": "https://europepmc.org/articles/PMC7255293"
+              }
+            ]
+          },
+          "commentCorrectionList": {
+            "commentCorrection": [
+              {
+                "source": "MED",
+                "id": "32485145",
+                "reference": "Lancet. 2020 May 30:S0140-6736(20)31249-6. doi: 10.1016/S0140-6736(20)31249-6.",
+                "type": "Erratum in",
+                "orderIn": 1
+              },
+              {
+                "source": "MED",
+                "id": "32504543",
+                "reference": "Lancet. 2020 Jun 13;395(10240):e102. doi: 10.1016/S0140-6736(20)31290-3.",
+                "type": "Expression of concern in",
+                "orderIn": 2
+              },
+              {
+                "source": "MED",
+                "id": "32511943",
+                "reference": "Lancet. 2020 Jun 13;395(10240):1820. doi: 10.1016/S0140-6736(20)31324-6.",
+                "type": "Retraction in",
+                "orderIn": 3
+              },
+              {
+                "source": "MED",
+                "id": "32607690",
+                "reference": "J Neuroimmune Pharmacol. 2020 Sep;15(3):349. doi: 10.1007/s11481-020-09940-9.",
+                "type": "Comment in",
+                "orderIn": 4
+              },
+              {
+                "source": "MED",
+                "id": "32653079",
+                "reference": "Lancet. 2020 Jul 18;396(10245):e2-e3. doi: 10.1016/S0140-6736(20)31528-2.",
+                "type": "Retraction in",
+                "orderIn": 5
+              },
+              {
+                "source": "MED",
+                "id": "33247886",
+                "reference": "Rev Colomb Obstet Ginecol. 2020 Sep;71(3):231-236. doi: 10.18597/rcog.3621.",
+                "type": "Comment in",
+                "orderIn": 6
+              }
+            ]
+          },
+          "isOpenAccess": "Y",
+          "inEPMC": "Y",
+          "inPMC": "Y",
+          "citedByCount": 543,
+          "hasReferences": "Y",
+          "hasTextMinedTerms": "Y",
+          "hasDbCrossReferences": "N",
+          "hasPDF": "N",
+          "hasBook": "N",
+          "hasSuppl": "Y",
+          "hasLabsLinks": "Y",
+          "hasData": "Y",
+          "authMan": "N",
+          "epmcAuthMan": "N",
+          "nihAuthMan": "N",
+          "hasTMAccessionNumbers": "Y",
+          "tmAccessionTypeList": {
+            "accessionType": [
+              "doi"
+            ]
+          },
+          "dateOfCreation": "2020-05-26",
+          "dateOfRevision": "2025-05-19",
+          "electronicPublicationDate": "2020-05-22",
+          "firstPublicationDate": "2020-05-22",
+          "firstIndexDate": "2020-05-27",
+          "fullTextReceivedDate": "2025-02-03",
+          "hasEvaluations": "N"
+        }
+      ]
+    }
+  },
+  "preprint": {
+    "version": "6.9",
+    "hitCount": 2677,
+    "nextCursorMark": "AoIIQXxlISg1NTU4MjM0Mw==",
+    "nextPageUrl": "https://www.ebi.ac.uk/europepmc/webservices/rest/search?query=sleep+memory+AND+SRC%3APPR&cursorMark=AoIIQXxlISg1NTU4MjM0Mw%3D%3D&resultType=core&pageSize=2&format=json",
+    "request": {
+      "queryString": "sleep memory AND SRC:PPR",
+      "resultType": "core",
+      "cursorMark": "*",
+      "pageSize": 2,
+      "sort": "",
+      "synonym": false
+    },
+    "resultList": {
+      "result": [
+        {
+          "id": "PPR1318318",
+          "source": "PPR",
+          "doi": "10.64898/2026.09.07.748279",
+          "title": "HIPPOCAMPAL TAU-RELATED SIGNAL INDEXES HYPEREXCITABILITY AND NREM SLEEP–MEMORY DYSFUNCTION IN TEMPORAL LOBE EPILEPSY",
+          "authorString": "Arafat T, Schiller K, Lam J, Von Ellenrieder N, Cai Z, DeKraker J, Fadaie F, Sziklas V, Crane J, Cruces RR, Hopewell R, Hsiao CH, Massarweh G, Soucy J, Erlandsson K, Hosseini SA, Chan T, Kobayashi E, Rosa-Neto P, Bernasconi A, Bernasconi N, Koepp M, Gotman J, Bernhardt BC.",
+          "authorList": {
+            "author": [
+              {
+                "fullName": "Arafat T",
+                "lastName": "Arafat",
+                "firstName": "Thaera",
+                "initials": "T"
+              },
+              {
+                "fullName": "Schiller K",
+                "lastName": "Schiller",
+                "firstName": "Katharina",
+                "initials": "K"
+              },
+              {
+                "fullName": "Lam J",
+                "lastName": "Lam",
+                "firstName": "Jack",
+                "initials": "J"
+              },
+              {
+                "fullName": "Von Ellenrieder N",
+                "lastName": "Von Ellenrieder",
+                "firstName": "Nicolas",
+                "initials": "N"
+              },
+              {
+                "fullName": "Cai Z",
+                "lastName": "Cai",
+                "firstName": "Zhengchen",
+                "initials": "Z"
+              },
+              {
+                "fullName": "DeKraker J",
+                "lastName": "DeKraker",
+                "firstName": "Jordan",
+                "initials": "J"
+              },
+              {
+                "fullName": "Fadaie F",
+                "lastName": "Fadaie",
+                "firstName": "Fatemeh",
+                "initials": "F"
+              },
+              {
+                "fullName": "Sziklas V",
+                "lastName": "Sziklas",
+                "firstName": "Viviane",
+                "initials": "V"
+              },
+              {
+                "fullName": "Crane J",
+                "lastName": "Crane",
+                "firstName": "Joelle",
+                "initials": "J"
+              },
+              {
+                "fullName": "Cruces RR",
+                "lastName": "Cruces",
+                "firstName": "Raúl",
+                "initials": "RR"
+              },
+              {
+                "fullName": "Hopewell R",
+                "lastName": "Hopewell",
+                "firstName": "Robert",
+                "initials": "R"
+              },
+              {
+                "fullName": "Hsiao CH",
+                "lastName": "Hsiao",
+                "firstName": "Chris Hung-Hsin",
+                "initials": "CH"
+              },
+              {
+                "fullName": "Massarweh G",
+                "lastName": "Massarweh",
+                "firstName": "Gassan",
+                "initials": "G"
+              },
+              {
+                "fullName": "Soucy J",
+                "lastName": "Soucy",
+                "firstName": "Jean-Paul",
+                "initials": "J"
+              },
+              {
+                "fullName": "Erlandsson K",
+                "lastName": "Erlandsson",
+                "firstName": "Kjell",
+                "initials": "K"
+              },
+              {
+                "fullName": "Hosseini SA",
+                "lastName": "Hosseini",
+                "firstName": "Seyyed Ali",
+                "initials": "SA"
+              },
+              {
+                "fullName": "Chan T",
+                "lastName": "Chan",
+                "firstName": "Tevy",
+                "initials": "T"
+              },
+              {
+                "fullName": "Kobayashi E",
+                "lastName": "Kobayashi",
+                "firstName": "Eliane",
+                "initials": "E"
+              },
+              {
+                "fullName": "Rosa-Neto P",
+                "lastName": "Rosa-Neto",
+                "firstName": "Pedro",
+                "initials": "P"
+              },
+              {
+                "fullName": "Bernasconi A",
+                "lastName": "Bernasconi",
+                "firstName": "Andrea",
+                "initials": "A"
+              },
+              {
+                "fullName": "Bernasconi N",
+                "lastName": "Bernasconi",
+                "firstName": "Neda",
+                "initials": "N"
+              },
+              {
+                "fullName": "Koepp M",
+                "lastName": "Koepp",
+                "firstName": "Matthias",
+                "initials": "M"
+              },
+              {
+                "fullName": "Gotman J",
+                "lastName": "Gotman",
+                "firstName": "Jean",
+                "initials": "J"
+              },
+              {
+                "fullName": "Bernhardt BC",
+                "lastName": "Bernhardt",
+                "firstName": "Boris",
+                "initials": "BC"
+              }
+            ]
+          },
+          "pubYear": "2026",
+          "abstractText": "<h4>ABSTRACT</h4>  <h4>Background</h4>  Sleep and memory disturbances are common in temporal lobe epilepsy (TLE), yet their relationship with tau-targeted neuroimaging measures remains unclear. We investigated whether  in-viv o temporal  18 F-MK6240 tracer retention relates to seizure burden, non–rapid eye movement (NREM) sleep microstructure, and memory performance in TLE.  <h4>Methods</h4>  This cross-sectional study was conducted from 2019 to 2024 at the Montreal Neurological Institute-Hospital. Eligible patients had unilateral TLE diagnosed according to International League Against Epilepsy criteria and underwent overnight electroencephalography (EEG) recordings, research-protocol 3T magnetic resonance imaging, and  18 F-MK6240 positron emission tomography. Regional  18 F-MK6240 standardized uptake value ratios (SUVRs), using the cerebellum as the reference region, were quantified in the ipsilateral hippocampus (defined a  priori as the primary region of interest), as well as in peri-hippocampal and lateral temporal regions. Electroclinical and neuropsychological measures, including seizure burden (high vs low), N2 interictal epileptiform discharge frequency (frequent vs non-frequent), and memory performance (impaired vs intact), were classified according to predefined clinical criteria. N2 spindle rate and N3 slow-wave rate were quantified from overnight EEG recordings.  <h4>Findings</h4>  Of 70 eligible patients, 25 were included (eight [32%] females; mean age 35·2 years [SD 12·1]). Higher ipsilateral hippocampal  18 F-MK6240 uptake was observed in participants with greater focal seizure burden (median [IQR] 0·70 [0·67–0·78] vs 0·64 [0·58–0·65], rank-biserial correlation=−0·58, 95% CI −0·82 to −0·19; p=0·02), was associated with lower N2 spindle rate (r=−0·42, 95% CI −0·70 to −0·03; p=0·04) and higher N3 slow-wave rate (r=0·47; 95% CI 0·09 to 0·73; p=0·02), and was also higher in participants with impaired than intact memory performance (n=21; mean [SD] 0·80 [0·12] vs 0·68 [0·10], Cohen’s d=1·15, 95% CI 0·07 to 2·21; p=0·04). Associations outside the hippocampus were generally less consistent and less precise, with the largest non-hippocampal estimate observed in peri-hippocampal regions.  <h4>Interpretation</h4>  Higher hippocampal  18 F-MK6240 uptake was associated with greater focal seizure burden, altered NREM sleep microstructure, and impaired memory performance in TLE. These findings suggest that hippocampal  18 F-MK6240 uptake may represent a candidate marker of circuit vulnerability associated with NREM sleep-memory dysfunction in TLE, warranting validation in larger longitudinal studies.  <h4>Funding</h4>  Canadian Institutes of Health Research, Fonds de la Recherche du Québec – Santé, Wellcome Trust, Natural Sciences and Engineering Research Council of Canada, Brain Canada, SickKids Foundation.",
+          "pubTypeList": {
+            "pubType": [
+              "Preprint"
+            ]
+          },
+          "bookOrReportDetails": {
+            "publisher": "bioRxiv",
+            "yearOfPublication": 2026
+          },
+          "fullTextUrlList": {
+            "fullTextUrl": [
+              {
+                "availability": "Free",
+                "availabilityCode": "F",
+                "documentStyle": "doi",
+                "site": "DOI",
+                "url": "https://doi.org/10.64898/2026.09.07.748279"
+              }
+            ]
+          },
+          "isOpenAccess": "N",
+          "inEPMC": "N",
+          "inPMC": "N",
+          "citedByCount": 0,
+          "hasReferences": "N",
+          "hasTextMinedTerms": "Y",
+          "hasDbCrossReferences": "N",
+          "hasPDF": "N",
+          "hasBook": "N",
+          "hasSuppl": "N",
+          "hasLabsLinks": "N",
+          "hasData": "N",
+          "authMan": "N",
+          "epmcAuthMan": "N",
+          "nihAuthMan": "N",
+          "hasTMAccessionNumbers": "N",
+          "dateOfCreation": "2026-09-14",
+          "firstPublicationDate": "2026-09-13",
+          "firstIndexDate": "2026-09-14",
+          "hasEvaluations": "N"
+        },
+        {
+          "id": "PPR1233086",
+          "source": "PPR",
+          "fullTextIdList": {
+            "fullTextId": [
+              "PPR1233086"
+            ]
+          },
+          "doi": "10.64898/2025.12.03.692036",
+          "title": "A paradoxical impact of alcohol on sleep-memory coupling",
+          "authorString": "Chouhan NS, Mitra W, Singh K, Sehgal A.",
+          "authorList": {
+            "author": [
+              {
+                "fullName": "Chouhan NS",
+                "lastName": "Chouhan",
+                "firstName": "Nitin",
+                "initials": "NS",
+                "authorAffiliationDetailsList": {
+                  "authorAffiliation": [
+                    {
+                      "affiliation": ", Perelman School of Medicine at the , , ,"
+                    }
+                  ]
+                }
+              },
+              {
+                "fullName": "Mitra W",
+                "lastName": "Mitra",
+                "firstName": "Wriju",
+                "initials": "W",
+                "authorAffiliationDetailsList": {
+                  "authorAffiliation": [
+                    {
+                      "affiliation": "Department of Biological Sciences, , ,"
+                    }
+                  ]
+                }
+              },
+              {
+                "fullName": "Singh K",
+                "lastName": "Singh",
+                "firstName": "Kamakshi",
+                "initials": "K",
+                "authorAffiliationDetailsList": {
+                  "authorAffiliation": [
+                    {
+                      "affiliation": "Department of Biological Sciences, , ,"
+                    }
+                  ]
+                }
+              },
+              {
+                "fullName": "Sehgal A",
+                "lastName": "Sehgal",
+                "firstName": "Amita",
+                "initials": "A",
+                "authorAffiliationDetailsList": {
+                  "authorAffiliation": [
+                    {
+                      "affiliation": ", Perelman School of Medicine at the , , ,"
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          "dataLinksTagsList": {
+            "dataLinkstag": [
+              "altmetrics"
+            ]
+          },
+          "pubYear": "2025",
+          "abstractText": "<h4>SUMMARY</h4>  Sleep serves a fundamental role in memory consolidation, and yet it must adapt to the organism’s physiological state. The latter is impacted profoundly by acute ethanol consumption, but whether intoxication affects the role of sleep in memory consolidation remains unexplored. Here, we demonstrate that acute ethanol inverts the canonical link between sleep and memory in  Drosophila . Typically, satiated flies require sleep for appetitive memory consolidation, but starved flies that must forage for food switch to sleep-independent memory. Ethanol selectively impairs memory consolidation in satiated flies by causing a switch to sleep-independent memory, which then can’t be supported because of ethanol-induced sedation. Under these conditions, sleep deprivation rescues memory and requires the upregulation of neuropeptide F, which signals through NPF receptors on PPL1 dopaminergic neurons. We suggest that reward-seeking behaviors, induced by starvation or ethanol, invoke sleep-independent memory. However, ethanol has a paradoxical impact, wherein it induces a switch in memory pathways but concurrently suppresses consolidation through the preferred pathway, thereby causing sleep to become detrimental for memory consolidation.",
+          "pubTypeList": {
+            "pubType": [
+              "Preprint"
+            ]
+          },
+          "bookOrReportDetails": {
+            "publisher": "bioRxiv",
+            "yearOfPublication": 2025
+          },
+          "fullTextUrlList": {
+            "fullTextUrl": [
+              {
+                "availability": "Free",
+                "availabilityCode": "F",
+                "documentStyle": "doi",
+                "site": "DOI",
+                "url": "https://doi.org/10.64898/2025.12.03.692036"
+              },
+              {
+                "availability": "Open access",
+                "availabilityCode": "OA",
+                "documentStyle": "html",
+                "site": "Europe_PMC",
+                "url": "https://europepmc.org/article/PPR/PPR1233086"
+              }
+            ]
+          },
+          "commentCorrectionList": {
+            "commentCorrection": [
+              {
+                "source": "MED",
+                "id": "42456656",
+                "reference": "Current biology : CB. \n    2026 Jul;:S0960-9822(26)00815-8",
+                "type": "Preprint of",
+                "note": "Link created based on a title-first author match",
+                "orderIn": 10001
+              }
+            ]
+          },
+          "isOpenAccess": "Y",
+          "inEPMC": "N",
+          "inPMC": "N",
+          "citedByCount": 0,
+          "hasReferences": "Y",
+          "hasTextMinedTerms": "Y",
+          "hasDbCrossReferences": "N",
+          "hasPDF": "N",
+          "hasBook": "N",
+          "hasSuppl": "Y",
+          "hasLabsLinks": "Y",
+          "hasData": "Y",
+          "license": "cc by",
+          "authMan": "N",
+          "epmcAuthMan": "Y",
+          "nihAuthMan": "N",
+          "manuscriptId": "EMS214898",
+          "hasTMAccessionNumbers": "N",
+          "dateOfCreation": "2026-05-19",
+          "firstPublicationDate": "2025-12-04",
+          "firstIndexDate": "2026-05-19",
+          "fullTextReceivedDate": "2026-10-09",
+          "hasEvaluations": "N"
+        }
+      ]
+    }
+  },
+  "review": {
+    "version": "6.9",
+    "hitCount": 5120,
+    "nextCursorMark": "AoIIQMWZrSg1NjQzNzE3OA==",
+    "nextPageUrl": "https://www.ebi.ac.uk/europepmc/webservices/rest/search?query=sleep+memory+consolidation+AND+PUB_TYPE%3A%22Review%22&cursorMark=AoIIQMWZrSg1NjQzNzE3OA%3D%3D&resultType=core&pageSize=2&format=json",
+    "request": {
+      "queryString": "sleep memory consolidation AND PUB_TYPE:\"Review\"",
+      "resultType": "core",
+      "cursorMark": "*",
+      "pageSize": 2,
+      "sort": "",
+      "synonym": false
+    },
+    "resultList": {
+      "result": [
+        {
+          "id": "42671347",
+          "source": "MED",
+          "pmid": "42671347",
+          "doi": "10.1177/13872877261479999",
+          "title": "Key circuits through which sleep affects memory and their role in Alzheimer's disease.",
+          "authorString": "Shen B, Zhu Z, Qing H, Quan Z.",
+          "authorList": {
+            "author": [
+              {
+                "fullName": "Shen B",
+                "lastName": "Shen",
+                "firstName": "Bingxin",
+                "initials": "B",
+                "authorId": {
+                  "type": "ORCID",
+                  "value": "0009-0000-0488-1085"
+                },
+                "authorAffiliationDetailsList": {
+                  "authorAffiliation": [
+                    {
+                      "affiliation": "School of Life Science, Beijing Institute of Technology, Beijing, PR China."
+                    }
+                  ]
+                }
+              },
+              {
+                "fullName": "Zhu Z",
+                "lastName": "Zhu",
+                "firstName": "Zilu",
+                "initials": "Z",
+                "authorId": {
+                  "type": "ORCID",
+                  "value": "0000-0001-5613-1884"
+                },
+                "authorAffiliationDetailsList": {
+                  "authorAffiliation": [
+                    {
+                      "affiliation": "School of Life Science, Beijing Institute of Technology, Beijing, PR China."
+                    }
+                  ]
+                }
+              },
+              {
+                "fullName": "Qing H",
+                "lastName": "Qing",
+                "firstName": "Hong",
+                "initials": "H",
+                "authorId": {
+                  "type": "ORCID",
+                  "value": "0000-0003-2820-450X"
+                },
+                "authorAffiliationDetailsList": {
+                  "authorAffiliation": [
+                    {
+                      "affiliation": "Department of Biology, Shenzhen SMU-BIT University, Shenzhen, PR China."
+                    }
+                  ]
+                }
+              },
+              {
+                "fullName": "Quan Z",
+                "lastName": "Quan",
+                "firstName": "Zhenzhen",
+                "initials": "Z",
+                "authorId": {
+                  "type": "ORCID",
+                  "value": "0000-0002-2557-0371"
+                },
+                "authorAffiliationDetailsList": {
+                  "authorAffiliation": [
+                    {
+                      "affiliation": "School of Life Science, Beijing Institute of Technology, Beijing, PR China."
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          "authorIdList": {
+            "authorId": [
+              {
+                "type": "ORCID",
+                "value": "0000-0001-5613-1884"
+              },
+              {
+                "type": "ORCID",
+                "value": "0000-0002-2557-0371"
+              },
+              {
+                "type": "ORCID",
+                "value": "0000-0003-2820-450X"
+              },
+              {
+                "type": "ORCID",
+                "value": "0009-0000-0488-1085"
+              }
+            ]
+          },
+          "journalInfo": {
+            "journalIssueId": 4236322,
+            "dateOfPublication": "2026 Aug",
+            "monthOfPublication": 8,
+            "yearOfPublication": 2026,
+            "journal": {
+              "medlineAbbreviation": "J Alzheimers Dis",
+              "title": "Journal of Alzheimer's disease : JAD",
+              "essn": "1875-8908",
+              "issn": "1387-2877",
+              "isoabbreviation": "J Alzheimers Dis",
+              "nlmid": "9814863"
+            },
+            "printPublicationDate": "2026-08-01"
+          },
+          "pubYear": "2026",
+          "pageInfo": "13872877261479999",
+          "abstractText": "Sleep is a critical physiological process for maintaining the cognitive function of brain, particularly about memory consolidation. This review systematically elaborates on the multiscale regulatory mechanisms of the sleep-wake cycle, with a focus on the neural circuits involved in sleep-dependent memory consolidation, such as the hippocampus-prefrontal-thalamus network, characteristic neural oscillations, and microglia-mediated synaptic changes. Building upon these foundations, the article delves into Alzheimer's disease (AD), providing an in-depth analysis of the complex bidirectional relationship between sleep disturbances and the core pathologies of AD. Early vulnerable brain regions in AD, including the entorhinal cortex, hippocampus, thalamus, and locus coeruleus, coincide precisely with key hubs of the sleep-memory circuitry. Pathological damage in these regions leads to disrupted sleep architecture and impaired memory consolidation, creating a vicious cycle that accelerates memory impairment and cognitive decline. Interventions targeting the sleep-memory circuitry may thus offer a promising new strategy for early intervention in AD.",
+          "affiliation": "School of Life Science, Beijing Institute of Technology, Beijing, PR China.",
+          "publicationStatus": "aheadofprint",
+          "language": "eng",
+          "pubModel": "Print-Electronic",
+          "pubTypeList": {
+            "pubType": [
+              "Review",
+              "Journal Article"
+            ]
+          },
+          "grantsList": {
+            "grant": [
+              {
+                "agency": "Shenzhen Basic Research Specialized Key Projects",
+                "grantId": "JCYJ20241202130511015",
+                "orderIn": 0
+              },
+              {
+                "agency": "National Natural Science Foundation of China",
+                "grantId": "82371441; 82371446",
+                "orderIn": 0
+              },
+              {
+                "agency": "The scientific research program of innovation platform in State Tobacco Monopoly Administration",
+                "grantId": "402021AWHZ04",
+                "orderIn": 0
+              },
+              {
+                "agency": "Alzheimer&apos;s Disease Pathogenesis and Drug Development Innovation Team, Innovation Team Project of Guangdong General Colleges and Universities",
+                "grantId": "2024KCXTD016",
+                "orderIn": 0
+              },
+              {
+                "agency": "National Science and Technology Major Project",
+                "grantId": "STI2030-Major Projects 2022ZD0206800",
+                "orderIn": 0
+              },
+              {
+                "agency": "Beijing Nova Program",
+                "grantId": "20220484083; 20230484436",
+                "orderIn": 0
+              }
+            ]
+          },
+          "keywordList": {
+            "keyword": [
+              "Hippocampus",
+              "Locus coeruleus",
+              "Alzheimer's disease",
+              "Thalamus",
+              "Entorhinal Cortex",
+              "Sleep Physiology",
+              "Memory Consolidation",
+              "Neural Circuits"
+            ]
+          },
+          "subsetList": {
+            "subset": [
+              {
+                "code": "IM",
+                "name": "Index Medicus"
+              }
+            ]
+          },
+          "fullTextUrlList": {
+            "fullTextUrl": [
+              {
+                "availability": "Subscription required",
+                "availabilityCode": "S",
+                "documentStyle": "doi",
+                "site": "DOI",
+                "url": "https://doi.org/10.1177/13872877261479999"
+              }
+            ]
+          },
+          "isOpenAccess": "N",
+          "inEPMC": "N",
+          "inPMC": "N",
+          "citedByCount": 0,
+          "hasReferences": "Y",
+          "hasTextMinedTerms": "Y",
+          "hasDbCrossReferences": "N",
+          "hasPDF": "N",
+          "hasBook": "N",
+          "hasSuppl": "N",
+          "hasLabsLinks": "N",
+          "hasData": "N",
+          "authMan": "N",
+          "epmcAuthMan": "N",
+          "nihAuthMan": "N",
+          "hasTMAccessionNumbers": "N",
+          "dateOfCreation": "2026-08-31",
+          "dateOfRevision": "2026-08-31",
+          "electronicPublicationDate": "2026-08-31",
+          "firstPublicationDate": "2026-08-31",
+          "firstIndexDate": "2026-09-01",
+          "hasEvaluations": "N"
+        },
+        {
+          "id": "42748517",
+          "source": "MED",
+          "pmid": "42748517",
+          "doi": "10.1016/j.yebeh.2026.111269",
+          "title": "The interplay between sleep and cognition in adults with Epilepsy: evidence from a systematic review.",
+          "authorString": "Jasniak D, Khaw JH, Huete AV, Stavropoulos I.",
+          "authorList": {
+            "author": [
+              {
+                "fullName": "Jasniak D",
+                "lastName": "Jasniak",
+                "firstName": "Dorothea",
+                "initials": "D",
+                "authorAffiliationDetailsList": {
+                  "authorAffiliation": [
+                    {
+                      "affiliation": "Faculty of Life Sciences and Medicine, King's College London, UK. Electronic address: redacted@example.org."
+                    }
+                  ]
+                }
+              },
+              {
+                "fullName": "Khaw JH",
+                "lastName": "Khaw",
+                "firstName": "Jin Han",
+                "initials": "JH",
+                "authorAffiliationDetailsList": {
+                  "authorAffiliation": [
+                    {
+                      "affiliation": "Department of Neurosurgery, University Hospital Coventry and Warwickshire NHS Trust, Coventry, UK. Electronic address: redacted@example.org."
+                    }
+                  ]
+                }
+              },
+              {
+                "fullName": "Huete AV",
+                "lastName": "Huete",
+                "firstName": "Antonio Valentin",
+                "initials": "AV",
+                "authorAffiliationDetailsList": {
+                  "authorAffiliation": [
+                    {
+                      "affiliation": "Department of Basic and Clinical Neuroscience, Institute of Psychiatry, Psychology & Neuroscience, King's College London, UK; Department of Clinical Neurophysiology, King's College Hospital, London, UK. Electronic address: redacted@example.org."
+                    }
+                  ]
+                }
+              },
+              {
+                "fullName": "Stavropoulos I",
+                "lastName": "Stavropoulos",
+                "firstName": "Ioannis",
+                "initials": "I",
+                "authorAffiliationDetailsList": {
+                  "authorAffiliation": [
+                    {
+                      "affiliation": "Department of Basic and Clinical Neuroscience, Institute of Psychiatry, Psychology & Neuroscience, King's College London, UK; Department of Clinical Neurophysiology, King's College Hospital, London, UK. Electronic address: redacted@example.org."
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          "journalInfo": {
+            "volume": "185",
+            "journalIssueId": 4252272,
+            "dateOfPublication": "2026 Sep",
+            "monthOfPublication": 9,
+            "yearOfPublication": 2026,
+            "journal": {
+              "medlineAbbreviation": "Epilepsy Behav",
+              "title": "Epilepsy & behavior : E&B",
+              "essn": "1525-5069",
+              "issn": "1525-5050",
+              "isoabbreviation": "Epilepsy Behav",
+              "nlmid": "100892858"
+            },
+            "printPublicationDate": "2026-09-01"
+          },
+          "pubYear": "2026",
+          "pageInfo": "111269",
+          "abstractText": "Sleep disturbances and cognitive impairment are common among people with epilepsy (PWE). The relationship between sleep and epilepsy has been studied extensively and considered bidirectional, but the mechanism behind cognitive problems remains unclear. Prior research has demonstrated the benefit of sleep on cognition in healthy individuals. In turn, studies investigating whether sleep disturbances could be causing cognitive impairment in PWE have been performed but these are few, mainly focusing on paediatric patients. We conducted a systematic review of studies published between 2000-2025, aiming to identify correlations between sleep (macro-architecture and self-reported sleep quality) and cognition in adult PWE. Risk of bias and quality were assessed. Thirteen studies passed the exclusion criteria with data from 581 patients. Nine studies identified significant correlations between at least one sleep parameter and cognitive function. Four studies investigating sleep-dependent memory consolidation demonstrated a retained benefit of sleep on memory in PWE. Four studies found that sleep microstructure played an independent role. Another finding shared by six studies was the negative effect of nocturnal interictal epileptic discharges (IEDs) on cognition. This effect might disrupt overnight memory consolidation processes, thus limiting the benefit of sleep on cognition, and, in turn, explain why several studies failed to record positive correlations between sleep and cognition. In conclusion, more homogeneous studies with larger cohorts are recommended to establish the exact relationship between sleep macro-architecture and cognition in PWE. Deeper research on the role of sleep microstructure for cognitive function might also provide further insight into this complex and multidirectional relationship.",
+          "affiliation": "Faculty of Life Sciences and Medicine, King's College London, UK. Electronic address: redacted@example.org.",
+          "publicationStatus": "aheadofprint",
+          "language": "eng",
+          "pubModel": "Print-Electronic",
+          "pubTypeList": {
+            "pubType": [
+              "Review",
+              "Journal Article"
+            ]
+          },
+          "keywordList": {
+            "keyword": [
+              "Epilepsy",
+              "Cognitive function",
+              "Memory Consolidation",
+              "Sleep Microstructure",
+              "Sleep Macro-architecture"
+            ]
+          },
+          "subsetList": {
+            "subset": [
+              {
+                "code": "IM",
+                "name": "Index Medicus"
+              }
+            ]
+          },
+          "fullTextUrlList": {
+            "fullTextUrl": [
+              {
+                "availability": "Subscription required",
+                "availabilityCode": "S",
+                "documentStyle": "doi",
+                "site": "DOI",
+                "url": "https://doi.org/10.1016/j.yebeh.2026.111269"
+              }
+            ]
+          },
+          "isOpenAccess": "N",
+          "inEPMC": "N",
+          "inPMC": "N",
+          "citedByCount": 0,
+          "hasReferences": "N",
+          "hasTextMinedTerms": "N",
+          "hasDbCrossReferences": "N",
+          "hasPDF": "N",
+          "hasBook": "N",
+          "hasSuppl": "N",
+          "hasLabsLinks": "N",
+          "hasData": "N",
+          "authMan": "N",
+          "epmcAuthMan": "N",
+          "nihAuthMan": "N",
+          "hasTMAccessionNumbers": "N",
+          "dateOfCreation": "2026-09-16",
+          "dateOfRevision": "2026-09-16",
+          "electronicPublicationDate": "2026-09-16",
+          "firstPublicationDate": "2026-09-16",
+          "firstIndexDate": "2026-09-17",
+          "hasEvaluations": "N"
+        }
+      ]
+    }
+  }
+}

@@ -1,4 +1,5 @@
 import {
+  createSearchCache,
   defaultFilters,
   defaultScoringSettings,
   type LabelOverride,
@@ -6,16 +7,16 @@ import {
   type ResultFilters,
   type ScoringSettings,
 } from "@sourcly/core";
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { browserStorage, loadApiKey, saveApiKey } from "./apiKey";
 import type { SourclyConfig } from "./config";
 import { Footer } from "./Footer";
 import { Header } from "./Header";
 import { rankResults } from "./pipeline";
-import { createProviders, DEFAULT_PROVIDERS } from "./providers";
+import { createProviders, DEFAULT_PROVIDERS, skippedStatuses } from "./providers";
 import { Results } from "./Results";
 import { SearchBox } from "./SearchBox";
-import { toggleInList, withOverride } from "./settings";
+import { DEFAULT_PER_SOURCE, toggleInList, withOverride } from "./settings";
 import { SettingsPanel } from "./SettingsPanel";
 import { useSearch } from "./useSearch";
 
@@ -25,28 +26,41 @@ export function App({ config }: { config: SourclyConfig }) {
   const [scoring, setScoring] = useState<ScoringSettings>(defaultScoringSettings);
   const [filters, setFilters] = useState<ResultFilters>(defaultFilters);
   const [enabledProviders, setEnabledProviders] = useState<ProviderId[]>([...DEFAULT_PROVIDERS]);
+  const [perSource, setPerSource] = useState(DEFAULT_PER_SOURCE);
   const [overrides, setOverrides] = useState<ReadonlyMap<string, LabelOverride>>(() => new Map());
+  const [page, setPage] = useState(1);
 
   const [storage] = useState(browserStorage);
   const [apiKey, setApiKey] = useState(() => loadApiKey(storage));
   const [keyIsStored, setKeyIsStored] = useState(true);
 
+  // This visit's memory of each source's answers. In memory only, gone when the page closes.
+  const cache = useRef(createSearchCache());
   const { state, search } = useSearch();
 
-  // Re-ranks instantly when any setting changes; it never contacts a provider.
+  // Merges, ranks and filters instantly whenever a source answers or a setting changes;
+  // it never contacts a source.
   const ranked = useMemo(
-    () => (state.phase === "done" ? rankResults(state.results, { scoring, filters, overrides }, REFERENCE_YEAR) : null),
+    () =>
+      state.phase === "idle" ? null : rankResults(state.results, { scoring, filters, overrides }, REFERENCE_YEAR),
     [state, scoring, filters, overrides],
   );
 
   function handleSearch(query: string) {
-    const providers = createProviders(enabledProviders, { openAlexApiKey: apiKey });
-    if (providers.length > 0) search(query, providers);
+    const providers = createProviders(enabledProviders, { openAlexApiKey: apiKey, contactEmail: config.contactEmail });
+    if (providers.length === 0) return;
+    setPage(1);
+    search(query, providers, { limit: perSource, cache: cache.current, skipped: skippedStatuses() });
   }
 
   function handleApiKeyChange(key: string) {
     setApiKey(key);
     setKeyIsStored(saveApiKey(storage, key));
+  }
+
+  function handlePageChange(next: number) {
+    setPage(next);
+    document.getElementById("results")?.scrollIntoView({ block: "start" });
   }
 
   return (
@@ -68,6 +82,9 @@ export function App({ config }: { config: SourclyConfig }) {
           onFiltersChange={setFilters}
           enabledProviders={enabledProviders}
           onToggleProvider={(id) => setEnabledProviders((current) => toggleInList(current, id))}
+          perSource={perSource}
+          onPerSourceChange={setPerSource}
+          onClearCache={() => cache.current.clear()}
           apiKey={apiKey}
           onApiKeyChange={handleApiKeyChange}
           keyIsStored={keyIsStored}
@@ -76,8 +93,11 @@ export function App({ config }: { config: SourclyConfig }) {
         <Results
           state={state}
           ranked={ranked}
+          page={page}
+          onPageChange={handlePageChange}
           overrides={overrides}
           libraryPrefix={config.libraryProxyPrefix}
+          librarySearchUrl={config.librarySearchUrl}
           onOverrideChange={(resultId, change) => setOverrides((current) => withOverride(current, resultId, change))}
           onClearFilters={() => setFilters(defaultFilters())}
         />

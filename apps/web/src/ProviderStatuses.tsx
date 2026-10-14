@@ -1,16 +1,36 @@
 import { PROVIDER_NAMES, type ProviderStatus } from "@sourcly/core";
 import { pluralize } from "./format";
+import { orderedStatuses, type ActiveSearch } from "./searchState";
 
-/** One line per source asked: ok, rate-limited or failed, so a gap is never silent. */
-export function ProviderStatuses({ statuses }: { statuses: readonly ProviderStatus[] }) {
-  if (statuses.length === 0) return null;
+function describe(status: ProviderStatus): string {
+  if (status.state === "ok") {
+    return `ok, ${pluralize(status.count, "result")}${status.cached === true ? " (remembered from earlier in this visit)" : ""}`;
+  }
+  return `${status.state}. ${status.message}`;
+}
+
+/**
+ * One line per source: searching, ok, rate-limited, failed or skipped, so a gap
+ * in the results is never silent. Sources keep the order they were asked in.
+ */
+export function ProviderStatuses({ search }: { search: ActiveSearch }) {
+  const answered = orderedStatuses(search);
+  const byProvider = new Map(answered.map((status) => [status.provider, status]));
+  const rows = [
+    ...search.order.map((id) => ({ id, status: byProvider.get(id) ?? null })),
+    // Sources that were never asked (skipped) come after the ones that were.
+    ...answered.filter((status) => !search.order.includes(status.provider)).map((status) => ({ id: status.provider, status })),
+  ];
+  if (rows.length === 0) return null;
 
   return (
     <ul className="statuses" aria-label="Source status">
-      {statuses.map((status) => (
-        <li key={status.provider} className={status.state === "ok" ? undefined : "status-problem"}>
-          <strong>{PROVIDER_NAMES[status.provider]}:</strong>{" "}
-          {status.state === "ok" ? `ok, ${pluralize(status.count, "result")}` : `${status.state}. ${status.message}`}
+      {rows.map(({ id, status }) => (
+        <li
+          key={id}
+          className={status === null ? undefined : status.state === "ok" ? undefined : status.state === "skipped" ? "status-skipped" : "status-problem"}
+        >
+          <strong>{PROVIDER_NAMES[id]}:</strong> {status === null ? "searching…" : describe(status)}
         </li>
       ))}
     </ul>

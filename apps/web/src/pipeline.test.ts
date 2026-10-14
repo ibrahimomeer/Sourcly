@@ -12,13 +12,13 @@ const hit = (rank: number, listSize: number) => [
 
 // A: best match, closed.  B: middle, open.  C: worst match, open preprint (not peer-reviewed).
 const results = (): Result[] => [
-  makeResult({ id: "10.1000/a", year: 2020, hits: hit(1, 3), citationCount: 30 }),
+  makeResult({ id: "10.1000/a", doi: "10.1000/a", year: 2020, hits: hit(1, 3), citationCount: 30 }),
   makeResult({
-    id: "10.1000/b", year: 2021, hits: hit(2, 3), citationCount: 10,
+    id: "10.1000/b", doi: "10.1000/b", year: 2021, hits: hit(2, 3), citationCount: 10,
     openAccess: { isOpen: true, status: "gold", url: null, pdfUrl: null },
   }),
   makeResult({
-    id: "10.1000/c", year: 2024, hits: hit(3, 3), citationCount: 2, type: "preprint", venueKind: null,
+    id: "10.1000/c", doi: "10.1000/c", year: 2024, hits: hit(3, 3), citationCount: 2, type: "preprint", venueKind: null,
     openAccess: { isOpen: true, status: "green", url: null, pdfUrl: null },
   }),
 ];
@@ -107,5 +107,54 @@ describe("rankResults", () => {
 
   it("returns empty lists for no results", () => {
     expect(rankResults([], view(), YEAR)).toEqual({ shown: [], hidden: [] });
+  });
+});
+
+describe("rankResults: results found by several sources", () => {
+  const found = (provider: "openalex" | "crossref" | "pubmed", rank: number, overrides: Partial<Result> = {}) =>
+    makeResult({
+      id: "10.1000/shared",
+      doi: "10.1000/shared",
+      hits: [{ provider, id: `${provider}-${rank}`, rank, listSize: 10, score: null }],
+      ...overrides,
+    });
+
+  it("merges one work returned by three sources into one result that lists all three", () => {
+    const { shown } = rankResults([found("pubmed", 7), found("crossref", 3), found("openalex", 1)], view(), YEAR);
+    expect(shown).toHaveLength(1);
+    expect(shown[0]?.result.hits.map((h) => h.provider)).toEqual(["openalex", "crossref", "pubmed"]);
+  });
+
+  it("scores relevance from the best rank any source gave", () => {
+    const { shown } = rankResults([found("pubmed", 9), found("openalex", 2)], view(), YEAR);
+    const relevance = shown[0]?.factors.find((f) => f.factor === "relevance");
+    expect(relevance?.raw).toBe(2);
+    expect(relevance?.detail).toContain("also returned by #9 of 10 on PubMed");
+  });
+
+  it("gives the same ranking whatever order the sources answered in", () => {
+    const others = [
+      makeResult({ id: "10.1000/x", doi: "10.1000/x", year: 2019, hits: hit(1, 3) }),
+      makeResult({ id: "10.1000/y", doi: "10.1000/y", year: 2015, hits: hit(3, 3) }),
+    ];
+    const pile = [found("openalex", 2), found("crossref", 5), ...others];
+    const forwards = rankResults(pile, view(), YEAR).shown;
+    const backwards = rankResults([...pile].reverse(), view(), YEAR).shown;
+    expect(backwards.map((s) => [s.result.id, s.score])).toEqual(forwards.map((s) => [s.result.id, s.score]));
+  });
+
+  it("uses the merged record for filters, so one source's open-access flag counts", () => {
+    const closed = found("crossref", 1, { openAccess: { isOpen: false, status: "closed", url: null, pdfUrl: null } });
+    const open = found("europepmc" as never, 4, { openAccess: { isOpen: true, status: "unknown", url: "https://x.org", pdfUrl: null } });
+    const filters = { ...defaultFilters(), openAccessOnly: true };
+    const { shown, hidden } = rankResults([closed, open], view({ filters }), YEAR);
+    expect(shown).toHaveLength(1);
+    expect(hidden).toHaveLength(0);
+  });
+
+  it("does not merge different works that merely share a title", () => {
+    const a = makeResult({ id: "10.1/a", doi: "10.1/a", title: "Sleep and memory in adults", authors: [{ name: "Ann Smith" }] });
+    const b = makeResult({ id: "10.1/b", doi: "10.1/b", title: "Sleep and memory in adults", authors: [{ name: "Ann Smith" }] });
+    expect(rankResults([a, b], view(), YEAR).shown).toHaveLength(2);
   });
 });

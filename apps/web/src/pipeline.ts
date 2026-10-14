@@ -2,6 +2,7 @@ import {
   applyFilters,
   applyOverride,
   classify,
+  mergeResults,
   scoreResults,
   type LabelOverride,
   type Result,
@@ -25,19 +26,20 @@ export interface RankedView {
 }
 
 /**
- * Everything that happens after the data arrives: label, score, sort, filter.
- * It reads only the already-fetched results, so changing any setting re-ranks
- * instantly without contacting a provider.
+ * Everything that happens after the data arrives: merge duplicates, label,
+ * score, sort, filter. It reads only the already-fetched results, so changing
+ * any setting re-ranks instantly without contacting a provider.
  *
- * Scores are computed over every fetched result before filtering, so a filter
- * never changes a result's score or rank, it only hides results.
+ * Results that several sources returned become one entry that lists all of
+ * them. Scores are computed over every merged result before filtering, so a
+ * filter never changes a result's score or rank, it only hides results.
  */
 export function rankResults(
   results: readonly Result[],
   settings: ViewSettings,
   referenceYear: number,
 ): RankedView {
-  const items = results.map((result) => ({
+  const items = mergeResults(results).map((result) => ({
     result,
     labels: applyOverride(classify(result), settings.overrides.get(result.id)),
   }));

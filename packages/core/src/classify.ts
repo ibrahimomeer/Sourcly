@@ -89,6 +89,11 @@ function classifyLevel(result: Result): Label<SourceLevel> {
 function classifyPeerReview(result: Result): Label<PeerReviewStatus> {
   const typeField = describeField(result.rawType, "no type in metadata");
 
+  // Wikipedia is the one source here that is known not to be peer reviewed.
+  if (result.rawType?.provider === "wikipedia") {
+    return rule("not-peer-reviewed", "Wikipedia is written and edited by volunteers, not peer reviewed", typeField);
+  }
+
   switch (result.type) {
     case "preprint":
       return rule("not-peer-reviewed", "Preprint: posted before peer review", typeField);

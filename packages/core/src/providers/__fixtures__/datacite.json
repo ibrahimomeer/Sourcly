@@ -1,0 +1,823 @@
+{
+  "data": [
+    {
+      "id": "10.25405/ncl.34495572.v1",
+      "type": "dois",
+      "attributes": {
+        "doi": "10.25405/ncl.34495572.v1",
+        "identifiers": [],
+        "creators": [
+          {
+            "givenName": "Fay E.",
+            "familyName": "Fletcher",
+            "name": "Fay E. Fletcher",
+            "affiliation": [],
+            "nameIdentifiers": []
+          },
+          {
+            "affiliation": [
+              "Newcastle University"
+            ],
+            "givenName": "Victoria",
+            "familyName": "Knowland",
+            "name": "Victoria Knowland",
+            "nameIdentifiers": [
+              {
+                "nameIdentifierScheme": "ORCID",
+                "schemeUri": "https://orcid.org",
+                "nameIdentifier": "https://orcid.org/0000-0003-4367-3689"
+              }
+            ]
+          },
+          {
+            "givenName": "Sarah",
+            "familyName": "Walker",
+            "name": "Sarah Walker",
+            "affiliation": [],
+            "nameIdentifiers": []
+          },
+          {
+            "givenName": "M. Gareth",
+            "familyName": "Gaskell",
+            "name": "M. Gareth Gaskell",
+            "affiliation": [],
+            "nameIdentifiers": []
+          },
+          {
+            "givenName": "Courtenay",
+            "familyName": "Norbury",
+            "name": "Courtenay Norbury",
+            "affiliation": [],
+            "nameIdentifiers": []
+          },
+          {
+            "givenName": "Lisa M.",
+            "familyName": "Henderson",
+            "name": "Lisa M. Henderson",
+            "affiliation": [],
+            "nameIdentifiers": []
+          }
+        ],
+        "titles": [
+          {
+            "title": "Atypicalities in sleep and semantic consolidation in autism"
+          }
+        ],
+        "publisher": "Newcastle University",
+        "container": {},
+        "publicationYear": 2026,
+        "subjects": [],
+        "contributors": [],
+        "dates": [
+          {
+            "date": "2026-10-14",
+            "dateType": "Created"
+          },
+          {
+            "date": "2026-10-14",
+            "dateType": "Updated"
+          },
+          {
+            "date": "2020-05-01",
+            "dateType": "Issued"
+          }
+        ],
+        "language": null,
+        "types": {
+          "schemaOrg": "ScholarlyArticle",
+          "resourceTypeGeneral": "JournalArticle",
+          "citeproc": "article-journal",
+          "bibtex": "article",
+          "ris": "JOUR",
+          "resourceType": "Journal contribution"
+        },
+        "relatedIdentifiers": [
+          {
+            "relationType": "IsIdenticalTo",
+            "relatedIdentifier": "10.25405/ncl.34495572",
+            "relatedIdentifierType": "DOI"
+          }
+        ],
+        "relatedItems": [],
+        "sizes": [
+          "856669 Bytes"
+        ],
+        "formats": [],
+        "version": "1",
+        "rightsList": [
+          {
+            "rightsIdentifierScheme": "SPDX",
+            "rightsUri": "https://creativecommons.org/licenses/by/4.0/legalcode",
+            "schemeUri": "https://spdx.org/licenses/",
+            "rights": "Creative Commons Attribution 4.0 International",
+            "rightsIdentifier": "cc-by-4.0"
+          }
+        ],
+        "descriptions": [
+          {
+            "descriptionType": "Abstract",
+            "description": "© 2019 The Authors. Developmental Science published by John Wiley &amp; Sons Ltd. Sleep is known to support the neocortical consolidation of declarative memory, including the acquisition of new language. Autism spectrum disorder (ASD) is often characterized by both sleep and language learning difficulties, but few studies have explored a potential connection between the two. Here, 54 children with and without ASD (matched on age, nonverbal ability and vocabulary) were taught nine rare animal names (e.g., pipa). Memory was assessed via definitions, naming and speeded semantic decision tasks immediately after learning (pre-sleep), the next day (post-sleep, with a night of polysomnography between pre- and post-sleep tests) and roughly 1 month later (follow-up). Both groups showed comparable performance at pre-test and similar levels of overnight change on all tasks; but at follow-up children with ASD showed significantly greater forgetting of the unique features of the new animals (e.g., pipa is a flat frog). Children with ASD had significantly lower central non-rapid eye movement (NREM) sigma power. Associations between spindle properties and overnight changes in speeded semantic decisions differed by group. For the TD group, spindle duration predicted overnight changes in responses to novel animals but not familiar animals, reinforcing a role for sleep in the stabilization of new semantic knowledge. For the ASD group, sigma power and spindle duration were associated with improvements in responses to novel and particularly familiar animals, perhaps reflecting more general sleep-associated improvements in task performance. Plausibly, microstructural sleep atypicalities in children with ASD and differences in how information is prioritized for consolidation may lead to cumulative consolidation difficulties, compromising the quality of newly formed semantic representations in long-term memory."
+          }
+        ],
+        "geoLocations": [],
+        "fundingReferences": [],
+        "url": "https://outputs.ncl.ac.uk/articles/journal_contribution/Atypicalities_in_sleep_and_semantic_consolidation_in_autism/34495572/1",
+        "contentUrl": null,
+        "metadataVersion": 0,
+        "schemaVersion": "http://datacite.org/schema/kernel-4",
+        "source": "mds",
+        "isActive": true,
+        "state": "findable",
+        "reason": null,
+        "viewCount": 0,
+        "downloadCount": 0,
+        "referenceCount": 0,
+        "citationCount": 0,
+        "partCount": 0,
+        "partOfCount": 0,
+        "versionCount": 0,
+        "versionOfCount": 0,
+        "created": "2026-10-14T12:04:26Z",
+        "registered": "2026-10-14T12:04:27Z",
+        "published": null,
+        "updated": "2026-10-14T12:04:28Z"
+      },
+      "relationships": {
+        "client": {
+          "data": {
+            "id": "figshare.ncl",
+            "type": "clients"
+          }
+        }
+      }
+    },
+    {
+      "id": "10.25405/ncl.34495572",
+      "type": "dois",
+      "attributes": {
+        "doi": "10.25405/ncl.34495572",
+        "identifiers": [],
+        "creators": [
+          {
+            "givenName": "Fay E.",
+            "familyName": "Fletcher",
+            "name": "Fay E. Fletcher",
+            "affiliation": [],
+            "nameIdentifiers": []
+          },
+          {
+            "affiliation": [
+              "Newcastle University"
+            ],
+            "givenName": "Victoria",
+            "familyName": "Knowland",
+            "name": "Victoria Knowland",
+            "nameIdentifiers": [
+              {
+                "nameIdentifierScheme": "ORCID",
+                "schemeUri": "https://orcid.org",
+                "nameIdentifier": "https://orcid.org/0000-0003-4367-3689"
+              }
+            ]
+          },
+          {
+            "givenName": "Sarah",
+            "familyName": "Walker",
+            "name": "Sarah Walker",
+            "affiliation": [],
+            "nameIdentifiers": []
+          },
+          {
+            "givenName": "M. Gareth",
+            "familyName": "Gaskell",
+            "name": "M. Gareth Gaskell",
+            "affiliation": [],
+            "nameIdentifiers": []
+          },
+          {
+            "givenName": "Courtenay",
+            "familyName": "Norbury",
+            "name": "Courtenay Norbury",
+            "affiliation": [],
+            "nameIdentifiers": []
+          },
+          {
+            "givenName": "Lisa M.",
+            "familyName": "Henderson",
+            "name": "Lisa M. Henderson",
+            "affiliation": [],
+            "nameIdentifiers": []
+          }
+        ],
+        "titles": [
+          {
+            "title": "Atypicalities in sleep and semantic consolidation in autism"
+          }
+        ],
+        "publisher": "Newcastle University",
+        "container": {},
+        "publicationYear": 2026,
+        "subjects": [],
+        "contributors": [],
+        "dates": [
+          {
+            "date": "2026-10-14",
+            "dateType": "Created"
+          },
+          {
+            "date": "2026-10-14",
+            "dateType": "Updated"
+          },
+          {
+            "date": "2020-05-01",
+            "dateType": "Issued"
+          }
+        ],
+        "language": null,
+        "types": {
+          "schemaOrg": "ScholarlyArticle",
+          "resourceTypeGeneral": "JournalArticle",
+          "citeproc": "article-journal",
+          "bibtex": "article",
+          "ris": "JOUR",
+          "resourceType": "Journal contribution"
+        },
+        "relatedIdentifiers": [],
+        "relatedItems": [],
+        "sizes": [
+          "856669 Bytes"
+        ],
+        "formats": [],
+        "version": null,
+        "rightsList": [
+          {
+            "rightsIdentifierScheme": "SPDX",
+            "rightsUri": "https://creativecommons.org/licenses/by/4.0/legalcode",
+            "schemeUri": "https://spdx.org/licenses/",
+            "rights": "Creative Commons Attribution 4.0 International",
+            "rightsIdentifier": "cc-by-4.0"
+          }
+        ],
+        "descriptions": [
+          {
+            "descriptionType": "Abstract",
+            "description": "© 2019 The Authors. Developmental Science published by John Wiley &amp; Sons Ltd. Sleep is known to support the neocortical consolidation of declarative memory, including the acquisition of new language. Autism spectrum disorder (ASD) is often characterized by both sleep and language learning difficulties, but few studies have explored a potential connection between the two. Here, 54 children with and without ASD (matched on age, nonverbal ability and vocabulary) were taught nine rare animal names (e.g., pipa). Memory was assessed via definitions, naming and speeded semantic decision tasks immediately after learning (pre-sleep), the next day (post-sleep, with a night of polysomnography between pre- and post-sleep tests) and roughly 1 month later (follow-up). Both groups showed comparable performance at pre-test and similar levels of overnight change on all tasks; but at follow-up children with ASD showed significantly greater forgetting of the unique features of the new animals (e.g., pipa is a flat frog). Children with ASD had significantly lower central non-rapid eye movement (NREM) sigma power. Associations between spindle properties and overnight changes in speeded semantic decisions differed by group. For the TD group, spindle duration predicted overnight changes in responses to novel animals but not familiar animals, reinforcing a role for sleep in the stabilization of new semantic knowledge. For the ASD group, sigma power and spindle duration were associated with improvements in responses to novel and particularly familiar animals, perhaps reflecting more general sleep-associated improvements in task performance. Plausibly, microstructural sleep atypicalities in children with ASD and differences in how information is prioritized for consolidation may lead to cumulative consolidation difficulties, compromising the quality of newly formed semantic representations in long-term memory."
+          }
+        ],
+        "geoLocations": [],
+        "fundingReferences": [],
+        "url": "https://outputs.ncl.ac.uk/articles/journal_contribution/Atypicalities_in_sleep_and_semantic_consolidation_in_autism/34495572",
+        "contentUrl": null,
+        "metadataVersion": 0,
+        "schemaVersion": "http://datacite.org/schema/kernel-4",
+        "source": "mds",
+        "isActive": true,
+        "state": "findable",
+        "reason": null,
+        "viewCount": 0,
+        "downloadCount": 0,
+        "referenceCount": 0,
+        "citationCount": 0,
+        "partCount": 0,
+        "partOfCount": 0,
+        "versionCount": 0,
+        "versionOfCount": 0,
+        "created": "2026-10-14T12:04:26Z",
+        "registered": "2026-10-14T12:04:27Z",
+        "published": null,
+        "updated": "2026-10-14T12:04:27Z"
+      },
+      "relationships": {
+        "client": {
+          "data": {
+            "id": "figshare.ncl",
+            "type": "clients"
+          }
+        }
+      }
+    },
+    {
+      "id": "10.25405/ncl.34495560.v1",
+      "type": "dois",
+      "attributes": {
+        "doi": "10.25405/ncl.34495560.v1",
+        "identifiers": [],
+        "creators": [
+          {
+            "givenName": "E.",
+            "familyName": "van Rijn",
+            "name": "E. van Rijn",
+            "affiliation": [],
+            "nameIdentifiers": []
+          },
+          {
+            "givenName": "A.",
+            "familyName": "Gouws",
+            "name": "A. Gouws",
+            "affiliation": [],
+            "nameIdentifiers": []
+          },
+          {
+            "givenName": "S. A.",
+            "familyName": "Walker",
+            "name": "S. A. Walker",
+            "affiliation": [],
+            "nameIdentifiers": []
+          },
+          {
+            "affiliation": [
+              "Newcastle University"
+            ],
+            "givenName": "Victoria",
+            "familyName": "Knowland",
+            "name": "Victoria Knowland",
+            "nameIdentifiers": [
+              {
+                "nameIdentifierScheme": "ORCID",
+                "schemeUri": "https://orcid.org",
+                "nameIdentifier": "https://orcid.org/0000-0003-4367-3689"
+              }
+            ]
+          },
+          {
+            "givenName": "S. A.",
+            "familyName": "Cairney",
+            "name": "S. A. Cairney",
+            "affiliation": [],
+            "nameIdentifiers": []
+          },
+          {
+            "givenName": "M. G.",
+            "familyName": "Gaskell",
+            "name": "M. G. Gaskell",
+            "affiliation": [],
+            "nameIdentifiers": []
+          },
+          {
+            "givenName": "L. M.",
+            "familyName": "Henderson",
+            "name": "L. M. Henderson",
+            "affiliation": [],
+            "nameIdentifiers": []
+          }
+        ],
+        "titles": [
+          {
+            "title": "Do naps benefit novel word learning? Developmental differences and white matter correlates"
+          }
+        ],
+        "publisher": "Newcastle University",
+        "container": {},
+        "publicationYear": 2026,
+        "subjects": [],
+        "contributors": [],
+        "dates": [
+          {
+            "date": "2026-10-14",
+            "dateType": "Created"
+          },
+          {
+            "date": "2026-10-14",
+            "dateType": "Updated"
+          },
+          {
+            "date": "2023-01-01",
+            "dateType": "Issued"
+          }
+        ],
+        "language": null,
+        "types": {
+          "schemaOrg": "ScholarlyArticle",
+          "resourceTypeGeneral": "JournalArticle",
+          "citeproc": "article-journal",
+          "bibtex": "article",
+          "ris": "JOUR",
+          "resourceType": "Journal contribution"
+        },
+        "relatedIdentifiers": [
+          {
+            "relationType": "IsIdenticalTo",
+            "relatedIdentifier": "10.25405/ncl.34495560",
+            "relatedIdentifierType": "DOI"
+          }
+        ],
+        "relatedItems": [],
+        "sizes": [
+          "1953401 Bytes"
+        ],
+        "formats": [],
+        "version": "1",
+        "rightsList": [
+          {
+            "rightsIdentifierScheme": "SPDX",
+            "rightsUri": "https://creativecommons.org/licenses/by/4.0/legalcode",
+            "schemeUri": "https://spdx.org/licenses/",
+            "rights": "Creative Commons Attribution 4.0 International",
+            "rightsIdentifier": "cc-by-4.0"
+          }
+        ],
+        "descriptions": [
+          {
+            "descriptionType": "Abstract",
+            "description": "© 2022 The Author(s). Memory representations of newly learned words undergo changes during nocturnal sleep, as evidenced by improvements in explicit recall and lexical integration (i.e., after sleep, novel words compete with existing words during online word recognition). Some studies have revealed larger sleep-benefits in children relative to adults. However, whether daytime naps play a similar facilitatory role is unclear. We investigated the effect of a daytime nap (relative to wake) on explicit memory (recall/recognition) and lexical integration (lexical competition) of newly learned novel words in young adults and children aged 10–12 years, also exploring white matter correlates of the pre- and post-nap effects of word learning in the child group with diffusion weighted MRI. In both age groups, a nap maintained explicit memory of novel words and wake led to forgetting. However, there was an age group interaction when comparing change in recall over the nap: children showed a slight improvement whereas adults showed a slight decline. There was no evidence of lexical integration at any point. Although children spent proportionally more time in slow-wave sleep (SWS) than adults, neither SWS nor spindle parameters correlated with over-nap changes in word learning. For children, increased fractional anisotropy (FA) in the uncinate fasciculus and arcuate fasciculus were associated with the recognition of novel words immediately after learning, and FA in the right arcuate fasciculus was further associated with changes in recall of novel words over a nap, supporting the importance of these tracts in the word learning and consolidation process. These findings point to a protective role of naps in word learning (at least under the present conditions), and emphasize the need to better understand both the active and passive roles that sleep plays in supporting vocabulary consolidation over development."
+          }
+        ],
+        "geoLocations": [],
+        "fundingReferences": [],
+        "url": "https://outputs.ncl.ac.uk/articles/journal_contribution/Do_naps_benefit_novel_word_learning_Developmental_differences_and_white_matter_correlates/34495560/1",
+        "contentUrl": null,
+        "metadataVersion": 0,
+        "schemaVersion": "http://datacite.org/schema/kernel-4",
+        "source": "mds",
+        "isActive": true,
+        "state": "findable",
+        "reason": null,
+        "viewCount": 0,
+        "downloadCount": 0,
+        "referenceCount": 0,
+        "citationCount": 0,
+        "partCount": 0,
+        "partOfCount": 0,
+        "versionCount": 0,
+        "versionOfCount": 0,
+        "created": "2026-10-14T12:04:08Z",
+        "registered": "2026-10-14T12:04:09Z",
+        "published": null,
+        "updated": "2026-10-14T12:04:10Z"
+      },
+      "relationships": {
+        "client": {
+          "data": {
+            "id": "figshare.ncl",
+            "type": "clients"
+          }
+        }
+      }
+    },
+    {
+      "id": "10.25405/ncl.34495560",
+      "type": "dois",
+      "attributes": {
+        "doi": "10.25405/ncl.34495560",
+        "identifiers": [],
+        "creators": [
+          {
+            "givenName": "E.",
+            "familyName": "van Rijn",
+            "name": "E. van Rijn",
+            "affiliation": [],
+            "nameIdentifiers": []
+          },
+          {
+            "givenName": "A.",
+            "familyName": "Gouws",
+            "name": "A. Gouws",
+            "affiliation": [],
+            "nameIdentifiers": []
+          },
+          {
+            "givenName": "S. A.",
+            "familyName": "Walker",
+            "name": "S. A. Walker",
+            "affiliation": [],
+            "nameIdentifiers": []
+          },
+          {
+            "affiliation": [
+              "Newcastle University"
+            ],
+            "givenName": "Victoria",
+            "familyName": "Knowland",
+            "name": "Victoria Knowland",
+            "nameIdentifiers": [
+              {
+                "nameIdentifierScheme": "ORCID",
+                "schemeUri": "https://orcid.org",
+                "nameIdentifier": "https://orcid.org/0000-0003-4367-3689"
+              }
+            ]
+          },
+          {
+            "givenName": "S. A.",
+            "familyName": "Cairney",
+            "name": "S. A. Cairney",
+            "affiliation": [],
+            "nameIdentifiers": []
+          },
+          {
+            "givenName": "M. G.",
+            "familyName": "Gaskell",
+            "name": "M. G. Gaskell",
+            "affiliation": [],
+            "nameIdentifiers": []
+          },
+          {
+            "givenName": "L. M.",
+            "familyName": "Henderson",
+            "name": "L. M. Henderson",
+            "affiliation": [],
+            "nameIdentifiers": []
+          }
+        ],
+        "titles": [
+          {
+            "title": "Do naps benefit novel word learning? Developmental differences and white matter correlates"
+          }
+        ],
+        "publisher": "Newcastle University",
+        "container": {},
+        "publicationYear": 2026,
+        "subjects": [],
+        "contributors": [],
+        "dates": [
+          {
+            "date": "2026-10-14",
+            "dateType": "Created"
+          },
+          {
+            "date": "2026-10-14",
+            "dateType": "Updated"
+          },
+          {
+            "date": "2023-01-01",
+            "dateType": "Issued"
+          }
+        ],
+        "language": null,
+        "types": {
+          "schemaOrg": "ScholarlyArticle",
+          "resourceTypeGeneral": "JournalArticle",
+          "citeproc": "article-journal",
+          "bibtex": "article",
+          "ris": "JOUR",
+          "resourceType": "Journal contribution"
+        },
+        "relatedIdentifiers": [],
+        "relatedItems": [],
+        "sizes": [
+          "1953401 Bytes"
+        ],
+        "formats": [],
+        "version": null,
+        "rightsList": [
+          {
+            "rightsIdentifierScheme": "SPDX",
+            "rightsUri": "https://creativecommons.org/licenses/by/4.0/legalcode",
+            "schemeUri": "https://spdx.org/licenses/",
+            "rights": "Creative Commons Attribution 4.0 International",
+            "rightsIdentifier": "cc-by-4.0"
+          }
+        ],
+        "descriptions": [
+          {
+            "descriptionType": "Abstract",
+            "description": "© 2022 The Author(s). Memory representations of newly learned words undergo changes during nocturnal sleep, as evidenced by improvements in explicit recall and lexical integration (i.e., after sleep, novel words compete with existing words during online word recognition). Some studies have revealed larger sleep-benefits in children relative to adults. However, whether daytime naps play a similar facilitatory role is unclear. We investigated the effect of a daytime nap (relative to wake) on explicit memory (recall/recognition) and lexical integration (lexical competition) of newly learned novel words in young adults and children aged 10–12 years, also exploring white matter correlates of the pre- and post-nap effects of word learning in the child group with diffusion weighted MRI. In both age groups, a nap maintained explicit memory of novel words and wake led to forgetting. However, there was an age group interaction when comparing change in recall over the nap: children showed a slight improvement whereas adults showed a slight decline. There was no evidence of lexical integration at any point. Although children spent proportionally more time in slow-wave sleep (SWS) than adults, neither SWS nor spindle parameters correlated with over-nap changes in word learning. For children, increased fractional anisotropy (FA) in the uncinate fasciculus and arcuate fasciculus were associated with the recognition of novel words immediately after learning, and FA in the right arcuate fasciculus was further associated with changes in recall of novel words over a nap, supporting the importance of these tracts in the word learning and consolidation process. These findings point to a protective role of naps in word learning (at least under the present conditions), and emphasize the need to better understand both the active and passive roles that sleep plays in supporting vocabulary consolidation over development."
+          }
+        ],
+        "geoLocations": [],
+        "fundingReferences": [],
+        "url": "https://outputs.ncl.ac.uk/articles/journal_contribution/Do_naps_benefit_novel_word_learning_Developmental_differences_and_white_matter_correlates/34495560",
+        "contentUrl": null,
+        "metadataVersion": 0,
+        "schemaVersion": "http://datacite.org/schema/kernel-4",
+        "source": "mds",
+        "isActive": true,
+        "state": "findable",
+        "reason": null,
+        "viewCount": 0,
+        "downloadCount": 0,
+        "referenceCount": 0,
+        "citationCount": 0,
+        "partCount": 0,
+        "partOfCount": 0,
+        "versionCount": 0,
+        "versionOfCount": 0,
+        "created": "2026-10-14T12:04:08Z",
+        "registered": "2026-10-14T12:04:09Z",
+        "published": null,
+        "updated": "2026-10-14T12:04:09Z"
+      },
+      "relationships": {
+        "client": {
+          "data": {
+            "id": "figshare.ncl",
+            "type": "clients"
+          }
+        }
+      }
+    },
+    {
+      "id": "10.25392/leicester.data.34485429.v1",
+      "type": "dois",
+      "attributes": {
+        "doi": "10.25392/leicester.data.34485429.v1",
+        "identifiers": [],
+        "creators": [
+          {
+            "givenName": "Anthony",
+            "familyName": "J. Bloxham",
+            "name": "Anthony J. Bloxham",
+            "affiliation": [],
+            "nameIdentifiers": []
+          }
+        ],
+        "titles": [
+          {
+            "title": "Dreaming and Sleep-Dependent Memory Consolidation"
+          }
+        ],
+        "publisher": "University of Leicester",
+        "container": {},
+        "publicationYear": 2026,
+        "subjects": [],
+        "contributors": [],
+        "dates": [
+          {
+            "date": "2026-10-14",
+            "dateType": "Created"
+          },
+          {
+            "date": "2026-10-14",
+            "dateType": "Updated"
+          },
+          {
+            "date": "2026-10-14",
+            "dateType": "Issued"
+          }
+        ],
+        "language": null,
+        "types": {
+          "schemaOrg": "Thesis",
+          "resourceTypeGeneral": "Dissertation",
+          "citeproc": "thesis",
+          "bibtex": "phdthesis",
+          "ris": "THES",
+          "resourceType": "Thesis"
+        },
+        "relatedIdentifiers": [
+          {
+            "relationType": "IsIdenticalTo",
+            "relatedIdentifier": "10.25392/leicester.data.34485429",
+            "relatedIdentifierType": "DOI"
+          }
+        ],
+        "relatedItems": [],
+        "sizes": [
+          "5692066 Bytes"
+        ],
+        "formats": [],
+        "version": "1",
+        "rightsList": [
+          {
+            "rightsUri": "https://www.rioxx.net/licenses/all-rights-reserved/",
+            "rights": "All Rights Reserved"
+          }
+        ],
+        "descriptions": [
+          {
+            "descriptionType": "Abstract",
+            "description": "A critical evaluation and synthesis of theoretical literature has revealed that memory reactivations in sleep, which are believed to drive memory consolidation, could also be a key mechanism in the production of dream content, thus marking dreams as a reflection of memory consolidation. This proposition remains untested empirically, as research has instead focused on testing the enhancing effects of dream content on subsequent memory, but with limited success. The aim of the work presented in this thesis was therefore to investigate if, and how, dreaming is related to memory consolidation in sleep.Three linked original, empirical studies were conducted (a daytime nap study, a targeted memory reactivation study, and a dream journals study). They all made use of novel Virtual Reality (VR) technology to simulate procedural learning tasks, and measured performance on these VR tasks before and after a period of sleep, sampling and analysing any dreams that were remembered for task-related content. In all three studies, dreaming of the learning tasks was not associated with enhanced performance on them later.Whilst no relation between dreaming and memory consolidation could be demonstrated conclusively, this thesis has provided a re-evaluation of the research problem. The established approach as employed in empirical research, testing the dream content enhancement hypothesis, has received only weak support and limited success, and it is time for this hypothesis to be discarded. Instead, it is encouraged to test for a relationship in a different way, in that future research should be aligned more closely to the mechanistic theory, determining whether memory reactivations in sleep actually contribute to dream content. The method of Targeted Memory Reactivation (TMR) combined with dream sampling is encouraged as the most promising means to answer this question, and a relation between dreaming and memory consolidation may yet be found."
+          }
+        ],
+        "geoLocations": [],
+        "fundingReferences": [],
+        "url": "https://figshare.le.ac.uk/articles/thesis/Dreaming_and_Sleep-Dependent_Memory_Consolidation/34485429/1",
+        "contentUrl": null,
+        "metadataVersion": 0,
+        "schemaVersion": "http://datacite.org/schema/kernel-4",
+        "source": "mds",
+        "isActive": true,
+        "state": "findable",
+        "reason": null,
+        "viewCount": 0,
+        "downloadCount": 0,
+        "referenceCount": 0,
+        "citationCount": 0,
+        "partCount": 0,
+        "partOfCount": 0,
+        "versionCount": 0,
+        "versionOfCount": 0,
+        "created": "2026-10-14T09:04:00Z",
+        "registered": "2026-10-14T09:04:01Z",
+        "published": null,
+        "updated": "2026-10-14T09:04:02Z"
+      },
+      "relationships": {
+        "client": {
+          "data": {
+            "id": "figshare.lest",
+            "type": "clients"
+          }
+        }
+      }
+    },
+    {
+      "id": "10.25392/leicester.data.34485429",
+      "type": "dois",
+      "attributes": {
+        "doi": "10.25392/leicester.data.34485429",
+        "identifiers": [],
+        "creators": [
+          {
+            "givenName": "Anthony",
+            "familyName": "J. Bloxham",
+            "name": "Anthony J. Bloxham",
+            "affiliation": [],
+            "nameIdentifiers": []
+          }
+        ],
+        "titles": [
+          {
+            "title": "Dreaming and Sleep-Dependent Memory Consolidation"
+          }
+        ],
+        "publisher": "University of Leicester",
+        "container": {},
+        "publicationYear": 2026,
+        "subjects": [],
+        "contributors": [],
+        "dates": [
+          {
+            "date": "2026-10-14",
+            "dateType": "Created"
+          },
+          {
+            "date": "2026-10-14",
+            "dateType": "Updated"
+          },
+          {
+            "date": "2026-10-14",
+            "dateType": "Issued"
+          }
+        ],
+        "language": null,
+        "types": {
+          "schemaOrg": "Thesis",
+          "resourceTypeGeneral": "Dissertation",
+          "citeproc": "thesis",
+          "bibtex": "phdthesis",
+          "ris": "THES",
+          "resourceType": "Thesis"
+        },
+        "relatedIdentifiers": [],
+        "relatedItems": [],
+        "sizes": [
+          "5692066 Bytes"
+        ],
+        "formats": [],
+        "version": null,
+        "rightsList": [
+          {
+            "rightsUri": "https://www.rioxx.net/licenses/all-rights-reserved/",
+            "rights": "All Rights Reserved"
+          }
+        ],
+        "descriptions": [
+          {
+            "descriptionType": "Abstract",
+            "description": "A critical evaluation and synthesis of theoretical literature has revealed that memory reactivations in sleep, which are believed to drive memory consolidation, could also be a key mechanism in the production of dream content, thus marking dreams as a reflection of memory consolidation. This proposition remains untested empirically, as research has instead focused on testing the enhancing effects of dream content on subsequent memory, but with limited success. The aim of the work presented in this thesis was therefore to investigate if, and how, dreaming is related to memory consolidation in sleep.Three linked original, empirical studies were conducted (a daytime nap study, a targeted memory reactivation study, and a dream journals study). They all made use of novel Virtual Reality (VR) technology to simulate procedural learning tasks, and measured performance on these VR tasks before and after a period of sleep, sampling and analysing any dreams that were remembered for task-related content. In all three studies, dreaming of the learning tasks was not associated with enhanced performance on them later.Whilst no relation between dreaming and memory consolidation could be demonstrated conclusively, this thesis has provided a re-evaluation of the research problem. The established approach as employed in empirical research, testing the dream content enhancement hypothesis, has received only weak support and limited success, and it is time for this hypothesis to be discarded. Instead, it is encouraged to test for a relationship in a different way, in that future research should be aligned more closely to the mechanistic theory, determining whether memory reactivations in sleep actually contribute to dream content. The method of Targeted Memory Reactivation (TMR) combined with dream sampling is encouraged as the most promising means to answer this question, and a relation between dreaming and memory consolidation may yet be found."
+          }
+        ],
+        "geoLocations": [],
+        "fundingReferences": [],
+        "url": "https://figshare.le.ac.uk/articles/thesis/Dreaming_and_Sleep-Dependent_Memory_Consolidation/34485429",
+        "contentUrl": null,
+        "metadataVersion": 0,
+        "schemaVersion": "http://datacite.org/schema/kernel-4",
+        "source": "mds",
+        "isActive": true,
+        "state": "findable",
+        "reason": null,
+        "viewCount": 0,
+        "downloadCount": 0,
+        "referenceCount": 0,
+        "citationCount": 0,
+        "partCount": 0,
+        "partOfCount": 0,
+        "versionCount": 0,
+        "versionOfCount": 0,
+        "created": "2026-10-14T09:04:00Z",
+        "registered": "2026-10-14T09:04:01Z",
+        "published": null,
+        "updated": "2026-10-14T09:04:02Z"
+      },
+      "relationships": {
+        "client": {
+          "data": {
+            "id": "figshare.lest",
+            "type": "clients"
+          }
+        }
+      }
+    }
+  ],
+  "meta": {
+    "total": 1748,
+    "totalPages": 292,
+    "page": 1
+  },
+  "links": {
+    "self": "https://api.datacite.org/dois?query=sleep%20memory%20consolidation&page%5Bsize%5D=6",
+    "next": "https://api.datacite.org/dois?page%5Bnumber%5D=2&page%5Bsize%5D=6&query=sleep+memory+consolidation"
+  }
+}

@@ -1,0 +1,69 @@
+{
+  "_note": "HAND-WRITTEN, not recorded. Written from the official OpenAPI spec (api.semanticscholar.org/graph/v1/swagger.json: PaperRelevanceSearchBatch -> BasePaper) because the live keyless API answered HTTP 429 to every request on 2026-10-14. Field names and example value shapes follow the spec; the paper contents are illustrative.",
+  "total": 4,
+  "offset": 0,
+  "data": [
+    {
+      "paperId": "d3c8b5f5e0a14f5c8a2a0f6c8c8f0a00aaaaaaaa",
+      "externalIds": { "DOI": "10.1038/nature04286", "PubMed": "16251952", "CorpusId": 4310000 },
+      "title": "Sleep-dependent memory consolidation",
+      "abstract": "Sleep is thought to benefit memory.",
+      "venue": "Nature",
+      "year": 2005,
+      "citationCount": 1841,
+      "isOpenAccess": true,
+      "openAccessPdf": { "url": "https://www.nature.com/articles/nature04286.pdf", "status": "BRONZE", "license": null },
+      "publicationTypes": ["JournalArticle"],
+      "publicationVenue": { "id": "6c24a0a0-b07d-4d7b-a19b-fd09af15b2f3", "name": "Nature", "type": "journal" },
+      "authors": [{ "authorId": "1", "name": "Robert Stickgold" }]
+    },
+    {
+      "paperId": "b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2",
+      "externalIds": { "DOI": "10.1136/bmj.n71" },
+      "title": "The PRISMA 2020 statement: an updated guideline for reporting systematic reviews",
+      "abstract": null,
+      "venue": "BMJ",
+      "year": 2021,
+      "citationCount": 105582,
+      "isOpenAccess": false,
+      "openAccessPdf": null,
+      "publicationTypes": ["Review", "JournalArticle"],
+      "publicationVenue": { "id": "a1a1a1a1-b07d-4d7b-a19b-fd09af15b2f3", "name": "BMJ", "type": "journal" },
+      "authors": [
+        { "authorId": "2", "name": "Matthew J. Page" },
+        { "authorId": "3", "name": "Joanne E. McKenzie" }
+      ]
+    },
+    {
+      "paperId": "c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3",
+      "externalIds": { "ArXiv": "1412.6980", "CorpusId": 6628106 },
+      "title": "Adam: A Method for Stochastic Optimization",
+      "abstract": "We introduce Adam.",
+      "venue": "arXiv.org",
+      "year": 2014,
+      "citationCount": 79368,
+      "isOpenAccess": true,
+      "openAccessPdf": { "url": "https://arxiv.org/pdf/1412.6980", "status": "GREEN", "license": null },
+      "publicationTypes": null,
+      "publicationVenue": null,
+      "authors": [
+        { "authorId": "4", "name": "Diederik P. Kingma" },
+        { "authorId": null, "name": "Jimmy Ba" }
+      ]
+    },
+    {
+      "paperId": "e4e4e4e4e4e4e4e4e4e4e4e4e4e4e4e4e4e4e4e4",
+      "externalIds": {},
+      "title": "A textbook of sleep",
+      "abstract": null,
+      "venue": "",
+      "year": null,
+      "citationCount": null,
+      "isOpenAccess": null,
+      "openAccessPdf": null,
+      "publicationTypes": ["Book"],
+      "publicationVenue": null,
+      "authors": []
+    }
+  ]
+}

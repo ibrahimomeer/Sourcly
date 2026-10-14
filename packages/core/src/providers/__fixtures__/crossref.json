@@ -1,0 +1,737 @@
+{
+  "search": {
+    "status": "ok",
+    "message-type": "work-list",
+    "message-version": "1.0.0",
+    "message": {
+      "facets": {},
+      "total-results": 857528,
+      "items": [
+        {
+          "publisher": "Springer-Verlag",
+          "DOI": "10.1007/springerreference_302140",
+          "type": "reference-entry",
+          "is-referenced-by-count": 0,
+          "title": [
+            "Reactivation and Consolidation of Memory During Sleep"
+          ],
+          "container-title": [
+            "SpringerReference"
+          ],
+          "score": 30.19654,
+          "issued": {
+            "date-parts": [
+              [
+                null
+              ]
+            ]
+          },
+          "URL": "https://doi.org/10.1007/springerreference_302140"
+        },
+        {
+          "publisher": "Oxford University Press (OUP)",
+          "DOI": "10.5665/sleep/31.8.1186",
+          "type": "journal-article",
+          "is-referenced-by-count": 0,
+          "title": [
+            "REM Illumination: Memory Consolidation"
+          ],
+          "container-title": [
+            "Sleep"
+          ],
+          "score": 29.712694,
+          "issued": {
+            "date-parts": [
+              [
+                2008,
+                8,
+                1
+              ]
+            ]
+          },
+          "URL": "https://doi.org/10.5665/sleep/31.8.1186"
+        },
+        {
+          "publisher": "Oxford University Press (OUP)",
+          "DOI": "10.5665/sleep/32.3.302",
+          "type": "journal-article",
+          "is-referenced-by-count": 1,
+          "title": [
+            "Slow Wave Sleep and REM Sleep Awakenings Do Not Affect Sleep Dependent Memory Consolidation"
+          ],
+          "container-title": [
+            "Sleep"
+          ],
+          "score": 29.35499,
+          "issued": {
+            "date-parts": [
+              [
+                2009,
+                3,
+                1
+              ]
+            ]
+          },
+          "URL": "https://doi.org/10.5665/sleep/32.3.302"
+        },
+        {
+          "publisher": "Wiley",
+          "DOI": "10.1111/j.1365-2869.2010.00872.x",
+          "type": "journal-article",
+          "is-referenced-by-count": 76,
+          "title": [
+            "Sleep-related memory consolidation in primary insomnia"
+          ],
+          "author": [
+            {
+              "given": "CHRISTOPH",
+              "family": "NISSEN",
+              "sequence": "first",
+              "affiliation": [],
+              "role": [
+                {
+                  "vocabulary": "crossref",
+                  "role": "author"
+                }
+              ]
+            },
+            {
+              "given": "CORINNA",
+              "family": "KLOEPFER",
+              "sequence": "additional",
+              "affiliation": [],
+              "role": [
+                {
+                  "vocabulary": "crossref",
+                  "role": "author"
+                }
+              ]
+            },
+            {
+              "given": "BERND",
+              "family": "FEIGE",
+              "sequence": "additional",
+              "affiliation": [],
+              "role": [
+                {
+                  "vocabulary": "crossref",
+                  "role": "author"
+                }
+              ]
+            },
+            {
+              "given": "HANNAH",
+              "family": "PIOSCZYK",
+              "sequence": "additional",
+              "affiliation": [],
+              "role": [
+                {
+                  "vocabulary": "crossref",
+                  "role": "author"
+                }
+              ]
+            },
+            {
+              "given": "KAI",
+              "family": "SPIEGELHALDER",
+              "sequence": "additional",
+              "affiliation": [],
+              "role": [
+                {
+                  "vocabulary": "crossref",
+                  "role": "author"
+                }
+              ]
+            },
+            {
+              "given": "ULRICH",
+              "family": "VODERHOLZER",
+              "sequence": "additional",
+              "affiliation": [],
+              "role": [
+                {
+                  "vocabulary": "crossref",
+                  "role": "author"
+                }
+              ]
+            },
+            {
+              "given": "DIETER",
+              "family": "RIEMANN",
+              "sequence": "additional",
+              "affiliation": [],
+              "role": [
+                {
+                  "vocabulary": "crossref",
+                  "role": "author"
+                }
+              ]
+            }
+          ],
+          "container-title": [
+            "Journal of Sleep Research"
+          ],
+          "score": 29.036896,
+          "issued": {
+            "date-parts": [
+              [
+                2011,
+                2,
+                15
+              ]
+            ]
+          },
+          "URL": "https://doi.org/10.1111/j.1365-2869.2010.00872.x"
+        },
+        {
+          "DOI": "10.55776/p15370",
+          "issued": {
+            "date-parts": [
+              [
+                2002,
+                6,
+                3
+              ]
+            ]
+          },
+          "type": "grant",
+          "URL": "https://doi.org/10.55776/p15370",
+          "score": 28.684673,
+          "publisher": "Austrian Science Fund (FWF)"
+        },
+        {
+          "group-title": "Neuroscience",
+          "publisher": "openRxiv",
+          "abstract": "<jats:p>Presentation of learning-related cues during NREM sleep has been shown to improve memory consolidation. Past studies suggest that REM sleep may contribute to the beneficial effect of reactivating memories during NREM sleep, but the relationship between REM sleep and induced reactivations in NREM remains unclear. We investigated whether a naturally ensuing episode of REM sleep is necessary for prior NREM targeted memory reactivation (TMR) to exert a beneficial effect on memory consolidation. Nineteen participants learned the association between prior or non-prior known objects and their names (pseudowords) in a within-subject multiple session experiment, in which TMR was subsequently performed either before (Pre-REM) or after (Post-REM) the final REM sleep episode of the night. While word-picture association recall measures did not differ between TMR conditions, we found better name recognition based on confidence ratings for words reactivated during Pre-REM TMR in contrast with associations cued during Post-REM TMR. In addition, we found distinct associations between cue-evoked sigma activity, subsequent REM theta power and TMR memory benefits which were contingent upon the level of relatedness with prior knowledge for the learned material. Although TMR may be less effective during the second half of the night, our findings suggest an interplay between NREM and REM sleep oscillatory activity for memory reactivation and consolidation processes.</jats:p>",
+          "DOI": "10.1101/2023.05.08.539563",
+          "type": "posted-content",
+          "is-referenced-by-count": 1,
+          "title": [
+            "Does targeted memory reactivation during NREM sleep require complementary REM sleep for memory consolidation?"
+          ],
+          "author": [
+            {
+              "given": "Rebeca",
+              "family": "Sifuentes Ortega",
+              "sequence": "first",
+              "affiliation": [],
+              "role": [
+                {
+                  "role": "author",
+                  "vocabulary": "crossref"
+                }
+              ]
+            },
+            {
+              "given": "Péter",
+              "family": "Simor",
+              "sequence": "additional",
+              "affiliation": [],
+              "role": [
+                {
+                  "role": "author",
+                  "vocabulary": "crossref"
+                }
+              ]
+            },
+            {
+              "ORCID": "https://orcid.org/0000-0003-4745-1434",
+              "authenticated-orcid": false,
+              "given": "Philippe",
+              "family": "Peigneux",
+              "sequence": "additional",
+              "affiliation": [],
+              "role": [
+                {
+                  "role": "author",
+                  "vocabulary": "crossref"
+                }
+              ]
+            }
+          ],
+          "score": 28.439274,
+          "issued": {
+            "date-parts": [
+              [
+                2023,
+                5,
+                8
+              ]
+            ]
+          },
+          "URL": "https://doi.org/10.1101/2023.05.08.539563"
+        }
+      ],
+      "items-per-page": 6,
+      "query": {
+        "start-index": 0,
+        "search-terms": "sleep memory consolidation"
+      }
+    }
+  },
+  "retracted": {
+    "status": "ok",
+    "message-type": "work-list",
+    "message-version": "1.0.0",
+    "message": {
+      "facets": {},
+      "total-results": 1,
+      "items": [
+        {
+          "update-to": [
+            {
+              "DOI": "10.1016/s0140-6736(20)31174-0",
+              "type": "retraction",
+              "label": "Retraction",
+              "source": "publisher",
+              "updated": {
+                "date-parts": [
+                  [
+                    2020,
+                    5,
+                    22
+                  ]
+                ],
+                "date-time": "2020-05-22T00:00:00Z",
+                "timestamp": 1590105600000
+              }
+            },
+            {
+              "DOI": "10.1016/s0140-6736(20)31290-3",
+              "type": "retraction",
+              "label": "Retraction",
+              "source": "publisher",
+              "updated": {
+                "date-parts": [
+                  [
+                    2020,
+                    5,
+                    22
+                  ]
+                ],
+                "date-time": "2020-05-22T00:00:00Z",
+                "timestamp": 1590105600000
+              }
+            },
+            {
+              "DOI": "10.1016/s0140-6736(20)31324-6",
+              "type": "retraction",
+              "label": "Retraction",
+              "source": "publisher",
+              "updated": {
+                "date-parts": [
+                  [
+                    2020,
+                    5,
+                    22
+                  ]
+                ],
+                "date-time": "2020-05-22T00:00:00Z",
+                "timestamp": 1590105600000
+              }
+            },
+            {
+              "DOI": "10.1016/s0140-6736(20)31528-2",
+              "type": "retraction",
+              "label": "Retraction",
+              "source": "publisher",
+              "updated": {
+                "date-parts": [
+                  [
+                    2020,
+                    5,
+                    22
+                  ]
+                ],
+                "date-time": "2020-05-22T00:00:00Z",
+                "timestamp": 1590105600000
+              }
+            }
+          ],
+          "publisher": "Elsevier BV",
+          "DOI": "10.1016/s0140-6736(20)31180-6",
+          "type": "journal-article",
+          "is-referenced-by-count": 425,
+          "title": [
+            "RETRACTED: Hydroxychloroquine or chloroquine with or without a macrolide for treatment of COVID-19: a multinational registry analysis"
+          ],
+          "author": [
+            {
+              "given": "Mandeep R",
+              "family": "Mehra",
+              "sequence": "first",
+              "affiliation": [],
+              "role": [
+                {
+                  "vocabulary": "crossref",
+                  "role": "author"
+                }
+              ]
+            },
+            {
+              "given": "Sapan S",
+              "family": "Desai",
+              "sequence": "additional",
+              "affiliation": [],
+              "role": [
+                {
+                  "vocabulary": "crossref",
+                  "role": "author"
+                }
+              ]
+            },
+            {
+              "given": "Frank",
+              "family": "Ruschitzka",
+              "sequence": "additional",
+              "affiliation": [],
+              "role": [
+                {
+                  "vocabulary": "crossref",
+                  "role": "author"
+                }
+              ]
+            },
+            {
+              "given": "Amit N",
+              "family": "Patel",
+              "sequence": "additional",
+              "affiliation": [],
+              "role": [
+                {
+                  "vocabulary": "crossref",
+                  "role": "author"
+                }
+              ]
+            }
+          ],
+          "updated-by": [
+            {
+              "DOI": "10.1016/s0140-6736(20)31290-3",
+              "type": "expression_of_concern",
+              "label": "Expression of concern",
+              "source": "retraction-watch",
+              "updated": {
+                "date-parts": [
+                  [
+                    2020,
+                    6,
+                    3
+                  ]
+                ],
+                "date-time": "2020-06-03T00:00:00Z",
+                "timestamp": 1591142400000
+              },
+              "record-id": "23527"
+            },
+            {
+              "DOI": "10.1016/s0140-6736(20)31249-6",
+              "type": "correction",
+              "label": "Correction",
+              "source": "retraction-watch",
+              "updated": {
+                "date-parts": [
+                  [
+                    2020,
+                    5,
+                    30
+                  ]
+                ],
+                "date-time": "2020-05-30T00:00:00Z",
+                "timestamp": 1590796800000
+              },
+              "record-id": "23528"
+            },
+            {
+              "DOI": "10.1016/s0140-6736(20)31324-6",
+              "type": "retraction",
+              "label": "Retraction",
+              "source": "retraction-watch",
+              "updated": {
+                "date-parts": [
+                  [
+                    2020,
+                    6,
+                    5
+                  ]
+                ],
+                "date-time": "2020-06-05T00:00:00Z",
+                "timestamp": 1591315200000
+              },
+              "record-id": "23529"
+            },
+            {
+              "DOI": "10.1016/s0140-6736(20)31174-0",
+              "type": "retraction",
+              "label": "Retraction",
+              "source": "publisher",
+              "updated": {
+                "date-parts": [
+                  [
+                    2020,
+                    5,
+                    22
+                  ]
+                ],
+                "date-time": "2020-05-22T00:00:00Z",
+                "timestamp": 1590105600000
+              }
+            },
+            {
+              "DOI": "10.1016/s0140-6736(20)31324-6",
+              "type": "erratum",
+              "label": "Erratum",
+              "source": "publisher",
+              "updated": {
+                "date-parts": [
+                  [
+                    2020,
+                    6,
+                    13
+                  ]
+                ],
+                "date-time": "2020-06-13T00:00:00Z",
+                "timestamp": 1592006400000
+              }
+            },
+            {
+              "DOI": "10.1016/s0140-6736(20)31528-2",
+              "type": "erratum",
+              "label": "Erratum",
+              "source": "publisher",
+              "updated": {
+                "date-parts": [
+                  [
+                    2020,
+                    7,
+                    18
+                  ]
+                ],
+                "date-time": "2020-07-18T00:00:00Z",
+                "timestamp": 1595030400000
+              }
+            },
+            {
+              "DOI": "10.1016/s0140-6736(20)31249-6",
+              "type": "erratum",
+              "label": "Erratum",
+              "source": "publisher",
+              "updated": {
+                "date-parts": [
+                  [
+                    2020,
+                    5,
+                    30
+                  ]
+                ],
+                "date-time": "2020-05-30T00:00:00Z",
+                "timestamp": 1590796800000
+              }
+            }
+          ],
+          "container-title": [
+            "The Lancet"
+          ],
+          "score": 0,
+          "issued": {
+            "date-parts": [
+              [
+                2020,
+                5
+              ]
+            ]
+          },
+          "URL": "https://doi.org/10.1016/s0140-6736(20)31180-6"
+        }
+      ],
+      "items-per-page": 20,
+      "query": {
+        "start-index": 0,
+        "search-terms": null
+      }
+    }
+  },
+  "preprint": {
+    "status": "ok",
+    "message-type": "work-list",
+    "message-version": "1.0.0",
+    "message": {
+      "facets": {},
+      "total-results": 154666,
+      "items": [
+        {
+          "publisher": "Wiley",
+          "abstract": "<jats:p>1 Insects recognition is crucial for taxonomy. It helps researchers to\nprocess tremendous and various ecology data. Most studies focus on\nfine-tuning the deep learning network or altering the algorithm to\nenhance the identification accuracy, and some useful tools have been\ngenerated with these methods. 2 This study focuses on the influence of\nimage data on the recognition model. The data set source of the existing\nautomated identification tools is relatively single, and the\ncompetition-based data set was released only focus on evaluating the\nmodel at present. For the first time, this article integrates butterfly\nimage data sets from multiple sources, covered illustrated books, and\nbutterfly popular science websites. The image types include standard\nspecimen images, illustrated book scan images and camera shots. In\naddition, these images concluded not only fixed poses, but also various\nother images of butterflies in natural poses. The size of these images\nis also various. Testing data set is new data that is not belongs to the\ntraining set, which also verifies the generalizability of the model,\nindicating that in practical applications, this model can identify new\nimages. 3 We designed different data sets using the ResNet18 network to\ntrain a classifier, which achieves a validation accuracy of 86 % in the\nend of analyze. By adjusting the data sets, the accuracy changes as\nwell. This study provides a method to recognize hundreds of butterfly\nspecies and analyzes the testing progress from the point of view of\ndata. 4 It is the first to combine butterflies from multiple countries\nin the world to a single data set, with a recognition accuracy that\noutperforms previous experiments, to the best of our knowledge. We\nfurther analyze the testing results of butterfly recognition at the\nfamily and genus level.</jats:p>",
+          "DOI": "10.22541/au.170666177.72403547/v1",
+          "type": "posted-content",
+          "is-referenced-by-count": 0,
+          "title": [
+            "Multiple butterflies recognition based on deep residual learning and image analyze"
+          ],
+          "author": [
+            {
+              "ORCID": "https://orcid.org/0000-0001-9619-3721",
+              "authenticated-orcid": false,
+              "given": "Tianyu",
+              "family": "Xi",
+              "sequence": "first",
+              "affiliation": [
+                {
+                  "name": "University of the Chinese Academy of Sciences"
+                }
+              ],
+              "role": [
+                {
+                  "role": "author",
+                  "vocabulary": "crossref"
+                }
+              ]
+            },
+            {
+              "given": "Jiangning",
+              "family": "Wang",
+              "sequence": "additional",
+              "affiliation": [
+                {
+                  "name": "Institute of Zoology, Chinese Academy of Sciences"
+                }
+              ],
+              "role": [
+                {
+                  "role": "author",
+                  "vocabulary": "crossref"
+                }
+              ]
+            },
+            {
+              "given": "Yan",
+              "family": "Han",
+              "sequence": "additional",
+              "affiliation": [
+                {
+                  "name": "Institute of Zoology Chinese Academy of Sciences"
+                }
+              ],
+              "role": [
+                {
+                  "role": "author",
+                  "vocabulary": "crossref"
+                }
+              ]
+            },
+            {
+              "ORCID": "https://orcid.org/0000-0002-4979-7618",
+              "authenticated-orcid": false,
+              "given": "Congtian",
+              "family": "Lin",
+              "sequence": "additional",
+              "affiliation": [
+                {
+                  "name": "Institute of Zoology Chinese Academy of Sciences"
+                }
+              ],
+              "role": [
+                {
+                  "role": "author",
+                  "vocabulary": "crossref"
+                }
+              ]
+            },
+            {
+              "given": "Liqiang",
+              "family": "Ji",
+              "sequence": "additional",
+              "affiliation": [
+                {
+                  "name": "Institute of Zoology, Chinese Academy of Sciences"
+                }
+              ],
+              "role": [
+                {
+                  "role": "author",
+                  "vocabulary": "crossref"
+                }
+              ]
+            }
+          ],
+          "score": 32.82392,
+          "issued": {
+            "date-parts": [
+              [
+                2024,
+                1,
+                31
+              ]
+            ]
+          },
+          "URL": "https://doi.org/10.22541/au.170666177.72403547/v1"
+        },
+        {
+          "group-title": "Engineering",
+          "publisher": "MDPI AG",
+          "abstract": "<jats:p>Single Image Super Resolution (SSIR) is a problem in computer vision where the goal is 1 to create high-resolution images from low-resolution ones. It has important applications in fields 2 such as medical imaging and security surveillance. While traditional methods such as interpolation 3 and reconstruction-based models have been used in the past, deep learning techniques have recently 4 gained attention due to their superior performance and computational efficiency. This article proposes 5 an Autoencoder based Deep Learning Model for SSIR, in particular, a light model that uses fewer 6 parameters without compromising performance. The down-sampling part of the Autoencoder 7 mainly uses 3 by 3 convolution and has no subsampling layers. The up-sampling part uses transpose 8 convolution and residual connections from the down sampling part. The model is trained using a 9 subset of the VILRC ImageNet database. The model is evaluated using quantitative metrics PSNR, 10 SSIM as well as qualitative measures such as perceptual quality. PSNR and SSIM figures as high as 11 76.06 and 0.93 are reported.</jats:p>",
+          "DOI": "10.20944/preprints202311.0231.v1",
+          "type": "posted-content",
+          "is-referenced-by-count": 0,
+          "title": [
+            "Single Image Super Resolution using Deep Residual Learning"
+          ],
+          "author": [
+            {
+              "given": "Xavier N",
+              "family": "Fernando",
+              "sequence": "first",
+              "affiliation": [],
+              "role": [
+                {
+                  "role": "author",
+                  "vocabulary": "crossref"
+                }
+              ]
+            },
+            {
+              "given": "Kandasamy",
+              "family": "Illanko",
+              "sequence": "additional",
+              "affiliation": [],
+              "role": [
+                {
+                  "role": "author",
+                  "vocabulary": "crossref"
+                }
+              ]
+            },
+            {
+              "given": "Moiz",
+              "family": "Hassan",
+              "sequence": "additional",
+              "affiliation": [],
+              "role": [
+                {
+                  "role": "author",
+                  "vocabulary": "crossref"
+                }
+              ]
+            }
+          ],
+          "score": 27.892475,
+          "issued": {
+            "date-parts": [
+              [
+                2023,
+                11,
+                3
+              ]
+            ]
+          },
+          "URL": "https://doi.org/10.20944/preprints202311.0231.v1"
+        }
+      ],
+      "items-per-page": 2,
+      "query": {
+        "start-index": 0,
+        "search-terms": "deep residual learning image recognition"
+      }
+    }
+  }
+}

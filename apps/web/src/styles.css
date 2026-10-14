@@ -230,9 +230,13 @@ fieldset > p:first-of-type {
 
 .check {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 0.5rem;
   margin: 0.25rem 0;
+}
+
+.check input {
+  margin-top: 0.3em;
 }
 
 .check-group {
@@ -321,6 +325,51 @@ fieldset > p:first-of-type {
 .status-problem {
   padding-left: 0.6rem;
   border-left: 3px solid var(--border-strong);
+}
+
+@media (min-width: 720px) {
+  .statuses {
+    columns: 2;
+    column-gap: 2rem;
+  }
+
+  .statuses li {
+    break-inside: avoid;
+  }
+}
+
+.status-skipped {
+  padding-left: 0.6rem;
+  border-left: 3px dashed var(--border-strong);
+  color: var(--muted);
+}
+
+.check-unavailable {
+  color: var(--muted);
+  align-items: flex-start;
+}
+
+.elsewhere {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0 0 1rem;
+}
+
+.elsewhere-label {
+  font-size: 0.875rem;
+  color: var(--muted);
+}
+
+.pagination {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+  margin: 0.75rem 0;
+  font-size: 0.9rem;
 }
 
 .result-list {
