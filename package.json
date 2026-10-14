@@ -1,0 +1,21 @@
+{
+  "name": "sourcly",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Transparent, tunable academic source discovery. Runs entirely in the browser.",
+  "license": "MIT",
+  "type": "module",
+  "packageManager": "pnpm@11.28.2",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "dev": "pnpm --filter @sourcly/web dev",
+    "typecheck": "pnpm -r typecheck",
+    "test": "pnpm -r test",
+    "build": "pnpm -r build"
+  },
+  "devDependencies": {
+    "typescript": "^7.0.2"
+  }
+}

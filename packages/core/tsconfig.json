@@ -1,0 +1,9 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    // DOM is for the fetch/Response/URL types the providers use; core touches no DOM elements.
+    "lib": ["ES2023", "DOM"],
+    "resolveJsonModule": true
+  },
+  "include": ["src"]
+}

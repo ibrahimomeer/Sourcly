@@ -1,0 +1,20 @@
+{
+  "name": "@sourcly/core",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Providers, classification, scoring, deduplication and APA formatting. No UI code.",
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./testing": "./src/testing/make-result.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --exclude \"**/*.live.test.ts\"",
+    "test:live": "vitest run .live.test"
+  },
+  "devDependencies": {
+    "vitest": "^5.0.4"
+  }
+}

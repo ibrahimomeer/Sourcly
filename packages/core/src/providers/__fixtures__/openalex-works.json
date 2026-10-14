@@ -1,0 +1,3518 @@
+{
+  "search": {
+    "meta": {
+      "count": 89003,
+      "per_page": 3
+    },
+    "results": [
+      {
+        "id": "https://openalex.org/W2086162146",
+        "doi": "https://doi.org/10.1038/nature04286",
+        "title": "Sleep-dependent memory consolidation",
+        "relevance_score": 289.29092,
+        "publication_year": 2005,
+        "publication_date": "2005-10-01",
+        "language": "en",
+        "type": "article",
+        "open_access": {
+          "is_oa": true,
+          "oa_status": "bronze",
+          "oa_url": "https://www.nature.com/articles/nature04286.pdf",
+          "any_repository_has_fulltext": true
+        },
+        "cited_by_count": 1841,
+        "is_retracted": false,
+        "authorships": [
+          {
+            "author_position": "first",
+            "author": {
+              "display_name": "Robert Stickgold"
+            },
+            "countries": [
+              "US"
+            ]
+          }
+        ],
+        "primary_location": {
+          "is_oa": true,
+          "landing_page_url": "https://doi.org/10.1038/nature04286",
+          "pdf_url": "https://www.nature.com/articles/nature04286.pdf",
+          "version": "publishedVersion",
+          "source": {
+            "display_name": "Nature",
+            "type": "journal"
+          }
+        },
+        "abstract_inverted_index": null,
+        "ids": {
+          "openalex": "https://openalex.org/W2086162146",
+          "doi": "https://doi.org/10.1038/nature04286",
+          "mag": "2086162146",
+          "pmid": "https://pubmed.ncbi.nlm.nih.gov/16251952"
+        },
+        "biblio": {
+          "volume": "437",
+          "issue": "7063",
+          "first_page": "1272",
+          "last_page": "1278"
+        }
+      },
+      {
+        "id": "https://openalex.org/W2006822588",
+        "doi": "https://doi.org/10.1016/j.smrv.2008.08.002",
+        "title": "The whats and whens of sleep-dependent memory consolidation",
+        "relevance_score": 260.37277,
+        "publication_year": 2009,
+        "publication_date": "2009-03-01",
+        "language": "en",
+        "type": "article",
+        "open_access": {
+          "is_oa": false,
+          "oa_status": "closed",
+          "oa_url": null,
+          "any_repository_has_fulltext": false
+        },
+        "cited_by_count": 564,
+        "is_retracted": false,
+        "authorships": [
+          {
+            "author_position": "first",
+            "author": {
+              "display_name": "Susanne Diekelmann"
+            },
+            "countries": [
+              "DE"
+            ]
+          },
+          {
+            "author_position": "middle",
+            "author": {
+              "display_name": "Ines Wilhelm"
+            },
+            "countries": [
+              "DE"
+            ]
+          },
+          {
+            "author_position": "last",
+            "author": {
+              "display_name": "Jan Born"
+            },
+            "countries": [
+              "DE"
+            ]
+          }
+        ],
+        "primary_location": {
+          "is_oa": false,
+          "landing_page_url": "https://doi.org/10.1016/j.smrv.2008.08.002",
+          "pdf_url": null,
+          "version": "publishedVersion",
+          "source": {
+            "display_name": "Sleep Medicine Reviews",
+            "type": "journal"
+          }
+        },
+        "abstract_inverted_index": null,
+        "ids": {
+          "openalex": "https://openalex.org/W2006822588",
+          "doi": "https://doi.org/10.1016/j.smrv.2008.08.002",
+          "mag": "2006822588",
+          "pmid": "https://pubmed.ncbi.nlm.nih.gov/19251443"
+        },
+        "biblio": {
+          "volume": "13",
+          "issue": "5",
+          "first_page": "309",
+          "last_page": "321"
+        }
+      },
+      {
+        "id": "https://openalex.org/W2149529050",
+        "doi": "https://doi.org/10.1016/j.sleep.2007.03.011",
+        "title": "Sleep-dependent memory consolidation and reconsolidation",
+        "relevance_score": 259.1771,
+        "publication_year": 2007,
+        "publication_date": "2007-05-01",
+        "language": "en",
+        "type": "article",
+        "open_access": {
+          "is_oa": true,
+          "oa_status": "green",
+          "oa_url": "https://www.ncbi.nlm.nih.gov/pmc/articles/2680680",
+          "any_repository_has_fulltext": true
+        },
+        "cited_by_count": 530,
+        "is_retracted": false,
+        "authorships": [
+          {
+            "author_position": "first",
+            "author": {
+              "display_name": "Robert Stickgold"
+            },
+            "countries": [
+              "US"
+            ]
+          },
+          {
+            "author_position": "last",
+            "author": {
+              "display_name": "Matthew P. Walker"
+            },
+            "countries": [
+              "US"
+            ]
+          }
+        ],
+        "primary_location": {
+          "is_oa": false,
+          "landing_page_url": "https://doi.org/10.1016/j.sleep.2007.03.011",
+          "pdf_url": null,
+          "version": "publishedVersion",
+          "source": {
+            "display_name": "Sleep Medicine",
+            "type": "journal"
+          }
+        },
+        "abstract_inverted_index": null,
+        "ids": {
+          "openalex": "https://openalex.org/W2149529050",
+          "doi": "https://doi.org/10.1016/j.sleep.2007.03.011",
+          "mag": "2149529050",
+          "pmid": "https://pubmed.ncbi.nlm.nih.gov/17470412"
+        },
+        "biblio": {
+          "volume": "8",
+          "issue": "4",
+          "first_page": "331",
+          "last_page": "343"
+        }
+      }
+    ]
+  },
+  "review": {
+    "id": "https://openalex.org/W3118615836",
+    "doi": "https://doi.org/10.1136/bmj.n71",
+    "title": "The PRISMA 2020 statement: an updated guideline for reporting systematic reviews",
+    "publication_year": 2021,
+    "publication_date": "2021-03-29",
+    "language": "en",
+    "type": "review",
+    "open_access": {
+      "is_oa": true,
+      "oa_status": "hybrid",
+      "oa_url": "https://www.bmj.com/content/bmj/372/bmj.n71.full.pdf",
+      "any_repository_has_fulltext": true
+    },
+    "cited_by_count": 105582,
+    "is_retracted": false,
+    "authorships": [
+      {
+        "author_position": "first",
+        "author": {
+          "display_name": "Matthew James Page"
+        },
+        "countries": [
+          "AU"
+        ]
+      },
+      {
+        "author_position": "middle",
+        "author": {
+          "display_name": "Joanne E. McKenzie"
+        },
+        "countries": [
+          "AU"
+        ]
+      },
+      {
+        "author_position": "middle",
+        "author": {
+          "display_name": "Patrick M. Bossuyt"
+        },
+        "countries": [
+          "NL"
+        ]
+      }
+    ],
+    "primary_location": {
+      "is_oa": true,
+      "landing_page_url": "https://doi.org/10.1136/bmj.n71",
+      "pdf_url": "https://www.bmj.com/content/bmj/372/bmj.n71.full.pdf",
+      "version": "publishedVersion",
+      "source": {
+        "display_name": "BMJ",
+        "type": "journal"
+      }
+    },
+    "abstract_inverted_index": {
+      "2009": [
+        59
+      ],
+      "2020": [
+        55,
+        98,
+        113
+      ],
+      "The": [
+        0,
+        53,
+        78
+      ],
+      "Preferred": [
+        1
+      ],
+      "Reporting": [
+        2
+      ],
+      "Items": [
+        3
+      ],
+      "for": [
+        4,
+        108,
+        121
+      ],
+      "Systematic": [
+        5
+      ],
+      "reviews": [
+        6
+      ],
+      "and": [
+        7,
+        31,
+        44,
+        61,
+        75,
+        80,
+        116,
+        123
+      ],
+      "Meta-Analyses": [
+        8
+      ],
+      "(PRISMA)": [
+        9
+      ],
+      "statement,": [
+        10
+      ],
+      "published": [
+        11
+      ],
+      "in": [
+        12,
+        40,
+        69
+      ],
+      "2009,": [
+        13
+      ],
+      "was": [
+        14,
+        25
+      ],
+      "designed": [
+        15
+      ],
+      "to": [
+        16,
+        50,
+        71,
+        88
+      ],
+      "help": [
+        17
+      ],
+      "systematic": [
+        18,
+        41
+      ],
+      "reviewers": [
+        19
+      ],
+      "transparently": [
+        20
+      ],
+      "report": [
+        21
+      ],
+      "why": [
+        22
+      ],
+      "the": [
+        23,
+        28,
+        36,
+        51,
+        58,
+        83,
+        96,
+        111,
+        117
+      ],
+      "review": [
+        24,
+        42
+      ],
+      "done,": [
+        26
+      ],
+      "what": [
+        27,
+        32
+      ],
+      "authors": [
+        29
+      ],
+      "did,": [
+        30
+      ],
+      "they": [
+        33
+      ],
+      "found.": [
+        34
+      ],
+      "Over": [
+        35
+      ],
+      "past": [
+        37
+      ],
+      "decade,": [
+        38
+      ],
+      "advances": [
+        39,
+        68
+      ],
+      "methodology": [
+        43
+      ],
+      "terminology": [
+        45
+      ],
+      "have": [
+        46,
+        85
+      ],
+      "necessitated": [
+        47
+      ],
+      "an": [
+        48,
+        101
+      ],
+      "update": [
+        49
+      ],
+      "guideline.": [
+        52
+      ],
+      "PRISMA": [
+        54,
+        97,
+        112
+      ],
+      "statement": [
+        56,
+        60
+      ],
+      "replaces": [
+        57
+      ],
+      "includes": [
+        62
+      ],
+      "new": [
+        63
+      ],
+      "reporting": [
+        64,
+        106
+      ],
+      "guidance": [
+        65
+      ],
+      "that": [
+        66,
+        104
+      ],
+      "reflects": [
+        67
+      ],
+      "methods": [
+        70
+      ],
+      "identify,": [
+        72
+      ],
+      "select,": [
+        73
+      ],
+      "appraise,": [
+        74
+      ],
+      "synthesise": [
+        76
+      ],
+      "studies.": [
+        77
+      ],
+      "structure": [
+        79
+      ],
+      "presentation": [
+        81
+      ],
+      "of": [
+        82
+      ],
+      "items": [
+        84
+      ],
+      "been": [
+        86
+      ],
+      "modified": [
+        87
+      ],
+      "facilitate": [
+        89
+      ],
+      "implementation.": [
+        90
+      ],
+      "In": [
+        91
+      ],
+      "this": [
+        92
+      ],
+      "article,": [
+        93
+      ],
+      "we": [
+        94
+      ],
+      "present": [
+        95
+      ],
+      "27-item": [
+        99
+      ],
+      "checklist,": [
+        100,
+        115
+      ],
+      "expanded": [
+        102
+      ],
+      "checklist": [
+        103
+      ],
+      "details": [
+        105
+      ],
+      "recommendations": [
+        107
+      ],
+      "each": [
+        109
+      ],
+      "item,": [
+        110
+      ],
+      "abstract": [
+        114
+      ],
+      "revised": [
+        118
+      ],
+      "flow": [
+        119
+      ],
+      "diagrams": [
+        120
+      ],
+      "original": [
+        122
+      ],
+      "updated": [
+        124
+      ],
+      "reviews.": [
+        125
+      ]
+    },
+    "ids": {
+      "openalex": "https://openalex.org/W3118615836",
+      "doi": "https://doi.org/10.1136/bmj.n71",
+      "mag": "3118615836",
+      "pmid": "https://pubmed.ncbi.nlm.nih.gov/33782057"
+    },
+    "biblio": {
+      "volume": "372",
+      "issue": null,
+      "first_page": "n71",
+      "last_page": "n71"
+    }
+  },
+  "preprint": {
+    "id": "https://openalex.org/W1522301498",
+    "doi": "https://doi.org/10.48550/arxiv.1412.6980",
+    "title": "Adam: A Method for Stochastic Optimization",
+    "publication_year": 2014,
+    "publication_date": "2014-12-22",
+    "language": "en",
+    "type": "preprint",
+    "open_access": {
+      "is_oa": true,
+      "oa_status": "green",
+      "oa_url": "https://arxiv.org/pdf/1412.6980",
+      "any_repository_has_fulltext": true
+    },
+    "cited_by_count": 79368,
+    "is_retracted": false,
+    "authorships": [
+      {
+        "author_position": "first",
+        "author": {
+          "display_name": "Diederik P. Kingma"
+        },
+        "countries": [
+          "NL"
+        ]
+      },
+      {
+        "author_position": "last",
+        "author": {
+          "display_name": "Jimmy Lei Ba"
+        },
+        "countries": [
+          "CA"
+        ]
+      }
+    ],
+    "primary_location": {
+      "is_oa": true,
+      "landing_page_url": "http://arxiv.org/abs/1412.6980",
+      "pdf_url": "https://arxiv.org/pdf/1412.6980",
+      "version": "submittedVersion",
+      "source": {
+        "display_name": "arXiv (Cornell University)",
+        "type": "repository"
+      }
+    },
+    "abstract_inverted_index": {
+      "We": [
+        0,
+        94
+      ],
+      "introduce": [
+        1
+      ],
+      "Adam,": [
+        2
+      ],
+      "an": [
+        3
+      ],
+      "algorithm": [
+        4,
+        103
+      ],
+      "for": [
+        5,
+        45,
+        61
+      ],
+      "first-order": [
+        6
+      ],
+      "gradient-based": [
+        7
+      ],
+      "optimization": [
+        8,
+        125,
+        142
+      ],
+      "of": [
+        9,
+        17,
+        38,
+        52,
+        101,
+        150
+      ],
+      "stochastic": [
+        10,
+        141
+      ],
+      "objective": [
+        11
+      ],
+      "functions,": [
+        12
+      ],
+      "based": [
+        13,
+        152
+      ],
+      "on": [
+        14,
+        87,
+        109,
+        153
+      ],
+      "adaptive": [
+        15
+      ],
+      "estimates": [
+        16
+      ],
+      "lower-order": [
+        18
+      ],
+      "moments.": [
+        19
+      ],
+      "The": [
+        20,
+        56,
+        72
+      ],
+      "method": [
+        21,
+        57
+      ],
+      "is": [
+        22,
+        26,
+        33,
+        42,
+        58,
+        114
+      ],
+      "straightforward": [
+        23
+      ],
+      "to": [
+        24,
+        35,
+        84,
+        116,
+        139
+      ],
+      "implement,": [
+        25
+      ],
+      "computationally": [
+        27
+      ],
+      "efficient,": [
+        28
+      ],
+      "has": [
+        29
+      ],
+      "little": [
+        30,
+        80
+      ],
+      "memory": [
+        31
+      ],
+      "requirements,": [
+        32
+      ],
+      "invariant": [
+        34
+      ],
+      "diagonal": [
+        36
+      ],
+      "rescaling": [
+        37
+      ],
+      "the": [
+        39,
+        97,
+        102,
+        110,
+        117,
+        122,
+        154
+      ],
+      "gradients,": [
+        40
+      ],
+      "and": [
+        41,
+        64,
+        77,
+        104,
+        136
+      ],
+      "well": [
+        43,
+        133
+      ],
+      "suited": [
+        44
+      ],
+      "problems": [
+        46,
+        65
+      ],
+      "that": [
+        47,
+        113,
+        130
+      ],
+      "are": [
+        48,
+        92
+      ],
+      "large": [
+        49
+      ],
+      "in": [
+        50,
+        134
+      ],
+      "terms": [
+        51
+      ],
+      "data": [
+        53
+      ],
+      "and/or": [
+        54,
+        69
+      ],
+      "parameters.": [
+        55
+      ],
+      "also": [
+        59,
+        95
+      ],
+      "appropriate": [
+        60
+      ],
+      "non-stationary": [
+        62
+      ],
+      "objectives": [
+        63
+      ],
+      "with": [
+        66
+      ],
+      "very": [
+        67
+      ],
+      "noisy": [
+        68
+      ],
+      "sparse": [
+        70
+      ],
+      "gradients.": [
+        71
+      ],
+      "hyper-parameters": [
+        73
+      ],
+      "have": [
+        74
+      ],
+      "intuitive": [
+        75
+      ],
+      "interpretations": [
+        76
+      ],
+      "typically": [
+        78
+      ],
+      "require": [
+        79
+      ],
+      "tuning.": [
+        81
+      ],
+      "Some": [
+        82
+      ],
+      "connections": [
+        83
+      ],
+      "related": [
+        85
+      ],
+      "algorithms,": [
+        86
+      ],
+      "which": [
+        88
+      ],
+      "Adam": [
+        89,
+        131,
+        151
+      ],
+      "was": [
+        90
+      ],
+      "inspired,": [
+        91
+      ],
+      "discussed.": [
+        93
+      ],
+      "analyze": [
+        96
+      ],
+      "theoretical": [
+        98
+      ],
+      "convergence": [
+        99,
+        111
+      ],
+      "properties": [
+        100
+      ],
+      "provide": [
+        105
+      ],
+      "a": [
+        106,
+        148
+      ],
+      "regret": [
+        107
+      ],
+      "bound": [
+        108
+      ],
+      "rate": [
+        112
+      ],
+      "comparable": [
+        115
+      ],
+      "best": [
+        118
+      ],
+      "known": [
+        119
+      ],
+      "results": [
+        120,
+        128
+      ],
+      "under": [
+        121
+      ],
+      "online": [
+        123
+      ],
+      "convex": [
+        124
+      ],
+      "framework.": [
+        126
+      ],
+      "Empirical": [
+        127
+      ],
+      "demonstrate": [
+        129
+      ],
+      "works": [
+        132
+      ],
+      "practice": [
+        135
+      ],
+      "compares": [
+        137
+      ],
+      "favorably": [
+        138
+      ],
+      "other": [
+        140
+      ],
+      "methods.": [
+        143
+      ],
+      "Finally,": [
+        144
+      ],
+      "we": [
+        145
+      ],
+      "discuss": [
+        146
+      ],
+      "AdaMax,": [
+        147
+      ],
+      "variant": [
+        149
+      ],
+      "infinity": [
+        155
+      ],
+      "norm.": [
+        156
+      ]
+    },
+    "ids": {
+      "openalex": "https://openalex.org/W1522301498",
+      "doi": "https://doi.org/10.48550/arxiv.1412.6980",
+      "mag": "1522301498"
+    },
+    "biblio": {
+      "volume": null,
+      "issue": null,
+      "first_page": null,
+      "last_page": null
+    }
+  },
+  "book": {
+    "id": "https://openalex.org/W4247665917",
+    "doi": "https://doi.org/10.1176/appi.books.9780890425596",
+    "title": "Diagnostic and Statistical Manual of Mental Disorders",
+    "publication_year": 2013,
+    "publication_date": "2013-05-22",
+    "language": "en",
+    "type": "book",
+    "open_access": {
+      "is_oa": true,
+      "oa_status": "green",
+      "oa_url": "https://www.who.int/news-room/fact-sheets/detail/depression",
+      "any_repository_has_fulltext": true
+    },
+    "cited_by_count": 115856,
+    "is_retracted": false,
+    "authorships": [
+      {
+        "author_position": "first",
+        "author": {
+          "display_name": "Andrés Santiago González Moreno"
+        },
+        "countries": [
+          "DK"
+        ]
+      }
+    ],
+    "primary_location": {
+      "is_oa": false,
+      "landing_page_url": "https://doi.org/10.1176/appi.books.9780890425596",
+      "pdf_url": null,
+      "version": "publishedVersion",
+      "source": {
+        "display_name": "American Psychiatric Association Publishing eBooks",
+        "type": "ebook platform"
+      }
+    },
+    "abstract_inverted_index": {
+      "En": [
+        0
+      ],
+      "la": [
+        1,
+        8,
+        20,
+        51,
+        82,
+        303,
+        309
+      ],
+      "actualidad": [
+        2
+      ],
+      "es": [
+        3
+      ],
+      "importante": [
+        4
+      ],
+      "detectar": [
+        5,
+        299
+      ],
+      "a": [
+        6,
+        42,
+        58,
+        80,
+        143,
+        157,
+        254,
+        302
+      ],
+      "tiempo": [
+        7
+      ],
+      "depresión,": [
+        9,
+        176
+      ],
+      "con": [
+        10,
+        94,
+        146,
+        173,
+        187,
+        208,
+        274,
+        311
+      ],
+      "el": [
+        11,
+        34,
+        89,
+        97,
+        108,
+        117,
+        147,
+        154,
+        161,
+        182,
+        188,
+        193,
+        246,
+        261
+      ],
+      "fin": [
+        12,
+        189
+      ],
+      "de": [
+        13,
+        22,
+        24,
+        29,
+        36,
+        48,
+        50,
+        61,
+        75,
+        84,
+        91,
+        99,
+        110,
+        119,
+        121,
+        125,
+        175,
+        190,
+        195,
+        205,
+        211,
+        225,
+        228,
+        233,
+        242,
+        257,
+        259,
+        263,
+        277,
+        291,
+        298,
+        308,
+        314
+      ],
+      "llevar": [
+        14
+      ],
+      "un": [
+        15,
+        43,
+        134,
+        209
+      ],
+      "tratamiento": [
+        16
+      ],
+      "oportuno": [
+        17
+      ],
+      "y": [
+        18,
+        96,
+        127,
+        201,
+        230,
+        238,
+        251,
+        266,
+        279,
+        305,
+        316
+      ],
+      "mejorar": [
+        19
+      ],
+      "calidad": [
+        21
+      ],
+      "vida": [
+        23
+      ],
+      "las": [
+        25,
+        71,
+        151,
+        196,
+        215,
+        240,
+        255
+      ],
+      "personas,": [
+        26
+      ],
+      "este": [
+        27,
+        76,
+        275
+      ],
+      "proceso": [
+        28
+      ],
+      "evaluación": [
+        30
+      ],
+      "o": [
+        31,
+        38,
+        63,
+        153,
+        171,
+        219,
+        286
+      ],
+      "detección": [
+        32
+      ],
+      "requiere": [
+        33
+      ],
+      "uso": [
+        35,
+        109,
+        118,
+        258
+      ],
+      "herramientas": [
+        37,
+        290
+      ],
+      "test": [
+        39
+      ],
+      "para": [
+        40,
+        70,
+        132,
+        213,
+        236,
+        288
+      ],
+      "llegar": [
+        41,
+        57,
+        142
+      ],
+      "diagnóstico": [
+        44,
+        315
+      ],
+      "correcto": [
+        45
+      ],
+      "por": [
+        46
+      ],
+      "parte": [
+        47
+      ],
+      "profesionales": [
+        49
+      ],
+      "salud": [
+        52
+      ],
+      "mental,": [
+        53
+      ],
+      "lo": [
+        54
+      ],
+      "cual": [
+        55
+      ],
+      "puede": [
+        56,
+        141,
+        270
+      ],
+      "ser": [
+        59,
+        67
+      ],
+      "largo": [
+        60
+      ],
+      "realizar": [
+        62
+      ],
+      "en": [
+        64,
+        112,
+        130,
+        150,
+        169,
+        181,
+        192,
+        217
+      ],
+      "algunos": [
+        65
+      ],
+      "casos": [
+        66
+      ],
+      "muy": [
+        68
+      ],
+      "invasivo": [
+        69
+      ],
+      "personas.": [
+        72
+      ],
+      "A": [
+        73
+      ],
+      "través": [
+        74
+      ],
+      "proyecto": [
+        77,
+        282
+      ],
+      "se": [
+        78,
+        140,
+        163,
+        199
+      ],
+      "llevó": [
+        79
+      ],
+      "cabo": [
+        81
+      ],
+      "investigación": [
+        83,
+        294
+      ],
+      "los": [
+        85,
+        104,
+        158,
+        165,
+        179,
+        243,
+        267
+      ],
+      "síntomas": [
+        86,
+        174,
+        300
+      ],
+      "que": [
+        87,
+        102,
+        139,
+        184,
+        269,
+        295,
+        306
+      ],
+      "caracterizan": [
+        88
+      ],
+      "perfil": [
+        90
+      ],
+      "una": [
+        92,
+        100,
+        231,
+        284
+      ],
+      "persona": [
+        93
+      ],
+      "depresión": [
+        95,
+        304
+      ],
+      "desarrollo": [
+        98,
+        162,
+        247
+      ],
+      "aplicación": [
+        101
+      ],
+      "detecta": [
+        103
+      ],
+      "posibles": [
+        105
+      ],
+      "síntomas,": [
+        106
+      ],
+      "mediante": [
+        107
+      ],
+      "webscraping": [
+        111
+      ],
+      "redes": [
+        113
+      ],
+      "sociales": [
+        114
+      ],
+      "como": [
+        115,
+        178
+      ],
+      "Instagram,": [
+        116,
+        260
+      ],
+      "algoritmos": [
+        120,
+        204
+      ],
+      "machine": [
+        122,
+        206
+      ],
+      "learning,": [
+        123
+      ],
+      "análisis": [
+        124,
+        128,
+        155,
+        234,
+        292
+      ],
+      "datos": [
+        126,
+        212,
+        264,
+        278
+      ],
+      "facial": [
+        129,
+        235
+      ],
+      "conjunto": [
+        131,
+        210
+      ],
+      "obtener": [
+        133
+      ],
+      "resultado": [
+        135
+      ],
+      "mas": [
+        136,
+        167
+      ],
+      "completo": [
+        137
+      ],
+      "del": [
+        138
+      ],
+      "tener": [
+        144
+      ],
+      "solo": [
+        145
+      ],
+      "texto": [
+        148,
+        194
+      ],
+      "obtenido": [
+        149
+      ],
+      "publicaciones": [
+        152,
+        216,
+        241
+      ],
+      "aplicado": [
+        156
+      ],
+      "rostros.": [
+        159
+      ],
+      "Durante": [
+        160,
+        245
+      ],
+      "investigaron": [
+        164,
+        200
+      ],
+      "rasgos": [
+        166
+      ],
+      "notorios": [
+        168
+      ],
+      "personas": [
+        170
+      ],
+      "pacientes": [
+        172
+      ],
+      "así": [
+        177
+      ],
+      "cambios": [
+        180
+      ],
+      "lenguaje": [
+        183
+      ],
+      "puedan": [
+        185
+      ],
+      "generar,": [
+        186
+      ],
+      "detectarlo": [
+        191
+      ],
+      "publicaciones,": [
+        197
+      ],
+      "además": [
+        198
+      ],
+      "probaron": [
+        202
+      ],
+      "distintos": [
+        203
+      ],
+      "learning": [
+        207
+      ],
+      "clasificar": [
+        214
+      ],
+      "suicida": [
+        218
+      ],
+      "no": [
+        220
+      ],
+      "suicida.": [
+        221
+      ],
+      "Se": [
+        222
+      ],
+      "implementaron": [
+        223
+      ],
+      "módulos": [
+        224
+      ],
+      "webscraping,": [
+        226
+      ],
+      "clasificación": [
+        227
+      ],
+      "palabras": [
+        229
+      ],
+      "API": [
+        232
+      ],
+      "descargar": [
+        237
+      ],
+      "analizar": [
+        239
+      ],
+      "perfiles.": [
+        244
+      ],
+      "encontraron": [
+        248
+      ],
+      "varios": [
+        249
+      ],
+      "obstáculos": [
+        250
+      ],
+      "consideraciones": [
+        252
+      ],
+      "relacionadas": [
+        253
+      ],
+      "políticas": [
+        256
+      ],
+      "manejo": [
+        262
+      ],
+      "personales": [
+        265
+      ],
+      "problemas": [
+        268
+      ],
+      "haber": [
+        271
+      ],
+      "al": [
+        272
+      ],
+      "trabajar": [
+        273
+      ],
+      "tipo": [
+        276
+      ],
+      "analizarlos.": [
+        280
+      ],
+      "Este": [
+        281
+      ],
+      "aporta": [
+        283
+      ],
+      "base": [
+        285
+      ],
+      "contexto": [
+        287
+      ],
+      "crear": [
+        289
+      ],
+      "e": [
+        293
+      ],
+      "sean": [
+        296
+      ],
+      "capaces": [
+        297
+      ],
+      "relacionados": [
+        301
+      ],
+      "trabajen": [
+        307
+      ],
+      "mano": [
+        310
+      ],
+      "otros": [
+        312
+      ],
+      "recursos": [
+        313
+      ],
+      "validación": [
+        317
+      ],
+      "clínica.": [
+        318
+      ]
+    },
+    "ids": {
+      "openalex": "https://openalex.org/W4247665917",
+      "doi": "https://doi.org/10.1176/appi.books.9780890425596"
+    },
+    "biblio": {
+      "volume": null,
+      "issue": null,
+      "first_page": null,
+      "last_page": null
+    }
+  },
+  "bookChapter": {
+    "id": "https://openalex.org/W1979300931",
+    "doi": "https://doi.org/10.1007/978-1-4612-4380-9_25",
+    "title": "Nonparametric Estimation from Incomplete Observations",
+    "publication_year": 1992,
+    "publication_date": "1992-01-01",
+    "language": "en",
+    "type": "book-chapter",
+    "open_access": {
+      "is_oa": false,
+      "oa_status": "closed",
+      "oa_url": null,
+      "any_repository_has_fulltext": false
+    },
+    "cited_by_count": 45181,
+    "is_retracted": false,
+    "authorships": [
+      {
+        "author_position": "first",
+        "author": {
+          "display_name": "Edward L. Kaplan"
+        },
+        "countries": [
+          "US"
+        ]
+      },
+      {
+        "author_position": "last",
+        "author": {
+          "display_name": "Paul Meier"
+        },
+        "countries": [
+          "US"
+        ]
+      }
+    ],
+    "primary_location": {
+      "is_oa": false,
+      "landing_page_url": "https://doi.org/10.1007/978-1-4612-4380-9_25",
+      "pdf_url": null,
+      "version": "publishedVersion",
+      "source": {
+        "display_name": "Springer series in statistics",
+        "type": "book series"
+      }
+    },
+    "abstract_inverted_index": null,
+    "ids": {
+      "openalex": "https://openalex.org/W1979300931",
+      "doi": "https://doi.org/10.1007/978-1-4612-4380-9_25",
+      "mag": "1979300931"
+    },
+    "biblio": {
+      "volume": null,
+      "issue": null,
+      "first_page": "319",
+      "last_page": "337"
+    }
+  },
+  "referenceEntry": {
+    "id": "https://openalex.org/W2159011576",
+    "doi": "https://doi.org/10.1093/acrefore/9780199975839.013.104",
+    "title": "Diagnostic and Statistical Manual of Mental Disorders",
+    "publication_year": 2013,
+    "publication_date": "2013-06-11",
+    "language": "en",
+    "type": "reference-entry",
+    "open_access": {
+      "is_oa": false,
+      "oa_status": "closed",
+      "oa_url": null,
+      "any_repository_has_fulltext": false
+    },
+    "cited_by_count": 109519,
+    "is_retracted": false,
+    "authorships": [
+      {
+        "author_position": "first",
+        "author": {
+          "display_name": "Janet B. W. Williams"
+        },
+        "countries": [
+          "US"
+        ]
+      },
+      {
+        "author_position": "last",
+        "author": {
+          "display_name": "Michael B. First"
+        },
+        "countries": [
+          "US"
+        ]
+      }
+    ],
+    "primary_location": {
+      "is_oa": false,
+      "landing_page_url": "https://doi.org/10.1093/acrefore/9780199975839.013.104",
+      "pdf_url": null,
+      "version": "publishedVersion",
+      "source": {
+        "display_name": "Encyclopedia of Social Work",
+        "type": "journal"
+      }
+    },
+    "abstract_inverted_index": {
+      "Abstract": [
+        0
+      ],
+      "The": [
+        1
+      ],
+      "fifth": [
+        2
+      ],
+      "edition": [
+        3
+      ],
+      "of": [
+        4,
+        10,
+        13,
+        37,
+        48,
+        67
+      ],
+      "the": [
+        5,
+        14,
+        30,
+        46,
+        61
+      ],
+      "Diagnostic": [
+        6
+      ],
+      "and": [
+        7
+      ],
+      "Statistical": [
+        8
+      ],
+      "Manual": [
+        9
+      ],
+      "Mental": [
+        11
+      ],
+      "Disorders": [
+        12
+      ],
+      "American": [
+        15
+      ],
+      "Psychiatric": [
+        16
+      ],
+      "Association": [
+        17
+      ],
+      "is": [
+        18
+      ],
+      "referred": [
+        19
+      ],
+      "to": [
+        20,
+        59
+      ],
+      "as": [
+        21
+      ],
+      "DSM-5™.": [
+        22
+      ],
+      "DSM-5’s": [
+        23
+      ],
+      "early": [
+        24
+      ],
+      "predecessor,": [
+        25
+      ],
+      "DSM-III,": [
+        26
+      ],
+      "differed": [
+        27
+      ],
+      "considerably": [
+        28
+      ],
+      "from": [
+        29
+      ],
+      "first": [
+        31
+      ],
+      "two": [
+        32
+      ],
+      "editions.": [
+        33
+      ],
+      "Its": [
+        34
+      ],
+      "innovative": [
+        35
+      ],
+      "incorporation": [
+        36
+      ],
+      "specified": [
+        38
+      ],
+      "diagnostic": [
+        39
+      ],
+      "criteria": [
+        40,
+        54
+      ],
+      "had": [
+        41
+      ],
+      "a": [
+        42
+      ],
+      "major": [
+        43
+      ],
+      "impact": [
+        44
+      ],
+      "on": [
+        45
+      ],
+      "field": [
+        47
+      ],
+      "mental": [
+        49,
+        68
+      ],
+      "health.": [
+        50
+      ],
+      "In": [
+        51
+      ],
+      "DSM-5,": [
+        52
+      ],
+      "these": [
+        53
+      ],
+      "have": [
+        55
+      ],
+      "been": [
+        56
+      ],
+      "further": [
+        57
+      ],
+      "updated": [
+        58
+      ],
+      "reflect": [
+        60
+      ],
+      "important": [
+        62
+      ],
+      "gains": [
+        63
+      ],
+      "in": [
+        64
+      ],
+      "our": [
+        65
+      ],
+      "understanding": [
+        66
+      ],
+      "disorders.": [
+        69
+      ]
+    },
+    "ids": {
+      "openalex": "https://openalex.org/W2159011576",
+      "doi": "https://doi.org/10.1093/acrefore/9780199975839.013.104",
+      "mag": "2159011576"
+    },
+    "biblio": {
+      "volume": null,
+      "issue": null,
+      "first_page": null,
+      "last_page": null
+    }
+  },
+  "dissertation": {
+    "id": "https://openalex.org/W1797402740",
+    "doi": "https://doi.org/10.1111/j.1467-",
+    "title": "Development and Distortion of Malaysian Public- Private Partnerships: Patronage, Privatised Profits and Pitfalls DOI: 10.1111/j.1467- 8500.2009.00655.x",
+    "publication_year": 2010,
+    "publication_date": "2010-08-01",
+    "language": "en",
+    "type": "dissertation",
+    "open_access": {
+      "is_oa": true,
+      "oa_status": "green",
+      "oa_url": "http://civis.se/Cifras-de-la-situacion-de-los-y",
+      "any_repository_has_fulltext": true
+    },
+    "cited_by_count": 16129,
+    "is_retracted": false,
+    "authorships": [
+      {
+        "author_position": "first",
+        "author": {
+          "display_name": "Loo‐See Beh"
+        },
+        "countries": []
+      }
+    ],
+    "primary_location": {
+      "is_oa": true,
+      "landing_page_url": "http://civis.se/Cifras-de-la-situacion-de-los-y",
+      "pdf_url": null,
+      "version": "acceptedVersion",
+      "source": {
+        "display_name": "Intellectum (Universidad de La Sabana)",
+        "type": "repository"
+      }
+    },
+    "abstract_inverted_index": {
+      "56": [
+        0
+      ],
+      "Páginas.": [
+        1
+      ]
+    },
+    "ids": {
+      "openalex": "https://openalex.org/W1797402740",
+      "doi": "https://doi.org/10.1111/j.1467-",
+      "mag": "1797402740"
+    },
+    "biblio": {
+      "volume": null,
+      "issue": null,
+      "first_page": null,
+      "last_page": null
+    }
+  },
+  "dataset": {
+    "id": "https://openalex.org/W2582743722",
+    "doi": "https://doi.org/10.32614/r.manuals",
+    "title": "R: A Language and Environment for Statistical Computing",
+    "publication_year": 2000,
+    "publication_date": "2000-02-29",
+    "language": "en",
+    "type": "dataset",
+    "open_access": {
+      "is_oa": true,
+      "oa_status": "gold",
+      "oa_url": "https://cran.r-project.org/doc/manuals/r-release/R-intro.pdf",
+      "any_repository_has_fulltext": true
+    },
+    "cited_by_count": 352181,
+    "is_retracted": false,
+    "authorships": [
+      {
+        "author_position": "first",
+        "author": {
+          "display_name": "R Core Team"
+        },
+        "countries": []
+      }
+    ],
+    "primary_location": {
+      "is_oa": true,
+      "landing_page_url": "https://doi.org/10.32614/r.manuals",
+      "pdf_url": "https://cran.r-project.org/doc/manuals/r-release/R-intro.pdf",
+      "version": "publishedVersion",
+      "source": null
+    },
+    "abstract_inverted_index": {
+      "This": [
+        0
+      ],
+      "introduction": [
+        1
+      ],
+      "to": [
+        2
+      ],
+      "R": [
+        3
+      ],
+      "is": [
+        4
+      ],
+      "derived": [
+        5
+      ],
+      "from": [
+        6
+      ],
+      "an": [
+        7
+      ],
+      "original": [
+        8
+      ],
+      "set": [
+        9
+      ],
+      "of": [
+        10
+      ],
+      "notes": [
+        11
+      ],
+      "describing": [
+        12
+      ],
+      "the": [
+        13
+      ],
+      "S": [
+        14
+      ],
+      "and": [
+        15,
+        24
+      ],
+      "S-Plus": [
+        16
+      ],
+      "environments": [
+        17
+      ],
+      "written": [
+        18
+      ],
+      "in": [
+        19
+      ],
+      "1990-2": [
+        20
+      ],
+      "by": [
+        21
+      ],
+      "Bill": [
+        22
+      ],
+      "Venables": [
+        23
+      ],
+      "David": [
+        25
+      ],
+      "M": [
+        26
+      ]
+    },
+    "ids": {
+      "openalex": "https://openalex.org/W2582743722",
+      "doi": "https://doi.org/10.32614/r.manuals",
+      "mag": "2582743722"
+    },
+    "biblio": {
+      "volume": "1",
+      "issue": "1",
+      "first_page": null,
+      "last_page": null
+    }
+  },
+  "conferencePaper": {
+    "id": "https://openalex.org/W2194775991",
+    "doi": "https://doi.org/10.1109/cvpr.2016.90",
+    "title": "Deep Residual Learning for Image Recognition",
+    "publication_year": 2016,
+    "publication_date": "2016-06-01",
+    "language": "en",
+    "type": "conference-paper",
+    "open_access": {
+      "is_oa": true,
+      "oa_status": "green",
+      "oa_url": "https://repositorio.unal.edu.co/handle/unal/81443",
+      "any_repository_has_fulltext": true
+    },
+    "cited_by_count": 221332,
+    "is_retracted": false,
+    "authorships": [
+      {
+        "author_position": "first",
+        "author": {
+          "display_name": "Kaiming He"
+        },
+        "countries": [
+          "US"
+        ]
+      },
+      {
+        "author_position": "middle",
+        "author": {
+          "display_name": "Xiangyu Zhang"
+        },
+        "countries": [
+          "US"
+        ]
+      },
+      {
+        "author_position": "middle",
+        "author": {
+          "display_name": "Shaoqing Ren"
+        },
+        "countries": [
+          "US"
+        ]
+      }
+    ],
+    "primary_location": {
+      "is_oa": false,
+      "landing_page_url": "https://doi.org/10.1109/cvpr.2016.90",
+      "pdf_url": null,
+      "version": "publishedVersion",
+      "source": {
+        "display_name": "IEEE Computer Society Conference on Computer Vision and Pattern Recognition/Proceedings - IEEE Computer Society Conference on Computer Vision and Pattern Recognition/Proceedings",
+        "type": "conference"
+      }
+    },
+    "abstract_inverted_index": {
+      "100": [
+        131
+      ],
+      "152": [
+        84
+      ],
+      "1000": [
+        133
+      ],
+      "2015": [
+        121,
+        179
+      ],
+      "Deeper": [
+        0
+      ],
+      "neural": [
+        1
+      ],
+      "networks": [
+        2,
+        19,
+        57
+      ],
+      "are": [
+        3,
+        21,
+        58,
+        170
+      ],
+      "more": [
+        4
+      ],
+      "difficult": [
+        5
+      ],
+      "to": [
+        6,
+        14,
+        39,
+        60,
+        83,
+        150,
+        175
+      ],
+      "train.": [
+        7
+      ],
+      "We": [
+        8,
+        28,
+        48,
+        124
+      ],
+      "present": [
+        9,
+        126
+      ],
+      "a": [
+        10,
+        79,
+        157
+      ],
+      "residual": [
+        11,
+        35,
+        56,
+        76,
+        102,
+        168
+      ],
+      "learning": [
+        12,
+        34,
+        45
+      ],
+      "framework": [
+        13
+      ],
+      "ease": [
+        15
+      ],
+      "the": [
+        16,
+        31,
+        40,
+        71,
+        108,
+        115,
+        119,
+        162,
+        185,
+        189
+      ],
+      "training": [
+        17
+      ],
+      "of": [
+        18,
+        44,
+        81,
+        100,
+        137,
+        140,
+        172,
+        191
+      ],
+      "that": [
+        20,
+        54
+      ],
+      "substantially": [
+        22
+      ],
+      "deeper": [
+        23,
+        88
+      ],
+      "than": [
+        24,
+        89
+      ],
+      "those": [
+        25
+      ],
+      "used": [
+        26
+      ],
+      "previously.": [
+        27
+      ],
+      "explicitly": [
+        29
+      ],
+      "reformulate": [
+        30
+      ],
+      "layers": [
+        32,
+        85
+      ],
+      "as": [
+        33
+      ],
+      "functions": [
+        36
+      ],
+      "with": [
+        37,
+        78,
+        130
+      ],
+      "reference": [
+        38
+      ],
+      "layer": [
+        41
+      ],
+      "inputs,": [
+        42
+      ],
+      "instead": [
+        43
+      ],
+      "unreferenced": [
+        46
+      ],
+      "functions.": [
+        47
+      ],
+      "provide": [
+        49
+      ],
+      "comprehensive": [
+        50
+      ],
+      "empirical": [
+        51
+      ],
+      "evidence": [
+        52
+      ],
+      "showing": [
+        53
+      ],
+      "these": [
+        55,
+        101
+      ],
+      "easier": [
+        59
+      ],
+      "optimize,": [
+        61
+      ],
+      "and": [
+        62,
+        132,
+        198
+      ],
+      "can": [
+        63
+      ],
+      "gain": [
+        64
+      ],
+      "accuracy": [
+        65
+      ],
+      "from": [
+        66
+      ],
+      "considerably": [
+        67
+      ],
+      "increased": [
+        68
+      ],
+      "depth.": [
+        69
+      ],
+      "On": [
+        70
+      ],
+      "ImageNet": [
+        72,
+        109,
+        192,
+        194
+      ],
+      "dataset": [
+        73
+      ],
+      "we": [
+        74,
+        155,
+        182
+      ],
+      "evaluate": [
+        75
+      ],
+      "nets": [
+        77,
+        91,
+        103,
+        169
+      ],
+      "depth": [
+        80,
+        136
+      ],
+      "up": [
+        82
+      ],
+      "-": [
+        86
+      ],
+      "8×": [
+        87
+      ],
+      "VGG": [
+        90
+      ],
+      "[40]": [
+        92
+      ],
+      "but": [
+        93
+      ],
+      "still": [
+        94
+      ],
+      "having": [
+        95
+      ],
+      "lower": [
+        96
+      ],
+      "complexity.": [
+        97
+      ],
+      "An": [
+        98
+      ],
+      "ensemble": [
+        99
+      ],
+      "achieves": [
+        104
+      ],
+      "3.57%": [
+        105
+      ],
+      "error": [
+        106
+      ],
+      "on": [
+        107,
+        118,
+        128,
+        161,
+        188
+      ],
+      "test": [
+        110
+      ],
+      "set.": [
+        111
+      ],
+      "This": [
+        112
+      ],
+      "result": [
+        113
+      ],
+      "won": [
+        114,
+        184
+      ],
+      "1st": [
+        116,
+        186
+      ],
+      "place": [
+        117
+      ],
+      "ILSVRC": [
+        120,
+        176
+      ],
+      "classification": [
+        122
+      ],
+      "task.": [
+        123
+      ],
+      "also": [
+        125,
+        183
+      ],
+      "analysis": [
+        127
+      ],
+      "CIFAR-10": [
+        129
+      ],
+      "layers.": [
+        134
+      ],
+      "The": [
+        135
+      ],
+      "representations": [
+        138
+      ],
+      "is": [
+        139
+      ],
+      "central": [
+        141
+      ],
+      "importance": [
+        142
+      ],
+      "for": [
+        143
+      ],
+      "many": [
+        144
+      ],
+      "visual": [
+        145
+      ],
+      "recognition": [
+        146
+      ],
+      "tasks.": [
+        147
+      ],
+      "Solely": [
+        148
+      ],
+      "due": [
+        149
+      ],
+      "our": [
+        151,
+        173
+      ],
+      "extremely": [
+        152
+      ],
+      "deep": [
+        153
+      ],
+      "representations,": [
+        154
+      ],
+      "obtain": [
+        156
+      ],
+      "28%": [
+        158
+      ],
+      "relative": [
+        159
+      ],
+      "improvement": [
+        160
+      ],
+      "COCO": [
+        163,
+        178,
+        196,
+        199
+      ],
+      "object": [
+        164
+      ],
+      "detection": [
+        165
+      ],
+      "dataset.": [
+        166
+      ],
+      "Deep": [
+        167
+      ],
+      "foundations": [
+        171
+      ],
+      "submissions": [
+        174
+      ],
+      "&": [
+        177
+      ],
+      "competitions1,": [
+        180
+      ],
+      "where": [
+        181
+      ],
+      "places": [
+        187
+      ],
+      "tasks": [
+        190
+      ],
+      "detection,": [
+        193,
+        197
+      ],
+      "localization,": [
+        195
+      ],
+      "segmentation.": [
+        200
+      ]
+    },
+    "ids": {
+      "openalex": "https://openalex.org/W2194775991",
+      "doi": "https://doi.org/10.1109/cvpr.2016.90",
+      "mag": "2194775991"
+    },
+    "biblio": {
+      "volume": null,
+      "issue": null,
+      "first_page": "770",
+      "last_page": "778"
+    }
+  },
+  "report": {
+    "id": "https://openalex.org/W2766736793",
+    "doi": "https://doi.org/10.21236/ada164453",
+    "title": "Learning Internal Representations by Error Propagation",
+    "publication_year": 1985,
+    "publication_date": "1985-09-01",
+    "language": "en",
+    "type": "report",
+    "open_access": {
+      "is_oa": false,
+      "oa_status": "closed",
+      "oa_url": null,
+      "any_repository_has_fulltext": false
+    },
+    "cited_by_count": 16172,
+    "is_retracted": false,
+    "authorships": [
+      {
+        "author_position": "first",
+        "author": {
+          "display_name": "David E. Rumelhart"
+        },
+        "countries": []
+      },
+      {
+        "author_position": "middle",
+        "author": {
+          "display_name": "Geoffrey E. Hinton"
+        },
+        "countries": []
+      },
+      {
+        "author_position": "last",
+        "author": {
+          "display_name": "Ronald J. Williams"
+        },
+        "countries": []
+      }
+    ],
+    "primary_location": {
+      "is_oa": false,
+      "landing_page_url": "https://doi.org/10.21236/ada164453",
+      "pdf_url": null,
+      "version": "publishedVersion",
+      "source": null
+    },
+    "abstract_inverted_index": {
+      "This": [
+        0
+      ],
+      "chapter": [
+        1
+      ],
+      "contains": [
+        2
+      ],
+      "sections": [
+        3
+      ],
+      "titled:": [
+        4
+      ],
+      "The": [
+        5,
+        7
+      ],
+      "Problem,": [
+        6
+      ],
+      "Generalized": [
+        8
+      ],
+      "Delta": [
+        9
+      ],
+      "Rule,": [
+        10
+      ],
+      "Simulation": [
+        11
+      ],
+      "Results,": [
+        12
+      ],
+      "Some": [
+        13
+      ],
+      "Further": [
+        14
+      ],
+      "Generalizations,": [
+        15
+      ],
+      "Conclusion": [
+        16
+      ]
+    },
+    "ids": {
+      "openalex": "https://openalex.org/W2766736793",
+      "doi": "https://doi.org/10.21236/ada164453",
+      "mag": "2766736793"
+    },
+    "biblio": {
+      "volume": null,
+      "issue": null,
+      "first_page": null,
+      "last_page": null
+    }
+  },
+  "other": {
+    "id": "https://openalex.org/W4321794881",
+    "doi": "https://doi.org/10.1093/9780197610145.002.001",
+    "title": "Official Methods of Analysis",
+    "publication_year": 2023,
+    "publication_date": "2023-01-04",
+    "language": "en",
+    "type": "other",
+    "open_access": {
+      "is_oa": true,
+      "oa_status": "gold",
+      "oa_url": "https://academic.oup.com/aoac-publications/book/45491/chapter/392327022/chapter-ag-pdf/56719633/book_45491_section_392327022.ag.pdf",
+      "any_repository_has_fulltext": null
+    },
+    "cited_by_count": 28007,
+    "is_retracted": false,
+    "authorships": [],
+    "primary_location": {
+      "is_oa": true,
+      "landing_page_url": "https://doi.org/10.1093/9780197610145.002.001",
+      "pdf_url": "https://academic.oup.com/aoac-publications/book/45491/chapter/392327022/chapter-ag-pdf/56719633/book_45491_section_392327022.ag.pdf",
+      "version": "publishedVersion",
+      "source": null
+    },
+    "abstract_inverted_index": {
+      "2019": [
+        16,
+        55
+      ],
+      "SMPRs": [
+        0
+      ],
+      "AOAC": [
+        1,
+        44,
+        70,
+        82,
+        98,
+        115,
+        128
+      ],
+      "SMPR": [
+        2,
+        45,
+        71,
+        83,
+        99,
+        116,
+        129
+      ],
+      "2017.021Quantitation": [
+        3
+      ],
+      "of": [
+        4,
+        47,
+        73,
+        88,
+        101,
+        106,
+        118,
+        131,
+        137
+      ],
+      "Wheat,": [
+        5
+      ],
+      "Rye,": [
+        6
+      ],
+      "and": [
+        7,
+        38,
+        77,
+        86,
+        120,
+        139
+      ],
+      "Barley": [
+        8
+      ],
+      "Gluten": [
+        9
+      ],
+      "in": [
+        10,
+        67,
+        75,
+        92,
+        103,
+        123,
+        134
+      ],
+      "Oats": [
+        11
+      ],
+      "®": [
+        12,
+        13,
+        52,
+        80,
+        96,
+        113,
+        126,
+        142
+      ],
+      "Revised": [
+        14,
+        53
+      ],
+      "March": [
+        15,
+        54
+      ],
+      "to": [
+        17,
+        31,
+        56,
+        62
+      ],
+      "provide": [
+        18
+      ],
+      "better": [
+        19
+      ],
+      "nal": [
+        20
+      ],
+      "calculations": [
+        21
+      ],
+      "(wet": [
+        22
+      ],
+      "chemical": [
+        23
+      ],
+      "analysis": [
+        24
+      ],
+      "vs": [
+        25
+      ],
+      "Dumas": [
+        26
+      ],
+      "nitrogen": [
+        27
+      ],
+      "content": [
+        28,
+        34
+      ],
+      "method)": [
+        29
+      ],
+      "used": [
+        30,
+        40
+      ],
+      "determine": [
+        32
+      ],
+      "gluten": [
+        33
+      ],
+      "for": [
+        35,
+        41
+      ],
+      "wheat,": [
+        36
+      ],
+      "rye,": [
+        37
+      ],
+      "barley": [
+        39
+      ],
+      "spiking": [
+        42
+      ],
+      "samples": [
+        43
+      ],
+      "2018.012Quantitation": [
+        46
+      ],
+      "Peanut": [
+        48
+      ],
+      "by": [
+        49
+      ],
+      "ELISA-Based": [
+        50
+      ],
+      "Methods": [
+        51
+      ],
+      "correct": [
+        57
+      ],
+      "\"1": [
+        58
+      ],
+      "ppm": [
+        59,
+        64
+      ],
+      "peanut": [
+        60,
+        65
+      ],
+      "protein\"": [
+        61,
+        66
+      ],
+      "\"2": [
+        63
+      ],
+      "Annex": [
+        68
+      ],
+      "NEW!": [
+        69,
+        81,
+        97,
+        114,
+        127
+      ],
+      "2019.001Detection": [
+        72
+      ],
+      "Aspergillus": [
+        74
+      ],
+      "Cannabis": [
+        76,
+        78,
+        94,
+        111,
+        138
+      ],
+      "Products": [
+        79,
+        141
+      ],
+      "2019.002Identi": [
+        84
+      ],
+      "cation": [
+        85
+      ],
+      "Quantitation": [
+        87
+      ],
+      "Selected": [
+        89,
+        124
+      ],
+      "Residual": [
+        90
+      ],
+      "Solvents": [
+        91
+      ],
+      "Dried": [
+        93
+      ],
+      "Materials": [
+        95,
+        105
+      ],
+      "2019.003Quantitation": [
+        100
+      ],
+      "Cannabinoids": [
+        102
+      ],
+      "Plant": [
+        104
+      ],
+      "Hemp": [
+        107
+      ],
+      "(Low": [
+        108
+      ],
+      "THC": [
+        109
+      ],
+      "Varieties": [
+        110
+      ],
+      "spp.)": [
+        112
+      ],
+      "2019.004Quantitation": [
+        117
+      ],
+      "Furan": [
+        119
+      ],
+      "Alkyl": [
+        121
+      ],
+      "Furans": [
+        122
+      ],
+      "Matrices": [
+        125
+      ],
+      "2020.001Determination": [
+        130
+      ],
+      "Heavy": [
+        132
+      ],
+      "Metals": [
+        133
+      ],
+      "a": [
+        135
+      ],
+      "Variety": [
+        136
+      ],
+      "Cannabis-Derived": [
+        140
+      ]
+    },
+    "ids": {
+      "openalex": "https://openalex.org/W4321794881",
+      "doi": "https://doi.org/10.1093/9780197610145.002.001"
+    },
+    "biblio": {
+      "volume": null,
+      "issue": null,
+      "first_page": null,
+      "last_page": null
+    }
+  },
+  "retracted": {
+    "id": "https://openalex.org/W3046275966",
+    "doi": "https://doi.org/10.1016/s0140-6736(20)30367-6",
+    "title": "Dementia prevention, intervention, and care: 2020 report of the Lancet Commission",
+    "publication_year": 2020,
+    "publication_date": "2020-07-30",
+    "language": "en",
+    "type": "article",
+    "open_access": {
+      "is_oa": true,
+      "oa_status": "bronze",
+      "oa_url": "http://www.thelancet.com/article/S0140673620303676/pdf",
+      "any_repository_has_fulltext": true
+    },
+    "cited_by_count": 10348,
+    "is_retracted": true,
+    "authorships": [
+      {
+        "author_position": "first",
+        "author": {
+          "display_name": "Gill Livingston"
+        },
+        "countries": [
+          "GB"
+        ]
+      },
+      {
+        "author_position": "middle",
+        "author": {
+          "display_name": "Jonathan D. Huntley"
+        },
+        "countries": [
+          "GB"
+        ]
+      },
+      {
+        "author_position": "middle",
+        "author": {
+          "display_name": "Andrew Sommerlad"
+        },
+        "countries": [
+          "GB"
+        ]
+      }
+    ],
+    "primary_location": {
+      "is_oa": true,
+      "landing_page_url": "https://doi.org/10.1016/s0140-6736(20)30367-6",
+      "pdf_url": "http://www.thelancet.com/article/S0140673620303676/pdf",
+      "version": "publishedVersion",
+      "source": {
+        "display_name": "The Lancet",
+        "type": "journal"
+      }
+    },
+    "abstract_inverted_index": null,
+    "ids": {
+      "openalex": "https://openalex.org/W3046275966",
+      "doi": "https://doi.org/10.1016/s0140-6736(20)30367-6",
+      "mag": "3046275966",
+      "pmid": "https://pubmed.ncbi.nlm.nih.gov/32738937"
+    },
+    "biblio": {
+      "volume": "396",
+      "issue": "10248",
+      "first_page": "413",
+      "last_page": "446"
+    }
+  },
+  "noDoi": {
+    "id": "https://openalex.org/W4288400169",
+    "doi": null,
+    "title": "Yaşlı Kadınlarda Üreme Sağlığı",
+    "publication_year": null,
+    "publication_date": null,
+    "language": "tr",
+    "type": "article",
+    "open_access": {
+      "is_oa": true,
+      "oa_status": "green",
+      "oa_url": "https://dergipark.org.tr/tr/pub/jgon/issue/51866/675113",
+      "any_repository_has_fulltext": true
+    },
+    "cited_by_count": 169709,
+    "is_retracted": false,
+    "authorships": [
+      {
+        "author_position": "first",
+        "author": {
+          "display_name": "Kokanalı, Demet"
+        },
+        "countries": [
+          "FR",
+          "TR"
+        ]
+      },
+      {
+        "author_position": "last",
+        "author": {
+          "display_name": "Engin Üstün, Yaprak"
+        },
+        "countries": []
+      }
+    ],
+    "primary_location": {
+      "is_oa": true,
+      "landing_page_url": "https://dergipark.org.tr/tr/pub/jgon/issue/51866/675113",
+      "pdf_url": "https://dergipark.org.tr/tr/pub/jgon/issue/51866/675113",
+      "version": "submittedVersion",
+      "source": {
+        "display_name": "DergiPark (Istanbul University)",
+        "type": "repository"
+      }
+    },
+    "abstract_inverted_index": {
+      "50": [
+        83
+      ],
+      "Üreme": [
+        0,
+        22
+      ],
+      "sağlığı,": [
+        1
+      ],
+      "üreme": [
+        2,
+        35,
+        39,
+        69,
+        89
+      ],
+      "sistemi": [
+        3
+      ],
+      "ve": [
+        4,
+        13,
+        15,
+        29,
+        56,
+        86
+      ],
+      "onun": [
+        5
+      ],
+      "fonksiyonlarına": [
+        6
+      ],
+      "ilişkin": [
+        7
+      ],
+      "hastalık": [
+        8
+      ],
+      "ya": [
+        9
+      ],
+      "da": [
+        10
+      ],
+      "sakatlık": [
+        11
+      ],
+      "olmaması": [
+        12
+      ],
+      "zihinsel": [
+        14
+      ],
+      "sosyal": [
+        16
+      ],
+      "açıdan": [
+        17
+      ],
+      "bütünüyle": [
+        18
+      ],
+      "iyi": [
+        19
+      ],
+      "olma": [
+        20
+      ],
+      "durumudur.": [
+        21
+      ],
+      "sağlığı": [
+        23,
+        70,
+        90
+      ],
+      "aynı": [
+        24
+      ],
+      "zamanda": [
+        25
+      ],
+      "insanların": [
+        26
+      ],
+      "tatmin": [
+        27
+      ],
+      "edici": [
+        28
+      ],
+      "güvenli": [
+        30
+      ],
+      "bir": [
+        31
+      ],
+      "cinsel": [
+        32
+      ],
+      "yaşamlarının": [
+        33
+      ],
+      "olması,": [
+        34
+      ],
+      "yeteneğine": [
+        36
+      ],
+      "sahip": [
+        37,
+        45
+      ],
+      "olmaları,": [
+        38
+      ],
+      "yeteneklerini": [
+        40
+      ],
+      "kullanmada": [
+        41
+      ],
+      "karar": [
+        42
+      ],
+      "verme": [
+        43
+      ],
+      "özgürlüğüne": [
+        44
+      ],
+      "olmaları": [
+        46
+      ],
+      "demektir.": [
+        47
+      ],
+      "Doğurganlığı": [
+        48
+      ],
+      "içerisinde": [
+        49
+      ],
+      "barındırdığı": [
+        50
+      ],
+      "için": [
+        51,
+        61
+      ],
+      "doğurganlığın": [
+        52
+      ],
+      "sona": [
+        53
+      ],
+      "erdiği": [
+        54
+      ],
+      "menopoz": [
+        55,
+        57
+      ],
+      "sonrası": [
+        58
+      ],
+      "yaşlı": [
+        59,
+        87
+      ],
+      "kadınlar": [
+        60
+      ],
+      "bu": [
+        62,
+        81
+      ],
+      "konu": [
+        63
+      ],
+      "genellikle": [
+        64
+      ],
+      "göz": [
+        65
+      ],
+      "ardı": [
+        66
+      ],
+      "edilmektedir.": [
+        67
+      ],
+      "Halbuki,": [
+        68
+      ],
+      "kadın-erkek,": [
+        71
+      ],
+      "genç-yaşlı": [
+        72
+      ],
+      "bütün": [
+        73
+      ],
+      "bireylerin": [
+        74
+      ],
+      "temel": [
+        75
+      ],
+      "hakkı": [
+        76
+      ],
+      "olarak": [
+        77
+      ],
+      "kabul": [
+        78
+      ],
+      "edilmelidir.": [
+        79
+      ],
+      "Biz": [
+        80
+      ],
+      "derlememizde": [
+        82
+      ],
+      "yaş": [
+        84
+      ],
+      "üstü": [
+        85
+      ],
+      "kadınların": [
+        88
+      ],
+      "konularındaki": [
+        91
+      ],
+      "sorunlarına": [
+        92
+      ],
+      "eğilmeyi": [
+        93
+      ],
+      "amaçladık.": [
+        94
+      ]
+    },
+    "ids": {
+      "openalex": "https://openalex.org/W4288400169"
+    },
+    "biblio": {
+      "volume": null,
+      "issue": null,
+      "first_page": null,
+      "last_page": null
+    }
+  }
+}
