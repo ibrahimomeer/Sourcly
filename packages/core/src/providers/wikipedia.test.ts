@@ -52,14 +52,14 @@ describe("parseWikipediaPage", () => {
 describe("createWikipediaProvider", () => {
   it("asks for 20 pages with their intro text, allows cross-origin reading, and ranks by search index", async () => {
     const fetchMock = vi.fn<typeof fetch>(() => Promise.resolve(Response.json(fixtures)));
-    const results = await createWikipediaProvider({ fetch: fetchMock }).search("sleep & memory", { limit: 100 });
+    const results = await createWikipediaProvider({ fetch: fetchMock }).search("sleep AND memory", { limit: 100 });
 
     const url = new URL(String(fetchMock.mock.calls[0]?.[0]));
     expect(url.origin + url.pathname).toBe("https://en.wikipedia.org/w/api.php");
     expect(Object.fromEntries(url.searchParams)).toMatchObject({
       action: "query",
       generator: "search",
-      gsrsearch: "sleep memory",
+      gsrsearch: "sleep AND memory",
       gsrlimit: "20",
       prop: "extracts|info",
       exintro: "1",
@@ -78,5 +78,12 @@ describe("createWikipediaProvider", () => {
       "Sleep spindle",
     ]);
     expect(results.map((r) => r.hits[0]?.rank)).toEqual([1, 2, 3, 4, 5, 6]);
+  });
+});
+
+describe("Wikipedia subjects and syntax", () => {
+  it("gives pages no subjects, and understands Boolean queries", () => {
+    expect(parseWikipediaPage(pages[0], 1, 1)?.subjects).toEqual([]);
+    expect(createWikipediaProvider().syntax).toBe("boolean");
   });
 });

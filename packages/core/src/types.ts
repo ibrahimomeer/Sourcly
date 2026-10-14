@@ -89,6 +89,22 @@ export interface RetractionInfo {
   source: string | null;
 }
 
+/**
+ * What kind of descriptive term a source attached to a work:
+ * - "topic": a topic from OpenAlex's classifier;
+ * - "keyword": a keyword given by authors or the source;
+ * - "mesh": a MeSH (Medical Subject Headings) heading, the controlled vocabulary used by PubMed;
+ * - "subject": a broad subject or category (a journal's subject area, a classification).
+ */
+export type SubjectKind = "topic" | "keyword" | "mesh" | "subject";
+
+/** One descriptive term for a work, and where it came from. */
+export interface Subject {
+  term: string;
+  kind: SubjectKind;
+  provider: ProviderId;
+}
+
 /** One provider's report that it returned this result. */
 export interface ProviderHit {
   provider: ProviderId;
@@ -126,9 +142,20 @@ export interface Result {
   authorCountries: string[];
   openAccess: OpenAccessInfo;
   retraction: RetractionInfo;
+  /**
+   * Descriptive terms (topics, keywords, MeSH headings) the sources gave the work. They
+   * are matched against the query for relevance and mined for "related terms".
+   */
+  subjects: Subject[];
   /** Which providers returned this result, and at what rank. */
   hits: ProviderHit[];
 }
+
+/**
+ * How a provider reads a query. "boolean" sources understand AND, OR, NOT, quoted
+ * phrases and parentheses; "plain" sources take only a list of words.
+ */
+export type QuerySyntax = "boolean" | "plain";
 
 export interface SearchOptions {
   /** Maximum number of results to return from one provider. */
@@ -139,6 +166,8 @@ export interface SearchOptions {
 export interface Provider {
   readonly id: ProviderId;
   readonly name: string;
+  /** How this provider reads the query it is given. */
+  readonly syntax: QuerySyntax;
   /**
    * Resolves with normalized results, best match first. Throws `ProviderError`
    * when the provider cannot answer; callers decide what to show.

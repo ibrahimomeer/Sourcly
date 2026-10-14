@@ -11,6 +11,7 @@ import {
   parseYear,
   requestJson,
   sourced,
+  subjectsFrom,
   type Fetch,
 } from "./shared";
 
@@ -115,6 +116,14 @@ export function parseEuropePmcRecord(raw: unknown, rank: number, listSize: numbe
     retraction: retracted
       ? { retracted: true, source: "Europe PMC pubTypeList: Retracted Publication" }
       : { retracted: source === "MED" || source === "PMC" ? false : null, source: null },
+    subjects: [
+      ...subjectsFrom(
+        "europepmc",
+        "mesh",
+        asArray(asRecord(record.meshHeadingList)?.meshHeading).map((heading) => asRecord(heading)?.descriptorName),
+      ),
+      ...subjectsFrom("europepmc", "keyword", asArray(asRecord(record.keywordList)?.keyword)),
+    ],
     hits: [{ provider: "europepmc", id: `${source}:${id}`, rank, listSize, score: null }],
   };
 }
@@ -129,10 +138,13 @@ export function createEuropePmcProvider(options: EuropePmcOptions = {}): Provide
   return {
     id: "europepmc",
     name: "Europe PMC",
+    syntax: "boolean",
 
     async search(query: string, { limit, signal }: SearchOptions): Promise<Result[]> {
+      const text = query.trim();
+      if (text === "") return [];
       const url = new URL(SEARCH_URL);
-      url.searchParams.set("query", query);
+      url.searchParams.set("query", text);
       url.searchParams.set("format", "json");
       url.searchParams.set("resultType", "core");
       url.searchParams.set("pageSize", String(clampLimit(limit, MAX_PAGE_SIZE)));

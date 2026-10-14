@@ -149,3 +149,24 @@ describe("createPubmedProvider", () => {
     expect(error).toMatchObject({ kind: "rate-limited", httpStatus: 429 });
   });
 });
+
+describe("PubMed subjects and syntax", () => {
+  it("reads MeSH headings and author keywords, dropping blanks", () => {
+    const all = parsed.flatMap((r) => r.subjects);
+    const mesh = all.filter((s) => s.kind === "mesh").map((s) => s.term);
+    expect(mesh).toEqual(expect.arrayContaining(["Memory Consolidation", "Sleep", "Hippocampus"]));
+    expect(all.every((s) => s.provider === "pubmed" && s.term.trim() === s.term && s.term !== "")).toBe(true);
+    expect(all.some((s) => s.kind === "keyword")).toBe(true);
+  });
+
+  it("does not repeat a term within one record", () => {
+    for (const result of parsed) {
+      const keys = result.subjects.map((s) => `${s.kind}:${s.term.toLowerCase()}`);
+      expect(new Set(keys).size).toBe(keys.length);
+    }
+  });
+
+  it("understands Boolean queries", () => {
+    expect(createPubmedProvider().syntax).toBe("boolean");
+  });
+});

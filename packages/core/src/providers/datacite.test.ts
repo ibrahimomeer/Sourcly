@@ -62,13 +62,25 @@ describe("parseDataCiteRecord", () => {
 });
 
 describe("createDataCiteProvider", () => {
-  it("sends a plain-words query with page[size] capped at 100", async () => {
+  it("sends the query it is given, with page[size] capped at 100", async () => {
     const fetchMock = vi.fn<typeof fetch>(() => Promise.resolve(Response.json(fixtures)));
     const found = await createDataCiteProvider({ fetch: fetchMock }).search('sleep AND "memory"', { limit: 1000 });
     const url = new URL(String(fetchMock.mock.calls[0]?.[0]));
     expect(url.origin + url.pathname).toBe("https://api.datacite.org/dois");
-    expect(url.searchParams.get("query")).toBe("sleep AND memory");
+    expect(url.searchParams.get("query")).toBe('sleep AND "memory"');
     expect(url.searchParams.get("page[size]")).toBe("100");
     expect(found).toHaveLength(records.length);
+  });
+});
+
+describe("DataCite subjects and syntax", () => {
+  it("reads subjects as keywords, and has none when the record lists none", () => {
+    expect(parse(records[0]).subjects).toEqual([]);
+    const result = parse({ attributes: { doi: "10.1000/x", subjects: [{ subject: "Sleep" }, { subject: "sleep" }, { subject: "Memory" }, {}] } });
+    expect(result.subjects).toEqual([
+      { term: "Sleep", kind: "keyword", provider: "datacite" },
+      { term: "Memory", kind: "keyword", provider: "datacite" },
+    ]);
+    expect(createDataCiteProvider().syntax).toBe("boolean");
   });
 });

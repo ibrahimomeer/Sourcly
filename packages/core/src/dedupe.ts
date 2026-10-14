@@ -1,4 +1,4 @@
-import type { Author, OaStatus, OpenAccessInfo, ProviderId, Result, RetractionInfo, WorkType } from "./types";
+import type { Author, OaStatus, OpenAccessInfo, ProviderId, Result, RetractionInfo, Subject, WorkType } from "./types";
 
 // Merging results that several providers returned for the same work.
 //
@@ -110,6 +110,19 @@ function mergeOpenAccess(ordered: Result[]): OpenAccessInfo {
   return { isOpen, status, url: pick((a) => a.url), pdfUrl: pick((a) => a.pdfUrl) };
 }
 
+/** All descriptive terms, from the source earliest in the priority order first, without repeats. */
+function mergeSubjects(ordered: Result[]): Subject[] {
+  const seen = new Set<string>();
+  const merged: Subject[] = [];
+  for (const subject of ordered.flatMap((result) => result.subjects)) {
+    const key = `${subject.kind}:${subject.term.toLowerCase()}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    merged.push(subject);
+  }
+  return merged;
+}
+
 function mergeRetraction(ordered: Result[]): RetractionInfo {
   const all = ordered.map((result) => result.retraction);
   const flagged = all.filter((r) => r.retracted === true);
@@ -162,6 +175,7 @@ function mergeGroup(group: Result[]): Result {
     authorCountries: [...new Set(ordered.flatMap((result) => result.authorCountries))].sort(),
     openAccess: mergeOpenAccess(ordered),
     retraction: mergeRetraction(ordered),
+    subjects: mergeSubjects(ordered),
     hits,
   };
 }

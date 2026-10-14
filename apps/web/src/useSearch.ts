@@ -1,5 +1,7 @@
 import {
+  planQueries,
   searchProviders,
+  type ParsedQuery,
   type Provider,
   type ProviderStatus,
   type SearchCache,
@@ -23,7 +25,7 @@ export interface SearchRequestOptions {
  */
 export function useSearch(): {
   state: SearchState;
-  search: (query: string, providers: readonly Provider[], options: SearchRequestOptions) => void;
+  search: (query: ParsedQuery, providers: readonly Provider[], options: SearchRequestOptions) => void;
 } {
   const [state, dispatch] = useReducer(searchReducer, idleSearch);
   const current = useRef<AbortController | null>(null);
@@ -31,14 +33,21 @@ export function useSearch(): {
 
   useEffect(() => () => current.current?.abort(), []);
 
-  const search = useCallback((query: string, providers: readonly Provider[], options: SearchRequestOptions) => {
+  const search = useCallback((query: ParsedQuery, providers: readonly Provider[], options: SearchRequestOptions) => {
     current.current?.abort();
     const controller = new AbortController();
     current.current = controller;
     counter.current += 1;
     const id = counter.current;
 
-    dispatch({ type: "start", id, query, order: providers.map((provider) => provider.id), skipped: options.skipped });
+    dispatch({
+      type: "start",
+      id,
+      parsed: query,
+      sent: planQueries(providers, query),
+      order: providers.map((provider) => provider.id),
+      skipped: options.skipped,
+    });
     void searchProviders(providers, query, {
       limit: options.limit,
       signal: controller.signal,

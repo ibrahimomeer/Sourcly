@@ -114,3 +114,18 @@ describe("createCrossrefProvider", () => {
     expect(results.map((r) => r.hits[0]?.rank)).toEqual(items.map((_, i) => i + 1));
   });
 });
+
+describe("Crossref subjects and syntax", () => {
+  it("treats Crossref's subject list as broad subjects", () => {
+    const result = parseCrossrefWork({ DOI: "10.1000/x", subject: ["Neuroscience", " Psychology ", "neuroscience", ""] }, 1, 1);
+    expect(result?.subjects).toEqual([
+      { term: "Neuroscience", kind: "subject", provider: "crossref" },
+      { term: "Psychology", kind: "subject", provider: "crossref" },
+    ]);
+  });
+
+  it("has none when Crossref lists none, and reads the query as plain words", () => {
+    expect(parseCrossrefWork(items[0], 1, 1)?.subjects).toEqual([]);
+    expect(createCrossrefProvider().syntax).toBe("plain");
+  });
+});

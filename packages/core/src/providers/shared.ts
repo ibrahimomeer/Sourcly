@@ -1,6 +1,6 @@
 import { normalizeDoi } from "../doi";
 import { asInteger, asString } from "../json";
-import { parseYear } from "../text";
+import { parseYear, stripMarkup } from "../text";
 import {
   ProviderError,
   type Author,
@@ -8,6 +8,8 @@ import {
   type OpenAccessInfo,
   type ProviderId,
   type Sourced,
+  type Subject,
+  type SubjectKind,
 } from "../types";
 
 // Helpers shared by the providers added after OpenAlex: one way to make a
@@ -118,6 +120,24 @@ export function authorFromParts(family: unknown, given: unknown, fullName?: unkn
   }
   const full = asString(fullName) ?? givenName;
   return full === null ? null : { name: full };
+}
+
+/** Most descriptive terms kept per kind for one work. */
+const MAX_SUBJECTS_PER_KIND = 20;
+
+/** Descriptive terms of one kind, cleaned of markup, without repeats, in the order given. */
+export function subjectsFrom(provider: ProviderId, kind: SubjectKind, values: readonly unknown[]): Subject[] {
+  const seen = new Set<string>();
+  const subjects: Subject[] = [];
+  for (const value of values) {
+    const term = stripMarkup(asString(value) ?? "");
+    const key = term.toLowerCase();
+    if (term === "" || seen.has(key)) continue;
+    seen.add(key);
+    subjects.push({ term, kind, provider });
+    if (subjects.length >= MAX_SUBJECTS_PER_KIND) break;
+  }
+  return subjects;
 }
 
 /** DOI from a value that may be a bare DOI, a doi.org link or null. */

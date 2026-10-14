@@ -1,4 +1,5 @@
 import type { Labels, SourceLevel } from "./classify";
+import { relevanceReadings } from "./relevance";
 import { PROVIDER_NAMES, type Result } from "./types";
 
 // score = sum(weight_i * factor_i) / sum(weight_i), over enabled factors, with
@@ -11,16 +12,18 @@ export const FACTOR_IDS = [
   "recency",
   "peerReview",
   "openAccess",
+  "providerAgreement",
   "studyType",
 ] as const;
 export type FactorId = (typeof FACTOR_IDS)[number];
 
 export const FACTOR_LABELS: Record<FactorId, string> = {
-  relevance: "Relevance",
+  relevance: "Relevance (BM25)",
   citations: "Citations",
   recency: "Recency",
   peerReview: "Peer review",
   openAccess: "Open access",
+  providerAgreement: "Provider agreement",
   studyType: "Study type",
 };
 
@@ -48,6 +51,8 @@ export function defaultScoringSettings(): ScoringSettings {
       // 0 by default: with library access, being open access says little about
       // whether you can read a source. Raise it if you do not have that access.
       openAccess: { enabled: true, weight: 0 },
+      // A result several independent sources returned is a little more likely to matter.
+      providerAgreement: { enabled: true, weight: 0.5 },
       studyType: { enabled: false, weight: 0 },
     },
     preferredLevels: [],
@@ -57,6 +62,16 @@ export function defaultScoringSettings(): ScoringSettings {
 
 /** What a factor scores when the result has no data for it. */
 export const NEUTRAL = 0.5;
+
+/** What a ranking needs to know besides the results and the settings. */
+export interface ScoringContext {
+  /** The year ages are measured from. Passed in, so the same inputs always rank the same way. */
+  referenceYear: number;
+  /** The words the query asks for (from `queryTerms`); relevance is BM25 over these. */
+  queryTerms: readonly string[];
+  /** How many sources answered; provider agreement is measured against this. */
+  answeredSources: number;
+}
 
 export interface ScoringItem {
   result: Result;
@@ -116,28 +131,32 @@ function percentileRank(value: number, population: readonly number[]): number {
   return (below + equal / 2) / population.length;
 }
 
-function relevanceFactor(result: Result): FactorValue {
-  if (result.hits.length === 0) {
-    return { raw: null, detail: "No provider rank recorded, so it scores neutral (0.5)", normalized: NEUTRAL };
+/**
+ * How many of the sources that answered returned this result. A result found independently
+ * by several sources is a little more likely to be what you want. With fewer than two
+ * answering sources there is nothing to compare, so it scores neutral.
+ */
+function agreementFactor(result: Result, answeredSources: number): FactorValue {
+  const found = [...new Set(result.hits.map((hit) => hit.provider))];
+  if (answeredSources < 2) {
+    return {
+      raw: found.length,
+      detail: "Only one source answered, so agreement between sources cannot be measured: neutral (0.5)",
+      normalized: NEUTRAL,
+    };
   }
-  // First place scores 1; last place scores 1/listSize. The best hit counts.
-  const ranked = result.hits.map((hit) => ({
-    hit,
-    value: clamp01(1 - (hit.rank - 1) / Math.max(1, hit.listSize, hit.rank)),
-  }));
-  ranked.sort((a, b) => b.value - a.value);
-  const [best, ...others] = ranked;
-  if (best === undefined) throw new Error("unreachable: hits is not empty");
-
-  const describe = ({ hit }: { hit: Result["hits"][number] }) =>
-    `#${hit.rank} of ${hit.listSize} on ${PROVIDER_NAMES[hit.provider]}`;
-  const score = best.hit.score === null ? "" : ` (its relevance score: ${best.hit.score.toFixed(1)})`;
-  const also = others.length === 0 ? "" : `; also returned by ${others.map(describe).join(", ")}`;
+  const normalized = clamp01(found.length / answeredSources);
   return {
-    raw: best.hit.rank,
-    detail: `Ranked ${describe(best)}${score}${also}. Rank position is turned into 1 - (rank - 1) / list size`,
-    normalized: best.value,
+    raw: found.length,
+    detail: `Found by ${found.length} of the ${answeredSources} sources that answered (${found.map((id) => PROVIDER_NAMES[id]).join(", ")}): ${found.length} / ${answeredSources}`,
+    normalized,
   };
+}
+
+/** Turns BM25's reading into a factor value; "cannot be measured" is neutral. */
+function relevanceFactor(reading: { raw: number | null; normalized: number | null; detail: string } | undefined): FactorValue {
+  if (reading === undefined) return { raw: null, detail: "No relevance reading", normalized: NEUTRAL };
+  return { raw: reading.raw, detail: reading.detail, normalized: reading.normalized ?? NEUTRAL };
 }
 
 function citationsFactor(
@@ -215,20 +234,24 @@ function compareScored(a: ScoredResult, b: ScoredResult): number {
 }
 
 /**
- * Scores and sorts results, best first. `referenceYear` is passed in (rather
- * than read from the clock) so the same inputs always give the same ranking.
- * Re-run it whenever settings or labels change; it never needs new data.
+ * Scores and sorts results, best first. The reference year, the query words and the number of
+ * answering sources are passed in (rather than read from the clock or the page) so the same
+ * inputs always give the same ranking. Re-run it whenever settings, labels or the set of
+ * results change; it never needs new data. Relevance is measured over the whole set given,
+ * so pass every merged result, not only the ones currently shown.
  */
 export function scoreResults(
   items: readonly ScoringItem[],
   settings: ScoringSettings,
-  referenceYear: number,
+  context: ScoringContext,
 ): ScoredResult[] {
+  const { referenceYear, queryTerms, answeredSources } = context;
   const halfLife =
     Number.isFinite(settings.recencyHalfLifeYears) && settings.recencyHalfLifeYears > 0
       ? settings.recencyHalfLifeYears
       : defaultScoringSettings().recencyHalfLifeYears;
 
+  const relevance = relevanceReadings(items.map(({ result }) => result), queryTerms);
   const rates = items.map(({ result }) => citationRate(result, referenceYear));
   const population = rates.filter((rate): rate is number => rate !== null);
 
@@ -240,11 +263,12 @@ export function scoreResults(
   const scored = items.map((item, index): ScoredResult => {
     const { result, labels } = item;
     const values: Record<FactorId, FactorValue> = {
-      relevance: relevanceFactor(result),
+      relevance: relevanceFactor(relevance[index]),
       citations: citationsFactor(result, rates[index] ?? null, population, referenceYear),
       recency: recencyFactor(result, referenceYear, halfLife),
       peerReview: peerReviewFactor(labels),
       openAccess: openAccessFactor(result),
+      providerAgreement: agreementFactor(result, answeredSources),
       studyType: studyTypeFactor(labels, settings.preferredLevels),
     };
 

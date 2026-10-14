@@ -1,6 +1,6 @@
 import { doiUrl } from "../doi";
 import { asArray, asHttpUrl, asRecord, asString } from "../json";
-import { plainTextOrNull, stripMarkup, toLanguageCode, toPlainQuery } from "../text";
+import { plainTextOrNull, stripMarkup, toLanguageCode } from "../text";
 import type { Author, Provider, Result, SearchOptions, WorkType } from "../types";
 import {
   authorFromName,
@@ -11,6 +11,7 @@ import {
   parseYear,
   requestJson,
   sourced,
+  subjectsFrom,
   type Fetch,
 } from "./shared";
 
@@ -19,7 +20,9 @@ import {
 //   `access-control-allow-origin: *`.
 // - Anonymous requests may ask for at most 25 results per page (size=100 is refused
 //   with HTTP 400), and search endpoints are limited to 30 requests per minute.
-// - q is an Elasticsearch query string, so it is reduced to plain words first.
+// - q is an Elasticsearch query string whose default operator is OR (72,788 hits for two
+//   words, 1,171 with an explicit AND). The query arrives already written for this source
+//   (see query.ts) with every AND spelled out.
 // - Zenodo holds anything a researcher uploads: papers, datasets, software, slides.
 
 const RECORDS_URL = "https://zenodo.org/api/records";
@@ -88,6 +91,7 @@ export function parseZenodoRecord(raw: unknown, rank: number, listSize: number):
       { url: access === "open" ? recordPage : null },
     ),
     retraction: { retracted: null, source: null },
+    subjects: subjectsFrom("zenodo", "keyword", asArray(metadata.keywords)),
     hits: [{ provider: "zenodo", id, rank, listSize, score: null }],
   };
 }
@@ -102,12 +106,13 @@ export function createZenodoProvider(options: ZenodoOptions = {}): Provider {
   return {
     id: "zenodo",
     name: "Zenodo",
+    syntax: "boolean",
 
     async search(query: string, { limit, signal }: SearchOptions): Promise<Result[]> {
-      const plain = toPlainQuery(query);
-      if (plain === "") return [];
+      const text = query.trim();
+      if (text === "") return [];
       const url = new URL(RECORDS_URL);
-      url.searchParams.set("q", plain);
+      url.searchParams.set("q", text);
       url.searchParams.set("size", String(clampLimit(limit, MAX_SIZE)));
 
       const body = asRecord(await requestJson(doFetch, url, "Zenodo", signal));

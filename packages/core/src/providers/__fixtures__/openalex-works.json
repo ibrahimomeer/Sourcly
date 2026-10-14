@@ -65,7 +65,35 @@
             "display_name": "Nature",
             "type": "journal"
           }
-        }
+        },
+        "topics": [
+          {
+            "display_name": "Sleep and Wakefulness Research",
+            "score": 0.9990000128746033
+          },
+          {
+            "display_name": "Memory and Neural Mechanisms",
+            "score": 0.0010000000474974513
+          },
+          {
+            "display_name": "Memory Processes and Influences",
+            "score": 0
+          }
+        ],
+        "keywords": [
+          {
+            "display_name": "sleep-dependent memory consolidation",
+            "score": 0.9549999833106995
+          },
+          {
+            "display_name": "memory encoding",
+            "score": 0.8289999961853027
+          },
+          {
+            "display_name": "memory formation",
+            "score": 0.6819999814033508
+          }
+        ]
       },
       {
         "id": "https://openalex.org/W2006822588",
@@ -136,7 +164,59 @@
           "first_page": "309",
           "last_page": "321"
         },
-        "best_oa_location": null
+        "best_oa_location": null,
+        "topics": [
+          {
+            "display_name": "Sleep and Wakefulness Research",
+            "score": 1
+          },
+          {
+            "display_name": "Memory and Neural Mechanisms",
+            "score": 0.00009999999747378752
+          },
+          {
+            "display_name": "Memory Processes and Influences",
+            "score": 0
+          }
+        ],
+        "keywords": [
+          {
+            "display_name": "sleep-dependent memory consolidation",
+            "score": 0.996999979019165
+          },
+          {
+            "display_name": "declarative memory",
+            "score": 0.7289999723434448
+          },
+          {
+            "display_name": "procedural memory",
+            "score": 0.9990000128746033
+          },
+          {
+            "display_name": "emotional memory",
+            "score": 0.9980000257492065
+          },
+          {
+            "display_name": "slow-wave sleep",
+            "score": 0.9300000071525574
+          },
+          {
+            "display_name": "REM sleep",
+            "score": 0.9900000095367432
+          },
+          {
+            "display_name": "sleep duration",
+            "score": 0.5590000152587891
+          },
+          {
+            "display_name": "reward prediction",
+            "score": 0.41999998688697815
+          },
+          {
+            "display_name": "children's sleep",
+            "score": 0.5759999752044678
+          }
+        ]
       },
       {
         "id": "https://openalex.org/W2149529050",
@@ -207,7 +287,47 @@
             "display_name": "PubMed Central",
             "type": "repository"
           }
-        }
+        },
+        "topics": [
+          {
+            "display_name": "Sleep and Wakefulness Research",
+            "score": 0.9951000213623047
+          },
+          {
+            "display_name": "Memory and Neural Mechanisms",
+            "score": 0.0044999998062849045
+          },
+          {
+            "display_name": "Memory Processes and Influences",
+            "score": 0.00009999999747378752
+          }
+        ],
+        "keywords": [
+          {
+            "display_name": "sleep-dependent memory consolidation",
+            "score": 0.8600000143051147
+          },
+          {
+            "display_name": "memory reconsolidation",
+            "score": 0.9909999966621399
+          },
+          {
+            "display_name": "sleep",
+            "score": 0.7049999833106995
+          },
+          {
+            "display_name": "memory stabilization",
+            "score": 0.5899999737739563
+          },
+          {
+            "display_name": "memory reactivation",
+            "score": 0.6159999966621399
+          },
+          {
+            "display_name": "memory retrieval",
+            "score": 0.7350000143051147
+          }
+        ]
       }
     ]
   },
@@ -589,7 +709,59 @@
         "display_name": "BMJ",
         "type": "journal"
       }
-    }
+    },
+    "topics": [
+      {
+        "display_name": "Meta-analysis and systematic reviews",
+        "score": 1
+      },
+      {
+        "display_name": "Clinical practice guidelines implementation",
+        "score": 0
+      },
+      {
+        "display_name": "Delphi Technique in Research",
+        "score": 0
+      }
+    ],
+    "keywords": [
+      {
+        "display_name": "PRISMA 2020",
+        "score": 0.9760000109672546
+      },
+      {
+        "display_name": "reporting guidelines",
+        "score": 0.8009999990463257
+      },
+      {
+        "display_name": "systematic reviews",
+        "score": 0.9300000071525574
+      },
+      {
+        "display_name": "meta-analysis",
+        "score": 0.6949999928474426
+      },
+      {
+        "display_name": "reporting checklist",
+        "score": 0.6980000138282776
+      },
+      {
+        "display_name": "flowcharts",
+        "score": 0.5730000138282776
+      },
+      {
+        "display_name": "study selection",
+        "score": 0.4959999918937683
+      },
+      {
+        "display_name": "study appraisal",
+        "score": 0.7599999904632568
+      },
+      {
+        "display_name": "transparency in research reporting",
+        "score": 0.4650000035762787
+      }
+    ]
   },
   "preprint": {
     "id": "https://openalex.org/W1522301498",
@@ -1026,7 +1198,51 @@
         "display_name": "arXiv (Cornell University)",
         "type": "repository"
       }
-    }
+    },
+    "topics": [
+      {
+        "display_name": "Stochastic Gradient Optimization Techniques",
+        "score": 0.9994999766349792
+      },
+      {
+        "display_name": "Advanced Optimization Algorithms Research",
+        "score": 0
+      },
+      {
+        "display_name": "Advanced Bandit Algorithms Research",
+        "score": 0
+      }
+    ],
+    "keywords": [
+      {
+        "display_name": "Adam optimizer",
+        "score": 0.9309999942779541
+      },
+      {
+        "display_name": "stochastic optimization",
+        "score": 0.9259999990463257
+      },
+      {
+        "display_name": "convergence analysis",
+        "score": 0.6549999713897705
+      },
+      {
+        "display_name": "regret bounds",
+        "score": 0.9520000219345093
+      },
+      {
+        "display_name": "online convex optimization",
+        "score": 0.9819999933242798
+      },
+      {
+        "display_name": "Adamax",
+        "score": 0.9589999914169312
+      },
+      {
+        "display_name": "hyperparameter optimization",
+        "score": 0.8119999766349792
+      }
+    ]
   },
   "book": {
     "id": "https://openalex.org/W4247665917",
@@ -1721,7 +1937,59 @@
         "display_name": "Repositorio Institucional UPTC",
         "type": "repository"
       }
-    }
+    },
+    "topics": [
+      {
+        "display_name": "Mental Health via Writing",
+        "score": 0.9980000257492065
+      },
+      {
+        "display_name": "Emotion and Mood Recognition",
+        "score": 0.000699999975040555
+      },
+      {
+        "display_name": "Artificial Intelligence in Healthcare",
+        "score": 0.00019999999494757503
+      }
+    ],
+    "keywords": [
+      {
+        "display_name": "depression detection",
+        "score": 0.9929999709129333
+      },
+      {
+        "display_name": "Instagram",
+        "score": 0.4259999990463257
+      },
+      {
+        "display_name": "social media text analysis",
+        "score": 0.734000027179718
+      },
+      {
+        "display_name": "suicide detection",
+        "score": 0.8330000042915344
+      },
+      {
+        "display_name": "facial analysis",
+        "score": 0.8339999914169312
+      },
+      {
+        "display_name": "web scraping",
+        "score": 0.652999997138977
+      },
+      {
+        "display_name": "mental health",
+        "score": 0.546999990940094
+      },
+      {
+        "display_name": "word classification",
+        "score": 0.5370000004768372
+      },
+      {
+        "display_name": "personal data privacy",
+        "score": 0.5730000138282776
+      }
+    ]
   },
   "bookChapter": {
     "id": "https://openalex.org/W1979300931",
@@ -1781,7 +2049,47 @@
       "first_page": "319",
       "last_page": "337"
     },
-    "best_oa_location": null
+    "best_oa_location": null,
+    "topics": [
+      {
+        "display_name": "Statistical Distribution Estimation and Applications",
+        "score": 0.8314999938011169
+      },
+      {
+        "display_name": "Statistical Methods and Inference",
+        "score": 0.08160000294446945
+      },
+      {
+        "display_name": "Probability and Statistical Research",
+        "score": 0.07209999859333038
+      }
+    ],
+    "keywords": [
+      {
+        "display_name": "nonparametric estimation",
+        "score": 0.8159999847412109
+      },
+      {
+        "display_name": "censored data",
+        "score": 0.890999972820282
+      },
+      {
+        "display_name": "survival analysis",
+        "score": 0.7039999961853027
+      },
+      {
+        "display_name": "Kaplan-Meier estimator",
+        "score": 0.9369999766349792
+      },
+      {
+        "display_name": "lifetime distributions",
+        "score": 0.5210000276565552
+      },
+      {
+        "display_name": "incomplete observations",
+        "score": 0.3799999952316284
+      }
+    ]
   },
   "referenceEntry": {
     "id": "https://openalex.org/W2159011576",
@@ -2028,7 +2336,51 @@
       "first_page": null,
       "last_page": null
     },
-    "best_oa_location": null
+    "best_oa_location": null,
+    "topics": [
+      {
+        "display_name": "Mental Health and Psychiatry",
+        "score": 0.9740999937057495
+      },
+      {
+        "display_name": "Psychology and Mental Health",
+        "score": 0.010200000368058681
+      },
+      {
+        "display_name": "Personality Disorders and Psychopathology",
+        "score": 0.004800000227987766
+      }
+    ],
+    "keywords": [
+      {
+        "display_name": "DSM-5",
+        "score": 0.9919999837875366
+      },
+      {
+        "display_name": "DSM-III",
+        "score": 0.8849999904632568
+      },
+      {
+        "display_name": "diagnostic criteria",
+        "score": 0.8629999756813049
+      },
+      {
+        "display_name": "mental illness",
+        "score": 0.8939999938011169
+      },
+      {
+        "display_name": "psychiatric diagnosis",
+        "score": 0.824999988079071
+      },
+      {
+        "display_name": "American Psychiatric Association",
+        "score": 0.781000018119812
+      },
+      {
+        "display_name": "history of psychiatry",
+        "score": 0.7039999961853027
+      }
+    ]
   },
   "dissertation": {
     "id": "https://openalex.org/W1797402740",
@@ -2093,7 +2445,39 @@
         "display_name": "Intellectum (Universidad de La Sabana)",
         "type": "repository"
       }
-    }
+    },
+    "topics": [
+      {
+        "display_name": "Public-Private Partnership Projects",
+        "score": 0.9984999895095825
+      },
+      {
+        "display_name": "Urban Planning and Governance",
+        "score": 0.00019999999494757503
+      },
+      {
+        "display_name": "Water Governance and Infrastructure",
+        "score": 0.00019999999494757503
+      }
+    ],
+    "keywords": [
+      {
+        "display_name": "public-private partnerships",
+        "score": 0.9990000128746033
+      },
+      {
+        "display_name": "patronage",
+        "score": 0.7630000114440918
+      },
+      {
+        "display_name": "privatization",
+        "score": 0.7110000252723694
+      },
+      {
+        "display_name": "Malaysian public sector",
+        "score": 0.43299999833106995
+      }
+    ]
   },
   "dataset": {
     "id": "https://openalex.org/W2582743722",
@@ -2225,7 +2609,43 @@
       "pdf_url": "https://cran.r-project.org/doc/manuals/r-release/R-intro.pdf",
       "version": "publishedVersion",
       "source": null
-    }
+    },
+    "topics": [
+      {
+        "display_name": "Data Analysis with R",
+        "score": 1
+      },
+      {
+        "display_name": "Statistical Methods and Applications",
+        "score": 0
+      },
+      {
+        "display_name": "SAS software applications and methods",
+        "score": 0
+      }
+    ],
+    "keywords": [
+      {
+        "display_name": "R programming language",
+        "score": 0.8939999938011169
+      },
+      {
+        "display_name": "statistical computing",
+        "score": 0.9620000123977661
+      },
+      {
+        "display_name": "S language",
+        "score": 0.7680000066757202
+      },
+      {
+        "display_name": "S-PLUS",
+        "score": 0.9649999737739563
+      },
+      {
+        "display_name": "statistical software",
+        "score": 0.781000018119812
+      }
+    ]
   },
   "conferencePaper": {
     "id": "https://openalex.org/W2194775991",
@@ -2763,7 +3183,55 @@
         "display_name": "LA Referencia (Red Federada de Repositorios Institucionales de Publicaciones Científicas)",
         "type": "repository"
       }
-    }
+    },
+    "topics": [
+      {
+        "display_name": "Advanced Neural Network Applications",
+        "score": 0.9897000193595886
+      },
+      {
+        "display_name": "Domain Adaptation and Few-Shot Learning",
+        "score": 0.005100000184029341
+      },
+      {
+        "display_name": "Advanced Image and Video Retrieval Techniques",
+        "score": 0.002099999925121665
+      }
+    ],
+    "keywords": [
+      {
+        "display_name": "residual learning",
+        "score": 0.7200000286102295
+      },
+      {
+        "display_name": "ResNet",
+        "score": 0.8960000276565552
+      },
+      {
+        "display_name": "image recognition",
+        "score": 0.6299999952316284
+      },
+      {
+        "display_name": "network depth",
+        "score": 0.6880000233650208
+      },
+      {
+        "display_name": "ImageNet classification",
+        "score": 0.7730000019073486
+      },
+      {
+        "display_name": "object detection",
+        "score": 0.671999990940094
+      },
+      {
+        "display_name": "semantic segmentation",
+        "score": 0.6620000004768372
+      },
+      {
+        "display_name": "localization",
+        "score": 0.41200000047683716
+      }
+    ]
   },
   "report": {
     "id": "https://openalex.org/W2766736793",
@@ -2873,7 +3341,47 @@
       "first_page": null,
       "last_page": null
     },
-    "best_oa_location": null
+    "best_oa_location": null,
+    "topics": [
+      {
+        "display_name": "Neural Networks and Applications",
+        "score": 0.9984999895095825
+      },
+      {
+        "display_name": "Reinforcement Learning in Robotics",
+        "score": 0.00019999999494757503
+      },
+      {
+        "display_name": "Machine Learning and Algorithms",
+        "score": 0.00009999999747378752
+      }
+    ],
+    "keywords": [
+      {
+        "display_name": "internal representations",
+        "score": 0.8050000071525574
+      },
+      {
+        "display_name": "error propagation",
+        "score": 0.9869999885559082
+      },
+      {
+        "display_name": "generalized delta rule",
+        "score": 0.9779999852180481
+      },
+      {
+        "display_name": "learning",
+        "score": 0.3499999940395355
+      },
+      {
+        "display_name": "artificial neural networks",
+        "score": 0.6399999856948853
+      },
+      {
+        "display_name": "backpropagation",
+        "score": 0.6259999871253967
+      }
+    ]
   },
   "other": {
     "id": "https://openalex.org/W4321794881",
@@ -3224,7 +3732,22 @@
       "pdf_url": "https://academic.oup.com/aoac-publications/book/45491/chapter/392327022/chapter-ag-pdf/56719633/book_45491_section_392327022.ag.pdf",
       "version": "publishedVersion",
       "source": null
-    }
+    },
+    "topics": [
+      {
+        "display_name": "Analytical chemistry methods development",
+        "score": 0.47780001163482666
+      },
+      {
+        "display_name": "Environmental and Analytical Chemistry Studies",
+        "score": 0.1876000016927719
+      },
+      {
+        "display_name": "Analytical Methods in Pharmaceuticals",
+        "score": 0.08879999816417694
+      }
+    ],
+    "keywords": []
   },
   "retracted": {
     "id": "https://openalex.org/W3046275966",
@@ -3303,7 +3826,87 @@
         "display_name": "The Lancet",
         "type": "journal"
       }
-    }
+    },
+    "topics": [
+      {
+        "display_name": "Dementia and Cognitive Impairment Research",
+        "score": 0.9994999766349792
+      },
+      {
+        "display_name": "Aging, Health, and Disability",
+        "score": 0
+      },
+      {
+        "display_name": "Alzheimer's disease research and treatments",
+        "score": 0
+      }
+    ],
+    "keywords": [
+      {
+        "display_name": "dementia",
+        "score": 0.7490000128746033
+      },
+      {
+        "display_name": "dementia prevention",
+        "score": 0.9950000047683716
+      },
+      {
+        "display_name": "dementia risk factors",
+        "score": 0.9010000228881836
+      },
+      {
+        "display_name": "modifiable risk factors",
+        "score": 0.8149999976158142
+      },
+      {
+        "display_name": "dementia interventions",
+        "score": 0.4480000138282776
+      },
+      {
+        "display_name": "dementia care",
+        "score": 0.9879999756813049
+      },
+      {
+        "display_name": "older adults",
+        "score": 0.5830000042915344
+      },
+      {
+        "display_name": "hypertension",
+        "score": 0.9869999885559082
+      },
+      {
+        "display_name": "hearing loss",
+        "score": 0.9950000047683716
+      },
+      {
+        "display_name": "smoking",
+        "score": 0.984000027179718
+      },
+      {
+        "display_name": "obesity",
+        "score": 1
+      },
+      {
+        "display_name": "depression",
+        "score": 0.9990000128746033
+      },
+      {
+        "display_name": "physical inactivity",
+        "score": 1
+      },
+      {
+        "display_name": "diabetes mellitus",
+        "score": 0.996999979019165
+      },
+      {
+        "display_name": "social contact",
+        "score": 0.7749999761581421
+      },
+      {
+        "display_name": "population aging",
+        "score": 0.5080000162124634
+      }
+    ]
   },
   "noDoi": {
     "id": "https://openalex.org/W4288400169",
@@ -3621,6 +4224,50 @@
         "display_name": "DergiPark (Istanbul University)",
         "type": "repository"
       }
-    }
+    },
+    "topics": [
+      {
+        "display_name": "Menopause: Health Impacts and Treatments",
+        "score": 0.861299991607666
+      },
+      {
+        "display_name": "Sexual function and dysfunction studies",
+        "score": 0.0868000015616417
+      },
+      {
+        "display_name": "Reproductive Health and Contraception",
+        "score": 0.020600000396370888
+      }
+    ],
+    "keywords": [
+      {
+        "display_name": "reproductive health",
+        "score": 0.9909999966621399
+      },
+      {
+        "display_name": "older women",
+        "score": 0.8970000147819519
+      },
+      {
+        "display_name": "menopause",
+        "score": 0.7699999809265137
+      },
+      {
+        "display_name": "postmenopausal women",
+        "score": 0.9350000023841858
+      },
+      {
+        "display_name": "reproductive capacity",
+        "score": 0.5699999928474426
+      },
+      {
+        "display_name": "sexual health",
+        "score": 0.7269999980926514
+      },
+      {
+        "display_name": "reproductive rights",
+        "score": 0.7009999752044678
+      }
+    ]
   }
 }

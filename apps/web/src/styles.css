@@ -554,3 +554,95 @@ fieldset > p:first-of-type {
     padding: 0.75rem;
   }
 }
+
+/* Writing a search, and what was actually sent */
+
+.search-tips {
+  margin: 0.5rem 0 0;
+  font-size: 0.875rem;
+}
+
+.search-tips ul,
+.sent-queries ul {
+  margin: 0.4rem 0 0;
+  padding-left: 1.25rem;
+}
+
+.search-tips li,
+.sent-queries li {
+  margin: 0.25rem 0;
+}
+
+code {
+  padding: 0.05rem 0.3rem;
+  border: 1px solid var(--border);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.85em;
+  overflow-wrap: anywhere;
+}
+
+.query-note {
+  margin: 0 0 1rem;
+  font-size: 0.875rem;
+}
+
+.query-note > p {
+  margin: 0 0 0.5rem;
+  padding-left: 0.6rem;
+  border-left: 3px solid var(--border-strong);
+}
+
+.sent-queries {
+  margin: 0;
+}
+
+.sent-queries > p {
+  margin: 0.4rem 0 0;
+}
+
+.sent-queries ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+.sent-note {
+  display: block;
+  margin-top: 0.1rem;
+  color: var(--muted);
+}
+
+/* Related terms */
+
+.related {
+  margin: 0 0 1rem;
+}
+
+.related h2 {
+  margin: 0 0 0.25rem;
+  font-size: 1rem;
+}
+
+.related > p {
+  margin: 0 0 0.5rem;
+  font-size: 0.875rem;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.chip {
+  padding: 0.25rem 0.6rem;
+  border-radius: 1rem;
+  font-size: 0.875rem;
+}
+
+.chip small {
+  margin-left: 0.2rem;
+  color: var(--muted);
+}

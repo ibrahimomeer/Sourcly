@@ -10,6 +10,7 @@ import {
   parseYear,
   requestJson,
   sourced,
+  subjectsFrom,
   type Fetch,
 } from "./shared";
 import { doiUrl } from "../doi";
@@ -154,6 +155,7 @@ export function parseCrossrefWork(raw: unknown, rank: number, listSize: number):
             retracted: true,
             source: `Crossref updated-by: ${withdrawal.type}${withdrawal.source !== null ? ` (${withdrawal.source})` : ""}`,
           },
+    subjects: subjectsFrom("crossref", "subject", asArray(work.subject)),
     hits: [{ provider: "crossref", id: doi, rank, listSize, score: asNumber(work.score) }],
   };
 }
@@ -174,10 +176,14 @@ export function createCrossrefProvider(options: CrossrefOptions = {}): Provider 
   return {
     id: "crossref",
     name: "Crossref",
+    // Crossref's `query` is free text: it ignores AND, OR, NOT and quotes (checked 2026-10-14).
+    syntax: "plain",
 
     async search(query: string, { limit, signal }: SearchOptions): Promise<Result[]> {
+      const text = query.trim();
+      if (text === "") return [];
       const url = new URL(WORKS_URL);
-      url.searchParams.set("query", query);
+      url.searchParams.set("query", text);
       url.searchParams.set("rows", String(clampLimit(limit, MAX_ROWS)));
       url.searchParams.set("select", SELECT);
       if (mailto !== "") url.searchParams.set("mailto", mailto);

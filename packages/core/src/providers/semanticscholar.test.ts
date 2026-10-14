@@ -104,3 +104,10 @@ describe("createSemanticScholarProvider", () => {
     expect((error as Error).message).toMatch(/free shared pool is often busy/);
   });
 });
+
+describe("Semantic Scholar subjects and syntax", () => {
+  it("gives papers no subjects here, and takes plain text only", () => {
+    expect(parse(papers[0]).subjects).toEqual([]);
+    expect(createSemanticScholarProvider().syntax).toBe("plain");
+  });
+});

@@ -1,5 +1,6 @@
 import { doiUrl, normalizeDoi } from "../doi";
 import { asArray, asBoolean, asHttpUrl, asInteger, asNumber, asRecord, asString } from "../json";
+import { subjectsFrom } from "./shared";
 import {
   ProviderError,
   type OaStatus,
@@ -44,6 +45,9 @@ const SELECT_FIELDS = [
   "primary_location",
   // Used only for its free PDF link. OpenAlex sets it to null when no open copy is known.
   "best_oa_location",
+  // Descriptive terms, matched against the query for relevance and mined for related terms.
+  "topics",
+  "keywords",
   "abstract_inverted_index",
 ];
 
@@ -88,6 +92,23 @@ const VENUE_KINDS: Record<string, VenueKind> = {
   other: "other",
   metadata: "other",
 };
+
+/**
+ * OpenAlex gives every work up to three topics and a list of keywords, each with a confidence
+ * score between 0 and 1. The second and third topic often score near 0, so only confident ones
+ * are kept: they would otherwise feed misleading "related terms".
+ */
+const MIN_TOPIC_SCORE = 0.3;
+const MIN_KEYWORD_SCORE = 0.5;
+const MAX_KEYWORDS = 10;
+
+function confidentNames(value: unknown, minimumScore: number): string[] {
+  return asArray(value)
+    .map(asRecord)
+    .filter((entry) => (asNumber(entry?.score) ?? 0) >= minimumScore)
+    .map((entry) => asString(entry?.display_name))
+    .filter((name): name is string => name !== null);
+}
 
 const OA_STATUSES: readonly OaStatus[] = ["gold", "diamond", "hybrid", "green", "bronze", "closed"];
 
@@ -189,6 +210,10 @@ export function parseOpenAlexWork(raw: unknown, rank: number, listSize: number):
       retracted: isRetracted,
       source: isRetracted === null ? null : "OpenAlex is_retracted (Retraction Watch)",
     },
+    subjects: [
+      ...subjectsFrom("openalex", "topic", confidentNames(work.topics, MIN_TOPIC_SCORE)),
+      ...subjectsFrom("openalex", "keyword", confidentNames(work.keywords, MIN_KEYWORD_SCORE).slice(0, MAX_KEYWORDS)),
+    ],
     hits: [
       {
         provider: "openalex",
@@ -220,10 +245,13 @@ export function createOpenAlexProvider(options: OpenAlexOptions = {}): Provider 
   return {
     id: "openalex",
     name: "OpenAlex",
+    syntax: "boolean",
 
     async search(query: string, { limit, signal }: SearchOptions): Promise<Result[]> {
+      const text = query.trim();
+      if (text === "") return [];
       const url = new URL(WORKS_URL);
-      url.searchParams.set("search", query);
+      url.searchParams.set("search", text);
       url.searchParams.set("per_page", String(Math.min(MAX_PER_PAGE, Math.max(1, Math.floor(limit)))));
       url.searchParams.set("select", SELECT_FIELDS.join(","));
       if (apiKey !== "") url.searchParams.set("api_key", apiKey);

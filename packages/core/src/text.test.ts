@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { decodeEntities, parseYear, plainTextOrNull, stripMarkup, toLanguageCode, toPlainQuery } from "./text";
+import { decodeEntities, parseYear, plainTextOrNull, stripMarkup, toLanguageCode } from "./text";
 
 describe("decodeEntities", () => {
   it("decodes named, decimal and hex entities", () => {
@@ -33,20 +33,6 @@ describe("stripMarkup", () => {
     expect(stripMarkup(undefined)).toBe("");
     expect(plainTextOrNull("<p> </p>")).toBeNull();
     expect(plainTextOrNull("<p>x</p>")).toBe("x");
-  });
-});
-
-describe("toPlainQuery", () => {
-  it("removes search-language symbols so a provider cannot misread them", () => {
-    expect(toPlainQuery('sleep AND (memory) -noise "consolidation": +test')).toBe("sleep AND memory noise consolidation test");
-  });
-
-  it("keeps letters and digits from any language", () => {
-    expect(toPlainQuery("Konsolidace paměti ve spánku 2024")).toBe("Konsolidace paměti ve spánku 2024");
-  });
-
-  it("returns an empty string when nothing is left", () => {
-    expect(toPlainQuery('  "(:)"  ')).toBe("");
   });
 });
 

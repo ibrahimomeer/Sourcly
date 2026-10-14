@@ -1,6 +1,6 @@
 import { doiUrl } from "../doi";
 import { asArray, asHttpUrl, asRecord, asString } from "../json";
-import { plainTextOrNull, stripMarkup, toLanguageCode, toPlainQuery } from "../text";
+import { plainTextOrNull, stripMarkup, toLanguageCode } from "../text";
 import type { Author, Provider, Result, SearchOptions } from "../types";
 import {
   authorFromParts,
@@ -11,6 +11,7 @@ import {
   parseYear,
   requestJson,
   sourced,
+  subjectsFrom,
   type Fetch,
 } from "./shared";
 
@@ -19,8 +20,8 @@ import {
 //   `access-control-allow-origin: *`. DOAJ documents a limit of two requests per
 //   second on all API routes.
 // - pageSize is capped at 100 (a request for 200 returned 100).
-// - The query is read as an Elasticsearch query string, so it is reduced to plain
-//   words first (see toPlainQuery).
+// - The query is an Elasticsearch query string. It arrives already written for this source
+//   (see query.ts) with every AND spelled out, because DOAJ's default is looser.
 // - DOAJ lists only open-access journals, so every result is open access.
 
 const SEARCH_URL = "https://doaj.org/api/search/articles/";
@@ -67,6 +68,14 @@ export function parseDoajArticle(raw: unknown, rank: number, listSize: number): 
       pdfUrl: asHttpUrl(pdfLink?.url),
     }),
     retraction: { retracted: null, source: null },
+    subjects: [
+      ...subjectsFrom("doaj", "keyword", asArray(bibjson.keywords)),
+      ...subjectsFrom(
+        "doaj",
+        "subject",
+        asArray(bibjson.subject).map((subject) => asRecord(subject)?.term),
+      ),
+    ],
     hits: [{ provider: "doaj", id, rank, listSize, score: null }],
   };
 }
@@ -81,11 +90,12 @@ export function createDoajProvider(options: DoajOptions = {}): Provider {
   return {
     id: "doaj",
     name: "DOAJ",
+    syntax: "boolean",
 
     async search(query: string, { limit, signal }: SearchOptions): Promise<Result[]> {
-      const plain = toPlainQuery(query);
-      if (plain === "") return [];
-      const url = new URL(`${SEARCH_URL}${encodeURIComponent(plain)}`);
+      const text = query.trim();
+      if (text === "") return [];
+      const url = new URL(`${SEARCH_URL}${encodeURIComponent(text)}`);
       url.searchParams.set("pageSize", String(clampLimit(limit, MAX_PAGE_SIZE)));
 
       const body = asRecord(await requestJson(doFetch, url, "DOAJ", signal));

@@ -1,5 +1,5 @@
 import { asArray, asHttpUrl, asInteger, asRecord, asString } from "../json";
-import { plainTextOrNull, toPlainQuery } from "../text";
+import { plainTextOrNull } from "../text";
 import type { Provider, Result, SearchOptions } from "../types";
 import { clampLimit, defaultFetch, openAccess, requestJson, sourced, type Fetch } from "./shared";
 
@@ -40,6 +40,7 @@ export function parseWikipediaPage(raw: unknown, rank: number, listSize: number)
     authorCountries: [],
     openAccess: openAccess(true, { url }),
     retraction: { retracted: null, source: null },
+    subjects: [],
     hits: [{ provider: "wikipedia", id: String(pageId), rank, listSize, score: null }],
   };
 }
@@ -54,16 +55,17 @@ export function createWikipediaProvider(options: WikipediaOptions = {}): Provide
   return {
     id: "wikipedia",
     name: "Wikipedia",
+    syntax: "boolean",
 
     async search(query: string, { limit, signal }: SearchOptions): Promise<Result[]> {
-      const plain = toPlainQuery(query);
-      if (plain === "") return [];
+      const text = query.trim();
+      if (text === "") return [];
       const count = String(clampLimit(limit, MAX_PAGES));
 
       const url = new URL(API_URL);
       url.searchParams.set("action", "query");
       url.searchParams.set("generator", "search");
-      url.searchParams.set("gsrsearch", plain);
+      url.searchParams.set("gsrsearch", text);
       url.searchParams.set("gsrlimit", count);
       url.searchParams.set("prop", "extracts|info");
       url.searchParams.set("inprop", "url");

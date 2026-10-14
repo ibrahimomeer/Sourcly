@@ -43,7 +43,42 @@ describe("parseOpenAlexWork", () => {
         pdfUrl: "https://www.nature.com/articles/nature04286.pdf",
       },
       retraction: { retracted: false, source: "OpenAlex is_retracted (Retraction Watch)" },
+      subjects: [
+        { term: "Sleep and Wakefulness Research", kind: "topic", provider: "openalex" },
+        { term: "sleep-dependent memory consolidation", kind: "keyword", provider: "openalex" },
+        { term: "memory encoding", kind: "keyword", provider: "openalex" },
+        { term: "memory formation", kind: "keyword", provider: "openalex" },
+      ],
       hits: [{ provider: "openalex", id: "W2086162146", rank: 1, listSize: 3, score: 289.29092 }],
+    });
+  });
+
+  describe("subjects", () => {
+    it("keeps only topics OpenAlex is confident about (the second and third often score near 0)", () => {
+      const topics = parse(fixtures.review).subjects.filter((s) => s.kind === "topic");
+      expect(topics.map((s) => s.term)).toEqual(["Meta-analysis and systematic reviews"]);
+    });
+
+    it("keeps keywords with a confidence of at least 0.5, at most ten", () => {
+      const keywords = parse(fixtures.review).subjects.filter((s) => s.kind === "keyword");
+      expect(keywords).toHaveLength(7); // 7 of the 9 recorded keywords score 0.5 or more
+      const many = parse({
+        id: "https://openalex.org/W1",
+        keywords: Array.from({ length: 25 }, (_, i) => ({ display_name: `k${i}`, score: 0.9 })),
+      });
+      expect(many.subjects).toHaveLength(10);
+    });
+
+    it("is empty when the work has no topics or keywords, or they are malformed", () => {
+      expect(parse({ id: "https://openalex.org/W1" }).subjects).toEqual([]);
+      expect(parse({ id: "https://openalex.org/W1", topics: "x", keywords: [null, 5, { score: 1 }] }).subjects).toEqual([]);
+    });
+
+    it("asks OpenAlex for topics and keywords", async () => {
+      const fetchMock = vi.fn<typeof fetch>(() => Promise.resolve(Response.json({ results: [] })));
+      await createOpenAlexProvider({ fetch: fetchMock }).search("q", { limit: 5 });
+      const select = new URL(String(fetchMock.mock.calls[0]?.[0])).searchParams.get("select")?.split(",");
+      expect(select).toEqual(expect.arrayContaining(["topics", "keywords"]));
     });
   });
 

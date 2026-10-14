@@ -19,6 +19,7 @@ export function makeResult(overrides: Partial<Result> = {}): Result {
     authorCountries: [],
     openAccess: { isOpen: false, status: "closed", url: null, pdfUrl: null },
     retraction: { retracted: false, source: null },
+    subjects: [],
     hits: [{ provider: "openalex", id: "W1", rank: 1, listSize: 1, score: null }],
     ...overrides,
   };

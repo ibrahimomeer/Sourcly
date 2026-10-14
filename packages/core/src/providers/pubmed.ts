@@ -13,6 +13,7 @@ import {
   requestJson,
   requestText,
   sourced,
+  subjectsFrom,
   type Fetch,
 } from "./shared";
 import { ProviderError } from "../types";
@@ -126,6 +127,18 @@ export function parsePubmedArticle(node: XmlNode, rank: number, listSize: number
     retraction: retracted
       ? { retracted: true, source: "PubMed (Retracted Publication / RetractionIn)" }
       : { retracted: false, source: "PubMed: no retraction recorded" },
+    subjects: [
+      ...subjectsFrom(
+        "pubmed",
+        "mesh",
+        childrenNamed(firstChild(citation, "MeshHeadingList"), "MeshHeading").map((heading) => textOf(firstChild(heading, "DescriptorName"))),
+      ),
+      ...subjectsFrom(
+        "pubmed",
+        "keyword",
+        childrenNamed(citation, "KeywordList").flatMap((list) => childrenNamed(list, "Keyword").map(textOf)),
+      ),
+    ],
     hits: [{ provider: "pubmed", id: pmid, rank, listSize, score: null }],
   };
 }
@@ -148,11 +161,14 @@ export function createPubmedProvider(options: PubmedOptions = {}): Provider {
   return {
     id: "pubmed",
     name: "PubMed",
+    syntax: "boolean",
 
     async search(query: string, { limit, signal }: SearchOptions): Promise<Result[]> {
+      const text = query.trim();
+      if (text === "") return [];
       const searchUrl = new URL(ESEARCH_URL);
       searchUrl.searchParams.set("db", "pubmed");
-      searchUrl.searchParams.set("term", query);
+      searchUrl.searchParams.set("term", text);
       searchUrl.searchParams.set("retmax", String(clampLimit(limit, MAX_RESULTS)));
       searchUrl.searchParams.set("retmode", "json");
       searchUrl.searchParams.set("sort", "relevance");

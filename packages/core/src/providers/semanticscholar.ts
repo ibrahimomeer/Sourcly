@@ -1,6 +1,6 @@
 import { doiUrl } from "../doi";
 import { asArray, asBoolean, asHttpUrl, asInteger, asRecord, asString } from "../json";
-import { plainTextOrNull, stripMarkup, toPlainQuery } from "../text";
+import { plainTextOrNull, stripMarkup } from "../text";
 import {
   ProviderError,
   type Author,
@@ -129,6 +129,7 @@ export function parseSemanticScholarPaper(raw: unknown, rank: number, listSize: 
       pdfUrl,
     }),
     retraction: { retracted: null, source: null },
+    subjects: [],
     hits: [{ provider: "semanticscholar", id: paperId, rank, listSize, score: null }],
   };
 }
@@ -143,12 +144,14 @@ export function createSemanticScholarProvider(options: SemanticScholarOptions = 
   return {
     id: "semanticscholar",
     name: "Semantic Scholar",
+    // Its relevance search takes plain text: no query syntax is supported (per its API docs).
+    syntax: "plain",
 
     async search(query: string, { limit, signal }: SearchOptions): Promise<Result[]> {
-      const plain = toPlainQuery(query);
-      if (plain === "") return [];
+      const searchText = query.trim();
+      if (searchText === "") return [];
       const url = new URL(SEARCH_URL);
-      url.searchParams.set("query", plain);
+      url.searchParams.set("query", searchText);
       url.searchParams.set("limit", String(clampLimit(limit, MAX_LIMIT)));
       url.searchParams.set("fields", FIELDS);
 

@@ -20,11 +20,14 @@ import { PER_SOURCE_CHOICES, toggleInList, withFactor } from "./settings";
 const OPENALEX_KEY_URL = "https://openalex.org/settings/api";
 
 const FACTOR_HELP: Record<FactorId, string> = {
-  relevance: "How closely the source's own ranking matches your words. First place scores highest.",
+  relevance:
+    "BM25, a standard word-matching formula, over each result's title, abstract and subject terms, worked out on all the results fetched. Rarer words count for more. The best match scores 1.",
   citations: "Citations per year since publication, compared with the other results.",
   recency: "Newer publications score higher. The score halves every “half-life”.",
   peerReview: "Likely peer-reviewed scores 1, unknown 0.5, not peer-reviewed 0.",
   openAccess: "Free to read online scores 1, anything else 0.",
+  providerAgreement:
+    "The share of the sources that answered which returned this result. Found by all of them scores 1. Sources often share data, so treat agreement as a hint, not proof.",
   studyType: "Prefer some levels (primary, secondary, ...). Does nothing until you pick at least one.",
 };
 

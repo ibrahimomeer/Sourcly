@@ -1,11 +1,16 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { createSearchCache } from "./cache";
-import { DEFAULT_TIMEOUT_MS, searchProviders, type ProviderUpdate } from "./search";
+import { parseQuery } from "./query";
+import { DEFAULT_TIMEOUT_MS, planQueries, searchProviders, type ProviderUpdate } from "./search";
 import { makeResult } from "./testing/make-result";
 import { ProviderError, type Provider, type ProviderId, type Result } from "./types";
 
-function provider(id: ProviderId, behaviour: (query: string) => Promise<Result[]>): Provider {
-  return { id, name: id, search: behaviour };
+function provider(
+  id: ProviderId,
+  behaviour: (query: string) => Promise<Result[]>,
+  syntax: Provider["syntax"] = "boolean",
+): Provider {
+  return { id, name: id, syntax, search: behaviour };
 }
 
 /** A provider that never answers and never looks at its cancellation signal. */
@@ -63,7 +68,7 @@ describe("searchProviders", () => {
   it("passes the trimmed query and the options to every provider", async () => {
     const search = vi.fn<Provider["search"]>(async () => []);
     const controller = new AbortController();
-    await searchProviders([{ id: "openalex", name: "OpenAlex", search }], "  sleep  ", {
+    await searchProviders([{ id: "openalex", name: "OpenAlex", syntax: "boolean", search }], "  sleep  ", {
       limit: 25,
       signal: controller.signal,
     });
@@ -74,7 +79,7 @@ describe("searchProviders", () => {
 
   it("does not call any provider for a blank query", async () => {
     const search = vi.fn<Provider["search"]>(async () => []);
-    const outcome = await searchProviders([{ id: "openalex", name: "OpenAlex", search }], "   ", { limit: 10 });
+    const outcome = await searchProviders([{ id: "openalex", name: "OpenAlex", syntax: "boolean", search }], "   ", { limit: 10 });
     expect(search).not.toHaveBeenCalled();
     expect(outcome).toEqual({ results: [], statuses: [] });
   });
@@ -132,6 +137,7 @@ describe("searchProviders: time limits", () => {
     const watching: Provider = {
       id: "openalex",
       name: "OpenAlex",
+      syntax: "boolean",
       search: (_query, { signal }) => {
         seen = signal;
         return new Promise<Result[]>(() => {});
@@ -151,6 +157,7 @@ describe("searchProviders: time limits", () => {
     const watching = (id: ProviderId): Provider => ({
       id,
       name: id,
+      syntax: "boolean",
       search: (_query, { signal }) => {
         if (signal) signals.push(signal);
         return new Promise<Result[]>(() => {});
@@ -176,6 +183,7 @@ describe("searchProviders: time limits", () => {
     const watching: Provider = {
       id: "openalex",
       name: "OpenAlex",
+      syntax: "boolean",
       search: async (_query, { signal }) => {
         aborted = signal?.aborted;
         return [];
@@ -243,7 +251,7 @@ describe("searchProviders: caching", () => {
   it("answers a repeated search from memory, and says so", async () => {
     const search = vi.fn(async () => [makeResult({ id: "10.1/a" })]);
     const cache = createSearchCache();
-    const providers = [{ id: "openalex" as const, name: "OpenAlex", search }];
+    const providers = [{ id: "openalex" as const, name: "OpenAlex", syntax: "boolean" as const, search }];
 
     const first = await searchProviders(providers, "sleep", { limit: 50, cache });
     const second = await searchProviders(providers, "  sleep ", { limit: 50, cache });
@@ -267,7 +275,7 @@ describe("searchProviders: caching", () => {
   it("asks again for a different query or a different number of results", async () => {
     const search = vi.fn(async () => []);
     const cache = createSearchCache();
-    const providers = [{ id: "openalex" as const, name: "OpenAlex", search }];
+    const providers = [{ id: "openalex" as const, name: "OpenAlex", syntax: "boolean" as const, search }];
     await searchProviders(providers, "sleep", { limit: 50, cache });
     await searchProviders(providers, "memory", { limit: 50, cache });
     await searchProviders(providers, "sleep", { limit: 100, cache });
@@ -294,8 +302,8 @@ describe("searchProviders: caching", () => {
     const a = vi.fn(async () => [makeResult({ id: "10.1/a" })]);
     const b = vi.fn(async () => [makeResult({ id: "10.1/b" })]);
     const providers = [
-      { id: "openalex" as const, name: "A", search: a },
-      { id: "crossref" as const, name: "B", search: b },
+      { id: "openalex" as const, name: "A", syntax: "boolean" as const, search: a },
+      { id: "crossref" as const, name: "B", syntax: "boolean" as const, search: b },
     ];
     await searchProviders(providers, "q", { limit: 5, cache });
     await searchProviders([providers[0] as Provider], "q", { limit: 5, cache });
@@ -305,9 +313,85 @@ describe("searchProviders: caching", () => {
 
   it("works without a cache", async () => {
     const search = vi.fn(async () => []);
-    const providers = [{ id: "openalex" as const, name: "OpenAlex", search }];
+    const providers = [{ id: "openalex" as const, name: "OpenAlex", syntax: "boolean" as const, search }];
     await searchProviders(providers, "q", { limit: 5 });
     await searchProviders(providers, "q", { limit: 5 });
+    expect(search).toHaveBeenCalledTimes(2);
+  });
+});
+
+describe("planQueries", () => {
+  const boolean = { id: "openalex" as const, syntax: "boolean" as const };
+  const plain = { id: "crossref" as const, syntax: "plain" as const };
+
+  it("writes the query once per provider, in the provider's own syntax", () => {
+    const planned = planQueries([boolean, plain], '"memory consolidation" sleep NOT rats');
+    expect(planned).toEqual([
+      { provider: "openalex", text: '"memory consolidation" AND sleep NOT rats', notes: [] },
+      { provider: "crossref", text: expect.any(String), notes: expect.any(Array) },
+    ]);
+    expect(planned[1]?.text).not.toContain("AND");
+    expect(planned[1]?.text).not.toContain("NOT");
+    expect(planned[1]?.notes.length).toBeGreaterThan(0);
+  });
+
+  it("accepts text or an already parsed query, with the same result", () => {
+    const text = "alpha OR beta";
+    expect(planQueries([boolean, plain], parseQuery(text))).toEqual(planQueries([boolean, plain], text));
+  });
+
+  it("keeps the provider order", () => {
+    expect(planQueries([plain, boolean], "sleep").map((p) => p.provider)).toEqual(["crossref", "openalex"]);
+  });
+});
+
+describe("searchProviders: what is sent", () => {
+  it("sends each provider the query written for it, which is what planQueries reports", async () => {
+    const seenBoolean = vi.fn(async () => [] as Result[]);
+    const seenPlain = vi.fn(async () => [] as Result[]);
+    const providers: Provider[] = [
+      { id: "openalex", name: "OpenAlex", syntax: "boolean", search: seenBoolean },
+      { id: "crossref", name: "Crossref", syntax: "plain", search: seenPlain },
+    ];
+    const query = '"memory consolidation" sleep NOT rats';
+    await searchProviders(providers, query, { limit: 5 });
+
+    const [openalex, crossref] = planQueries(providers, query);
+    expect(seenBoolean).toHaveBeenCalledWith(openalex?.text, expect.anything());
+    expect(seenPlain).toHaveBeenCalledWith(crossref?.text, expect.anything());
+    expect(openalex?.text).not.toBe(crossref?.text);
+  });
+
+  it("accepts a parsed query", async () => {
+    const search = vi.fn(async () => [] as Result[]);
+    await searchProviders([{ id: "openalex", name: "OpenAlex", syntax: "boolean", search }], parseQuery("alpha beta"), { limit: 5 });
+    expect(search).toHaveBeenCalledWith("alpha AND beta", expect.anything());
+  });
+
+  it("asks no one when the query has nothing searchable in it", async () => {
+    const search = vi.fn(async () => [] as Result[]);
+    const providers = [{ id: "openalex" as const, name: "OpenAlex", syntax: "boolean" as const, search }];
+    for (const query of ["", "   ", "the of and", "NOT rats"]) {
+      expect(await searchProviders(providers, query, { limit: 5 })).toEqual({ results: [], statuses: [] });
+    }
+    expect(search).not.toHaveBeenCalled();
+  });
+
+  it("shares cached answers between spellings that render to the same text", async () => {
+    const search = vi.fn(async () => [makeResult({ id: "10.1/a" })]);
+    const providers = [{ id: "openalex" as const, name: "OpenAlex", syntax: "boolean" as const, search }];
+    const cache = createSearchCache();
+    await searchProviders(providers, "sleep   memory", { limit: 5, cache });
+    await searchProviders(providers, "sleep AND memory", { limit: 5, cache });
+    expect(search).toHaveBeenCalledTimes(1);
+  });
+
+  it("does not share cached answers between different queries", async () => {
+    const search = vi.fn(async () => [] as Result[]);
+    const providers = [{ id: "openalex" as const, name: "OpenAlex", syntax: "boolean" as const, search }];
+    const cache = createSearchCache();
+    await searchProviders(providers, "sleep OR memory", { limit: 5, cache });
+    await searchProviders(providers, "sleep AND memory", { limit: 5, cache });
     expect(search).toHaveBeenCalledTimes(2);
   });
 });

@@ -101,3 +101,19 @@ describe("createEuropePmcProvider", () => {
     expect(found).toHaveLength(results.length);
   });
 });
+
+describe("Europe PMC subjects and syntax", () => {
+  it("reads MeSH headings and author keywords as different kinds", () => {
+    const { subjects } = parse(results[0]);
+    expect(subjects.filter((s) => s.kind === "mesh").map((s) => s.term)).toEqual(
+      expect.arrayContaining(["Memory Consolidation", "Sleep", "Hippocampus"]),
+    );
+    expect(subjects.filter((s) => s.kind === "keyword").map((s) => s.term)).toEqual(expect.arrayContaining(["Hippocampus", "Ripples"]));
+    expect(subjects.every((s) => s.provider === "europepmc")).toBe(true);
+  });
+
+  it("has none for a record without them, and understands Boolean queries", () => {
+    expect(parse(results[1]).subjects).toEqual([]);
+    expect(createEuropePmcProvider().syntax).toBe("boolean");
+  });
+});

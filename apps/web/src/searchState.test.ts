@@ -1,4 +1,4 @@
-import type { ProviderId, ProviderStatus, ProviderUpdate } from "@sourcly/core";
+import { parseQuery, planQueries, type ProviderId, type ProviderStatus, type ProviderUpdate } from "@sourcly/core";
 import { makeResult } from "@sourcly/core/testing";
 import { describe, expect, it } from "vitest";
 import { idleSearch, orderedStatuses, searchReducer, type ActiveSearch, type SearchState } from "./searchState";
@@ -9,8 +9,20 @@ const done = (provider: ProviderId, ids: string[] = []): ProviderUpdate => ({
   results: ids.map((id) => makeResult({ id })),
 });
 
+const startAction = (text: string, order: ProviderId[], skipped: ProviderStatus[] = [], id = 1) => {
+  const parsed = parseQuery(text);
+  return {
+    type: "start" as const,
+    id,
+    parsed,
+    sent: planQueries(order.map((provider) => ({ id: provider, syntax: "boolean" as const })), parsed),
+    order,
+    skipped,
+  };
+};
+
 const started = (order: ProviderId[] = ["openalex", "crossref"], skipped: ProviderStatus[] = []): ActiveSearch => {
-  const state = searchReducer(idleSearch, { type: "start", id: 1, query: "sleep", order, skipped });
+  const state = searchReducer(idleSearch, startAction("sleep", order, skipped));
   if (state.phase === "idle") throw new Error("expected an active search");
   return state;
 };
@@ -21,6 +33,12 @@ describe("searchReducer", () => {
       phase: "searching",
       id: 1,
       query: "sleep",
+      parsed: parseQuery("sleep"),
+      terms: ["sleep"],
+      sent: [
+        { provider: "openalex", text: "sleep", notes: [] },
+        { provider: "crossref", text: "sleep", notes: [] },
+      ],
       order: ["openalex", "crossref"],
       results: [],
       statuses: [],
@@ -62,7 +80,7 @@ describe("searchReducer", () => {
   });
 
   it("ignores answers that belong to an older search", () => {
-    const newer = searchReducer(started(), { type: "start", id: 2, query: "memory", order: ["openalex"], skipped: [] });
+    const newer = searchReducer(started(), startAction("memory", ["openalex"], [], 2));
     const afterLate = searchReducer(newer, { type: "provider-done", id: 1, update: done("openalex", ["10.1/stale"]) });
     expect(afterLate).toBe(newer);
     expect(searchReducer(newer, { type: "finish", id: 1, at: new Date() })).toBe(newer);
@@ -84,8 +102,38 @@ describe("searchReducer", () => {
   it("starts with skipped providers already reported, and clears the previous results", () => {
     const skipped: ProviderStatus[] = [{ provider: "arxiv", state: "skipped", message: "browsers cannot call it" }];
     const first = searchReducer(started(), { type: "provider-done", id: 1, update: done("openalex", ["10.1/a"]) });
-    const second = searchReducer(first, { type: "start", id: 2, query: "memory", order: ["openalex"], skipped });
+    const second = searchReducer(first, startAction("memory", ["openalex"], skipped, 2));
     expect(second).toMatchObject({ id: 2, query: "memory", results: [], statuses: skipped, pending: ["openalex"] });
+  });
+});
+
+describe("searchReducer: the query", () => {
+  const begin = (text: string) => {
+    const state = searchReducer(idleSearch, startAction(text, ["openalex", "crossref"]));
+    if (state.phase === "idle") throw new Error("expected an active search");
+    return state;
+  };
+
+  it("keeps the query as tidy text, the words it asks for, and what was typed", () => {
+    const state = begin("what is the effect of sleep on memory?");
+    expect(state.query).toBe("effect sleep memory");
+    expect(state.terms).toEqual(["effect", "sleep", "memory"]);
+    expect(state.parsed.original).toBe("what is the effect of sleep on memory?");
+    expect(state.parsed.droppedStopwords).toEqual(["what", "is", "the", "of", "on"]);
+  });
+
+  it("keeps the words to leave out out of the words it asks for", () => {
+    const state = begin('"memory consolidation" sleep NOT rats');
+    expect(state.query).toBe('"memory consolidation" sleep NOT rats');
+    expect(state.terms).toEqual(["memory", "consolidation", "sleep"]);
+  });
+
+  it("keeps what each source was sent", () => {
+    const state = begin("sleep memory");
+    expect(state.sent.map((s) => [s.provider, s.text])).toEqual([
+      ["openalex", "sleep AND memory"],
+      ["crossref", "sleep AND memory"],
+    ]);
   });
 });
 

@@ -42,15 +42,6 @@ export function plainTextOrNull(text: string | null | undefined): string | null 
   return plain === "" ? null : plain;
 }
 
-/**
- * Reduces a query to letters, digits and spaces. Several providers read the
- * query as a search language (+ - : " ( ) are operators), so symbols typed by
- * a person could otherwise cause an error or change the meaning of the search.
- */
-export function toPlainQuery(query: string): string {
-  return query.replace(/[^\p{L}\p{N}\s]/gu, " ").replace(/\s+/g, " ").trim();
-}
-
 /** The four-digit year at the start of a value such as 2024, "2024-06-03" or "2019 Oct"; otherwise null. */
 export function parseYear(value: unknown): number | null {
   const text = typeof value === "number" ? String(value) : typeof value === "string" ? value.trim() : "";

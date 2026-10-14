@@ -10,7 +10,8 @@ import { createZenodoProvider } from "./zenodo";
 import type { Fetch } from "./shared";
 
 // What every provider added after OpenAlex must do the same way: one plain GET, never more
-// than its documented page size, and a clear, key-free message for each way a request can fail.
+// than its documented page size, send the query exactly as it was given (it arrives already
+// written for that provider), and give a clear, key-free message for each way a request can fail.
 
 interface Case {
   name: string;
@@ -19,23 +20,23 @@ interface Case {
   /** The query parameter that carries the result count, or null if it is not a parameter. */
   limitParam: string;
   max: number;
-  /** Providers that read the query as a search language get plain words only. */
-  plain: boolean;
+  /** Reads the query back out of the request the provider made. */
+  queryOf: (url: URL) => string | null;
 }
 
 const cases: Case[] = [
-  { name: "Crossref", make: (fetch) => createCrossrefProvider({ fetch }), host: "api.crossref.org", limitParam: "rows", max: 100, plain: false },
-  { name: "Europe PMC", make: (fetch) => createEuropePmcProvider({ fetch }), host: "www.ebi.ac.uk", limitParam: "pageSize", max: 100, plain: false },
-  { name: "DOAJ", make: (fetch) => createDoajProvider({ fetch }), host: "doaj.org", limitParam: "pageSize", max: 100, plain: true },
-  { name: "DataCite", make: (fetch) => createDataCiteProvider({ fetch }), host: "api.datacite.org", limitParam: "page[size]", max: 100, plain: true },
-  { name: "Zenodo", make: (fetch) => createZenodoProvider({ fetch }), host: "zenodo.org", limitParam: "size", max: 25, plain: true },
-  { name: "Wikipedia", make: (fetch) => createWikipediaProvider({ fetch }), host: "en.wikipedia.org", limitParam: "gsrlimit", max: 20, plain: true },
-  { name: "Semantic Scholar", make: (fetch) => createSemanticScholarProvider({ fetch }), host: "api.semanticscholar.org", limitParam: "limit", max: 100, plain: true },
+  { name: "Crossref", make: (fetch) => createCrossrefProvider({ fetch }), host: "api.crossref.org", limitParam: "rows", max: 100, queryOf: (url) => url.searchParams.get("query") },
+  { name: "Europe PMC", make: (fetch) => createEuropePmcProvider({ fetch }), host: "www.ebi.ac.uk", limitParam: "pageSize", max: 100, queryOf: (url) => url.searchParams.get("query") },
+  { name: "DOAJ", make: (fetch) => createDoajProvider({ fetch }), host: "doaj.org", limitParam: "pageSize", max: 100, queryOf: (url) => decodeURIComponent(url.pathname.replace("/api/search/articles/", "")) },
+  { name: "DataCite", make: (fetch) => createDataCiteProvider({ fetch }), host: "api.datacite.org", limitParam: "page[size]", max: 100, queryOf: (url) => url.searchParams.get("query") },
+  { name: "Zenodo", make: (fetch) => createZenodoProvider({ fetch }), host: "zenodo.org", limitParam: "size", max: 25, queryOf: (url) => url.searchParams.get("q") },
+  { name: "Wikipedia", make: (fetch) => createWikipediaProvider({ fetch }), host: "en.wikipedia.org", limitParam: "gsrlimit", max: 20, queryOf: (url) => url.searchParams.get("gsrsearch") },
+  { name: "Semantic Scholar", make: (fetch) => createSemanticScholarProvider({ fetch }), host: "api.semanticscholar.org", limitParam: "limit", max: 100, queryOf: (url) => url.searchParams.get("query") },
 ];
 
 const emptyJson = () => Promise.resolve(Response.json({}));
 
-describe.each(cases)("$name provider contract", ({ name, make, host, limitParam, max, plain }) => {
+describe.each(cases)("$name provider contract", ({ name, make, host, limitParam, max, queryOf }) => {
   it("makes one plain GET to its documented host, with no custom headers", async () => {
     const fetchMock = vi.fn<Fetch>(emptyJson);
     await make(fetchMock).search("sleep memory", { limit: 10 });
@@ -102,18 +103,16 @@ describe.each(cases)("$name provider contract", ({ name, make, host, limitParam,
     expect(await make(emptyJson).search("sleep", { limit: 5 })).toEqual([]);
   });
 
-  if (plain) {
-    it("sends no request at all for a query with no words in it", async () => {
-      const fetchMock = vi.fn<Fetch>(emptyJson);
-      expect(await make(fetchMock).search('  "(:)"  ', { limit: 5 })).toEqual([]);
-      expect(fetchMock).not.toHaveBeenCalled();
-    });
+  it("sends no request at all for a blank query", async () => {
+    const fetchMock = vi.fn<Fetch>(emptyJson);
+    expect(await make(fetchMock).search("   ", { limit: 5 })).toEqual([]);
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
 
-    it("reduces the query to plain words before sending it", async () => {
-      const fetchMock = vi.fn<Fetch>(emptyJson);
-      await make(fetchMock).search('sleep AND (memory): "x"', { limit: 5 });
-      const url = decodeURIComponent(String(fetchMock.mock.calls[0]?.[0]));
-      expect(url).toContain("sleep AND memory x".replace(/ /g, url.includes("+") ? "+" : " "));
-    });
-  }
+  it("sends the query exactly as it is given, without rewriting it", async () => {
+    const given = 'sleep AND "memory consolidation" NOT rats';
+    const fetchMock = vi.fn<Fetch>(emptyJson);
+    await make(fetchMock).search(`  ${given}  `, { limit: 5 });
+    expect(queryOf(new URL(String(fetchMock.mock.calls[0]?.[0])))).toBe(given);
+  });
 });

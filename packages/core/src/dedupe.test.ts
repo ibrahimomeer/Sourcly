@@ -148,6 +148,38 @@ describe("what a merged result keeps", () => {
     const y = result("crossref", { id: doi, doi, authorCountries: ["CA", "US"] });
     expect(mergeResults([x, y])[0]?.authorCountries).toEqual(["CA", "DE", "US"]);
   });
+
+  it("combines subject terms from every provider, without repeats, earliest-priority source first", () => {
+    const fromOpenAlex = result("openalex", {
+      id: doi,
+      doi,
+      subjects: [
+        { term: "Sleep", kind: "topic", provider: "openalex" },
+        { term: "Memory", kind: "keyword", provider: "openalex" },
+      ],
+    });
+    const fromPubmed = result("pubmed", {
+      id: doi,
+      doi,
+      subjects: [
+        { term: "sleep", kind: "topic", provider: "pubmed" },
+        { term: "Sleep", kind: "mesh", provider: "pubmed" },
+        { term: "Dreams", kind: "mesh", provider: "pubmed" },
+      ],
+    });
+    const merged = mergeResults([fromPubmed, fromOpenAlex])[0]?.subjects ?? [];
+    expect(merged.map((s) => `${s.provider}:${s.kind}:${s.term}`)).toEqual([
+      "openalex:topic:Sleep",
+      "openalex:keyword:Memory",
+      "pubmed:mesh:Sleep",
+      "pubmed:mesh:Dreams",
+    ]);
+  });
+
+  it("keeps a lone result's subjects as they were", () => {
+    const subjects = [{ term: "Sleep", kind: "topic" as const, provider: "openalex" as const }];
+    expect(mergeResults([result("openalex", { id: doi, doi, subjects })])[0]?.subjects).toEqual(subjects);
+  });
 });
 
 describe("mergeResults in general", () => {

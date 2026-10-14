@@ -58,13 +58,22 @@ describe("parseZenodoRecord", () => {
 });
 
 describe("createZenodoProvider", () => {
-  it("asks for at most 25 results, the anonymous cap, and sends plain words", async () => {
+  it("asks for at most 25 results, the anonymous cap, and sends the query it is given", async () => {
     const fetchMock = vi.fn<typeof fetch>(() => Promise.resolve(Response.json(fixtures)));
-    const found = await createZenodoProvider({ fetch: fetchMock }).search('sleep: "memory"', { limit: 100 });
+    const found = await createZenodoProvider({ fetch: fetchMock }).search('sleep AND "memory"', { limit: 100 });
     const url = new URL(String(fetchMock.mock.calls[0]?.[0]));
     expect(url.origin + url.pathname).toBe("https://zenodo.org/api/records");
-    expect(url.searchParams.get("q")).toBe("sleep memory");
+    expect(url.searchParams.get("q")).toBe('sleep AND "memory"');
     expect(url.searchParams.get("size")).toBe("25");
     expect(found).toHaveLength(hits.length);
+  });
+});
+
+describe("Zenodo subjects and syntax", () => {
+  it("reads the record's keywords", () => {
+    const { subjects } = parse(hits[0]);
+    expect(subjects).toHaveLength(6);
+    expect(subjects[0]).toEqual({ term: "sleep spindle", kind: "keyword", provider: "zenodo" });
+    expect(createZenodoProvider().syntax).toBe("boolean");
   });
 });

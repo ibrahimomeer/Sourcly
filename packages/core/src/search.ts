@@ -1,4 +1,5 @@
 import type { SearchCache } from "./cache";
+import { isUsable, parseQuery, renderQuery, type ParsedQuery } from "./query";
 import {
   ProviderError,
   type Provider,
@@ -18,6 +19,14 @@ export interface ProviderUpdate {
   results: Result[];
 }
 
+/** The query as written for one provider: exactly what is sent to it. */
+export interface SentQuery {
+  provider: ProviderId;
+  text: string;
+  /** What this provider could not apply from the query, in plain language. */
+  notes: string[];
+}
+
 export interface SearchRunOptions extends SearchOptions {
   /** Per-provider time limit in milliseconds. Defaults to DEFAULT_TIMEOUT_MS. */
   timeoutMs?: number;
@@ -32,6 +41,18 @@ export interface SearchOutcome {
   results: Result[];
   /** One entry per provider asked, in the same order as `providers`. */
   statuses: ProviderStatus[];
+}
+
+/**
+ * Writes the query for each provider's syntax. This is the single place where a query
+ * becomes the text a provider receives, so what the page shows is what is sent.
+ */
+export function planQueries(
+  providers: readonly Pick<Provider, "id" | "syntax">[],
+  query: string | ParsedQuery,
+): SentQuery[] {
+  const parsed = typeof query === "string" ? parseQuery(query) : query;
+  return providers.map((provider) => ({ provider: provider.id, ...renderQuery(parsed, provider.syntax) }));
 }
 
 /**
@@ -67,17 +88,20 @@ async function askWithTimeout(
 }
 
 /**
- * Asks every provider at the same time. One provider failing, being rate limited or
- * timing out never affects the others: it just gets a status. Each provider's answer
- * is also reported through `onProviderDone` as soon as it arrives.
+ * Asks every provider at the same time, each in its own syntax. One provider failing, being
+ * rate limited or timing out never affects the others: it just gets a status. Each provider's
+ * answer is also reported through `onProviderDone` as soon as it arrives.
+ *
+ * `query` may be the text a person typed or an already parsed query. A query with nothing
+ * searchable in it (only common words, say) asks no provider anything.
  */
 export async function searchProviders(
   providers: readonly Provider[],
-  query: string,
+  query: string | ParsedQuery,
   options: SearchRunOptions,
 ): Promise<SearchOutcome> {
-  const trimmed = query.trim();
-  if (trimmed === "") return { results: [], statuses: [] };
+  const parsed = typeof query === "string" ? parseQuery(query.trim()) : query;
+  if (!isUsable(parsed)) return { results: [], statuses: [] };
   const { limit, signal, cache, onProviderDone, timeoutMs = DEFAULT_TIMEOUT_MS } = options;
 
   const notify = (update: ProviderUpdate) => {
@@ -90,7 +114,18 @@ export async function searchProviders(
 
   const answers = await Promise.all(
     providers.map(async (provider): Promise<ProviderUpdate> => {
-      const remembered = cache?.get(provider.id, trimmed, limit);
+      const sent = renderQuery(parsed, provider.syntax).text;
+      if (sent === "") {
+        const update: ProviderUpdate = {
+          provider: provider.id,
+          status: { provider: provider.id, state: "skipped", message: `Nothing in the query could be sent to ${provider.name}` },
+          results: [],
+        };
+        notify(update);
+        return update;
+      }
+
+      const remembered = cache?.get(provider.id, sent, limit);
       if (remembered !== undefined) {
         const update: ProviderUpdate = {
           provider: provider.id,
@@ -103,8 +138,8 @@ export async function searchProviders(
 
       let update: ProviderUpdate;
       try {
-        const results = await askWithTimeout(provider, trimmed, limit, signal, timeoutMs);
-        cache?.set(provider.id, trimmed, limit, results);
+        const results = await askWithTimeout(provider, sent, limit, signal, timeoutMs);
+        cache?.set(provider.id, sent, limit, results);
         update = { provider: provider.id, status: { provider: provider.id, state: "ok", count: results.length }, results };
       } catch (error) {
         update = { provider: provider.id, status: failureStatus(provider, error), results: [] };

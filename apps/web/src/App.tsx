@@ -12,8 +12,9 @@ import { browserStorage, loadApiKey, saveApiKey } from "./apiKey";
 import type { SourclyConfig } from "./config";
 import { Footer } from "./Footer";
 import { Header } from "./Header";
-import { rankResults } from "./pipeline";
+import { rankResults, relatedFor, scoringContext } from "./pipeline";
 import { createProviders, DEFAULT_PROVIDERS, skippedStatuses } from "./providers";
+import { addTermToQuery, explainUnusable, prepareSearch } from "./queryText";
 import { Results } from "./Results";
 import { SearchBox } from "./SearchBox";
 import { DEFAULT_PER_SOURCE, toggleInList, withOverride } from "./settings";
@@ -29,6 +30,8 @@ export function App({ config }: { config: SourclyConfig }) {
   const [perSource, setPerSource] = useState(DEFAULT_PER_SOURCE);
   const [overrides, setOverrides] = useState<ReadonlyMap<string, LabelOverride>>(() => new Map());
   const [page, setPage] = useState(1);
+  const [queryText, setQueryText] = useState("");
+  const [queryProblem, setQueryProblem] = useState<string | null>(null);
 
   const [storage] = useState(browserStorage);
   const [apiKey, setApiKey] = useState(() => loadApiKey(storage));
@@ -42,15 +45,36 @@ export function App({ config }: { config: SourclyConfig }) {
   // it never contacts a source.
   const ranked = useMemo(
     () =>
-      state.phase === "idle" ? null : rankResults(state.results, { scoring, filters, overrides }, REFERENCE_YEAR),
+      state.phase === "idle"
+        ? null
+        : rankResults(state.results, { scoring, filters, overrides }, scoringContext(state, REFERENCE_YEAR)),
     [state, scoring, filters, overrides],
   );
 
-  function handleSearch(query: string) {
+  // Suggested from the top results only; a suggestion never changes the query by itself.
+  const related = useMemo(
+    () => (state.phase === "idle" || ranked === null ? [] : relatedFor(ranked, state.terms)),
+    [state, ranked],
+  );
+
+  function handleSearch(text: string) {
+    const prepared = prepareSearch(text);
+    if (!prepared.usable) {
+      setQueryProblem(explainUnusable(prepared.parsed));
+      return;
+    }
+    setQueryProblem(null);
     const providers = createProviders(enabledProviders, { openAlexApiKey: apiKey, contactEmail: config.contactEmail });
     if (providers.length === 0) return;
+    // Show what is being searched: for a question, the keywords it was reduced to.
+    setQueryText(prepared.box);
     setPage(1);
-    search(query, providers, { limit: perSource, cache: cache.current, skipped: skippedStatuses() });
+    search(prepared.parsed, providers, { limit: perSource, cache: cache.current, skipped: skippedStatuses() });
+  }
+
+  function handleAddRelatedTerm(term: string) {
+    setQueryText((current) => addTermToQuery(current, term));
+    document.getElementById("query")?.focus();
   }
 
   function handleApiKeyChange(key: string) {
@@ -67,7 +91,8 @@ export function App({ config }: { config: SourclyConfig }) {
     <div className="page">
       <Header config={config} />
       <main>
-        <SearchBox onSearch={handleSearch} />
+        <SearchBox value={queryText} onChange={setQueryText} onSearch={handleSearch} />
+        {queryProblem !== null && <p className="warning">{queryProblem}</p>}
         <p className="notice">
           Labels and rankings are heuristics based on metadata. Verify sources before citing.
         </p>
@@ -100,6 +125,8 @@ export function App({ config }: { config: SourclyConfig }) {
           librarySearchUrl={config.librarySearchUrl}
           onOverrideChange={(resultId, change) => setOverrides((current) => withOverride(current, resultId, change))}
           onClearFilters={() => setFilters(defaultFilters())}
+          related={related}
+          onAddRelatedTerm={handleAddRelatedTerm}
         />
       </main>
       <Footer config={config} />

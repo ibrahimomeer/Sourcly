@@ -1,6 +1,6 @@
 import { doiUrl } from "../doi";
 import { asArray, asHttpUrl, asInteger, asRecord, asString } from "../json";
-import { plainTextOrNull, stripMarkup, toLanguageCode, toPlainQuery } from "../text";
+import { plainTextOrNull, stripMarkup, toLanguageCode } from "../text";
 import type { Author, Provider, Result, SearchOptions, WorkType } from "../types";
 import {
   authorFromParts,
@@ -11,6 +11,7 @@ import {
   parseYear,
   requestJson,
   sourced,
+  subjectsFrom,
   type Fetch,
 } from "./shared";
 
@@ -18,7 +19,8 @@ import {
 // - GET /dois?query=...&page[size]=N returns JSON:API, needs no key for reading
 //   public metadata, and echoes the requesting origin in `access-control-allow-origin`.
 // - page[size] of 100 works; 1000 returned an 18 MB response, so 100 is the cap here.
-// - The query is read as a Lucene query string, so it is reduced to plain words.
+// - The query is a Lucene query string. It arrives already written for this source (see
+//   query.ts) with every AND spelled out, because DataCite's default is looser.
 // - DataCite holds deposits made to repositories (datasets, software, theses,
 //   articles in institutional repositories), not publishers' journals.
 
@@ -96,6 +98,11 @@ export function parseDataCiteRecord(raw: unknown, rank: number, listSize: number
     authorCountries: [],
     openAccess: openAccess(accessFromRights(asArray(attributes.rightsList))),
     retraction: { retracted: null, source: null },
+    subjects: subjectsFrom(
+      "datacite",
+      "keyword",
+      asArray(attributes.subjects).map((subject) => asRecord(subject)?.subject),
+    ),
     hits: [{ provider: "datacite", id: doi, rank, listSize, score: null }],
   };
 }
@@ -110,12 +117,13 @@ export function createDataCiteProvider(options: DataCiteOptions = {}): Provider 
   return {
     id: "datacite",
     name: "DataCite",
+    syntax: "boolean",
 
     async search(query: string, { limit, signal }: SearchOptions): Promise<Result[]> {
-      const plain = toPlainQuery(query);
-      if (plain === "") return [];
+      const text = query.trim();
+      if (text === "") return [];
       const url = new URL(DOIS_URL);
-      url.searchParams.set("query", plain);
+      url.searchParams.set("query", text);
       url.searchParams.set("page[size]", String(clampLimit(limit, MAX_PAGE_SIZE)));
 
       const body = asRecord(await requestJson(doFetch, url, "DataCite", signal));

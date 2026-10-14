@@ -1,4 +1,13 @@
-import type { ProviderId, ProviderStatus, ProviderUpdate, Result } from "@sourcly/core";
+import {
+  formatQuery,
+  queryTerms,
+  type ParsedQuery,
+  type ProviderId,
+  type ProviderStatus,
+  type ProviderUpdate,
+  type Result,
+  type SentQuery,
+} from "@sourcly/core";
 
 // The state of a search as results arrive one provider at a time. It is a pure
 // reducer so the rules can be tested without a browser or React.
@@ -7,7 +16,14 @@ export interface ActiveSearch {
   phase: "searching" | "done";
   /** Identifies this search, so a late answer from an older one is ignored. */
   id: number;
+  /** What was searched for, as tidy text (common words removed). */
   query: string;
+  /** The query as it was read, including what was typed and which common words were dropped. */
+  parsed: ParsedQuery;
+  /** Every word the query asks for. Relevance and related terms are worked out from these. */
+  terms: string[];
+  /** The query as written for each source asked: exactly what was sent. */
+  sent: SentQuery[];
   /** The providers asked, in the order shown to the user. */
   order: ProviderId[];
   /** Every provider's results so far, not yet de-duplicated. */
@@ -21,7 +37,7 @@ export interface ActiveSearch {
 export type SearchState = { phase: "idle" } | ActiveSearch;
 
 export type SearchAction =
-  | { type: "start"; id: number; query: string; order: ProviderId[]; skipped: ProviderStatus[] }
+  | { type: "start"; id: number; parsed: ParsedQuery; sent: SentQuery[]; order: ProviderId[]; skipped: ProviderStatus[] }
   | { type: "provider-done"; id: number; update: ProviderUpdate }
   | { type: "finish"; id: number; at: Date };
 
@@ -32,7 +48,10 @@ export function searchReducer(state: SearchState, action: SearchAction): SearchS
     return {
       phase: "searching",
       id: action.id,
-      query: action.query,
+      query: formatQuery(action.parsed),
+      parsed: action.parsed,
+      terms: queryTerms(action.parsed),
+      sent: action.sent,
       order: action.order,
       results: [],
       // Providers that cannot be asked are reported up front, so a gap is never silent.

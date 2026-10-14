@@ -1,19 +1,32 @@
 import { describe, expect, it } from "vitest";
 import { applyOverride, classify } from "./classify";
-import { FACTOR_IDS, defaultScoringSettings, scoreResults, type FactorId, type ScoringItem } from "./scoring";
+import {
+  FACTOR_IDS,
+  defaultScoringSettings,
+  scoreResults,
+  type FactorId,
+  type ScoringContext,
+  type ScoringItem,
+} from "./scoring";
 import { makeResult } from "./testing/make-result";
-import type { Result } from "./types";
+import type { ProviderId, Result } from "./types";
 
 const REFERENCE_YEAR = 2026;
+
+const ctx = (changes: Partial<ScoringContext> = {}): ScoringContext => ({
+  referenceYear: REFERENCE_YEAR,
+  queryTerms: [],
+  answeredSources: 1,
+  ...changes,
+});
 
 const item = (overrides: Partial<Result>): ScoringItem => {
   const result = makeResult(overrides);
   return { result, labels: classify(result) };
 };
 
-const hit = (rank: number, listSize: number) => [
-  { provider: "openalex" as const, id: `W${rank}`, rank, listSize, score: null },
-];
+const hits = (...providers: ProviderId[]) =>
+  providers.map((provider, index) => ({ provider, id: `${provider}-${index}`, rank: index + 1, listSize: 10, score: null }));
 
 /** Settings with only the named factors on, all at weight 1. */
 function only(...enabled: FactorId[]) {
@@ -23,69 +36,55 @@ function only(...enabled: FactorId[]) {
 }
 
 // Three results, worked out by hand with the default weights
-// (relevance 3, citations 1, recency 1, peer review 1, open access 0; total 6).
+// (relevance 3, citations 1, recency 1, peer review 1, open access 0, provider agreement 0.5; total 6.5),
+// for the query "sleep memory" with two sources answering.
 //
-//        relevance  citations/yr -> percentile   recency        peer review   open access
-//   A    rank 1/3   10/1  = 10   -> 2/3           2026: 2^0 = 1   yes   = 1    open   = 1
-//   B    rank 2/3   100/10 = 10  -> 2/3           2016: 2^-1 = .5 unknown = .5  closed = 0
-//   C    rank 3/3   0/20   = 0   -> 1/6           2006: 2^-2 = .25 preprint = 0 open   = 1
+//   All three have the title "sleep and memory", so BM25 scores them the same: relevance 1 each.
 //
-// relevance = 1 - (rank-1)/3 -> A 1, B 2/3, C 1/3.  Percentile = (below + ties/2)/3.
-// Open access has weight 0 by default, so it adds nothing to the numerator or the total.
-//   A = (3*1   + 2/3 + 1   + 1) / 6 = 17/18
-//   B = (3*2/3 + 2/3 + .5  + .5) / 6 = 11/18
-//   C = (3*1/3 + 1/6 + .25 + 0) / 6 = 17/72
+//        citations/yr -> percentile   recency          peer review     agreement
+//   A    10/1  = 10   -> 2/3           2026: 2^0 = 1     yes   = 1      both sources 2/2 = 1
+//   B    100/10 = 10  -> 2/3           2016: 2^-1 = .5   unknown = .5   one source   1/2 = .5
+//   C    0/20   = 0   -> 1/6           2006: 2^-2 = .25  preprint = 0   one source   1/2 = .5
+//
+// Percentile = (below + ties/2) / 3. Open access has weight 0, so it adds nothing.
+//   A = (3*1 + 2/3 + 1   + 1 + 0.5*1)  / 6.5 = 37/39
+//   B = (3*1 + 2/3 + .5  + .5 + 0.5*.5) / 6.5 = 59/78
+//   C = (3*1 + 1/6 + .25 + 0 + 0.5*.5) / 6.5 = 22/39
+const QUERY = ["sleep", "memory"];
+const TITLE = "sleep and memory";
+
 function threeResults(): ScoringItem[] {
   return [
     item({
-      id: "10.1000/a", year: 2026, citationCount: 10, hits: hit(1, 3),
+      id: "10.1000/a", title: TITLE, year: 2026, citationCount: 10, hits: hits("openalex", "crossref"),
       openAccess: { isOpen: true, status: "gold", url: null, pdfUrl: null },
     }),
     item({
-      id: "10.1000/b", year: 2016, citationCount: 100, hits: hit(2, 3), type: "report",
+      id: "10.1000/b", title: TITLE, year: 2016, citationCount: 100, hits: hits("openalex"), type: "report",
       openAccess: { isOpen: false, status: "closed", url: null, pdfUrl: null },
     }),
     item({
-      id: "10.1000/c", year: 2006, citationCount: 0, hits: hit(3, 3), type: "preprint",
+      id: "10.1000/c", title: TITLE, year: 2006, citationCount: 0, hits: hits("crossref"), type: "preprint",
       openAccess: { isOpen: true, status: "green", url: null, pdfUrl: null },
     }),
   ];
 }
+const scenario = () => ctx({ queryTerms: QUERY, answeredSources: 2 });
 
 describe("scoreResults: the documented formula", () => {
   it("matches the hand-computed scores and order", () => {
-    const scored = scoreResults(threeResults(), defaultScoringSettings(), REFERENCE_YEAR);
+    const scored = scoreResults(threeResults(), defaultScoringSettings(), scenario());
     expect(scored.map((s) => s.result.id)).toEqual(["10.1000/a", "10.1000/b", "10.1000/c"]);
-    expect(scored[0]?.score).toBeCloseTo(17 / 18, 12);
-    expect(scored[1]?.score).toBeCloseTo(11 / 18, 12);
-    expect(scored[2]?.score).toBeCloseTo(17 / 72, 12);
-  });
-
-  it("does not rank a result lower for being closed access, unless the user raises the weight", () => {
-    const open = item({ id: "10.1000/open", openAccess: { isOpen: true, status: "gold", url: null, pdfUrl: null } });
-    const closed = item({ id: "10.1000/closed", openAccess: { isOpen: false, status: "closed", url: null, pdfUrl: null } });
-
-    const byDefault = scoreResults([open, closed], defaultScoringSettings(), REFERENCE_YEAR);
-    expect(byDefault[0]?.score).toBe(byDefault[1]?.score);
-    for (const scored of byDefault) {
-      expect(scored.factors.find((f) => f.factor === "openAccess")).toMatchObject({ weight: 0, contribution: 0 });
-    }
-
-    // Raising the weight is the user's choice, and then open access does count.
-    const raised = defaultScoringSettings();
-    raised.factors.openAccess.weight = 2;
-    const rankedAfter = scoreResults([open, closed], raised, REFERENCE_YEAR);
-    expect(rankedAfter.map((s) => s.result.id)).toEqual(["10.1000/open", "10.1000/closed"]);
-    expect(rankedAfter[0]?.score).toBeGreaterThan(rankedAfter[1]?.score ?? Number.POSITIVE_INFINITY);
+    expect(scored[0]?.score).toBeCloseTo(37 / 39, 12);
+    expect(scored[1]?.score).toBeCloseTo(59 / 78, 12);
+    expect(scored[2]?.score).toBeCloseTo(22 / 39, 12);
   });
 
   it("normalizes each factor as documented", () => {
-    const [a, b, c] = scoreResults(threeResults(), defaultScoringSettings(), REFERENCE_YEAR);
+    const [a, b, c] = scoreResults(threeResults(), defaultScoringSettings(), scenario());
     const norm = (s: typeof a, id: FactorId) => s?.factors.find((f) => f.factor === id)?.normalized;
 
-    expect(norm(a, "relevance")).toBeCloseTo(1, 12);
-    expect(norm(b, "relevance")).toBeCloseTo(2 / 3, 12);
-    expect(norm(c, "relevance")).toBeCloseTo(1 / 3, 12);
+    for (const s of [a, b, c]) expect(norm(s, "relevance")).toBeCloseTo(1, 12);
 
     expect(norm(a, "citations")).toBeCloseTo(2 / 3, 12);
     expect(norm(b, "citations")).toBeCloseTo(2 / 3, 12);
@@ -102,42 +101,194 @@ describe("scoreResults: the documented formula", () => {
     expect(norm(a, "openAccess")).toBe(1);
     expect(norm(b, "openAccess")).toBe(0);
     expect(norm(c, "openAccess")).toBe(1);
+
+    expect(norm(a, "providerAgreement")).toBe(1);
+    expect(norm(b, "providerAgreement")).toBe(0.5);
+    expect(norm(c, "providerAgreement")).toBe(0.5);
   });
 
   it("reports, per factor, the raw value, normalized value, weight and contribution", () => {
-    const [a] = scoreResults(threeResults(), defaultScoringSettings(), REFERENCE_YEAR);
+    const [a] = scoreResults(threeResults(), defaultScoringSettings(), scenario());
     expect(a?.factors.map((f) => f.factor)).toEqual([...FACTOR_IDS]);
 
     const relevance = a?.factors[0];
-    expect(relevance).toMatchObject({ factor: "relevance", label: "Relevance", enabled: true, weight: 3, raw: 1, normalized: 1 });
-    expect(relevance?.contribution).toBeCloseTo(3 / 6, 12);
-    expect(relevance?.detail).toContain("#1 of 3 on OpenAlex");
+    expect(relevance).toMatchObject({ factor: "relevance", label: "Relevance (BM25)", enabled: true, weight: 3, normalized: 1 });
+    // Three identical documents, each containing both words: each word has idf ln(1 + 0.5/3.5).
+    expect(relevance?.raw).toBeCloseTo(2 * Math.log(1 + 0.5 / 3.5), 12);
+    expect(relevance?.contribution).toBeCloseTo(3 / 6.5, 12);
+    expect(relevance?.detail).toContain("BM25 score");
+    expect(relevance?.detail).toContain("sleep ×1");
 
     const citations = a?.factors[1];
     expect(citations?.raw).toBe(10);
     expect(citations?.detail).toContain("10 citations over 1 year = 10.0 per year");
     expect(citations?.detail).toContain("67th percentile among the 3 results");
+
+    const agreement = a?.factors.find((f) => f.factor === "providerAgreement");
+    expect(agreement).toMatchObject({ raw: 2, weight: 0.5, normalized: 1 });
+    expect(agreement?.detail).toBe("Found by 2 of the 2 sources that answered (OpenAlex, Crossref): 2 / 2");
   });
 
-  it("makes contributions add up to the score", () => {
-    for (const scored of scoreResults(threeResults(), defaultScoringSettings(), REFERENCE_YEAR)) {
+  it("makes contributions add up to the score, and keeps scores within 0..1", () => {
+    for (const scored of scoreResults(threeResults(), defaultScoringSettings(), scenario())) {
       const sum = scored.factors.reduce((total, f) => total + f.contribution, 0);
       expect(sum).toBeCloseTo(scored.score, 12);
-    }
-  });
-
-  it("keeps scores within 0..1", () => {
-    for (const scored of scoreResults(threeResults(), defaultScoringSettings(), REFERENCE_YEAR)) {
       expect(scored.score).toBeGreaterThanOrEqual(0);
       expect(scored.score).toBeLessThanOrEqual(1);
     }
+  });
+
+  it("does not rank a result lower for being closed access, unless the user raises the weight", () => {
+    const open = item({ id: "10.1000/open", openAccess: { isOpen: true, status: "gold", url: null, pdfUrl: null } });
+    const closed = item({ id: "10.1000/closed", openAccess: { isOpen: false, status: "closed", url: null, pdfUrl: null } });
+
+    const byDefault = scoreResults([open, closed], defaultScoringSettings(), ctx());
+    expect(byDefault[0]?.score).toBe(byDefault[1]?.score);
+    for (const scored of byDefault) {
+      expect(scored.factors.find((f) => f.factor === "openAccess")).toMatchObject({ weight: 0, contribution: 0 });
+    }
+
+    const raised = defaultScoringSettings();
+    raised.factors.openAccess.weight = 2;
+    const rankedAfter = scoreResults([open, closed], raised, ctx());
+    expect(rankedAfter.map((s) => s.result.id)).toEqual(["10.1000/open", "10.1000/closed"]);
+    expect(rankedAfter[0]?.score).toBeGreaterThan(rankedAfter[1]?.score ?? Number.POSITIVE_INFINITY);
+  });
+});
+
+describe("scoreResults: relevance (BM25)", () => {
+  // Titles: 1 "sleep memory", 2 "sleep dreams", 3 "unrelated topic". Query: sleep, memory.
+  // N = 3 and all documents have 2 words, so the length factor is 1 and every matching word scores idf.
+  //   idf(sleep)  = ln(1 + (3 - 2 + 0.5) / (2 + 0.5)) = ln 1.6      (in 2 documents)
+  //   idf(memory) = ln(1 + (3 - 1 + 0.5) / (1 + 0.5)) = ln(8/3)     (in 1 document)
+  const idfSleep = Math.log(1.6);
+  const idfMemory = Math.log(1 + 2.5 / 1.5);
+  const docs = () => [
+    item({ id: "10.1/one", title: "sleep memory" }),
+    item({ id: "10.1/two", title: "sleep dreams" }),
+    item({ id: "10.1/three", title: "unrelated topic" }),
+  ];
+  const relevanceOf = (scored: ReturnType<typeof scoreResults>, id: string) =>
+    scored.find((s) => s.result.id === id)?.factors.find((f) => f.factor === "relevance");
+
+  it("scores by the formula, and normalizes against the best result in the set", () => {
+    const scored = scoreResults(docs(), only("relevance"), ctx({ queryTerms: QUERY }));
+    expect(relevanceOf(scored, "10.1/one")?.raw).toBeCloseTo(idfSleep + idfMemory, 12);
+    expect(relevanceOf(scored, "10.1/one")?.normalized).toBe(1);
+    expect(relevanceOf(scored, "10.1/two")?.raw).toBeCloseTo(idfSleep, 12);
+    expect(relevanceOf(scored, "10.1/two")?.normalized).toBeCloseTo(idfSleep / (idfSleep + idfMemory), 12);
+    expect(relevanceOf(scored, "10.1/three")).toMatchObject({ raw: 0, normalized: 0 });
+    expect(scored.map((s) => s.result.id)).toEqual(["10.1/one", "10.1/two", "10.1/three"]);
+  });
+
+  it("explains a match, and a non-match, in plain words", () => {
+    const scored = scoreResults(docs(), only("relevance"), ctx({ queryTerms: QUERY }));
+    const best = relevanceOf(scored, "10.1/one")?.detail ?? "";
+    expect(best).toContain("BM25 score");
+    expect(best).toContain("best of these 3 results");
+    expect(best).toContain("100% of it");
+    expect(best).toMatch(/Matched (memory ×1, sleep ×1|sleep ×1, memory ×1)/);
+    expect(relevanceOf(scored, "10.1/three")?.detail).toBe(
+      "None of the query words (sleep, memory) appear in the title, abstract or subjects: BM25 score 0",
+    );
+  });
+
+  it("counts the abstract and the subjects, not only the title", () => {
+    const set = [
+      item({ id: "10.1/title", title: "sleep memory" }),
+      item({ id: "10.1/abstract", title: "unrelated", abstract: "an essay about sleep and memory" }),
+      item({ id: "10.1/subjects", title: "unrelated", subjects: [{ term: "Sleep", kind: "topic", provider: "openalex" }, { term: "Memory Consolidation", kind: "mesh", provider: "pubmed" }] }),
+      item({ id: "10.1/nothing", title: "unrelated" }),
+    ];
+    const scored = scoreResults(set, only("relevance"), ctx({ queryTerms: QUERY }));
+    const raw = (id: string) => relevanceOf(scored, id)?.raw ?? 0;
+    expect(raw("10.1/abstract")).toBeGreaterThan(0);
+    expect(raw("10.1/subjects")).toBeGreaterThan(0);
+    expect(raw("10.1/nothing")).toBe(0);
+  });
+
+  it("matches singular and plural, ignores accents and case, and ignores common words in the query", () => {
+    const set = [item({ id: "10.1/a", title: "Memories of Sleep" }), item({ id: "10.1/b", title: "Café culture" })];
+    const scored = scoreResults(set, only("relevance"), ctx({ queryTerms: ["the", "memory", "SLEEP", "cafe"] }));
+    expect(relevanceOf(scored, "10.1/a")?.raw).toBeGreaterThan(0);
+    expect(relevanceOf(scored, "10.1/b")?.raw).toBeGreaterThan(0);
+  });
+
+  it("scores neutral (0.5) when the query has no searchable words, and says why", () => {
+    for (const terms of [[], ["the", "of"]]) {
+      const scored = scoreResults(docs(), only("relevance"), ctx({ queryTerms: terms }));
+      for (const s of scored) {
+        const factor = s.factors.find((f) => f.factor === "relevance");
+        expect(factor).toMatchObject({ raw: null, normalized: 0.5 });
+        expect(factor?.detail).toContain("no searchable words");
+      }
+    }
+  });
+
+  it("does not depend on how many sources a result came from, or on the order results arrive in", () => {
+    const forwards = scoreResults(docs(), only("relevance"), ctx({ queryTerms: QUERY }));
+    const backwards = scoreResults([...docs()].reverse(), only("relevance"), ctx({ queryTerms: QUERY }));
+    const byId = (list: typeof forwards) => Object.fromEntries(list.map((s) => [s.result.id, s.score]));
+    expect(byId(backwards)).toEqual(byId(forwards));
+  });
+
+  it("is measured over the whole set it is given, so a rarer word counts for more", () => {
+    const common = Array.from({ length: 9 }, (_, i) => item({ id: `10.1/c${i}`, title: "sleep studies" }));
+    const rare = item({ id: "10.1/rare", title: "sleep spindles" });
+    const scored = scoreResults([...common, rare], only("relevance"), ctx({ queryTerms: ["sleep", "spindles"] }));
+    const rareFactor = relevanceOf(scored, "10.1/rare");
+    const commonFactor = relevanceOf(scored, "10.1/c0");
+    expect(Number(rareFactor?.raw ?? 0)).toBeGreaterThan(Number(commonFactor?.raw ?? 0));
+    expect(scored[0]?.result.id).toBe("10.1/rare");
+  });
+});
+
+describe("scoreResults: provider agreement", () => {
+  const agreement = (result: Partial<Result>, answeredSources: number) =>
+    scoreResults([item(result)], only("providerAgreement"), ctx({ answeredSources }))[0]?.factors.find((f) => f.factor === "providerAgreement");
+
+  it("is the share of the answering sources that found the result", () => {
+    expect(agreement({ hits: hits("openalex", "crossref", "pubmed") }, 8)).toMatchObject({ raw: 3, normalized: 3 / 8 });
+    expect(agreement({ hits: hits("openalex") }, 8)).toMatchObject({ raw: 1, normalized: 1 / 8 });
+    expect(agreement({ hits: hits("openalex", "crossref") }, 2)).toMatchObject({ raw: 2, normalized: 1 });
+  });
+
+  it("names the sources in its explanation", () => {
+    expect(agreement({ hits: hits("openalex", "europepmc") }, 4)?.detail).toBe(
+      "Found by 2 of the 4 sources that answered (OpenAlex, Europe PMC): 2 / 4",
+    );
+  });
+
+  it("counts each source once, even if it listed the result twice", () => {
+    const doubled = [...hits("openalex"), ...hits("openalex"), ...hits("crossref")];
+    expect(agreement({ hits: doubled }, 4)).toMatchObject({ raw: 2, normalized: 0.5 });
+  });
+
+  it("scores neutral when fewer than two sources answered, because there is nothing to compare", () => {
+    for (const answered of [0, 1]) {
+      const factor = agreement({ hits: hits("openalex") }, answered);
+      expect(factor).toMatchObject({ raw: 1, normalized: 0.5 });
+      expect(factor?.detail).toContain("cannot be measured");
+    }
+  });
+
+  it("never exceeds 1, even if more sources are listed than answered", () => {
+    expect(agreement({ hits: hits("openalex", "crossref", "pubmed") }, 2)?.normalized).toBe(1);
+  });
+
+  it("can be raised by the user, and then a result found by more sources ranks higher", () => {
+    const many = item({ id: "10.1/many", hits: hits("openalex", "crossref", "pubmed") });
+    const few = item({ id: "10.1/few", hits: hits("openalex") });
+    const settings = defaultScoringSettings();
+    settings.factors.providerAgreement.weight = 5;
+    const scored = scoreResults([few, many], settings, ctx({ answeredSources: 4 }));
+    expect(scored.map((s) => s.result.id)).toEqual(["10.1/many", "10.1/few"]);
   });
 });
 
 describe("scoreResults: user control", () => {
   it("drops a disabled factor from both the numerator and the denominator", () => {
-    const settings = only("citations");
-    const scored = scoreResults(threeResults(), settings, REFERENCE_YEAR);
+    const scored = scoreResults(threeResults(), only("citations"), scenario());
     const byId = new Map(scored.map((s) => [s.result.id, s]));
     expect(byId.get("10.1000/a")?.score).toBeCloseTo(2 / 3, 12);
     expect(byId.get("10.1000/c")?.score).toBeCloseTo(1 / 6, 12);
@@ -150,19 +301,18 @@ describe("scoreResults: user control", () => {
 
   it("re-ranks the same results when the weights change, without any new data", () => {
     const items = threeResults();
-    const ids = (settings = defaultScoringSettings()) =>
-      scoreResults(items, settings, REFERENCE_YEAR).map((s) => s.result.id);
+    const ids = (settings = defaultScoringSettings()) => scoreResults(items, settings, scenario()).map((s) => s.result.id);
 
-    expect(ids(only("relevance"))).toEqual(["10.1000/a", "10.1000/b", "10.1000/c"]);
+    expect(ids(only("providerAgreement"))).toEqual(["10.1000/a", "10.1000/b", "10.1000/c"]);
     // A and C are open access and B is not; the tie between A and C falls back to id order.
     expect(ids(only("openAccess"))).toEqual(["10.1000/a", "10.1000/c", "10.1000/b"]);
   });
 
   it("does not depend on the scale of the weights", () => {
-    const base = scoreResults(threeResults(), defaultScoringSettings(), REFERENCE_YEAR);
+    const base = scoreResults(threeResults(), defaultScoringSettings(), scenario());
     const scaled = defaultScoringSettings();
     for (const id of FACTOR_IDS) scaled.factors[id].weight *= 10;
-    const tenfold = scoreResults(threeResults(), scaled, REFERENCE_YEAR);
+    const tenfold = scoreResults(threeResults(), scaled, scenario());
 
     expect(tenfold.map((s) => s.result.id)).toEqual(base.map((s) => s.result.id));
     tenfold.forEach((s, i) => expect(s.score).toBeCloseTo(base[i]?.score ?? Number.NaN, 12));
@@ -173,13 +323,13 @@ describe("scoreResults: user control", () => {
     settings.factors.citations.weight = -5;
     settings.factors.relevance.weight = Number.NaN;
     settings.factors.recency.weight = Number.POSITIVE_INFINITY;
-    const scored = scoreResults(threeResults(), settings, REFERENCE_YEAR);
+    const scored = scoreResults(threeResults(), settings, scenario());
     expect(scored.every((s) => s.score === 0)).toBe(true);
-    expect(scored[0]?.factors.map((f) => f.weight)).toEqual([0, 0, 0, 1, 1, 1]);
+    expect(scored[0]?.factors.map((f) => f.weight)).toEqual([0, 0, 0, 1, 1, 1, 1]);
   });
 
   it("scores 0 and falls back to id order when no factor is active", () => {
-    const scored = scoreResults(threeResults().reverse(), only(), REFERENCE_YEAR);
+    const scored = scoreResults(threeResults().reverse(), only(), scenario());
     expect(scored.every((s) => s.score === 0 && s.factors.every((f) => f.contribution === 0))).toBe(true);
     expect(scored.map((s) => s.result.id)).toEqual(["10.1000/a", "10.1000/b", "10.1000/c"]);
   });
@@ -190,7 +340,7 @@ describe("scoreResults: user control", () => {
       result: base.result,
       labels: applyOverride(base.labels, { peerReview: "not-peer-reviewed" }),
     };
-    const [scored] = scoreResults([overridden], only("peerReview"), REFERENCE_YEAR);
+    const [scored] = scoreResults([overridden], only("peerReview"), ctx());
     const factor = scored?.factors.find((f) => f.factor === "peerReview");
     expect(factor?.normalized).toBe(0);
     expect(factor?.detail).toContain("(set by you)");
@@ -201,38 +351,38 @@ describe("scoreResults: determinism", () => {
   it("breaks ties by id, whatever order the input arrives in", () => {
     const x = item({ id: "10.1000/zzz" });
     const y = item({ id: "10.1000/aaa" });
-    expect(scoreResults([x, y], defaultScoringSettings(), REFERENCE_YEAR).map((s) => s.result.id)).toEqual([
-      "10.1000/aaa",
-      "10.1000/zzz",
-    ]);
-    expect(scoreResults([y, x], defaultScoringSettings(), REFERENCE_YEAR).map((s) => s.result.id)).toEqual([
-      "10.1000/aaa",
-      "10.1000/zzz",
-    ]);
+    expect(scoreResults([x, y], defaultScoringSettings(), ctx()).map((s) => s.result.id)).toEqual(["10.1000/aaa", "10.1000/zzz"]);
+    expect(scoreResults([y, x], defaultScoringSettings(), ctx()).map((s) => s.result.id)).toEqual(["10.1000/aaa", "10.1000/zzz"]);
   });
 
   it("gives identical output for identical input, and does not mutate it", () => {
     const items = threeResults().reverse();
     const idsBefore = items.map((i) => i.result.id);
-    const first = scoreResults(items, defaultScoringSettings(), REFERENCE_YEAR);
-    const second = scoreResults(items, defaultScoringSettings(), REFERENCE_YEAR);
+    const first = scoreResults(items, defaultScoringSettings(), scenario());
+    const second = scoreResults(items, defaultScoringSettings(), scenario());
     expect(second).toEqual(first);
     expect(items.map((i) => i.result.id)).toEqual(idsBefore);
   });
 
+  it("gives the same scores whatever order the results arrive in", () => {
+    const forwards = scoreResults(threeResults(), defaultScoringSettings(), scenario());
+    const backwards = scoreResults(threeResults().reverse(), defaultScoringSettings(), scenario());
+    expect(backwards.map((s) => [s.result.id, s.score])).toEqual(forwards.map((s) => [s.result.id, s.score]));
+  });
+
   it("returns an empty list for no results", () => {
-    expect(scoreResults([], defaultScoringSettings(), REFERENCE_YEAR)).toEqual([]);
+    expect(scoreResults([], defaultScoringSettings(), scenario())).toEqual([]);
   });
 });
 
 describe("scoreResults: factor edge cases", () => {
-  const first = (overrides: Partial<Result>, settings = defaultScoringSettings()) =>
-    scoreResults([item(overrides)], settings, REFERENCE_YEAR)[0];
+  const first = (overrides: Partial<Result>, settings = defaultScoringSettings(), context = ctx()) =>
+    scoreResults([item(overrides)], settings, context)[0];
   const factor = (s: ReturnType<typeof first>, id: FactorId) => s?.factors.find((f) => f.factor === id);
 
   it("scores missing data as neutral (0.5) rather than as zero", () => {
-    const scored = first({ year: null, citationCount: null, hits: [] });
-    for (const id of ["relevance", "citations", "recency"] as const) {
+    const scored = first({ year: null, citationCount: null });
+    for (const id of ["citations", "recency"] as const) {
       expect(factor(scored, id)).toMatchObject({ raw: null, normalized: 0.5 });
       expect(factor(scored, id)?.detail).toContain("neutral");
     }
@@ -240,8 +390,7 @@ describe("scoreResults: factor edge cases", () => {
 
   it("gives tied citation rates the same middle percentile", () => {
     const tied = [item({ id: "10.1000/1", citationCount: 5 }), item({ id: "10.1000/2", citationCount: 5 })];
-    const scored = scoreResults(tied, only("citations"), REFERENCE_YEAR);
-    expect(scored.map((s) => s.score)).toEqual([0.5, 0.5]);
+    expect(scoreResults(tied, only("citations"), ctx()).map((s) => s.score)).toEqual([0.5, 0.5]);
   });
 
   it("puts a lone result at the 50th percentile", () => {
@@ -254,16 +403,14 @@ describe("scoreResults: factor edge cases", () => {
       item({ id: "10.1000/2", citationCount: 50 }),
       item({ id: "10.1000/3", citationCount: null }),
     ];
-    const scored = scoreResults(set, only("citations"), REFERENCE_YEAR);
-    const byId = new Map(scored.map((s) => [s.result.id, s.score]));
+    const byId = new Map(scoreResults(set, only("citations"), ctx()).map((s) => [s.result.id, s.score]));
     expect(byId.get("10.1000/1")).toBeCloseTo(0.25, 12);
     expect(byId.get("10.1000/2")).toBeCloseTo(0.75, 12);
     expect(byId.get("10.1000/3")).toBe(0.5);
   });
 
   it("counts a paper published this year as one year old for citation rate", () => {
-    const scored = first({ year: REFERENCE_YEAR, citationCount: 8 });
-    expect(factor(scored, "citations")?.raw).toBe(8);
+    expect(factor(first({ year: REFERENCE_YEAR, citationCount: 8 }), "citations")?.raw).toBe(8);
   });
 
   it("halves recency every half-life, and never exceeds 1 for future-dated work", () => {
@@ -298,25 +445,6 @@ describe("scoreResults: factor edge cases", () => {
     expect(factor(first({ type: "review" }, settings), "studyType")?.normalized).toBe(1);
     expect(factor(first({ type: "journal-article" }, settings), "studyType")?.normalized).toBe(0);
   });
-
-  it("uses the best rank when several providers returned the result", () => {
-    const scored = first({
-      hits: [
-        { provider: "openalex", id: "W1", rank: 5, listSize: 10, score: 12.3 },
-        { provider: "crossref", id: "10.1000/example", rank: 1, listSize: 20, score: null },
-      ],
-    });
-    const relevance = factor(scored, "relevance");
-    expect(relevance?.raw).toBe(1);
-    expect(relevance?.normalized).toBe(1);
-    expect(relevance?.detail).toContain("#1 of 20 on Crossref");
-    expect(relevance?.detail).toContain("also returned by #5 of 10 on OpenAlex");
-  });
-
-  it("mentions the provider's own relevance score when it gives one", () => {
-    const scored = first({ hits: [{ provider: "openalex", id: "W1", rank: 2, listSize: 4, score: 241.04 }] });
-    expect(factor(scored, "relevance")?.detail).toContain("relevance score: 241.0");
-  });
 });
 
 describe("defaultScoringSettings", () => {
@@ -328,10 +456,12 @@ describe("defaultScoringSettings", () => {
       recency: 1,
       peerReview: 1,
       openAccess: 0,
+      providerAgreement: 0.5,
       studyType: 0,
     });
-    // Open access stays switched on (so its value is still shown); its weight is just 0.
+    // Open access and provider agreement stay switched on (so their values are shown); study type is off.
     expect(factors.openAccess.enabled).toBe(true);
+    expect(factors.providerAgreement.enabled).toBe(true);
     expect(factors.studyType.enabled).toBe(false);
     expect(preferredLevels).toEqual([]);
     expect(recencyHalfLifeYears).toBe(10);

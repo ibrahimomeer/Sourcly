@@ -1,9 +1,11 @@
-import type { LabelOverride } from "@sourcly/core";
+import type { LabelOverride, RelatedTerm } from "@sourcly/core";
 import { pluralize } from "./format";
 import { Pagination } from "./Pagination";
 import { paginate } from "./paginate";
 import type { RankedView } from "./pipeline";
 import { ProviderStatuses } from "./ProviderStatuses";
+import { QueryNote } from "./QueryNote";
+import { RelatedTerms } from "./RelatedTerms";
 import { ResultCard } from "./ResultCard";
 import { SearchElsewhere } from "./SearchElsewhere";
 import type { SearchState } from "./searchState";
@@ -18,6 +20,8 @@ export function Results({
   librarySearchUrl,
   onOverrideChange,
   onClearFilters,
+  related,
+  onAddRelatedTerm,
 }: {
   state: SearchState;
   /** Null until a search has started. */
@@ -32,6 +36,9 @@ export function Results({
   librarySearchUrl: string;
   onOverrideChange: (resultId: string, change: LabelOverride) => void;
   onClearFilters: () => void;
+  /** Terms to suggest, from the top results. */
+  related: readonly RelatedTerm[];
+  onAddRelatedTerm: (term: string) => void;
 }) {
   if (state.phase === "idle" || ranked === null) {
     return (
@@ -54,6 +61,7 @@ export function Results({
   return (
     <section id="results" className="results" aria-label="Results" aria-live="polite">
       <ProviderStatuses search={state} />
+      <QueryNote search={state} />
       <SearchElsewhere query={state.query} librarySearchUrl={librarySearchUrl} />
 
       {total === 0 && searching && <p>Searching for “{state.query}”…</p>}
@@ -88,6 +96,8 @@ export function Results({
       )}
 
       {ranked.shown.length === 0 && ranked.hidden.length > 0 && <p>Every result is hidden by your filters.</p>}
+
+      <RelatedTerms terms={related} onAdd={onAddRelatedTerm} />
 
       {pagination("Pages (top)")}
       <ol className="result-list" start={current.offset + 1}>

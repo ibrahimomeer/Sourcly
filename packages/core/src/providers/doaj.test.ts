@@ -54,13 +54,27 @@ describe("parseDoajArticle", () => {
 });
 
 describe("createDoajProvider", () => {
-  it("puts the plain-words query in the path and caps pageSize at 100", async () => {
+  it("puts the query it is given in the path, and caps pageSize at 100", async () => {
     const fetchMock = vi.fn<typeof fetch>(() => Promise.resolve(Response.json(fixtures)));
-    const found = await createDoajProvider({ fetch: fetchMock }).search('sleep: "memory" (consolidation)', { limit: 300 });
+    const found = await createDoajProvider({ fetch: fetchMock }).search('sleep AND "memory consolidation"', { limit: 300 });
     const url = new URL(String(fetchMock.mock.calls[0]?.[0]));
     expect(url.origin).toBe("https://doaj.org");
-    expect(decodeURIComponent(url.pathname)).toBe("/api/search/articles/sleep memory consolidation");
+    expect(decodeURIComponent(url.pathname)).toBe('/api/search/articles/sleep AND "memory consolidation"');
     expect(url.searchParams.get("pageSize")).toBe("100");
     expect(found).toHaveLength(hits.length);
+  });
+});
+
+describe("DOAJ subjects and syntax", () => {
+  it("reads author keywords and the journal's subject category", () => {
+    const { subjects } = parse(hits[2]);
+    expect(subjects.filter((s) => s.kind === "keyword").map((s) => s.term)).toEqual([
+      "Acetylcholine", "Emotional Memory", "habituation", "encoding", "REM sleep", "theta activity",
+    ]);
+    expect(subjects.filter((s) => s.kind === "subject")).toEqual([{ term: "Psychology", kind: "subject", provider: "doaj" }]);
+  });
+
+  it("understands Boolean queries", () => {
+    expect(createDoajProvider().syntax).toBe("boolean");
   });
 });
