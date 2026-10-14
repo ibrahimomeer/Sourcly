@@ -646,3 +646,143 @@ code {
   margin-left: 0.2rem;
   color: var(--muted);
 }
+
+/* Two columns: the main results and the counterarguments panel */
+
+.page {
+  max-width: 1280px;
+}
+
+.top {
+  max-width: 900px;
+}
+
+.columns:not(.columns-two) {
+  max-width: 900px;
+}
+
+.column {
+  min-width: 0;
+}
+
+@media (min-width: 1000px) {
+  .columns-two {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 2rem;
+    align-items: start;
+  }
+
+  .columns-two > .column + .column {
+    padding-left: 2rem;
+    border-left: 1px solid var(--border);
+  }
+}
+
+@media (max-width: 999px) {
+  .columns-two > .column + .column {
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+  }
+}
+
+/* Counterarguments & limitations */
+
+.counter h2 {
+  margin: 0 0 0.5rem;
+  font-size: 1.25rem;
+}
+
+.counter > p {
+  font-size: 0.875rem;
+}
+
+.counter-notice {
+  margin: 0 0 0.75rem;
+  padding: 0.5rem 0.75rem;
+  border: 2px solid var(--border-strong);
+  font-weight: 600;
+}
+
+.counter-mode {
+  margin: 0 0 0.75rem;
+  padding: 0;
+  border: 0;
+}
+
+.counter-terms {
+  margin: 0.4rem 0 0.9rem 1.6rem;
+}
+
+.counter-mode .field-row {
+  margin: 0.4rem 0 0.9rem 1.6rem;
+}
+
+.chip-term {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.15rem;
+  padding: 0.1rem 0.2rem 0.1rem 0.6rem;
+  border: 1px solid var(--border-strong);
+  border-radius: 1rem;
+  font-size: 0.875rem;
+}
+
+.chip-remove {
+  padding: 0 0.35rem;
+  border: 0;
+  background: transparent;
+  font-size: 1rem;
+  line-height: 1.4;
+}
+
+.view-switch {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0 0 1rem;
+}
+
+.view-switch button {
+  padding: 0.3rem 0.7rem;
+  font-size: 0.875rem;
+}
+
+.view-switch button[aria-pressed="true"] {
+  border-width: 3px;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.counter .statuses {
+  columns: 1;
+}
+
+mark {
+  padding: 0 0.1rem;
+  background: #e0e0e0;
+  color: var(--text);
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+.matched {
+  margin: 0.35rem 0 0;
+  font-size: 0.875rem;
+}
+
+.terms-label {
+  margin: 0 0 0.25rem;
+  font-size: 0.875rem;
+}
+.counter-terms {
+  margin-left: 0;
+}
+
+.own-hint {
+  margin: 0 0 0.9rem 1.6rem;
+  font-size: 0.8rem;
+}

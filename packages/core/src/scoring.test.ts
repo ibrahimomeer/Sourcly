@@ -243,6 +243,31 @@ describe("scoreResults: relevance (BM25)", () => {
   });
 });
 
+describe("scoreResults: counterargument terms", () => {
+  const items = () => [
+    item({ id: "10.1/match", title: "Sleep and memory: a limitation", citationCount: 5 }),
+    item({ id: "10.1/topic", title: "Sleep and memory", citationCount: 5 }),
+    item({ id: "10.1/terms", title: "A limitation of surveys", citationCount: 5 }),
+  ];
+  const relevanceOf = (scored: ReturnType<typeof scoreResults>, id: string) =>
+    scored.find((s) => s.result.id === id)?.factors.find((f) => f.factor === "relevance");
+
+  it("makes relevance need both the search words and a term", () => {
+    const scored = scoreResults(items(), only("relevance"), ctx({ queryTerms: QUERY, signalTerms: ["limitation"] }));
+    expect(scored.map((s) => s.result.id)[0]).toBe("10.1/match");
+    expect(relevanceOf(scored, "10.1/match")?.normalized).toBeGreaterThan(0.5);
+    expect(relevanceOf(scored, "10.1/topic")?.normalized).toBe(0);
+    expect(relevanceOf(scored, "10.1/terms")?.normalized).toBe(0);
+    expect(relevanceOf(scored, "10.1/match")?.detail).toContain("Relevance here is the two multiplied");
+  });
+
+  it("leaves ranking exactly as before when no terms are given", () => {
+    const plain = scoreResults(items(), defaultScoringSettings(), ctx({ queryTerms: QUERY }));
+    const none = scoreResults(items(), defaultScoringSettings(), ctx({ queryTerms: QUERY, signalTerms: [] }));
+    expect(none).toEqual(plain);
+  });
+});
+
 describe("scoreResults: provider agreement", () => {
   const agreement = (result: Partial<Result>, answeredSources: number) =>
     scoreResults([item(result)], only("providerAgreement"), ctx({ answeredSources }))[0]?.factors.find((f) => f.factor === "providerAgreement");

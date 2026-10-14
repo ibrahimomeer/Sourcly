@@ -1,4 +1,4 @@
-import type { Author, Label, OpenAccessInfo, PeerReviewStatus, SourceLevel } from "@sourcly/core";
+import type { Author, Label, LexiconMatch, OpenAccessInfo, PeerReviewStatus, Result, SourceLevel } from "@sourcly/core";
 
 const MAX_AUTHORS_SHOWN = 6;
 
@@ -56,4 +56,20 @@ export function formatNumber(value: number, decimals = 2): string {
 /** "1 result" / "2 results". */
 export function pluralize(count: number, singular: string): string {
   return `${count} ${singular}${count === 1 ? "" : "s"}`;
+}
+
+/**
+ * The badge for a review article: "Review", or the source's own wording when it is more specific
+ * ("Systematic Review", "Meta-Analysis"). Null for anything that is not a review.
+ */
+export function reviewBadgeText(result: Pick<Result, "type" | "rawType">): string | null {
+  if (result.type !== "review") return null;
+  const raw = result.rawType?.value.trim() ?? "";
+  if (raw === "" || /^review([- ]article)?$/i.test(raw)) return "Review";
+  return /review|meta-?analys/i.test(raw) ? raw.charAt(0).toUpperCase() + raw.slice(1) : "Review";
+}
+
+/** "limitation (title), bias (abstract)": which terms a result matched and where. */
+export function describeLexiconMatches(matches: readonly LexiconMatch[]): string {
+  return matches.map((match) => `${match.term} (${match.fields.join(" and ")})`).join(", ");
 }

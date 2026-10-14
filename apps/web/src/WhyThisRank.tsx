@@ -48,7 +48,7 @@ export function WhyThisRank({ scored }: { scored: ScoredResult }) {
       </div>
       <p className="muted">
         Relevance is BM25 over the title, abstract and subject terms of all the results fetched for this search, divided by
-        the best score among them. Provider agreement is how many of the sources that answered returned this result.
+        the best score among them (in the counterarguments panel it is multiplied by a second reading, of the terms). Provider agreement is how many of the sources that answered returned this result.
         Equal scores are ordered by DOI. Level and peer-review values come from the labels shown on this card, including
         any change you made.
       </p>

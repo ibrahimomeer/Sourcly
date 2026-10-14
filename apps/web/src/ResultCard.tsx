@@ -1,8 +1,18 @@
-import { PROVIDER_NAMES, classify, doiUrl, type LabelOverride, type ScoredResult } from "@sourcly/core";
+import {
+  NOTICE_LABELS,
+  PROVIDER_NAMES,
+  classify,
+  doiUrl,
+  findLexiconMatches,
+  noticeKind,
+  type LabelOverride,
+  type ScoredResult,
+} from "@sourcly/core";
 import { Badge, type BadgeStyle } from "./Badge";
 import { LabelEditor } from "./LabelEditor";
 import { LabelRows } from "./LabelRows";
-import { accessBadgeText, formatAuthors, formatNumber } from "./format";
+import { accessBadgeText, describeLexiconMatches, formatAuthors, formatNumber, reviewBadgeText } from "./format";
+import { Highlighted } from "./Highlighted";
 import { libraryUrl } from "./libraryLink";
 import { WhyThisRank } from "./WhyThisRank";
 
@@ -12,6 +22,7 @@ export function ResultCard({
   override,
   libraryPrefix,
   onOverrideChange,
+  highlight = [],
 }: {
   /** 1-based place in the current ordering. */
   position: number;
@@ -20,11 +31,16 @@ export function ResultCard({
   /** config.libraryProxyPrefix; empty hides the library button. */
   libraryPrefix: string;
   onOverrideChange: (resultId: string, change: LabelOverride) => void;
+  /** Counterargument terms to mark in the title and abstract. Empty (the default) marks nothing. */
+  highlight?: readonly string[];
 }) {
   const { result, labels } = scored;
   const { openAccess, retraction } = result;
   const title = result.title === "" ? "(untitled)" : result.title;
   const libraryHref = libraryUrl(libraryPrefix, result);
+  const notice = noticeKind(result);
+  const reviewText = reviewBadgeText(result);
+  const matches = findLexiconMatches(result, highlight);
   // Borders, not color: solid = open, dashed = not open, faint dashed = not stated.
   const accessStyle: BadgeStyle =
     openAccess.isOpen === true ? "solid" : openAccess.isOpen === false ? "dashed" : "faint-dashed";
@@ -35,10 +51,10 @@ export function ResultCard({
         <h3 className="card-title">
           <span className="position">{position}.</span>{" "}
           {result.url === null ? (
-            title
+            <Highlighted text={title} terms={highlight} />
           ) : (
             <a href={result.url} target="_blank" rel="noopener noreferrer">
-              {title}
+              <Highlighted text={title} terms={highlight} />
             </a>
           )}
         </h3>
@@ -53,6 +69,20 @@ export function ResultCard({
       </p>
 
       <ul className="badges" aria-label="Badges">
+        {notice !== null && (
+          <li>
+            <Badge style="bold" title="Recognised from the way the title begins">
+              {NOTICE_LABELS[notice]}
+            </Badge>
+          </li>
+        )}
+        {reviewText !== null && (
+          <li>
+            <Badge style="dotted" title="The source says this is a review article">
+              {reviewText}
+            </Badge>
+          </li>
+        )}
         {retraction.retracted === true && (
           <li>
             <Badge style="bold" title={retraction.source ?? undefined}>
@@ -76,6 +106,19 @@ export function ResultCard({
         <p className="warning">
           This work is marked as retracted ({retraction.source ?? "source unknown"}). Read the retraction notice before
           citing it.
+        </p>
+      )}
+
+      {notice !== null && (
+        <p className="warning">
+          This record is a notice about another article, not research itself. Find the article it concerns and read both
+          before citing either.
+        </p>
+      )}
+
+      {matches.length > 0 && (
+        <p className="matched">
+          <strong>Counterargument terms found:</strong> {describeLexiconMatches(matches)}
         </p>
       )}
 
@@ -113,7 +156,9 @@ export function ResultCard({
       {result.abstract !== null && (
         <details className="panel">
           <summary>Abstract</summary>
-          <p>{result.abstract}</p>
+          <p>
+            <Highlighted text={result.abstract} terms={highlight} />
+          </p>
         </details>
       )}
 

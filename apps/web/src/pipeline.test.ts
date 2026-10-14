@@ -238,6 +238,11 @@ describe("scoringContext", () => {
     });
   });
 
+  it("passes the counterargument terms on only when it is given them", () => {
+    expect(scoringContext(searching("sleep"), 2026, ["bias", "limitation"]).signalTerms).toEqual(["bias", "limitation"]);
+    expect("signalTerms" in scoringContext(searching("sleep"), 2026)).toBe(false);
+  });
+
   it("counts only the sources that answered, not failed, rate-limited or skipped ones", () => {
     let state: ActiveSearch = searching("sleep");
     const answer = (provider: ProviderId, status: ActiveSearch["statuses"][number]) => {

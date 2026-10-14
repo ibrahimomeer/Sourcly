@@ -11,6 +11,7 @@ import { useMemo, useRef, useState } from "react";
 import { browserStorage, loadApiKey, saveApiKey } from "./apiKey";
 import type { SourclyConfig } from "./config";
 import { Footer } from "./Footer";
+import { CounterPanel } from "./CounterPanel";
 import { Header } from "./Header";
 import { rankResults, relatedFor, scoringContext } from "./pipeline";
 import { createProviders, DEFAULT_PROVIDERS, skippedStatuses } from "./providers";
@@ -43,12 +44,11 @@ export function App({ config }: { config: SourclyConfig }) {
 
   // Merges, ranks and filters instantly whenever a source answers or a setting changes;
   // it never contacts a source.
+  const viewSettings = useMemo(() => ({ scoring, filters, overrides }), [scoring, filters, overrides]);
   const ranked = useMemo(
     () =>
-      state.phase === "idle"
-        ? null
-        : rankResults(state.results, { scoring, filters, overrides }, scoringContext(state, REFERENCE_YEAR)),
-    [state, scoring, filters, overrides],
+      state.phase === "idle" ? null : rankResults(state.results, viewSettings, scoringContext(state, REFERENCE_YEAR)),
+    [state, viewSettings],
   );
 
   // Suggested from the top results only; a suggestion never changes the query by itself.
@@ -57,6 +57,9 @@ export function App({ config }: { config: SourclyConfig }) {
     [state, ranked],
   );
 
+  const makeProviders = () =>
+    createProviders(enabledProviders, { openAlexApiKey: apiKey, contactEmail: config.contactEmail });
+
   function handleSearch(text: string) {
     const prepared = prepareSearch(text);
     if (!prepared.usable) {
@@ -64,7 +67,7 @@ export function App({ config }: { config: SourclyConfig }) {
       return;
     }
     setQueryProblem(null);
-    const providers = createProviders(enabledProviders, { openAlexApiKey: apiKey, contactEmail: config.contactEmail });
+    const providers = makeProviders();
     if (providers.length === 0) return;
     // Show what is being searched: for a question, the keywords it was reduced to.
     setQueryText(prepared.box);
@@ -82,6 +85,10 @@ export function App({ config }: { config: SourclyConfig }) {
     setKeyIsStored(saveApiKey(storage, key));
   }
 
+  function handleOverrideChange(resultId: string, change: LabelOverride) {
+    setOverrides((current) => withOverride(current, resultId, change));
+  }
+
   function handlePageChange(next: number) {
     setPage(next);
     document.getElementById("results")?.scrollIntoView({ block: "start" });
@@ -91,43 +98,67 @@ export function App({ config }: { config: SourclyConfig }) {
     <div className="page">
       <Header config={config} />
       <main>
-        <SearchBox value={queryText} onChange={setQueryText} onSearch={handleSearch} />
-        {queryProblem !== null && <p className="warning">{queryProblem}</p>}
-        <p className="notice">
-          Labels and rankings are heuristics based on metadata. Verify sources before citing.
-        </p>
-        {enabledProviders.length === 0 && (
-          <p className="warning">No source is selected. Open Settings and choose at least one to search.</p>
-        )}
+        <div className="top">
+          <SearchBox value={queryText} onChange={setQueryText} onSearch={handleSearch} />
+          {queryProblem !== null && <p className="warning">{queryProblem}</p>}
+          <p className="notice">
+            Labels and rankings are heuristics based on metadata. Verify sources before citing.
+          </p>
+          {enabledProviders.length === 0 && (
+            <p className="warning">No source is selected. Open Settings and choose at least one to search.</p>
+          )}
 
-        <SettingsPanel
-          scoring={scoring}
-          onScoringChange={setScoring}
-          filters={filters}
-          onFiltersChange={setFilters}
-          enabledProviders={enabledProviders}
-          onToggleProvider={(id) => setEnabledProviders((current) => toggleInList(current, id))}
-          perSource={perSource}
-          onPerSourceChange={setPerSource}
-          onClearCache={() => cache.current.clear()}
-          apiKey={apiKey}
-          onApiKeyChange={handleApiKeyChange}
-          keyIsStored={keyIsStored}
-        />
+          <SettingsPanel
+            scoring={scoring}
+            onScoringChange={setScoring}
+            filters={filters}
+            onFiltersChange={setFilters}
+            enabledProviders={enabledProviders}
+            onToggleProvider={(id) => setEnabledProviders((current) => toggleInList(current, id))}
+            perSource={perSource}
+            onPerSourceChange={setPerSource}
+            onClearCache={() => cache.current.clear()}
+            apiKey={apiKey}
+            onApiKeyChange={handleApiKeyChange}
+            keyIsStored={keyIsStored}
+          />
+        </div>
 
-        <Results
-          state={state}
-          ranked={ranked}
-          page={page}
-          onPageChange={handlePageChange}
-          overrides={overrides}
-          libraryPrefix={config.libraryProxyPrefix}
-          librarySearchUrl={config.librarySearchUrl}
-          onOverrideChange={(resultId, change) => setOverrides((current) => withOverride(current, resultId, change))}
-          onClearFilters={() => setFilters(defaultFilters())}
-          related={related}
-          onAddRelatedTerm={handleAddRelatedTerm}
-        />
+        {/* Two columns on wide screens once a search has been made; stacked on narrow ones. */}
+        <div className={state.phase === "idle" ? "columns" : "columns columns-two"}>
+          <div className="column">
+            <Results
+              state={state}
+              ranked={ranked}
+              page={page}
+              onPageChange={handlePageChange}
+              overrides={overrides}
+              libraryPrefix={config.libraryProxyPrefix}
+              librarySearchUrl={config.librarySearchUrl}
+              onOverrideChange={handleOverrideChange}
+              onClearFilters={() => setFilters(defaultFilters())}
+              related={related}
+              onAddRelatedTerm={handleAddRelatedTerm}
+            />
+          </div>
+          {state.phase !== "idle" && (
+            <div className="column">
+              <CounterPanel
+                mainSearch={state}
+                makeProviders={makeProviders}
+                perSource={perSource}
+                cache={cache.current}
+                skipped={skippedStatuses()}
+                view={viewSettings}
+                referenceYear={REFERENCE_YEAR}
+                overrides={overrides}
+                libraryPrefix={config.libraryProxyPrefix}
+                onOverrideChange={handleOverrideChange}
+                onClearFilters={() => setFilters(defaultFilters())}
+              />
+            </div>
+          )}
+        </div>
       </main>
       <Footer config={config} />
     </div>

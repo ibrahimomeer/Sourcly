@@ -1,6 +1,6 @@
 import {
   formatQuery,
-  queryTerms,
+  requiredTerms,
   type ParsedQuery,
   type ProviderId,
   type ProviderStatus,
@@ -20,7 +20,7 @@ export interface ActiveSearch {
   query: string;
   /** The query as it was read, including what was typed and which common words were dropped. */
   parsed: ParsedQuery;
-  /** Every word the query asks for. Relevance and related terms are worked out from these. */
+  /** The words the search is about (not optional terms such as the counterargument ones). Relevance and related terms are worked out from these. */
   terms: string[];
   /** The query as written for each source asked: exactly what was sent. */
   sent: SentQuery[];
@@ -39,18 +39,21 @@ export type SearchState = { phase: "idle" } | ActiveSearch;
 export type SearchAction =
   | { type: "start"; id: number; parsed: ParsedQuery; sent: SentQuery[]; order: ProviderId[]; skipped: ProviderStatus[] }
   | { type: "provider-done"; id: number; update: ProviderUpdate }
-  | { type: "finish"; id: number; at: Date };
+  | { type: "finish"; id: number; at: Date }
+  /** Forget the search, e.g. because the search it was based on has been replaced. */
+  | { type: "reset" };
 
 export const idleSearch: SearchState = { phase: "idle" };
 
 export function searchReducer(state: SearchState, action: SearchAction): SearchState {
+  if (action.type === "reset") return idleSearch;
   if (action.type === "start") {
     return {
       phase: "searching",
       id: action.id,
       query: formatQuery(action.parsed),
       parsed: action.parsed,
-      terms: queryTerms(action.parsed),
+      terms: requiredTerms(action.parsed),
       sent: action.sent,
       order: action.order,
       results: [],

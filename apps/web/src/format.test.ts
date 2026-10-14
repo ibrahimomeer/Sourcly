@@ -1,7 +1,17 @@
 import { applyOverride, classify, type OaStatus } from "@sourcly/core";
 import { makeResult } from "@sourcly/core/testing";
 import { describe, expect, it } from "vitest";
-import { accessBadgeText, formatAuthors, formatNumber, formatRaw, labelText, pluralize, valueName } from "./format";
+import {
+  accessBadgeText,
+  describeLexiconMatches,
+  formatAuthors,
+  formatNumber,
+  formatRaw,
+  labelText,
+  pluralize,
+  reviewBadgeText,
+  valueName,
+} from "./format";
 
 describe("labelText", () => {
   it("calls rule-based labels 'likely'", () => {
@@ -97,5 +107,49 @@ describe("formatRaw / formatNumber / pluralize", () => {
     expect(pluralize(1, "result")).toBe("1 result");
     expect(pluralize(0, "result")).toBe("0 results");
     expect(pluralize(50, "result")).toBe("50 results");
+  });
+});
+
+describe("reviewBadgeText", () => {
+  const review = (value: string | null) =>
+    makeResult({ type: "review", rawType: value === null ? null : { value, provider: "pubmed", field: "PublicationType" } });
+
+  it("says Review for a plain review, with or without a raw type", () => {
+    expect(reviewBadgeText(review("review"))).toBe("Review");
+    expect(reviewBadgeText(review("Review"))).toBe("Review");
+    expect(reviewBadgeText(review("review-article"))).toBe("Review");
+    expect(reviewBadgeText(review("Review Article"))).toBe("Review");
+    expect(reviewBadgeText(review(null))).toBe("Review");
+    expect(reviewBadgeText(review(""))).toBe("Review");
+  });
+
+  it("uses the source's own wording when it is more specific", () => {
+    expect(reviewBadgeText(review("Systematic Review"))).toBe("Systematic Review");
+    expect(reviewBadgeText(review("Meta-Analysis"))).toBe("Meta-Analysis");
+    expect(reviewBadgeText(review("meta-analysis"))).toBe("Meta-analysis");
+  });
+
+  it("says Review rather than a raw value that does not name a review", () => {
+    expect(reviewBadgeText(review("article"))).toBe("Review");
+  });
+
+  it("is null for anything that is not a review", () => {
+    expect(reviewBadgeText(makeResult({ type: "journal-article" }))).toBeNull();
+    expect(reviewBadgeText(makeResult({ type: "preprint" }))).toBeNull();
+  });
+});
+
+describe("describeLexiconMatches", () => {
+  it("lists each term with where it was found", () => {
+    expect(
+      describeLexiconMatches([
+        { term: "limitation", fields: ["title", "abstract"] },
+        { term: "bias", fields: ["abstract"] },
+      ]),
+    ).toBe("limitation (title and abstract), bias (abstract)");
+  });
+
+  it("is empty for no matches", () => {
+    expect(describeLexiconMatches([])).toBe("");
   });
 });

@@ -18,7 +18,11 @@ export type QueryNode =
   | { type: "word"; text: string }
   | { type: "phrase"; text: string }
   | { type: "and"; items: QueryNode[] }
-  | { type: "or"; items: QueryNode[] }
+  /**
+   * `optional` marks a group that narrows a search but is not what the search is about (the
+   * counterargument terms). Sources that cannot say "any of these" are sent the query without it.
+   */
+  | { type: "or"; items: QueryNode[]; optional?: true }
   | { type: "not"; item: QueryNode };
 
 export interface ParsedQuery {
@@ -40,11 +44,28 @@ type Token =
 const OPERATORS = new Set(["AND", "OR", "NOT"]);
 
 /**
- * Letters and digits only. Punctuation inside a word splits it (meta-analysis -> meta analysis),
- * except apostrophes, which are simply removed (memory's -> memorys, don't -> dont).
+ * Letters and digits, and hyphens between them. A hyphen stays inside a word (covid-19,
+ * meta-analysis, IL-6), because splitting it breaks real searches: PubMed finds nothing for
+ * `covid AND 19`. Other punctuation splits a word, and apostrophes are simply removed
+ * (memory's -> memorys, don't -> dont).
  */
 function splitWords(text: string): string[] {
-  return text.replace(/['’]/g, "").split(/[^\p{L}\p{N}]+/u).filter((part) => part !== "");
+  return text
+    .replace(/['’]/g, "")
+    .replace(/[‐‑]/g, "-")
+    .split(/[^\p{L}\p{N}-]+/u)
+    .map((part) => part.replace(/-{2,}/g, "-").replace(/^-+|-+$/g, ""))
+    .filter((part) => part !== "");
+}
+
+/**
+ * One term (a word or a few words) as a query node: a word, or a phrase when it has several
+ * words. Common words are kept, as if the term were in quotes. Null when it has no words.
+ */
+export function termNode(text: string): Extract<QueryNode, { type: "word" | "phrase" }> | null {
+  const words = splitWords(text);
+  if (words.length === 0) return null;
+  return words.length === 1 ? { type: "word", text: words[0] as string } : { type: "phrase", text: words.join(" ") };
 }
 
 function lex(text: string, dropped: string[]): Token[] {
@@ -146,7 +167,12 @@ export function parseQuery(text: string): ParsedQuery {
   return { original: text, root, droppedStopwords };
 }
 
-function collectWords(node: QueryNode, negated: boolean, out: { positive: string[]; excluded: string[] }): void {
+function collectWords(
+  node: QueryNode,
+  negated: boolean,
+  out: { positive: string[]; excluded: string[] },
+  skipOptional = false,
+): void {
   switch (node.type) {
     case "word":
       (negated ? out.excluded : out.positive).push(node.text);
@@ -156,10 +182,11 @@ function collectWords(node: QueryNode, negated: boolean, out: { positive: string
       break;
     case "and":
     case "or":
-      for (const item of node.items) collectWords(item, negated, out);
+      if (skipOptional && node.type === "or" && node.optional === true) break;
+      for (const item of node.items) collectWords(item, negated, out, skipOptional);
       break;
     case "not":
-      collectWords(node.item, !negated, out);
+      collectWords(node.item, !negated, out, skipOptional);
       break;
   }
 }
@@ -168,6 +195,16 @@ function collectWords(node: QueryNode, negated: boolean, out: { positive: string
 export function queryTerms(query: ParsedQuery): string[] {
   const out = { positive: [] as string[], excluded: [] as string[] };
   if (query.root !== null) collectWords(query.root, false, out);
+  return unique(out.positive);
+}
+
+/**
+ * The words the search is about: every word it asks for except those in an optional group
+ * (the counterargument terms, which narrow a search but are not its subject).
+ */
+export function requiredTerms(query: ParsedQuery): string[] {
+  const out = { positive: [] as string[], excluded: [] as string[] };
+  if (query.root !== null) collectWords(query.root, false, out, true);
   return unique(out.positive);
 }
 
@@ -242,7 +279,8 @@ function renderBoolean(node: QueryNode, dropped: Set<string>): string | null {
 
   switch (node.type) {
     case "word":
-      return node.text;
+      // A word spelled like an operator (from "AND" in quotes) must not be read as one.
+      return OPERATORS.has(node.text.toUpperCase()) ? `"${node.text}"` : node.text;
     case "phrase":
       return `"${node.text}"`;
     case "or": {
@@ -287,10 +325,14 @@ export function renderQuery(query: ParsedQuery, syntax: QuerySyntax): RenderedQu
   }
 
   const out = { positive: [] as string[], excluded: [] as string[] };
-  collectWords(query.root, false, out);
+  collectWords(query.root, false, out, true);
   const words = unique(out.positive);
-  const flags = { phrase: false, or: false, not: false };
+  const flags = { phrase: false, or: false, not: false, optional: false };
   const scan = (node: QueryNode) => {
+    if (node.type === "or" && node.optional === true) {
+      flags.optional = true;
+      return;
+    }
     if (node.type === "phrase") flags.phrase = true;
     if (node.type === "or") flags.or = true;
     if (node.type === "not") flags.not = true;
@@ -307,5 +349,8 @@ export function renderQuery(query: ParsedQuery, syntax: QuerySyntax): RenderedQu
   }
   if (flags.or) notes.push("This source cannot match “either word”, so it searches for all of the words together");
   if (flags.phrase) notes.push("This source cannot match a phrase, so it searches for the words of the phrase separately");
+  if (flags.optional) {
+    notes.push("This source cannot ask for “any of these terms”, so it was sent only the rest of your search; its results that contain none of the terms rank lower");
+  }
   return { text: words.join(" "), notes };
 }

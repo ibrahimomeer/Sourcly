@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { STOPWORDS } from "./stopwords";
-import { stem, tokenize } from "./tokens";
+import { stem, tokenize, wordKey } from "./tokens";
 
 describe("stem", () => {
   it.each([
@@ -69,5 +69,42 @@ describe("STOPWORDS", () => {
   it("is only lowercase, and keeps topic words", () => {
     for (const word of STOPWORDS) expect(word).toBe(word.toLowerCase());
     for (const word of ["sleep", "memory", "effect", "children", "study"]) expect(STOPWORDS.has(word)).toBe(false);
+  });
+});
+
+describe("stem: words ending in s, and irregular plurals", () => {
+  it("keeps words that are singular but end in s", () => {
+    for (const word of ["bias", "gas", "atlas", "canvas", "alias", "pancreas"]) expect(stem(word)).toBe(word);
+  });
+
+  it("folds the irregular plurals academic writing uses", () => {
+    expect(stem("biases")).toBe("bias");
+    expect(stem("analyses")).toBe("analysis");
+    expect(stem("hypotheses")).toBe("hypothesis");
+    expect(stem("diagnoses")).toBe("diagnosis");
+    expect(stem("syntheses")).toBe("synthesis");
+    expect(stem("theses")).toBe("thesis");
+    expect(stem("crises")).toBe("crisis");
+  });
+
+  it("still leaves ordinary plurals to the general rules", () => {
+    expect(stem("cases")).toBe("case");
+    expect(stem("diseases")).toBe("disease");
+    expect(stem("databases")).toBe("database");
+  });
+});
+
+describe("wordKey", () => {
+  it("makes a word comparable: lowercase, no accents, no apostrophes, plural folded", () => {
+    expect(wordKey("Limitations")).toBe("limitation");
+    expect(wordKey("RÉPLICATION")).toBe("replication");
+    expect(wordKey("Biases")).toBe("bias");
+    // The apostrophe goes and the possessive s folds like a plural, so it matches the base word.
+    expect(wordKey("memory's")).toBe("memory");
+  });
+
+  it("keeps common words, because phrases such as 'no evidence' need them", () => {
+    expect(wordKey("No")).toBe("no");
+    expect(wordKey("The")).toBe("the");
   });
 });

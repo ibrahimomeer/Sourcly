@@ -76,6 +76,33 @@ describe("parseCrossrefWork", () => {
     expect(notice.rawType).toMatchObject({ value: "journal-article (retraction notice)", field: "update-to" });
   });
 
+  it("does not treat a retracted article as a notice when its own update-to points at itself", () => {
+    // Checked on Crossref 2026-10-14: publishers' "RETRACTED ARTICLE: ..." records list a retraction
+    // update that points at the article's own DOI. The article is research; it is flagged retracted.
+    const article = parse({
+      DOI: "10.1007/s11277-021-09072-0",
+      type: "journal-article",
+      title: ["RETRACTED ARTICLE: Deep reinforcement learning"],
+      "update-to": [{ type: "retraction", DOI: "10.1007/s11277-021-09072-0" }],
+      "updated-by": [{ type: "retraction", DOI: "10.1007/s11277-021-09072-0", source: "publisher" }],
+    });
+    expect(article.type).toBe("journal-article");
+    expect(article.rawType).toMatchObject({ value: "journal-article", field: "type" });
+    expect(article.retraction).toMatchObject({ retracted: true });
+  });
+
+  it("still treats a record as a notice when only some of its updates point at other works", () => {
+    const notice = parse({
+      DOI: "10.1000/notice",
+      type: "journal-article",
+      "update-to": [
+        { type: "retraction", DOI: "10.1000/notice" },
+        { type: "retraction", DOI: "10.1000/orig" },
+      ],
+    });
+    expect(notice.type).toBe("other");
+  });
+
   it("returns null for entries without a DOI or that are not objects", () => {
     expect(parseCrossrefWork({ title: ["x"] }, 1, 1)).toBeNull();
     expect(parseCrossrefWork(null, 1, 1)).toBeNull();

@@ -71,6 +71,11 @@ export interface ScoringContext {
   queryTerms: readonly string[];
   /** How many sources answered; provider agreement is measured against this. */
   answeredSources: number;
+  /**
+   * Words a result must also match to be relevant: the counterargument terms. When given,
+   * relevance multiplies a second BM25 reading of these terms into the usual one.
+   */
+  signalTerms?: readonly string[];
 }
 
 export interface ScoringItem {
@@ -245,13 +250,17 @@ export function scoreResults(
   settings: ScoringSettings,
   context: ScoringContext,
 ): ScoredResult[] {
-  const { referenceYear, queryTerms, answeredSources } = context;
+  const { referenceYear, queryTerms, answeredSources, signalTerms } = context;
   const halfLife =
     Number.isFinite(settings.recencyHalfLifeYears) && settings.recencyHalfLifeYears > 0
       ? settings.recencyHalfLifeYears
       : defaultScoringSettings().recencyHalfLifeYears;
 
-  const relevance = relevanceReadings(items.map(({ result }) => result), queryTerms);
+  const relevance = relevanceReadings(
+    items.map(({ result }) => result),
+    queryTerms,
+    signalTerms,
+  );
   const rates = items.map(({ result }) => citationRate(result, referenceYear));
   const population = rates.filter((rate): rate is number => rate !== null);
 

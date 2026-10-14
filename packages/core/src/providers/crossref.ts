@@ -107,6 +107,13 @@ function updateTypes(value: unknown): { type: string; source: string | null }[] 
     .filter((update) => update.type !== "");
 }
 
+function updateTargets(value: unknown): { type: string; doi: string | null }[] {
+  return asArray(value)
+    .map(asRecord)
+    .map((update) => ({ type: asString(update?.type)?.toLowerCase() ?? "", doi: doiOf(update?.DOI) }))
+    .filter((update) => update.type !== "");
+}
+
 export function parseCrossrefWork(raw: unknown, rank: number, listSize: number): Result | null {
   const work = asRecord(raw);
   const doi = doiOf(work?.DOI);
@@ -117,8 +124,12 @@ export function parseCrossrefWork(raw: unknown, rank: number, listSize: number):
   const publisher = asString(work.publisher);
   const kind = lookup(VENUE_KINDS, typeValue);
 
-  // A notice that retracts another work carries an `update-to` entry of that kind.
-  const isNotice = updateTypes(work["update-to"]).some((update) => WITHDRAWAL_TYPES.has(update.type));
+  // A notice that retracts another work carries an `update-to` entry of that kind pointing at the
+  // other work. Some publishers also put one pointing at the retracted article itself (checked
+  // 2026-10-14 on "RETRACTED ARTICLE: ..." records), and that article is research, not a notice.
+  const isNotice = updateTargets(work["update-to"]).some(
+    (update) => WITHDRAWAL_TYPES.has(update.type) && update.doi !== null && update.doi !== doi,
+  );
   const withdrawal = updateTypes(work["updated-by"]).find((update) => WITHDRAWAL_TYPES.has(update.type));
 
   const authors = asArray(work.author)

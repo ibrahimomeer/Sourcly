@@ -57,11 +57,17 @@ export function rankResults(
  * What ranking needs to know about the search: its words, and how many sources answered
  * (a source that answered with nothing still counts, a source that failed does not).
  */
-export function scoringContext(search: ActiveSearch, referenceYear: number): ScoringContext {
+export function scoringContext(
+  search: ActiveSearch,
+  referenceYear: number,
+  /** The counterargument terms, when this is that search: relevance then also needs a term. */
+  signalTerms?: readonly string[],
+): ScoringContext {
   return {
     referenceYear,
     queryTerms: search.terms,
     answeredSources: search.statuses.filter((status) => status.state === "ok").length,
+    ...(signalTerms === undefined ? {} : { signalTerms }),
   };
 }
 

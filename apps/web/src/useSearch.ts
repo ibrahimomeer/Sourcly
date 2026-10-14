@@ -26,6 +26,8 @@ export interface SearchRequestOptions {
 export function useSearch(): {
   state: SearchState;
   search: (query: ParsedQuery, providers: readonly Provider[], options: SearchRequestOptions) => void;
+  /** Cancels any search in progress and forgets its results. */
+  reset: () => void;
 } {
   const [state, dispatch] = useReducer(searchReducer, idleSearch);
   const current = useRef<AbortController | null>(null);
@@ -60,5 +62,11 @@ export function useSearch(): {
     });
   }, []);
 
-  return { state, search };
+  const reset = useCallback(() => {
+    current.current?.abort();
+    current.current = null;
+    dispatch({ type: "reset" });
+  }, []);
+
+  return { state, search, reset };
 }

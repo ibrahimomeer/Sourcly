@@ -8,11 +8,29 @@ export {
   parseQuery,
   queryTerms,
   renderQuery,
+  requiredTerms,
   type ParsedQuery,
   type QueryNode,
   type RenderedQuery,
 } from "./query";
 export { CHECK_TAGS, isCheckTag } from "./checktags";
+export {
+  CRITICISM_TERMS,
+  DEFAULT_COUNTER_TERMS,
+  MAX_COUNTER_TERM_LENGTH,
+  NOTICE_TERMS,
+  counterQuery,
+  findLexiconMatches,
+  findTerms,
+  highlightSegments,
+  parseCounterTerm,
+  usableCounterTerms,
+  type CounterTermResult,
+  type HighlightSegment,
+  type LexiconMatch,
+  type TermMatch,
+} from "./counter";
+export { NOTICE_LABELS, noticeKind, type NoticeKind } from "./notices";
 export { relatedTerms, type RelatedTerm } from "./related";
 export { BM25_B, BM25_K1 } from "./bm25";
 export { tokenize } from "./tokens";

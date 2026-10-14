@@ -1,5 +1,15 @@
 import { describe, expect, it } from "vitest";
-import { excludedTerms, formatQuery, isUsable, parseQuery, queryTerms, renderQuery, type QueryNode } from "./query";
+import {
+  excludedTerms,
+  formatQuery,
+  isUsable,
+  parseQuery,
+  queryTerms,
+  renderQuery,
+  requiredTerms,
+  termNode,
+  type QueryNode,
+} from "./query";
 
 const word = (text: string): QueryNode => ({ type: "word", text });
 const phrase = (text: string): QueryNode => ({ type: "phrase", text });
@@ -18,10 +28,18 @@ describe("parseQuery: words", () => {
     expect(root("COVID Sleep")).toEqual(and(word("COVID"), word("Sleep")));
   });
 
-  it("splits punctuation inside a word, and removes apostrophes", () => {
-    expect(root("meta-analysis")).toEqual(and(word("meta"), word("analysis")));
+  it("keeps a hyphen inside a word, splits other punctuation, and removes apostrophes", () => {
+    expect(root("meta-analysis")).toEqual(word("meta-analysis"));
+    expect(root("covid-19 IL-6 SARS-CoV-2")).toEqual(and(word("covid-19"), word("IL-6"), word("SARS-CoV-2")));
     expect(root("memory's")).toEqual(word("memorys"));
     expect(root("sleep, memory; dreams.")).toEqual(and(word("sleep"), word("memory"), word("dreams")));
+    expect(root("sleep/memory (rem)")).toEqual(and(word("sleep"), word("memory"), word("rem")));
+    expect(root("dream–sleep")).toEqual(and(word("dream"), word("sleep")));
+  });
+
+  it("drops hyphens that are not between letters or digits", () => {
+    expect(root("-sleep sleep- - --memory-- a--b")).toEqual(and(word("sleep"), word("sleep"), word("memory"), word("a-b")));
+    expect(root("non‐linear")).toEqual(word("non-linear"));
   });
 
   it("keeps letters from any language", () => {
@@ -258,5 +276,77 @@ describe("determinism", () => {
     const input = 'What is "memory consolidation" (sleep OR nap) NOT rats?';
     expect(parseQuery(input)).toEqual(parseQuery(input));
     expect(renderQuery(parseQuery(input), "boolean")).toEqual(renderQuery(parseQuery(input), "boolean"));
+  });
+});
+
+describe("termNode", () => {
+  it("makes one word a word and several words a phrase, keeping common words", () => {
+    expect(termNode("limitation")).toEqual(word("limitation"));
+    expect(termNode("no evidence")).toEqual(phrase("no evidence"));
+    expect(termNode("no")).toEqual(word("no"));
+  });
+
+  it("splits punctuation the way a typed query does, and ignores quotes", () => {
+    expect(termNode('"negative-results"')).toEqual(word("negative-results"));
+    expect(termNode('"negative/null results"')).toEqual(phrase("negative null results"));
+    expect(termNode("  spaced   out ")).toEqual(phrase("spaced out"));
+  });
+
+  it("is null when there is no word", () => {
+    expect(termNode("")).toBeNull();
+    expect(termNode(' "" -- ')).toBeNull();
+  });
+});
+
+describe("renderQuery: a word that looks like an operator", () => {
+  it("is quoted for Boolean sources, so it is read as a word", () => {
+    const parsed = parseQuery('rats "AND" mice');
+    expect(renderQuery(parsed, "boolean").text).toBe('rats AND "AND" AND mice');
+    expect(renderQuery(parseQuery('"or"'), "boolean").text).toBe('"or"');
+  });
+
+  it("is left alone for sources that take only words", () => {
+    expect(renderQuery(parseQuery('rats "AND" mice'), "plain").text).toBe("rats AND mice");
+  });
+});
+
+describe("an optional group", () => {
+  const optional = (...items: QueryNode[]): QueryNode => ({ type: "or", items, optional: true });
+  const query = {
+    original: "",
+    root: and(word("sleep"), optional(word("bias"), phrase("no evidence"))),
+    droppedStopwords: [],
+  };
+
+  it("is written like any OR for sources that understand one", () => {
+    expect(renderQuery(query, "boolean")).toEqual({ text: 'sleep AND (bias OR "no evidence")', notes: [] });
+    expect(formatQuery(query)).toBe('sleep (bias OR "no evidence")');
+  });
+
+  it("is left out for sources that take only words, with a note saying so", () => {
+    const rendered = renderQuery(query, "plain");
+    expect(rendered.text).toBe("sleep");
+    expect(rendered.notes).toHaveLength(1);
+    expect(rendered.notes[0]).toContain("any of these terms");
+  });
+
+  it("still counts its words among the words the query asks for", () => {
+    expect(queryTerms(query)).toEqual(["sleep", "bias", "no", "evidence"]);
+  });
+
+  it("but not among the words the search is about", () => {
+    expect(requiredTerms(query)).toEqual(["sleep"]);
+  });
+});
+
+describe("requiredTerms", () => {
+  it("is the same as queryTerms for a query without an optional group", () => {
+    for (const text of ["sleep memory", '"memory consolidation" (sleep OR nap) NOT rats', "covid-19"]) {
+      expect(requiredTerms(parseQuery(text))).toEqual(queryTerms(parseQuery(text)));
+    }
+  });
+
+  it("is empty for a query with nothing in it", () => {
+    expect(requiredTerms(parseQuery(""))).toEqual([]);
   });
 });

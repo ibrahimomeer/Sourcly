@@ -1,4 +1,4 @@
-import { parseQuery, planQueries, type ProviderId, type ProviderStatus, type ProviderUpdate } from "@sourcly/core";
+import { counterQuery, parseQuery, planQueries, type ProviderId, type ProviderStatus, type ProviderUpdate } from "@sourcly/core";
 import { makeResult } from "@sourcly/core/testing";
 import { describe, expect, it } from "vitest";
 import { idleSearch, orderedStatuses, searchReducer, type ActiveSearch, type SearchState } from "./searchState";
@@ -128,12 +128,43 @@ describe("searchReducer: the query", () => {
     expect(state.terms).toEqual(["memory", "consolidation", "sleep"]);
   });
 
+  it("does not count the counterargument terms among the words the search is about", () => {
+    const main = parseQuery("sleep memory");
+    const query = counterQuery(main, ["limitation", "bias"]);
+    const state = searchReducer(idleSearch, {
+      type: "start",
+      id: 1,
+      parsed: query,
+      sent: planQueries([{ id: "openalex", syntax: "boolean" }], query),
+      order: ["openalex"],
+      skipped: [],
+    });
+    if (state.phase === "idle") throw new Error("expected an active search");
+    expect(state.terms).toEqual(["sleep", "memory"]);
+    expect(state.query).toBe("sleep memory (limitation OR bias)");
+  });
+
   it("keeps what each source was sent", () => {
     const state = begin("sleep memory");
     expect(state.sent.map((s) => [s.provider, s.text])).toEqual([
       ["openalex", "sleep AND memory"],
       ["crossref", "sleep AND memory"],
     ]);
+  });
+});
+
+describe("searchReducer: reset", () => {
+  it("forgets the search, whatever state it was in", () => {
+    const mid = searchReducer(started(), { type: "provider-done", id: 1, update: done("openalex", ["10.1/a"]) });
+    expect(searchReducer(mid, { type: "reset" })).toBe(idleSearch);
+    expect(searchReducer(started(), { type: "reset" })).toBe(idleSearch);
+    expect(searchReducer(idleSearch, { type: "reset" })).toBe(idleSearch);
+  });
+
+  it("makes late answers from the forgotten search do nothing", () => {
+    const reset = searchReducer(started(), { type: "reset" });
+    expect(searchReducer(reset, { type: "provider-done", id: 1, update: done("openalex", ["10.1/late"]) })).toBe(reset);
+    expect(searchReducer(reset, { type: "finish", id: 1, at: new Date() })).toBe(reset);
   });
 });
 
