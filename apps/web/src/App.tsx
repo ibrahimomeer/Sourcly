@@ -77,6 +77,7 @@ export function App({ config }: { config: SourclyConfig }) {
           state={state}
           ranked={ranked}
           overrides={overrides}
+          libraryPrefix={config.libraryProxyPrefix}
           onOverrideChange={(resultId, change) => setOverrides((current) => withOverride(current, resultId, change))}
           onClearFilters={() => setFilters(defaultFilters())}
         />

@@ -24,6 +24,8 @@ Labels and rankings are heuristics based on metadata. Verify sources before citi
 4. Change sources, filters or weights in Settings. Results re-rank instantly without re-fetching. If a label looks wrong, change it on the card.
 5. Export a reference list (APA 7) or a search protocol (JSON). _(planned)_
 
+Each result can offer an "Open access PDF" button (when a free PDF is known), an "Open via UBC Library" button (on every result with a DOI or link, if `libraryProxyPrefix` is set in `config.js`), and a DOI button. Open access does not affect the ranking by default, so results are never pushed down for being behind a paywall.
+
 Without an API key, OpenAlex allows roughly 100 searches a day. If you reach the limit, Sourcly shows OpenAlex as rate-limited. You can paste a free personal key from [openalex.org/settings/api](https://openalex.org/settings/api) into Settings to raise it.
 
 ## Install _(planned)_

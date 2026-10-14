@@ -9,6 +9,7 @@ export function Results({
   state,
   ranked,
   overrides,
+  libraryPrefix,
   onOverrideChange,
   onClearFilters,
 }: {
@@ -16,6 +17,8 @@ export function Results({
   /** Null until a search has finished. */
   ranked: RankedView | null;
   overrides: ReadonlyMap<string, LabelOverride>;
+  /** config.libraryProxyPrefix; empty hides the library button on every card. */
+  libraryPrefix: string;
   onOverrideChange: (resultId: string, change: LabelOverride) => void;
   onClearFilters: () => void;
 }) {
@@ -62,6 +65,7 @@ export function Results({
                   position={index + 1}
                   scored={scored}
                   override={overrides.get(scored.result.id)}
+                  libraryPrefix={libraryPrefix}
                   onOverrideChange={onOverrideChange}
                 />
               </li>

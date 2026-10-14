@@ -125,6 +125,7 @@ function RankingSection({ scoring, onScoringChange }: SettingsPanelProps) {
               onChange={(event) => onScoringChange(withFactor(scoring, id, { weight: Number(event.target.value) }))}
             />
             <p className="muted help">{FACTOR_HELP[id]}</p>
+            {id === "openAccess" && <p className="muted help">If you have library access, keep this at 0.</p>}
 
             {id === "recency" && (
               <NumberInput

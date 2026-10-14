@@ -23,7 +23,7 @@ function only(...enabled: FactorId[]) {
 }
 
 // Three results, worked out by hand with the default weights
-// (relevance 3, citations 1, recency 1, peer review 1, open access 0.5; total 6.5).
+// (relevance 3, citations 1, recency 1, peer review 1, open access 0; total 6).
 //
 //        relevance  citations/yr -> percentile   recency        peer review   open access
 //   A    rank 1/3   10/1  = 10   -> 2/3           2026: 2^0 = 1   yes   = 1    open   = 1
@@ -31,22 +31,23 @@ function only(...enabled: FactorId[]) {
 //   C    rank 3/3   0/20   = 0   -> 1/6           2006: 2^-2 = .25 preprint = 0 open   = 1
 //
 // relevance = 1 - (rank-1)/3 -> A 1, B 2/3, C 1/3.  Percentile = (below + ties/2)/3.
-//   A = (3*1   + 2/3 + 1   + 1 + .5) / 6.5 = 37/39
-//   B = (3*2/3 + 2/3 + .5 + .5 + 0) / 6.5 = 22/39
-//   C = (3*1/3 + 1/6 + .25 + 0 + .5) / 6.5 = 23/78
+// Open access has weight 0 by default, so it adds nothing to the numerator or the total.
+//   A = (3*1   + 2/3 + 1   + 1) / 6 = 17/18
+//   B = (3*2/3 + 2/3 + .5  + .5) / 6 = 11/18
+//   C = (3*1/3 + 1/6 + .25 + 0) / 6 = 17/72
 function threeResults(): ScoringItem[] {
   return [
     item({
       id: "10.1000/a", year: 2026, citationCount: 10, hits: hit(1, 3),
-      openAccess: { isOpen: true, status: "gold", url: null },
+      openAccess: { isOpen: true, status: "gold", url: null, pdfUrl: null },
     }),
     item({
       id: "10.1000/b", year: 2016, citationCount: 100, hits: hit(2, 3), type: "report",
-      openAccess: { isOpen: false, status: "closed", url: null },
+      openAccess: { isOpen: false, status: "closed", url: null, pdfUrl: null },
     }),
     item({
       id: "10.1000/c", year: 2006, citationCount: 0, hits: hit(3, 3), type: "preprint",
-      openAccess: { isOpen: true, status: "green", url: null },
+      openAccess: { isOpen: true, status: "green", url: null, pdfUrl: null },
     }),
   ];
 }
@@ -55,9 +56,27 @@ describe("scoreResults: the documented formula", () => {
   it("matches the hand-computed scores and order", () => {
     const scored = scoreResults(threeResults(), defaultScoringSettings(), REFERENCE_YEAR);
     expect(scored.map((s) => s.result.id)).toEqual(["10.1000/a", "10.1000/b", "10.1000/c"]);
-    expect(scored[0]?.score).toBeCloseTo(37 / 39, 12);
-    expect(scored[1]?.score).toBeCloseTo(22 / 39, 12);
-    expect(scored[2]?.score).toBeCloseTo(23 / 78, 12);
+    expect(scored[0]?.score).toBeCloseTo(17 / 18, 12);
+    expect(scored[1]?.score).toBeCloseTo(11 / 18, 12);
+    expect(scored[2]?.score).toBeCloseTo(17 / 72, 12);
+  });
+
+  it("does not rank a result lower for being closed access, unless the user raises the weight", () => {
+    const open = item({ id: "10.1000/open", openAccess: { isOpen: true, status: "gold", url: null, pdfUrl: null } });
+    const closed = item({ id: "10.1000/closed", openAccess: { isOpen: false, status: "closed", url: null, pdfUrl: null } });
+
+    const byDefault = scoreResults([open, closed], defaultScoringSettings(), REFERENCE_YEAR);
+    expect(byDefault[0]?.score).toBe(byDefault[1]?.score);
+    for (const scored of byDefault) {
+      expect(scored.factors.find((f) => f.factor === "openAccess")).toMatchObject({ weight: 0, contribution: 0 });
+    }
+
+    // Raising the weight is the user's choice, and then open access does count.
+    const raised = defaultScoringSettings();
+    raised.factors.openAccess.weight = 2;
+    const rankedAfter = scoreResults([open, closed], raised, REFERENCE_YEAR);
+    expect(rankedAfter.map((s) => s.result.id)).toEqual(["10.1000/open", "10.1000/closed"]);
+    expect(rankedAfter[0]?.score).toBeGreaterThan(rankedAfter[1]?.score ?? Number.POSITIVE_INFINITY);
   });
 
   it("normalizes each factor as documented", () => {
@@ -91,7 +110,7 @@ describe("scoreResults: the documented formula", () => {
 
     const relevance = a?.factors[0];
     expect(relevance).toMatchObject({ factor: "relevance", label: "Relevance", enabled: true, weight: 3, raw: 1, normalized: 1 });
-    expect(relevance?.contribution).toBeCloseTo(3 / 6.5, 12);
+    expect(relevance?.contribution).toBeCloseTo(3 / 6, 12);
     expect(relevance?.detail).toContain("#1 of 3 on OpenAlex");
 
     const citations = a?.factors[1];
@@ -262,9 +281,9 @@ describe("scoreResults: factor edge cases", () => {
   });
 
   it("scores open access as 1 or 0, with unknown counting as 0", () => {
-    const open = first({ openAccess: { isOpen: true, status: "gold", url: null } });
-    const closed = first({ openAccess: { isOpen: false, status: "closed", url: null } });
-    const unknown = first({ openAccess: { isOpen: null, status: "unknown", url: null } });
+    const open = first({ openAccess: { isOpen: true, status: "gold", url: null, pdfUrl: null } });
+    const closed = first({ openAccess: { isOpen: false, status: "closed", url: null, pdfUrl: null } });
+    const unknown = first({ openAccess: { isOpen: null, status: "unknown", url: null, pdfUrl: null } });
     expect(factor(open, "openAccess")?.normalized).toBe(1);
     expect(factor(closed, "openAccess")?.normalized).toBe(0);
     expect(factor(unknown, "openAccess")).toMatchObject({ normalized: 0, raw: "unknown" });
@@ -308,9 +327,11 @@ describe("defaultScoringSettings", () => {
       citations: 1,
       recency: 1,
       peerReview: 1,
-      openAccess: 0.5,
+      openAccess: 0,
       studyType: 0,
     });
+    // Open access stays switched on (so its value is still shown); its weight is just 0.
+    expect(factors.openAccess.enabled).toBe(true);
     expect(factors.studyType.enabled).toBe(false);
     expect(preferredLevels).toEqual([]);
     expect(recencyHalfLifeYears).toBe(10);

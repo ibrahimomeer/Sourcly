@@ -55,6 +55,16 @@
           "issue": "7063",
           "first_page": "1272",
           "last_page": "1278"
+        },
+        "best_oa_location": {
+          "is_oa": true,
+          "landing_page_url": "https://doi.org/10.1038/nature04286",
+          "pdf_url": "https://www.nature.com/articles/nature04286.pdf",
+          "version": "publishedVersion",
+          "source": {
+            "display_name": "Nature",
+            "type": "journal"
+          }
         }
       },
       {
@@ -125,7 +135,8 @@
           "issue": "5",
           "first_page": "309",
           "last_page": "321"
-        }
+        },
+        "best_oa_location": null
       },
       {
         "id": "https://openalex.org/W2149529050",
@@ -186,6 +197,16 @@
           "issue": "4",
           "first_page": "331",
           "last_page": "343"
+        },
+        "best_oa_location": {
+          "is_oa": true,
+          "landing_page_url": "https://www.ncbi.nlm.nih.gov/pmc/articles/2680680",
+          "pdf_url": null,
+          "version": "submittedVersion",
+          "source": {
+            "display_name": "PubMed Central",
+            "type": "repository"
+          }
         }
       }
     ]
@@ -558,6 +579,16 @@
       "issue": null,
       "first_page": "n71",
       "last_page": "n71"
+    },
+    "best_oa_location": {
+      "is_oa": true,
+      "landing_page_url": "https://doi.org/10.1136/bmj.n71",
+      "pdf_url": "https://www.bmj.com/content/bmj/372/bmj.n71.full.pdf",
+      "version": "publishedVersion",
+      "source": {
+        "display_name": "BMJ",
+        "type": "journal"
+      }
     }
   },
   "preprint": {
@@ -985,6 +1016,16 @@
       "issue": null,
       "first_page": null,
       "last_page": null
+    },
+    "best_oa_location": {
+      "is_oa": true,
+      "landing_page_url": "http://arxiv.org/abs/1412.6980",
+      "pdf_url": "https://arxiv.org/pdf/1412.6980",
+      "version": "submittedVersion",
+      "source": {
+        "display_name": "arXiv (Cornell University)",
+        "type": "repository"
+      }
     }
   },
   "book": {
@@ -1670,6 +1711,16 @@
       "issue": null,
       "first_page": null,
       "last_page": null
+    },
+    "best_oa_location": {
+      "is_oa": true,
+      "landing_page_url": "https://www.who.int/news-room/fact-sheets/detail/depression",
+      "pdf_url": null,
+      "version": "submittedVersion",
+      "source": {
+        "display_name": "Repositorio Institucional UPTC",
+        "type": "repository"
+      }
     }
   },
   "bookChapter": {
@@ -1729,7 +1780,8 @@
       "issue": null,
       "first_page": "319",
       "last_page": "337"
-    }
+    },
+    "best_oa_location": null
   },
   "referenceEntry": {
     "id": "https://openalex.org/W2159011576",
@@ -1975,7 +2027,8 @@
       "issue": null,
       "first_page": null,
       "last_page": null
-    }
+    },
+    "best_oa_location": null
   },
   "dissertation": {
     "id": "https://openalex.org/W1797402740",
@@ -2030,6 +2083,16 @@
       "issue": null,
       "first_page": null,
       "last_page": null
+    },
+    "best_oa_location": {
+      "is_oa": true,
+      "landing_page_url": "http://civis.se/Cifras-de-la-situacion-de-los-y",
+      "pdf_url": null,
+      "version": "acceptedVersion",
+      "source": {
+        "display_name": "Intellectum (Universidad de La Sabana)",
+        "type": "repository"
+      }
     }
   },
   "dataset": {
@@ -2155,6 +2218,13 @@
       "issue": "1",
       "first_page": null,
       "last_page": null
+    },
+    "best_oa_location": {
+      "is_oa": true,
+      "landing_page_url": "https://doi.org/10.32614/r.manuals",
+      "pdf_url": "https://cran.r-project.org/doc/manuals/r-release/R-intro.pdf",
+      "version": "publishedVersion",
+      "source": null
     }
   },
   "conferencePaper": {
@@ -2683,6 +2753,16 @@
       "issue": null,
       "first_page": "770",
       "last_page": "778"
+    },
+    "best_oa_location": {
+      "is_oa": true,
+      "landing_page_url": "https://repositorio.unal.edu.co/handle/unal/81443",
+      "pdf_url": null,
+      "version": "submittedVersion",
+      "source": {
+        "display_name": "LA Referencia (Red Federada de Repositorios Institucionales de Publicaciones Científicas)",
+        "type": "repository"
+      }
     }
   },
   "report": {
@@ -2792,7 +2872,8 @@
       "issue": null,
       "first_page": null,
       "last_page": null
-    }
+    },
+    "best_oa_location": null
   },
   "other": {
     "id": "https://openalex.org/W4321794881",
@@ -3136,6 +3217,13 @@
       "issue": null,
       "first_page": null,
       "last_page": null
+    },
+    "best_oa_location": {
+      "is_oa": true,
+      "landing_page_url": "https://doi.org/10.1093/9780197610145.002.001",
+      "pdf_url": "https://academic.oup.com/aoac-publications/book/45491/chapter/392327022/chapter-ag-pdf/56719633/book_45491_section_392327022.ag.pdf",
+      "version": "publishedVersion",
+      "source": null
     }
   },
   "retracted": {
@@ -3205,6 +3293,16 @@
       "issue": "10248",
       "first_page": "413",
       "last_page": "446"
+    },
+    "best_oa_location": {
+      "is_oa": true,
+      "landing_page_url": "https://doi.org/10.1016/s0140-6736(20)30367-6",
+      "pdf_url": "http://www.thelancet.com/article/S0140673620303676/pdf",
+      "version": "publishedVersion",
+      "source": {
+        "display_name": "The Lancet",
+        "type": "journal"
+      }
     }
   },
   "noDoi": {
@@ -3513,6 +3611,16 @@
       "issue": null,
       "first_page": null,
       "last_page": null
+    },
+    "best_oa_location": {
+      "is_oa": true,
+      "landing_page_url": "https://dergipark.org.tr/tr/pub/jgon/issue/51866/675113",
+      "pdf_url": "https://dergipark.org.tr/tr/pub/jgon/issue/51866/675113",
+      "version": "submittedVersion",
+      "source": {
+        "display_name": "DergiPark (Istanbul University)",
+        "type": "repository"
+      }
     }
   }
 }

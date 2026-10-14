@@ -1,4 +1,4 @@
-import type { Author, Label, PeerReviewStatus, SourceLevel } from "@sourcly/core";
+import type { Author, Label, OpenAccessInfo, PeerReviewStatus, SourceLevel } from "@sourcly/core";
 
 const MAX_AUTHORS_SHOWN = 6;
 
@@ -20,6 +20,19 @@ export function labelText(label: Label<SourceLevel | PeerReviewStatus>): string 
   const value = label.value.replace(/^not-/, "not ");
   if (label.origin === "user") return `${value} (set by you)`;
   return label.value === "unknown" ? "unknown" : `likely ${value}`;
+}
+
+/**
+ * The access badge on a card: plain text, never a reason to hide or demote a
+ * result. "try UBC Library" appears only when the card really has that link.
+ */
+export function accessBadgeText(openAccess: OpenAccessInfo, hasLibraryLink: boolean): string {
+  const suffix = hasLibraryLink ? ", try UBC Library" : "";
+  if (openAccess.isOpen === true) {
+    return openAccess.status === "unknown" ? "Open access" : `Open access (${openAccess.status})`;
+  }
+  if (openAccess.isOpen === false) return `Not open access${suffix}`;
+  return `Open access status unknown${suffix}`;
 }
 
 /** A label value as a short name, e.g. "not-peer-reviewed" -> "Not peer-reviewed". */

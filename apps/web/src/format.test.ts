@@ -1,7 +1,7 @@
-import { applyOverride, classify } from "@sourcly/core";
+import { applyOverride, classify, type OaStatus } from "@sourcly/core";
 import { makeResult } from "@sourcly/core/testing";
 import { describe, expect, it } from "vitest";
-import { formatAuthors, formatNumber, formatRaw, labelText, pluralize, valueName } from "./format";
+import { accessBadgeText, formatAuthors, formatNumber, formatRaw, labelText, pluralize, valueName } from "./format";
 
 describe("labelText", () => {
   it("calls rule-based labels 'likely'", () => {
@@ -41,6 +41,33 @@ describe("formatAuthors", () => {
 
   it("shortens a long list and says how many are left out", () => {
     expect(formatAuthors(people(9))).toBe("Author 1, Author 2, Author 3, Author 4, Author 5, Author 6 and 3 more");
+  });
+});
+
+describe("accessBadgeText", () => {
+  const access = (isOpen: boolean | null, status: OaStatus) => ({ isOpen, status, url: null, pdfUrl: null });
+
+  it("names the kind of open access", () => {
+    expect(accessBadgeText(access(true, "gold"), true)).toBe("Open access (gold)");
+    expect(accessBadgeText(access(true, "green"), false)).toBe("Open access (green)");
+    expect(accessBadgeText(access(true, "bronze"), true)).toBe("Open access (bronze)");
+  });
+
+  it("says plain 'Open access' when the kind is not known", () => {
+    expect(accessBadgeText(access(true, "unknown"), true)).toBe("Open access");
+  });
+
+  it("points to UBC Library for a work that is not open access", () => {
+    expect(accessBadgeText(access(false, "closed"), true)).toBe("Not open access, try UBC Library");
+  });
+
+  it("does not point to a library link the card does not have", () => {
+    expect(accessBadgeText(access(false, "closed"), false)).toBe("Not open access");
+    expect(accessBadgeText(access(null, "unknown"), false)).toBe("Open access status unknown");
+  });
+
+  it("does not claim a work is closed when the provider did not say", () => {
+    expect(accessBadgeText(access(null, "unknown"), true)).toBe("Open access status unknown, try UBC Library");
   });
 });
 

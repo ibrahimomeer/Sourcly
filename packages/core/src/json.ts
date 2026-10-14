@@ -30,6 +30,16 @@ export function asInteger(value: unknown): number | null {
   return number !== null && Number.isInteger(number) ? number : null;
 }
 
+/**
+ * A web address that starts with http:// or https://; otherwise null. Provider
+ * data ends up in links, so anything else (javascript:, data:, relative paths)
+ * is refused here rather than trusted.
+ */
+export function asHttpUrl(value: unknown): string | null {
+  const text = asString(value);
+  return text !== null && /^https?:\/\//i.test(text) ? text : null;
+}
+
 export function asBoolean(value: unknown): boolean | null {
   return typeof value === "boolean" ? value : null;
 }

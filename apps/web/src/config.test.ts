@@ -20,7 +20,7 @@ describe("resolveConfig", () => {
       contactEmail: "a@example.org",
       repoUrl: "https://example.org/repo",
       downloadUrl: "https://example.org/repo/releases/latest",
-      ezproxyPrefix: "https://proxy.example.org/login?url=",
+      libraryProxyPrefix: "https://proxy.example.org/login?url=",
     });
     expect(config).toEqual({
       siteName: "My Sources",
@@ -28,7 +28,7 @@ describe("resolveConfig", () => {
       contactEmail: "a@example.org",
       repoUrl: "https://example.org/repo",
       downloadUrl: "https://example.org/repo/releases/latest",
-      ezproxyPrefix: "https://proxy.example.org/login?url=",
+      libraryProxyPrefix: "https://proxy.example.org/login?url=",
     });
   });
 
@@ -45,11 +45,11 @@ describe("resolveConfig", () => {
     const config = resolveConfig({
       repoUrl: "javascript:alert(1)",
       downloadUrl: "example.org/download",
-      ezproxyPrefix: "ftp://proxy.example.org/",
+      libraryProxyPrefix: "ftp://proxy.example.org/",
     });
     expect(config.repoUrl).toBe("");
     expect(config.downloadUrl).toBe("");
-    expect(config.ezproxyPrefix).toBe("");
+    expect(config.libraryProxyPrefix).toBe("");
   });
 });
 

@@ -431,7 +431,15 @@ fieldset > p:first-of-type {
 }
 
 .actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
   margin-top: 0.75rem;
+}
+
+.note {
+  margin: 0.35rem 0 0;
+  font-size: 0.8rem;
 }
 
 .panel {

@@ -17,7 +17,7 @@ export function makeResult(overrides: Partial<Result> = {}): Result {
     citationCount: 10,
     language: "en",
     authorCountries: [],
-    openAccess: { isOpen: false, status: "closed", url: null },
+    openAccess: { isOpen: false, status: "closed", url: null, pdfUrl: null },
     retraction: { retracted: false, source: null },
     hits: [{ provider: "openalex", id: "W1", rank: 1, listSize: 1, score: null }],
     ...overrides,

@@ -61,6 +61,11 @@ export interface OpenAccessInfo {
   status: OaStatus;
   /** Best free-to-read location, if the provider names one. */
   url: string | null;
+  /**
+   * A direct link to a free PDF, if a provider names one. Only ever set from a
+   * location the provider says is open access, never from a paywalled copy.
+   */
+  pdfUrl: string | null;
 }
 
 export interface RetractionInfo {

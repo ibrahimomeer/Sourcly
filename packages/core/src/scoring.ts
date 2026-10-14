@@ -45,7 +45,9 @@ export function defaultScoringSettings(): ScoringSettings {
       citations: { enabled: true, weight: 1 },
       recency: { enabled: true, weight: 1 },
       peerReview: { enabled: true, weight: 1 },
-      openAccess: { enabled: true, weight: 0.5 },
+      // 0 by default: with library access, being open access says little about
+      // whether you can read a source. Raise it if you do not have that access.
+      openAccess: { enabled: true, weight: 0 },
       studyType: { enabled: false, weight: 0 },
     },
     preferredLevels: [],

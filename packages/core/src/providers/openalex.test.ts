@@ -36,7 +36,12 @@ describe("parseOpenAlexWork", () => {
       citationCount: 1841,
       language: "en",
       authorCountries: ["US"],
-      openAccess: { isOpen: true, status: "bronze", url: "https://www.nature.com/articles/nature04286.pdf" },
+      openAccess: {
+        isOpen: true,
+        status: "bronze",
+        url: "https://www.nature.com/articles/nature04286.pdf",
+        pdfUrl: "https://www.nature.com/articles/nature04286.pdf",
+      },
       retraction: { retracted: false, source: "OpenAlex is_retracted (Retraction Watch)" },
       hits: [{ provider: "openalex", id: "W2086162146", rank: 1, listSize: 3, score: 289.29092 }],
     });
@@ -110,6 +115,47 @@ describe("parseOpenAlexWork", () => {
     expect(parse(fixtures[key]).venueKind?.value).toBe(expected);
   });
 
+  describe("free PDF link", () => {
+    it("comes from OpenAlex's best open-access copy when that copy has a PDF", () => {
+      expect(parse(fixtures.review).openAccess.pdfUrl).toBe("https://www.bmj.com/content/bmj/372/bmj.n71.full.pdf");
+      expect(parse(fixtures.preprint).openAccess.pdfUrl).toBe("https://arxiv.org/pdf/1412.6980");
+    });
+
+    it("is null for an open work whose best copy has no PDF (a repository landing page only)", () => {
+      const result = parseOpenAlexWork(fixtures.search.results[2], 3, 3);
+      expect(result?.openAccess).toMatchObject({ isOpen: true, status: "green", pdfUrl: null });
+      expect(result?.openAccess.url).toBe("https://www.ncbi.nlm.nih.gov/pmc/articles/2680680");
+    });
+
+    it("is null for a closed work, whose best open copy is null", () => {
+      const result = parseOpenAlexWork(fixtures.search.results[1], 2, 3);
+      expect(result?.openAccess).toMatchObject({ isOpen: false, status: "closed", pdfUrl: null });
+    });
+
+    it("is never taken from a copy OpenAlex does not mark as open access", () => {
+      const result = parse({
+        id: "https://openalex.org/W1",
+        best_oa_location: { is_oa: false, pdf_url: "https://publisher.example/paywalled.pdf" },
+      });
+      expect(result.openAccess.pdfUrl).toBeNull();
+      expect(parse({ id: "https://openalex.org/W1", best_oa_location: { pdf_url: "https://x.example/a.pdf" } }).openAccess.pdfUrl).toBeNull();
+    });
+  });
+
+  it("refuses non-web addresses anywhere they could become a link", () => {
+    const result = parse({
+      id: "https://openalex.org/W1",
+      doi: "https://doi.org/10.1000/safe",
+      primary_location: { landing_page_url: "javascript:alert(1)" },
+      open_access: { is_oa: true, oa_url: "ftp://files.example/paper.pdf" },
+      best_oa_location: { is_oa: true, pdf_url: "data:application/pdf;base64,AAAA" },
+    });
+    // The unsafe landing page is skipped in favour of the DOI link.
+    expect(result.url).toBe("https://doi.org/10.1000/safe");
+    expect(result.openAccess.url).toBeNull();
+    expect(result.openAccess.pdfUrl).toBeNull();
+  });
+
   it("returns null for entries it cannot identify", () => {
     expect(parseOpenAlexWork(null, 1, 1)).toBeNull();
     expect(parseOpenAlexWork("text", 1, 1)).toBeNull();
@@ -133,7 +179,7 @@ describe("parseOpenAlexWork", () => {
     expect(result.year).toBeNull();
     expect(result.citationCount).toBeNull();
     expect(result.type).toBe("unknown");
-    expect(result.openAccess).toEqual({ isOpen: null, status: "unknown", url: null });
+    expect(result.openAccess).toEqual({ isOpen: null, status: "unknown", url: null, pdfUrl: null });
     expect(result.retraction).toEqual({ retracted: null, source: null });
   });
 });
@@ -217,7 +263,9 @@ describe("createOpenAlexProvider", () => {
     expect(url.searchParams.get("search")).toBe("sleep and memory");
     expect(url.searchParams.get("per_page")).toBe("50");
     expect(url.searchParams.get("select")?.split(",")).toEqual(
-      expect.arrayContaining(["id", "doi", "title", "relevance_score", "type", "is_retracted", "abstract_inverted_index"]),
+      expect.arrayContaining([
+        "id", "doi", "title", "relevance_score", "type", "is_retracted", "abstract_inverted_index", "best_oa_location",
+      ]),
     );
     expect([...url.searchParams.keys()].sort()).toEqual(["per_page", "search", "select"]);
     expect(init).toEqual({ signal: controller.signal });

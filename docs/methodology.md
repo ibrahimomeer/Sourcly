@@ -119,7 +119,7 @@ For each factor, the "Why this rank?" panel shows the raw value, the normalized 
 | Citations | 1 | A sign of influence, but biased (see below), so it only nudges. |
 | Recency | 1 | Newer work matters in many fields, but old work is often foundational. |
 | Peer review | 1 | A useful signal, but based on a heuristic label. |
-| Open access | 0.5 | Convenience, not quality. |
+| Open access | 0 | Institutional library access makes open access much less relevant for ranking. With UBC Library access you can read most paywalled sources as easily as free ones, so "is it free?" says little about whether *you* can use it, and counting it would push good sources down just because their publisher charges. The factor is still switched on and its value still shown, but at weight 0 it changes no score. If you do not have library access, raise the weight in Settings. |
 | Study type | 0 (off) | Sourcly cannot know which kind of source your assignment needs, so you decide. |
 
 These are starting points, not truths. Change them freely.
@@ -127,6 +127,36 @@ These are starting points, not truths. Change them freely.
 ### Ties and determinism
 
 Results with equal scores are ordered by DOI (or internal id), compared by plain character codes, so the order never depends on your language settings or on the order providers answered. If you switch every factor off, every score is 0 and the order is simply by DOI/id.
+
+## Access: open access, PDFs and library links
+
+Every card carries an **access badge** in plain text: "Open access (gold)" (or green, hybrid, bronze, diamond), "Not open access, try UBC Library", or "Open access status unknown, try UBC Library" when the provider does not say. The words "try UBC Library" appear only on cards that actually have a library button. A result is never hidden or ranked lower for not being open access: the factor's default weight is 0, and only the "Open access only" filter, which you have to switch on, hides closed results.
+
+Each card can show up to three buttons, in this order:
+
+1. **Open access PDF.** Shown only when OpenAlex names a direct PDF for a copy that OpenAlex itself marks as open access (its `best_oa_location`). It is never taken from a paywalled copy, and a green or repository copy without a PDF link gets no button. This is OpenAlex's own data for now. Unpaywall, the dedicated open-access lookup, is planned for a later stage and will feed the same button.
+2. **Open via UBC Library.** Shown on every result that has a landing-page address or a DOI, whether or not it is open access, as long as `libraryProxyPrefix` in `config.js` is not empty. Next to it: "Access depends on UBC Library subscriptions; you may be asked to log in."
+3. **DOI.** The plain `https://doi.org/...` link.
+
+### How the library link is built
+
+The link is `libraryProxyPrefix` (in `config.js`) followed by the address to open, **percent-encoded as a single value**. The address is the publisher's **landing page** when the result has one, and the `https://doi.org/<DOI>` link only as a fallback. (A provider's own record page, such as an openalex.org page, does not count as a landing page, because a library cannot open it for you.) Percent-encoding is how any web address is passed inside a link's query string, and it keeps characters such as `&`, `?` and `#` inside the address from being read as part of the link.
+
+The default prefix is UBC Library's OpenAthens redirector, `https://go.openathens.net/redirector/ubc.ca?url=`. A finished link looks like this:
+
+```
+https://go.openathens.net/redirector/ubc.ca?url=https%3A%2F%2Fdoi.org%2F10.1038%2Fnature04286
+```
+
+**What was checked** (2026-10-14):
+
+- **The project maintainer** confirmed that the prefix works with both a publisher landing page and a doi.org link, with the address percent-encoded, for a ScienceDirect book chapter.
+- **UBC Library's current guide** (guides.library.ubc.ca/connect, updated July 2026) gives this prefix and says OpenAthens replaced EZproxy in June 2021. Its own example appends the address raw, and it says adding the prefix to a DOI is "not recommended".
+- **The redirector itself**, tested with plain requests that sent a browser-like User-Agent and no sign-in: ScienceDirect, Elsevier and Nature links, both landing pages and DOI links, were all forwarded to the publisher's sign-in for UBC, whether the address was raw or encoded. (Some earlier test requests that did not look like a browser, or that came in quick bursts, got an empty or "Please wait" response instead, so quick scripted tests of this redirector are not a reliable guide. A real browser is.) Sourcly sends the address encoded because that is the standard way to put one web address inside another link, it is what the maintainer confirmed works, and it stops `&`, `?` and `#` inside the address from being read as part of the link. The landing page comes first because that is the form UBC's guide shows, with the encoded DOI link as the fallback.
+
+**The legacy EZproxy prefix no longer works for most resources.** UBC Library replaced EZproxy with OpenAthens in June 2021 and says "a few UBC Library e-resources still require EZproxy" (its guide names three: eNCPT, Patrologiae Graecae and Torrossa). So `https://login.ezproxy.library.ubc.ca/login?url=` is not the default. A library that still uses EZproxy should end its prefix in `qurl=` instead of `url=`: OCLC, who make EZproxy, document that an encoded address needs `qurl=`, and an encoded address after `url=` leaves users on the EZproxy menu page.
+
+Which prefix suits your library is a setting. Change `libraryProxyPrefix` in `config.js`, or leave it empty to hide the button.
 
 ## Provider notes
 
@@ -149,5 +179,6 @@ Results with equal scores are ordered by DOI (or internal id), compared by plain
 - **Blogs, news, interviews and most grey literature are not indexed** by the academic APIs Sourcly uses, so they will not appear. That is a limit of the data, not a judgment that they are unreliable.
 - **Providers cover different things.** A result missing from one provider may exist in another. Results are only as complete as the providers selected.
 - **The free allowance is limited** (see OpenAlex above), and providers can change their rules; the app will report the failure rather than hide it.
+- **The library button is a shortcut, not a guarantee.** Whether it opens a result depends on your library's subscriptions, on which link style your library currently supports, and on the publisher. You may be asked to log in, and some resources will not open through it.
 - **Reference lists (APA 7) may need manual checks.** Metadata can be incomplete, so check every reference before submitting. _(Export arrives in a later stage.)_
 - **A ranking is a view, not a verdict.** Different weights give different, equally defensible orders. The point of Sourcly is that you can see and change why.

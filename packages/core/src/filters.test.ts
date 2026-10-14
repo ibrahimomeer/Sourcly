@@ -12,13 +12,13 @@ const item = (overrides: Partial<Result>): ScoringItem => {
 
 // A small, varied set. Levels / peer review follow from the classification rules.
 const set = {
-  articleOpen: item({ id: "article-open", year: 2022, openAccess: { isOpen: true, status: "gold", url: null } }),
+  articleOpen: item({ id: "article-open", year: 2022, openAccess: { isOpen: true, status: "gold", url: null, pdfUrl: null } }),
   articleClosed: item({ id: "article-closed", year: 2010 }),
   review: item({ id: "review", year: 2018, type: "review" }),
   preprint: item({ id: "preprint", year: 2024, type: "preprint", venueKind: null }),
   book: item({ id: "book", year: 1999, type: "book", venueKind: null }),
   noYear: item({ id: "no-year", year: null }),
-  oaUnknown: item({ id: "oa-unknown", openAccess: { isOpen: null, status: "unknown", url: null } }),
+  oaUnknown: item({ id: "oa-unknown", openAccess: { isOpen: null, status: "unknown", url: null, pdfUrl: null } }),
 };
 const all = Object.values(set);
 const ids = (items: readonly ScoringItem[]) => items.map((i) => i.result.id);

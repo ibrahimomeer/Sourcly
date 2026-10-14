@@ -20,9 +20,22 @@ window.SOURCLY_CONFIG = {
   // email. (Not used yet: those providers arrive in a later stage.)
   contactEmail: "",
 
-  // Prefix for the "Open via UBC Library" button: prefix + DOI/URL.
-  // Verify against UBC Library's official guidance before relying on it.
-  ezproxyPrefix: "https://login.ezproxy.library.ubc.ca/login?url=",
+  // Library sign-in prefix for the "Open via UBC Library" button. The link is the
+  // prefix followed by the work's address, percent-encoded as one value: the
+  // publisher's landing page when the result has one, otherwise https://doi.org/<DOI>.
+  // Leave it empty ("") to hide the button.
+  //
+  // The default is UBC Library's OpenAthens redirector, the library's current method
+  // (guides.library.ubc.ca/connect, updated July 2026). It was tested with a publisher
+  // landing page and with a doi.org link, both percent-encoded.
+  //
+  // NOTE: the legacy EZproxy prefix, https://login.ezproxy.library.ubc.ca/login?url=,
+  // no longer works for most resources. UBC replaced EZproxy with OpenAthens in 2021
+  // and says only a few resources (it names three) still require it. Do not use it.
+  //
+  // Other libraries: put your own proxy prefix here. For an old-style EZproxy prefix,
+  // end it in "qurl=" rather than "url=", because the address is sent encoded.
+  libraryProxyPrefix: "https://go.openathens.net/redirector/ubc.ca?url=",
 
   // Target of the footer "Download" link.
   downloadUrl: "https://github.com/ibrahimomeer/Sourcly/releases/latest",

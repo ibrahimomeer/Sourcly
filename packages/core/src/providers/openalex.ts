@@ -1,5 +1,5 @@
 import { doiUrl, normalizeDoi } from "../doi";
-import { asArray, asBoolean, asInteger, asNumber, asRecord, asString } from "../json";
+import { asArray, asBoolean, asHttpUrl, asInteger, asNumber, asRecord, asString } from "../json";
 import {
   ProviderError,
   type OaStatus,
@@ -42,6 +42,8 @@ const SELECT_FIELDS = [
   "is_retracted",
   "authorships",
   "primary_location",
+  // Used only for its free PDF link. OpenAlex sets it to null when no open copy is known.
+  "best_oa_location",
   "abstract_inverted_index",
 ];
 
@@ -137,6 +139,9 @@ export function parseOpenAlexWork(raw: unknown, rank: number, listSize: number):
 
   const openAccess = asRecord(work.open_access);
   const oaStatus = asString(openAccess?.oa_status);
+  const bestOpenCopy = asRecord(work.best_oa_location);
+  // The PDF link counts only if OpenAlex itself marks that copy as open access.
+  const pdfUrl = asBoolean(bestOpenCopy?.is_oa) === true ? asHttpUrl(bestOpenCopy?.pdf_url) : null;
   const isRetracted = asBoolean(work.is_retracted);
 
   const authorships = asArray(work.authorships).map(asRecord);
@@ -160,7 +165,7 @@ export function parseOpenAlexWork(raw: unknown, rank: number, listSize: number):
             field: "primary_location.source.type",
           },
     doi,
-    url: asString(location?.landing_page_url) ?? (doi !== null ? doiUrl(doi) : openAlexUrl),
+    url: asHttpUrl(location?.landing_page_url) ?? (doi !== null ? doiUrl(doi) : openAlexUrl),
     abstract: reconstructAbstract(work.abstract_inverted_index),
     type: mapOpenAlexType(typeValue),
     rawType: typeValue === null ? null : { value: typeValue, provider: "openalex", field: "type" },
@@ -177,7 +182,8 @@ export function parseOpenAlexWork(raw: unknown, rank: number, listSize: number):
     openAccess: {
       isOpen: asBoolean(openAccess?.is_oa),
       status: OA_STATUSES.find((status) => status === oaStatus) ?? "unknown",
-      url: asString(openAccess?.oa_url),
+      url: asHttpUrl(openAccess?.oa_url),
+      pdfUrl,
     },
     retraction: {
       retracted: isRetracted,

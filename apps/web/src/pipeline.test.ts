@@ -15,11 +15,11 @@ const results = (): Result[] => [
   makeResult({ id: "10.1000/a", year: 2020, hits: hit(1, 3), citationCount: 30 }),
   makeResult({
     id: "10.1000/b", year: 2021, hits: hit(2, 3), citationCount: 10,
-    openAccess: { isOpen: true, status: "gold", url: null },
+    openAccess: { isOpen: true, status: "gold", url: null, pdfUrl: null },
   }),
   makeResult({
     id: "10.1000/c", year: 2024, hits: hit(3, 3), citationCount: 2, type: "preprint", venueKind: null,
-    openAccess: { isOpen: true, status: "green", url: null },
+    openAccess: { isOpen: true, status: "green", url: null, pdfUrl: null },
   }),
 ];
 

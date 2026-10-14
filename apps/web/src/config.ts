@@ -3,7 +3,7 @@ export interface SourclyConfig {
   authorName: string;
   repoUrl: string;
   contactEmail: string;
-  ezproxyPrefix: string;
+  libraryProxyPrefix: string;
   downloadUrl: string;
 }
 
@@ -20,11 +20,11 @@ export const DEFAULT_CONFIG: SourclyConfig = {
   authorName: "",
   repoUrl: "",
   contactEmail: "",
-  ezproxyPrefix: "",
+  libraryProxyPrefix: "",
   downloadUrl: "",
 };
 
-const URL_FIELDS = ["repoUrl", "ezproxyPrefix", "downloadUrl"] as const;
+const URL_FIELDS = ["repoUrl", "libraryProxyPrefix", "downloadUrl"] as const;
 
 function isHttpUrl(value: string): boolean {
   return /^https?:\/\//i.test(value);
