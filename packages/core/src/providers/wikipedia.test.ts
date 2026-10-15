@@ -50,7 +50,7 @@ describe("parseWikipediaPage", () => {
 });
 
 describe("createWikipediaProvider", () => {
-  it("asks for 20 pages with their intro text, allows cross-origin reading, and ranks by search index", async () => {
+  it("asks for 5 pages with their intro text, allows cross-origin reading, and ranks by search index", async () => {
     const fetchMock = vi.fn<typeof fetch>(() => Promise.resolve(Response.json(fixtures)));
     const results = await createWikipediaProvider({ fetch: fetchMock }).search("sleep AND memory", { limit: 100 });
 
@@ -60,11 +60,11 @@ describe("createWikipediaProvider", () => {
       action: "query",
       generator: "search",
       gsrsearch: "sleep AND memory",
-      gsrlimit: "20",
+      gsrlimit: "5",
       prop: "extracts|info",
       exintro: "1",
       explaintext: "1",
-      exlimit: "20",
+      exlimit: "5",
       formatversion: "2",
       origin: "*", // MediaWiki's documented switch for anonymous cross-origin requests
     });

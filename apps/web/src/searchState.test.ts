@@ -1,7 +1,7 @@
 import { counterQuery, parseQuery, planQueries, type ProviderId, type ProviderStatus, type ProviderUpdate } from "@sourcly/core";
 import { makeResult } from "@sourcly/core/testing";
 import { describe, expect, it } from "vitest";
-import { idleSearch, orderedStatuses, searchReducer, type ActiveSearch, type SearchState } from "./searchState";
+import { idleSearch, isSearching, orderedStatuses, searchReducer, type ActiveSearch, type SearchState } from "./searchState";
 
 const done = (provider: ProviderId, ids: string[] = []): ProviderUpdate => ({
   provider,
@@ -44,6 +44,7 @@ describe("searchReducer", () => {
       statuses: [],
       pending: ["openalex", "crossref"],
       searchedAt: null,
+      expansion: null,
     });
   });
 
@@ -177,5 +178,74 @@ describe("orderedStatuses", () => {
     }
     if (state.phase === "idle") throw new Error("expected an active search");
     expect(orderedStatuses(state).map((s) => s.provider)).toEqual(["openalex", "crossref", "pubmed", "arxiv"]);
+  });
+});
+
+describe("searchReducer: the expanded second pass", () => {
+  const finished = (): ActiveSearch => {
+    let state: SearchState = started(["openalex", "crossref"]);
+    for (const provider of ["openalex", "crossref"] as const) state = searchReducer(state, { type: "provider-done", id: 1, update: done(provider, [`10.1/${provider}`]) });
+    state = searchReducer(state, { type: "finish", id: 1, at: new Date() });
+    if (state.phase === "idle") throw new Error("expected an active search");
+    return state;
+  };
+  const sent = [{ provider: "openalex" as const, text: "sleep memory", notes: [] }];
+  const expanding = () => {
+    const state = searchReducer(finished(), { type: "expand-start", id: 1, sent, order: ["openalex"] });
+    if (state.phase === "idle") throw new Error("expected an active search");
+    return state;
+  };
+
+  it("starts only after the strict pass is done, and only once", () => {
+    const mid = started();
+    expect(searchReducer(mid, { type: "expand-start", id: 1, sent, order: ["openalex"] })).toBe(mid);
+    const again = expanding();
+    expect(searchReducer(again, { type: "expand-start", id: 1, sent, order: ["openalex"] })).toBe(again);
+  });
+
+  it("keeps its queries and answers apart from the strict pass's", () => {
+    const state = expanding();
+    expect(state.expansion).toEqual({ phase: "searching", sent, order: ["openalex"], statuses: [], pending: ["openalex"] });
+    expect(state.statuses).toHaveLength(2);
+    expect(state.sent).toHaveLength(2);
+  });
+
+  it("adds its results to the search, and its status to its own list", () => {
+    const next = searchReducer(expanding(), { type: "expand-provider-done", id: 1, update: done("openalex", ["10.1/extra"]) });
+    if (next.phase === "idle") throw new Error("expected an active search");
+    expect(next.results.map((r) => r.id)).toEqual(["10.1/openalex", "10.1/crossref", "10.1/extra"]);
+    expect(next.expansion?.statuses).toEqual([{ provider: "openalex", state: "ok", count: 1 }]);
+    expect(next.expansion?.pending).toEqual([]);
+    expect(next.statuses).toHaveLength(2);
+  });
+
+  it("ignores an answer from a provider it did not ask, and one it already has", () => {
+    const state = expanding();
+    expect(searchReducer(state, { type: "expand-provider-done", id: 1, update: done("crossref", ["10.1/x"]) })).toBe(state);
+    const once = searchReducer(state, { type: "expand-provider-done", id: 1, update: done("openalex", ["10.1/a"]) });
+    expect(searchReducer(once, { type: "expand-provider-done", id: 1, update: done("openalex", ["10.1/b"]) })).toBe(once);
+  });
+
+  it("finishes, and is searching until it does", () => {
+    const state = expanding();
+    expect(isSearching(state)).toBe(true);
+    const done2 = searchReducer(searchReducer(state, { type: "expand-provider-done", id: 1, update: done("openalex") }), { type: "expand-finish", id: 1 });
+    expect(isSearching(done2)).toBe(false);
+    if (done2.phase === "idle") throw new Error("expected an active search");
+    expect(done2.expansion?.phase).toBe("done");
+  });
+
+  it("is not searching when the strict pass is done and no second pass was started", () => {
+    expect(isSearching(finished())).toBe(false);
+    expect(isSearching(started())).toBe(true);
+    expect(isSearching(idleSearch)).toBe(false);
+  });
+
+  it("is dropped with the search: a newer search or a reset makes late answers do nothing", () => {
+    const state = expanding();
+    const newer = searchReducer(state, startAction("other", ["openalex"], [], 2));
+    expect(searchReducer(newer, { type: "expand-provider-done", id: 1, update: done("openalex", ["10.1/late"]) })).toBe(newer);
+    const reset = searchReducer(state, { type: "reset" });
+    expect(searchReducer(reset, { type: "expand-finish", id: 1 })).toBe(reset);
   });
 });

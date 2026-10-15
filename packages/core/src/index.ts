@@ -80,11 +80,11 @@ export {
 export { NOTICE_LABELS, noticeKind, type NoticeKind } from "./notices";
 export { relatedTerms, type RelatedTerm } from "./related";
 export { BM25_B, BM25_K1 } from "./bm25";
-export { tokenize, type TokenizeOptions } from "./tokens";
+export { normalizeWord, tokenize, type TokenizeOptions } from "./tokens";
 export { STOPWORDS } from "./stopwords";
 export { createOpenAlexProvider, type OpenAlexOptions } from "./providers/openalex";
 export { createCrossrefProvider, type CrossrefOptions } from "./providers/crossref";
-export { createPubmedProvider, createPubmedSpellchecker, type PubmedOptions, type Spellchecker } from "./providers/pubmed";
+export { createPubmedProvider, type PubmedOptions } from "./providers/pubmed";
 export { createEuropePmcProvider, type EuropePmcOptions } from "./providers/europepmc";
 export { createDoajProvider, type DoajOptions } from "./providers/doaj";
 export { createDataCiteProvider, type DataCiteOptions } from "./providers/datacite";
@@ -93,6 +93,8 @@ export { createWikipediaProvider, type WikipediaOptions } from "./providers/wiki
 export { createSemanticScholarProvider, type SemanticScholarOptions } from "./providers/semanticscholar";
 export {
   DEFAULT_TIMEOUT_MS,
+  expandable,
+  planExpandedQueries,
   planQueries,
   searchProviders,
   type ProviderUpdate,
@@ -101,17 +103,56 @@ export {
   type SentQuery,
 } from "./search";
 export { createSearchCache, type SearchCache } from "./cache";
+export { MIN_TITLE_WORDS, describeInput, parseInput, type DetectedInput } from "./identifiers";
+export {
+  MIN_TITLE_SIMILARITY,
+  addressVariants,
+  closestTitleMatch,
+  fetchNeighbours,
+  lookupWork,
+  titleSimilarity,
+  withUnpaywall,
+  type ClosestMatch,
+  type LookupOptions,
+  type LookupOutcome,
+  type Neighbours,
+} from "./lookup";
 export { PROVIDER_PRIORITY, mergeResults } from "./dedupe";
 export { applyFilters, defaultFilters, isFiltering, type ResultFilters } from "./filters";
-export { UNKNOWN_LANGUAGE, countLanguages, languageName, languageOf, type LanguageCount } from "./language";
 export {
-  MIN_SPELLCHECK_LENGTH,
-  RARE_WORD_RESULTS,
-  suggestSpelling,
-  wordsToSpellcheck,
-  type SpellingChange,
-  type SpellingSuggestion,
-} from "./spelling";
+  UNKNOWN_LANGUAGE,
+  countLanguages,
+  detectLanguage,
+  languageBadge,
+  languageExplanation,
+  languageName,
+  languageOf,
+  resolveLanguage,
+  type LanguageCount,
+  type LanguageInfo,
+} from "./language";
+export {
+  FEW_FULL_MATCHES,
+  arrangeResults,
+  defaultLayoutSettings,
+  isArticleLike,
+  matchCountLabel,
+  sectionOf,
+  type Layout,
+  type LayoutSettings,
+  type SectionId,
+} from "./sections";
+export {
+  MAX_TYPO_DISTANCE,
+  MIN_SUGGESTION_RESULTS,
+  SUGGESTION_RATIO,
+  SUGGESTION_RATIO_ONE_EDIT,
+  damerauLevenshtein,
+  suggestTypos,
+  wordsToCheck,
+  type TypoChange,
+  type TypoSuggestion,
+} from "./typo";
 export {
   PEER_REVIEW_STATUSES,
   SOURCE_LEVELS,
@@ -140,7 +181,6 @@ export {
   FACTOR_IDS,
   FACTOR_LABELS,
   NEUTRAL,
-  TERM_MATCHING_MODES,
   defaultScoringSettings,
   scoreResults,
   type FactorBreakdown,
@@ -150,5 +190,4 @@ export {
   type ScoringContext,
   type ScoringItem,
   type ScoringSettings,
-  type TermMatching,
 } from "./scoring";

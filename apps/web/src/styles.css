@@ -1015,15 +1015,6 @@ mark.mark-query {
   font-size: 1rem;
 }
 
-.term-matching {
-  margin: 0.75rem 0 1rem;
-}
-
-.term-matching .check {
-  align-items: flex-start;
-  margin: 0.4rem 0;
-}
-
 .few-results {
   margin: 0.75rem 0;
   padding: 0.5rem 0.75rem;
@@ -1036,4 +1027,54 @@ mark.mark-query {
 
 .did-you-mean .link-button {
   font-weight: 600;
+}
+
+.detected {
+  margin: 0.5rem 0;
+  font-size: 0.875rem;
+}
+
+.card-heading {
+  margin: 0 0 0.25rem;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.card-detailed {
+  border-width: 2px;
+}
+
+dl.record {
+  margin: 0.5rem 0;
+}
+
+dl.record > div {
+  display: grid;
+  grid-template-columns: 9rem 1fr;
+  gap: 0.5rem;
+  padding: 0.25rem 0;
+  border-top: 1px solid var(--border);
+}
+
+dl.record dt {
+  font-weight: 600;
+}
+
+dl.record dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.placement ol {
+  margin: 0.25rem 0 0.5rem;
+  padding-left: 1.25rem;
+}
+
+@media (max-width: 40rem) {
+  dl.record > div {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
 }

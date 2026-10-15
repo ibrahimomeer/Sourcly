@@ -143,6 +143,8 @@ export function createEuropePmcProvider(options: EuropePmcOptions = {}): Provide
     id: "europepmc",
     name: "Europe PMC",
     syntax: "europepmc",
+    expandedSyntax: "plain",
+    expandedRequestNotes: ["The words are looked for in every field and in the full text of open-access papers"],
     requestNotes: ["Every word is looked for in the title and abstract only, not in the full text"],
 
     async search(query: string, { limit, signal }: SearchOptions): Promise<Result[]> {

@@ -1,4 +1,4 @@
-import { addSaved, buildProtocol, defaultFilters, defaultScoringSettings, parseQuery, planQueries, protocolJson, type ProviderId } from "@sourcly/core";
+import { addSaved, buildProtocol, defaultFilters, defaultLayoutSettings, defaultScoringSettings, parseQuery, planQueries, protocolJson, type ProviderId } from "@sourcly/core";
 import { makeResult } from "@sourcly/core/testing";
 import { describe, expect, it } from "vitest";
 import { rankResults, scoringContext } from "./pipeline";
@@ -39,7 +39,7 @@ function finished(text: string, ids: string[]): ActiveSearch {
   return state;
 }
 
-const view = { scoring: defaultScoringSettings(), filters: defaultFilters(), overrides: new Map() };
+const view = { scoring: defaultScoringSettings(), filters: defaultFilters(), overrides: new Map(), layout: defaultLayoutSettings() };
 const rank = (search: ActiveSearch) => rankResults(search.results, view, scoringContext(search, 2026));
 
 describe("searchRecord", () => {
@@ -64,15 +64,53 @@ describe("searchRecord", () => {
   it("counts what was fetched, merged, shown and hidden by filters", () => {
     const search = finished("sleep memory", ["10.1/a", "10.1/b", "10.1/c"]);
     const filtered = rankResults(search.results, { ...view, filters: { ...defaultFilters(), openAccessOnly: true } }, scoringContext(search, 2026));
-    expect(searchRecord(search, rank(search)).counts).toEqual({ fetched: 3, merged: 3, shown: 3, partialMatches: 0, hiddenByFilters: 0 });
-    expect(searchRecord(search, filtered).counts).toEqual({ fetched: 3, merged: 3, shown: 0, partialMatches: 0, hiddenByFilters: 3 });
+    expect(searchRecord(search, rank(search)).counts).toEqual({ fetched: 3, merged: 3, shown: 3, partialMatches: 0, otherLanguages: 0, otherTypes: 0, hiddenByFilters: 0 });
+    expect(searchRecord(search, filtered).counts).toEqual({ fetched: 3, merged: 3, shown: 0, partialMatches: 0, otherLanguages: 0, otherTypes: 0, hiddenByFilters: 3 });
   });
 
-  it("counts results that lack a search word as partial matches, not as shown", () => {
-    const search = finished("sleep memory dreams", ["10.1/a", "10.1/b"]);
+  it("counts results that lack more than one search word as partial matches, not as shown", () => {
+    const search = finished("sleep memory dreams nightmares", ["10.1/a", "10.1/b"]);
     expect(searchRecord(search, rank(search)).counts).toMatchObject({ fetched: 2, merged: 2, shown: 0, partialMatches: 2 });
-    const byCoverage = rankResults(search.results, { ...view, scoring: { ...view.scoring, termMatching: "coverage" } }, scoringContext(search, 2026));
-    expect(searchRecord(search, byCoverage).counts).toMatchObject({ shown: 2, partialMatches: 0 });
+  });
+
+  it("counts results that lack one word as shown while few contain every word", () => {
+    const search = finished("sleep memory dreams", ["10.1/a", "10.1/b"]);
+    expect(searchRecord(search, rank(search)).counts).toMatchObject({ shown: 2, partialMatches: 0 });
+  });
+
+  it("counts the results kept apart as other languages and as other types", () => {
+    const parsed = parseQuery("pendulum");
+    let state = searchReducer(idleSearch, { type: "start", id: 1, parsed, sent: planQueries(providers, parsed), order: ["openalex"], skipped: [] });
+    state = searchReducer(state, {
+      type: "provider-done",
+      id: 1,
+      update: {
+        provider: "openalex",
+        status: { provider: "openalex", state: "ok", count: 3 },
+        results: [
+          makeResult({ id: "10.1/en", doi: "10.1/en", title: "Pendulum", language: "en" }),
+          makeResult({ id: "10.1/es", doi: "10.1/es", title: "Pendulum", language: "es" }),
+          makeResult({ id: "10.1/data", doi: "10.1/data", title: "Pendulum", type: "dataset", language: "en" }),
+        ],
+      },
+    });
+    if (state.phase === "idle") throw new Error("expected an active search");
+    expect(searchRecord(state, rank(state)).counts).toMatchObject({ merged: 3, shown: 1, otherLanguages: 1, otherTypes: 1 });
+  });
+
+  it("records the expanded pass when it ran, and null when it did not", () => {
+    const search = finished("sleep memory", ["10.1/a"]);
+    expect(searchRecord(search, rank(search)).expandedPass).toBeNull();
+    const expanded = searchReducer(searchReducer(search, { type: "expand-start", id: 1, sent: [{ provider: "openalex", text: "sleep memory", notes: [] }], order: ["openalex"] }), {
+      type: "expand-provider-done",
+      id: 1,
+      update: { provider: "openalex", status: { provider: "openalex", state: "ok", count: 0 }, results: [] },
+    });
+    if (expanded.phase === "idle") throw new Error("expected an active search");
+    expect(searchRecord(expanded, rank(expanded)).expandedPass).toEqual({
+      sentQueries: [{ provider: "openalex", text: "sleep memory", notes: [] }],
+      statuses: [{ provider: "openalex", state: "ok", count: 0 }],
+    });
   });
 
   it("counts duplicates as fetched but not as merged", () => {
@@ -106,6 +144,7 @@ describe("protocolInputFrom", () => {
       perSource: 50,
       filters: { ...defaultFilters(), yearFrom: 2010 },
       scoring: defaultScoringSettings(),
+      layout: defaultLayoutSettings(),
       saved,
       referenceYear: 2026,
       appVersion: "0.1.0",
@@ -129,6 +168,7 @@ describe("protocolInputFrom", () => {
       perSource: 100,
       filters: defaultFilters(),
       scoring: defaultScoringSettings(),
+      layout: defaultLayoutSettings(),
       saved: [],
       referenceYear: 2026,
       appVersion: "0.1.0",
@@ -146,6 +186,7 @@ describe("protocolInputFrom", () => {
       perSource: 100,
       filters: defaultFilters(),
       scoring: defaultScoringSettings(),
+      layout: defaultLayoutSettings(),
       saved: [],
       referenceYear: 2026,
       appVersion: "0.1.0",

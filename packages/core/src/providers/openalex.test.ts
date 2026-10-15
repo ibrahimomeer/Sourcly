@@ -310,6 +310,20 @@ describe("createOpenAlexProvider", () => {
     expect(init).toEqual({ signal: controller.signal });
   });
 
+  it("uses the scoped title-and-abstract search for the strict pass and the default relevance search for the expanded pass", async () => {
+    const fetchMock = vi.fn<typeof fetch>(() => jsonResponse({ results: [] }));
+    const provider = createOpenAlexProvider({ fetch: fetchMock });
+    await provider.search("sleep memory", { limit: 5 });
+    await provider.search("sleep memory", { limit: 5, expanded: true });
+    const [strict, expanded] = fetchMock.mock.calls.map((call) => new URL(String(call[0])));
+    expect(strict?.searchParams.get("search.title_and_abstract")).toBe("sleep memory");
+    expect(strict?.searchParams.has("search")).toBe(false);
+    expect(expanded?.searchParams.get("search")).toBe("sleep memory");
+    expect(expanded?.searchParams.has("search.title_and_abstract")).toBe(false);
+    expect(provider.expandedSyntax).toBe("plain");
+    expect(provider.expandedRequestNotes?.join(" ")).toMatch(/default relevance search/);
+  });
+
   it.each([
     [500, "100"],
     [100, "100"],

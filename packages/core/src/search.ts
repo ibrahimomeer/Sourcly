@@ -27,7 +27,9 @@ export interface SentQuery {
   notes: string[];
 }
 
-export interface SearchRunOptions extends SearchOptions {
+export interface SearchRunOptions extends Omit<SearchOptions, "expanded"> {
+  /** Run the expanded pass: only the providers that have one, each asked in its looser way. */
+  expanded?: boolean;
   /** Per-provider time limit in milliseconds. Defaults to DEFAULT_TIMEOUT_MS. */
   timeoutMs?: number;
   /** When given, successful answers are remembered and reused for the same query and limit. */
@@ -58,6 +60,27 @@ export function planQueries(
   });
 }
 
+/** The providers that take part in the expanded pass. */
+export function expandable<T extends Pick<Provider, "expandedSyntax">>(providers: readonly T[]): T[] {
+  return providers.filter((provider) => provider.expandedSyntax !== undefined);
+}
+
+/**
+ * The query as written for the expanded pass: the same words, in the looser syntax each expanding provider has
+ * (usually just the words). Only providers that take part are listed.
+ */
+export function planExpandedQueries(
+  providers: readonly Pick<Provider, "id" | "expandedSyntax" | "expandedRequestNotes">[],
+  query: string | ParsedQuery,
+): SentQuery[] {
+  const parsed = typeof query === "string" ? parseQuery(query) : query;
+  return providers.flatMap((provider) => {
+    if (provider.expandedSyntax === undefined) return [];
+    const rendered = renderQuery(parsed, provider.expandedSyntax);
+    return [{ provider: provider.id, text: rendered.text, notes: [...rendered.notes, ...(provider.expandedRequestNotes ?? [])] }];
+  });
+}
+
 /**
  * Asks one provider, giving up after `timeoutMs` even if the provider ignores the
  * cancellation signal. A user's own cancellation passes straight through.
@@ -68,6 +91,7 @@ async function askWithTimeout(
   limit: number,
   signal: AbortSignal | undefined,
   timeoutMs: number,
+  expanded = false,
 ): Promise<Result[]> {
   const controller = new AbortController();
   const cancel = () => controller.abort();
@@ -83,7 +107,7 @@ async function askWithTimeout(
   });
 
   try {
-    return await Promise.race([provider.search(query, { limit, signal: controller.signal }), timeout]);
+    return await Promise.race([provider.search(query, { limit, signal: controller.signal, ...(expanded ? { expanded: true } : {}) }), timeout]);
   } finally {
     clearTimeout(timer);
     signal?.removeEventListener("abort", cancel);
@@ -105,7 +129,8 @@ export async function searchProviders(
 ): Promise<SearchOutcome> {
   const parsed = typeof query === "string" ? parseQuery(query.trim()) : query;
   if (!isUsable(parsed)) return { results: [], statuses: [] };
-  const { limit, signal, cache, onProviderDone, timeoutMs = DEFAULT_TIMEOUT_MS } = options;
+  const { limit, signal, cache, onProviderDone, timeoutMs = DEFAULT_TIMEOUT_MS, expanded = false } = options;
+  const asked = expanded ? expandable(providers) : providers;
 
   const notify = (update: ProviderUpdate) => {
     try {
@@ -116,8 +141,10 @@ export async function searchProviders(
   };
 
   const answers = await Promise.all(
-    providers.map(async (provider): Promise<ProviderUpdate> => {
-      const sent = renderQuery(parsed, provider.syntax).text;
+    asked.map(async (provider): Promise<ProviderUpdate> => {
+      const sent = renderQuery(parsed, expanded ? (provider.expandedSyntax ?? provider.syntax) : provider.syntax).text;
+      // The expanded pass remembers its answers apart from the strict one, even when the text happens to be the same.
+      const memory = expanded ? `\u0001${sent}` : sent;
       if (sent === "") {
         const update: ProviderUpdate = {
           provider: provider.id,
@@ -128,7 +155,7 @@ export async function searchProviders(
         return update;
       }
 
-      const remembered = cache?.get(provider.id, sent, limit);
+      const remembered = cache?.get(provider.id, memory, limit);
       if (remembered !== undefined) {
         const update: ProviderUpdate = {
           provider: provider.id,
@@ -141,8 +168,9 @@ export async function searchProviders(
 
       let update: ProviderUpdate;
       try {
-        const results = await askWithTimeout(provider, sent, limit, signal, timeoutMs);
-        cache?.set(provider.id, sent, limit, results);
+        const found = await askWithTimeout(provider, sent, limit, signal, timeoutMs, expanded);
+        const results = expanded ? found.map((result) => ({ ...result, hits: result.hits.map((hit) => ({ ...hit, expanded: true as const })) })) : found;
+        cache?.set(provider.id, memory, limit, results);
         update = { provider: provider.id, status: { provider: provider.id, state: "ok", count: results.length }, results };
       } catch (error) {
         update = { provider: provider.id, status: failureStatus(provider, error), results: [] };

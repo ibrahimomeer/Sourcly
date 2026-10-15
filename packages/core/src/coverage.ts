@@ -6,16 +6,17 @@ import type { Result } from "./types";
 // It is the first thing that decides the order of results (see scoring.ts), because a result that
 // lacks half the query is rarely what was asked for, however well the rest of it scores.
 //
-// Everything is deterministic. Words are compared as lowercase, accent-free, plural-folded keys (see
-// tokens.ts), so "pendulums" matches "pendulum"; with "Search exactly as typed" nothing is folded.
+// Everything is deterministic. Words are compared as lowercase, accent-free, normalized keys (see
+// normalizeWord in tokens.ts), so "pendulums" matches "pendulum" but "caos" does not match "cao"; with
+// "Search exactly as typed" nothing is normalized. Only the title, the abstract and the author keywords are read.
 // A phrase, and a word with a hyphen in it, matches when its words are next to each other, in order.
 
-export type MatchField = "title" | "keywords" | "topics" | "abstract";
+export type MatchField = "title" | "keywords" | "abstract";
 
 /** How much a match in each field counts toward the term-coverage factor: the title most. */
-export const FIELD_WEIGHTS: Readonly<Record<MatchField, number>> = { title: 1, keywords: 0.8, topics: 0.7, abstract: 0.6 };
+export const FIELD_WEIGHTS: Readonly<Record<MatchField, number>> = { title: 1, keywords: 0.8, abstract: 0.6 };
 
-const FIELD_ORDER: readonly MatchField[] = ["title", "keywords", "topics", "abstract"];
+const FIELD_ORDER: readonly MatchField[] = ["title", "keywords", "abstract"];
 
 /** How much a pair of query words found next to each other counts: in the title, or in the abstract. */
 export const PHRASE_WEIGHTS = { title: 1, abstract: 0.7 } as const;
@@ -142,19 +143,20 @@ export function coverageSpec(query: ParsedQuery): CoverageSpec {
 
 // ---- Measuring one result
 
-/** A mark between two keywords or topics, so a phrase cannot run from one into the next. */
+/** A mark between two keywords, so a phrase cannot run from one into the next. */
 const BOUNDARY = "\u0000";
 
 type Streams = Record<MatchField, string[]>;
 
 function streamsOf(result: Result, exact: boolean): Streams {
   const options = { exact };
-  const listed = (kinds: readonly string[]) =>
-    result.subjects.filter((subject) => kinds.includes(subject.kind)).flatMap((subject) => [...wordKeys(subject.term, options), BOUNDARY]);
+  // Author keywords only: the keywords PubMed, Europe PMC, DOAJ, Zenodo and DataCite carry. OpenAlex's keywords are
+  // assigned by its own classifier, and topics, MeSH headings and subjects are tags of the source, not words of the work.
+  // The venue is not read either.
+  const authorKeywords = result.subjects.filter((subject) => subject.kind === "keyword" && subject.provider !== "openalex");
   return {
     title: wordKeys(result.title, options),
-    keywords: listed(["keyword"]),
-    topics: listed(["topic", "mesh", "subject"]),
+    keywords: authorKeywords.flatMap((subject) => [...wordKeys(subject.term, options), BOUNDARY]),
     abstract: wordKeys(result.abstract ?? "", options),
   };
 }

@@ -1,15 +1,15 @@
-import { PROVIDER_NAMES, type SentQuery } from "@sourcly/core";
+import { FEW_FULL_MATCHES, PROVIDER_NAMES, type SentQuery } from "@sourcly/core";
 import { droppedWords } from "./queryText";
 import type { ActiveSearch } from "./searchState";
 
 /** The exact text each source received, and what it could not apply, so nothing about the query is hidden. */
-export function SentQueries({ sent }: { sent: readonly SentQuery[] }) {
+export function SentQueries({ sent, title = "Queries sent", intro }: { sent: readonly SentQuery[]; title?: string; intro?: string }) {
   return (
     <details className="panel sent-queries">
-      <summary>Queries sent</summary>
+      <summary>{title}</summary>
       <p className="muted">
-        Sources read queries differently, so each one gets the same query written in the way it understands. This is the
-        exact text each source received.
+        {intro ??
+          "Sources read queries differently, so each one gets the same query written in the way it understands. This is the exact text each source received."}
       </p>
       <ul>
         {sent.map((entry) => (
@@ -47,6 +47,20 @@ export function QueryNote({ search, restorable = false }: { search: ActiveSearch
         </p>
       )}
       <SentQueries sent={search.sent} />
+      {search.expansion !== null && (
+        <>
+          <p>
+            <strong>A second, expanded pass ran</strong>, because fewer than {FEW_FULL_MATCHES} results contained every word.
+            {search.expansion.phase === "searching" && " It is still running."} Its results are labelled “Expanded search:
+            not every word matched”.
+          </p>
+          <SentQueries
+            sent={search.expansion.sent}
+            title="Queries sent in the expanded pass"
+            intro="The expanded pass asks the sources that have a looser way of searching, with the same words and without requiring every word. This is the exact text each one received."
+          />
+        </>
+      )}
     </div>
   );
 }

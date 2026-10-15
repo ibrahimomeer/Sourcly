@@ -1,15 +1,12 @@
 import { describe, expect, it, vi } from "vitest";
 import { ProviderError } from "../types";
 import { childrenNamed, parseXml } from "../xml";
-import { createPubmedProvider, createPubmedSpellchecker, parsePubmedArticle } from "./pubmed";
+import { createPubmedProvider, parsePubmedArticle } from "./pubmed";
 // Real responses recorded from eutils.ncbi.nlm.nih.gov on 2026-10-14: an esearch (five PMIDs in
 // relevance order) and one efetch covering those five plus a systematic review and the retracted
 // Lancet paper (PMID 32450107): six distinct articles.
 import esearch from "./__fixtures__/pubmed-esearch.json";
 import efetchXml from "./__fixtures__/pubmed-efetch.xml?raw";
-// Real espell.fcgi answers recorded the same day: "chaos double pendulm" (corrected) and "memory consolidation" (nothing to suggest).
-import espellCorrected from "./__fixtures__/pubmed-espell.xml?raw";
-import espellNone from "./__fixtures__/pubmed-espell-none.xml?raw";
 
 const articles = childrenNamed(parseXml(efetchXml), "PubmedArticle");
 const parsed = articles.map((article, index) => {
@@ -172,6 +169,7 @@ describe("PubMed subjects and syntax", () => {
   it("understands Boolean queries and looks every word up in PubMed's text words, and says so", () => {
     const provider = createPubmedProvider();
     expect(provider.syntax).toBe("pubmed");
+    expect(provider.expandedSyntax).toBe("plain");
     expect(provider.requestNotes?.join(" ")).toMatch(/text words.*synonyms and word forms is switched off/);
   });
 });
@@ -187,46 +185,5 @@ describe("PubMed: volume, issue and pages", () => {
         expect(value === null || value.length > 0).toBe(true);
       }
     }
-  });
-});
-
-describe("PubMed spell checker (ESpell)", () => {
-  const answering = (body: string) => vi.fn<typeof fetch>(() => Promise.resolve(new Response(body)));
-
-  it("asks espell.fcgi once, with the words only, identifying the app and sending no key", async () => {
-    const fetchMock = answering(espellCorrected);
-    await createPubmedSpellchecker({ fetch: fetchMock })(["chaos", "double", "pendulm"]);
-    expect(fetchMock).toHaveBeenCalledTimes(1);
-    const url = new URL(String(fetchMock.mock.calls[0]?.[0]));
-    expect(url.origin + url.pathname).toBe("https://eutils.ncbi.nlm.nih.gov/entrez/eutils/espell.fcgi");
-    expect(Object.fromEntries(url.searchParams)).toEqual({ db: "pubmed", term: "chaos double pendulm", tool: "sourcly" });
-    expect(fetchMock.mock.calls[0]?.[1]).toEqual({ signal: undefined });
-  });
-
-  it("sends the contact address as NCBI's email only when one is configured", async () => {
-    const fetchMock = answering(espellCorrected);
-    await createPubmedSpellchecker({ fetch: fetchMock, email: " me@example.org " })(["pendulm"]);
-    expect(new URL(String(fetchMock.mock.calls[0]?.[0])).searchParams.get("email")).toBe("me@example.org");
-  });
-
-  it("returns the corrected text from a real answer", async () => {
-    expect(await createPubmedSpellchecker({ fetch: answering(espellCorrected) })(["chaos", "double", "pendulm"])).toBe("chaos double pendulum");
-  });
-
-  it("returns null when PubMed has nothing to suggest", async () => {
-    expect(await createPubmedSpellchecker({ fetch: answering(espellNone) })(["memory", "consolidation"])).toBeNull();
-  });
-
-  it("asks nothing for no words", async () => {
-    const fetchMock = answering(espellCorrected);
-    expect(await createPubmedSpellchecker({ fetch: fetchMock })([])).toBeNull();
-    expect(fetchMock).not.toHaveBeenCalled();
-  });
-
-  it("reports a rate limit and a body that is not XML as errors, naming PubMed", async () => {
-    const limited = createPubmedSpellchecker({ fetch: () => Promise.resolve(new Response("{}", { status: 429 })) });
-    await expect(limited(["sleep"])).rejects.toMatchObject({ kind: "rate-limited" });
-    const notXml = createPubmedSpellchecker({ fetch: answering('{"error":"API rate limit exceeded"}') });
-    await expect(notXml(["sleep"])).rejects.toBeInstanceOf(ProviderError);
   });
 });

@@ -1,16 +1,16 @@
-import type { LabelOverride, RelatedTerm, SpellingSuggestion, TermMatching } from "@sourcly/core";
+import type { LabelOverride, RelatedTerm, TypoSuggestion } from "@sourcly/core";
 import type { ReactNode } from "react";
-import { describeOrder, fewResultsMessage, pluralize } from "./format";
+import { fewResultsMessage, ORDER_SENTENCE, pluralize } from "./format";
 import { Pagination } from "./Pagination";
-import { PartialMatches } from "./PartialMatches";
 import { paginate } from "./paginate";
-import { hasFewFullMatches, type RankedView } from "./pipeline";
+import { allResults, hasFewFullMatches, type RankedView } from "./pipeline";
 import { ProviderStatuses } from "./ProviderStatuses";
 import { QueryNote } from "./QueryNote";
 import { RelatedTerms } from "./RelatedTerms";
 import { ResultCard } from "./ResultCard";
 import { SearchElsewhere } from "./SearchElsewhere";
-import type { SearchState } from "./searchState";
+import { isSearching, type SearchState } from "./searchState";
+import { ResultSections } from "./ResultSections";
 
 export function Results({
   state,
@@ -25,7 +25,6 @@ export function Results({
   related,
   onAddRelatedTerm,
   exportSlot,
-  termMatching,
   suggestion,
   onUseSuggestion,
 }: {
@@ -47,10 +46,8 @@ export function Results({
   onAddRelatedTerm: (term: string) => void;
   /** Shown under "Search elsewhere": the search protocol download. */
   exportSlot?: ReactNode;
-  /** The Settings choice that decides how results lacking a search word are ordered or set apart. */
-  termMatching: TermMatching;
   /** A "Did you mean ...?" for the search, or null. It is only a link: nothing changes until it is clicked. */
-  suggestion: SpellingSuggestion | null;
+  suggestion: TypoSuggestion | null;
   onUseSuggestion: (text: string) => void;
 }) {
   if (state.phase === "idle" || ranked === null) {
@@ -61,12 +58,13 @@ export function Results({
     );
   }
 
-  const searching = state.phase === "searching";
-  const partialCount = ranked.partial.length;
-  const total = ranked.shown.length + ranked.hidden.length + partialCount;
+  const searching = isSearching(state);
+  const sectioned = ranked.partial.length + ranked.otherLanguages.length + ranked.otherTypes.length;
+  const total = allResults(ranked).length;
   const duplicates = state.results.length - total;
   const current = paginate(ranked.shown, page);
   const anyAnswered = state.statuses.some((status) => status.state === "ok");
+  const few = !searching && anyAnswered && hasFewFullMatches(ranked);
 
   const pagination = (label: string) => (
     <Pagination page={current} shownOnPage={current.items.length} onPage={onPageChange} label={label} />
@@ -92,12 +90,18 @@ export function Results({
       {total > 0 && (
         <p className="summary">
           {ranked.hidden.length > 0
-            ? `Showing ${ranked.shown.length + partialCount} of ${pluralize(total, "result")}`
+            ? `Showing ${total - ranked.hidden.length} of ${pluralize(total, "result")}`
             : pluralize(total, "result")}{" "}
-          for “{state.query}”.
-          {partialCount > 0 &&
-            ` ${ranked.shown.length} contain every term and ${ranked.shown.length === 1 ? "is" : "are"} listed below, sorted by score; ${partialCount} ${partialCount === 1 ? "is a partial match, kept" : "are partial matches, kept"} apart under “Partial matches”.`}
-          {partialCount === 0 && ` ${describeOrder(termMatching)}`}
+          for “{state.query}”. {pluralize(ranked.shown.length, "result")} {ranked.shown.length === 1 ? "is" : "are"} in the main list.
+          {sectioned > 0 &&
+            ` ${sectioned} ${sectioned === 1 ? "is" : "are"} kept apart in the collapsed sections below the list (${[
+              ranked.partial.length > 0 ? `${ranked.partial.length} partial matches` : "",
+              ranked.otherLanguages.length > 0 ? `${ranked.otherLanguages.length} in other languages` : "",
+              ranked.otherTypes.length > 0 ? `${ranked.otherTypes.length} datasets and other types` : "",
+            ]
+              .filter((part) => part !== "")
+              .join(", ")}); nothing is removed.`}
+          {` ${ORDER_SENTENCE}`}
           {searching && " More are still arriving, and the order may change as they do."}
           {duplicates > 0 &&
             ` ${pluralize(duplicates, "duplicate")} across sources ${duplicates === 1 ? "was" : "were"} merged, and each result lists every source that found it.`}
@@ -113,26 +117,32 @@ export function Results({
         </p>
       )}
 
-      {!searching && anyAnswered && hasFewFullMatches(ranked) && (
+      {(few || suggestion !== null) && (
         <div className="few-results" role="status">
-          {total > 0 && <p>{fewResultsMessage(termMatching)}</p>}
+          {few && total > 0 && <p>{fewResultsMessage()}</p>}
           {suggestion !== null && (
             <p className="did-you-mean">
               Did you mean{" "}
               <button type="button" className="link-button" onClick={() => onUseSuggestion(suggestion.text)}>
                 {suggestion.text}
               </button>
-              ? <span className="muted">PubMed’s spell checker suggests {suggestion.changes.map((change) => `“${change.to}” for “${change.from}”`).join(", ")}. Nothing is changed unless you click.</span>
+              ?{" "}
+              <span className="muted">
+                {suggestion.changes
+                  .map((change) => `“${change.from}” is in ${pluralize(change.resultsWithFrom, "result")}, “${change.to}” in ${change.resultsWithTo}`)
+                  .join("; ")}
+                . Nothing is changed unless you click.
+              </span>
             </p>
           )}
         </div>
       )}
 
-      {ranked.shown.length === 0 && partialCount === 0 && ranked.hidden.length > 0 && <p>Every result is hidden by your filters.</p>}
-      {ranked.shown.length === 0 && partialCount > 0 && !searching && (
+      {ranked.shown.length === 0 && sectioned === 0 && ranked.hidden.length > 0 && <p>Every result is hidden by your filters.</p>}
+      {ranked.shown.length === 0 && sectioned > 0 && !searching && (
         <p>
-          <strong>No result contains every term of your search.</strong> The partial matches are listed under “Partial
-          matches” below, each with what it matched.
+          <strong>Nothing is in the main list.</strong> The results are listed in the collapsed sections below, each with what it
+          matched.
         </p>
       )}
 
@@ -148,18 +158,14 @@ export function Results({
               override={overrides.get(scored.result.id)}
               libraryPrefix={libraryPrefix}
               onOverrideChange={onOverrideChange}
+              section="main"
             />
           </li>
         ))}
       </ol>
       {pagination("Pages (bottom)")}
 
-      <PartialMatches
-        items={ranked.partial}
-        overrides={overrides}
-        libraryPrefix={libraryPrefix}
-        onOverrideChange={onOverrideChange}
-      />
+      <ResultSections ranked={ranked} overrides={overrides} libraryPrefix={libraryPrefix} onOverrideChange={onOverrideChange} />
     </section>
   );
 }

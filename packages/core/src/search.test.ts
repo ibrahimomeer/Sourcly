@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { createSearchCache } from "./cache";
 import { parseQuery } from "./query";
-import { DEFAULT_TIMEOUT_MS, planQueries, searchProviders, type ProviderUpdate } from "./search";
+import { DEFAULT_TIMEOUT_MS, expandable, planExpandedQueries, planQueries, searchProviders, type ProviderUpdate } from "./search";
 import { makeResult } from "./testing/make-result";
 import { ProviderError, type Provider, type ProviderId, type Result } from "./types";
 
@@ -428,5 +428,71 @@ describe("searchProviders: what is sent", () => {
     await searchProviders(providers, "sleep OR memory", { limit: 5, cache });
     await searchProviders(providers, "sleep AND memory", { limit: 5, cache });
     expect(search).toHaveBeenCalledTimes(2);
+  });
+});
+
+describe("the expanded pass", () => {
+  const strictOnly = { id: "crossref" as const, name: "Crossref", syntax: "plain" as const };
+  const expanding = (search: (query: string, options: { limit: number; expanded?: boolean }) => Promise<Result[]>): Provider => ({
+    id: "openalex",
+    name: "OpenAlex",
+    syntax: "boolean",
+    expandedSyntax: "plain",
+    expandedRequestNotes: ["The default relevance search"],
+    search,
+  });
+
+  it("is planned only for the providers that have a looser way, with the words and without AND", () => {
+    const planned = planExpandedQueries([{ id: "openalex", expandedSyntax: "plain", expandedRequestNotes: ["a looser note"] }, strictOnly], "chaos double pendulum");
+    expect(planned).toEqual([{ provider: "openalex", text: "chaos double pendulum", notes: ["a looser note"] }]);
+  });
+
+  it("says what a plain pass leaves out, the same way the strict one does", () => {
+    const [only] = planExpandedQueries([{ id: "openalex", expandedSyntax: "plain" }], '"double pendulum" chaos NOT rats');
+    expect(only?.text).toBe("double pendulum chaos");
+    expect(only?.notes.length).toBeGreaterThan(0);
+  });
+
+  it("lists the providers that take part", () => {
+    const both = [expanding(async () => []), { ...strictOnly, search: async () => [] } as Provider];
+    expect(expandable(both).map((p) => p.id)).toEqual(["openalex"]);
+  });
+
+  it("asks only those providers, in their looser syntax, with expanded set, and marks every hit as expanded", async () => {
+    const asked: { query: string; expanded: boolean | undefined }[] = [];
+    const openalex = expanding(async (query, options) => {
+      asked.push({ query, expanded: options.expanded });
+      return [makeResult({ id: "10.1/a", hits: [{ provider: "openalex", id: "W1", rank: 1, listSize: 1, score: null }] })];
+    });
+    const crossref: Provider = { ...strictOnly, search: vi.fn(async () => [] as Result[]) };
+    const outcome = await searchProviders([openalex, crossref], "chaos double pendulum", { limit: 5, expanded: true });
+    expect(asked).toEqual([{ query: "chaos double pendulum", expanded: true }]);
+    expect(crossref.search).not.toHaveBeenCalled();
+    expect(outcome.statuses).toHaveLength(1);
+    expect(outcome.results[0]?.hits).toEqual([{ provider: "openalex", id: "W1", rank: 1, listSize: 1, score: null, expanded: true }]);
+  });
+
+  it("does not mark the results of the strict pass", async () => {
+    const openalex = expanding(async () => [makeResult({ id: "10.1/a", hits: [{ provider: "openalex", id: "W1", rank: 1, listSize: 1, score: null }] })]);
+    const outcome = await searchProviders([openalex], "sleep", { limit: 5 });
+    expect(outcome.results[0]?.hits[0]).not.toHaveProperty("expanded");
+  });
+
+  it("remembers the expanded answer apart from the strict one, even for the same text", async () => {
+    const cache = createSearchCache();
+    const calls: (boolean | undefined)[] = [];
+    const openalex = expanding(async (_query, options) => {
+      calls.push(options.expanded);
+      return [];
+    });
+    await searchProviders([openalex], "sleep", { limit: 5, cache });
+    await searchProviders([openalex], "sleep", { limit: 5, cache, expanded: true });
+    await searchProviders([openalex], "sleep", { limit: 5, cache, expanded: true });
+    expect(calls).toEqual([undefined, true]);
+  });
+
+  it("asks nothing when no provider has an expanded pass", async () => {
+    const outcome = await searchProviders([{ ...strictOnly, search: async () => [] }], "sleep", { limit: 5, expanded: true });
+    expect(outcome).toEqual({ results: [], statuses: [] });
   });
 });

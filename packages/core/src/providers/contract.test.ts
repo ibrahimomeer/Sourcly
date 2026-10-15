@@ -25,12 +25,12 @@ interface Case {
 }
 
 const cases: Case[] = [
-  { name: "Crossref", make: (fetch) => createCrossrefProvider({ fetch }), host: "api.crossref.org", limitParam: "rows", max: 50, queryOf: (url) => url.searchParams.get("query.bibliographic") },
+  { name: "Crossref", make: (fetch) => createCrossrefProvider({ fetch }), host: "api.crossref.org", limitParam: "rows", max: 25, queryOf: (url) => url.searchParams.get("query.bibliographic") },
   { name: "Europe PMC", make: (fetch) => createEuropePmcProvider({ fetch }), host: "www.ebi.ac.uk", limitParam: "pageSize", max: 100, queryOf: (url) => url.searchParams.get("query") },
   { name: "DOAJ", make: (fetch) => createDoajProvider({ fetch }), host: "doaj.org", limitParam: "pageSize", max: 100, queryOf: (url) => decodeURIComponent(url.pathname.replace("/api/search/articles/", "")) },
   { name: "DataCite", make: (fetch) => createDataCiteProvider({ fetch }), host: "api.datacite.org", limitParam: "page[size]", max: 100, queryOf: (url) => url.searchParams.get("query") },
   { name: "Zenodo", make: (fetch) => createZenodoProvider({ fetch }), host: "zenodo.org", limitParam: "size", max: 25, queryOf: (url) => url.searchParams.get("q") },
-  { name: "Wikipedia", make: (fetch) => createWikipediaProvider({ fetch }), host: "en.wikipedia.org", limitParam: "gsrlimit", max: 20, queryOf: (url) => url.searchParams.get("gsrsearch") },
+  { name: "Wikipedia", make: (fetch) => createWikipediaProvider({ fetch }), host: "en.wikipedia.org", limitParam: "gsrlimit", max: 5, queryOf: (url) => url.searchParams.get("gsrsearch") },
   { name: "Semantic Scholar", make: (fetch) => createSemanticScholarProvider({ fetch }), host: "api.semanticscholar.org", limitParam: "limit", max: 100, queryOf: (url) => url.searchParams.get("query") },
 ];
 

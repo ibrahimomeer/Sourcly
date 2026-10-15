@@ -1,11 +1,57 @@
-import type { ScoredResult } from "@sourcly/core";
+import { languageExplanation, resolveLanguage, type ScoredResult, type SectionId } from "@sourcly/core";
 import { formatNumber, formatRaw } from "./format";
 
+const TIER_TEXT = { 1: "every word", 2: "most of the words", 3: "few of the words" } as const;
+
+const SECTION_TEXT: Record<SectionId, string> = {
+  main: "the main list",
+  partial: "Partial matches: it lacks more than one of your words",
+  otherLanguages: "Other languages: it is not in one of your preferred languages",
+  otherTypes: "Datasets, presentations and other types: it is not an article, or only a repository holds it",
+};
+
+/** Where the result sits and the three things that put it there, before the score is used. Empty when it is not in a search. */
+function Placement({ scored, section }: { scored: ScoredResult; section: SectionId | undefined }) {
+  const coverage = scored.coverage;
+  const language = resolveLanguage(scored.result);
+  return (
+    <div className="placement">
+      <p>
+        <strong>Placement.</strong> {section !== undefined && <>It is in {SECTION_TEXT[section]}. </>}Results are ordered by three
+        things, in this order: how many of your words they contain, whether your words appear next to each other, in order, and
+        then the score below.
+      </p>
+      <ol>
+        <li>
+          <strong>Coverage tier {coverage === null ? "1" : scored.tier}</strong>
+          {coverage === null || coverage.total === 0
+            ? ": the search has no words to look for."
+            : `: contains ${TIER_TEXT[scored.tier]} (${coverage.matchedCount} of ${coverage.total}).`}
+        </li>
+        <li>
+          <strong>Phrase match {coverage?.phraseScore === null || coverage === null ? "none" : formatNumber(coverage.phraseScore)}</strong>
+          {coverage === null || coverage.phraseScore === null
+            ? ": the search has no two words next to each other."
+            : `: ${coverage.pairs.filter((pair) => pair.found !== null).length} of ${coverage.pairs.length} neighbouring pairs are adjacent (in the title 1, in the abstract 0.7).`}
+        </li>
+        <li>
+          <strong>Score {formatNumber(scored.score, 3)}</strong>: the table below.
+        </li>
+      </ol>
+      <p className="muted">
+        Type: {scored.result.type}
+        {scored.result.rawType !== null ? ` (the source says “${scored.result.rawType.value}”)` : ""}. Language: {languageExplanation(language)}
+      </p>
+    </div>
+  );
+}
+
 /** Every ranking decision, factor by factor, so the order can be checked by hand. */
-export function WhyThisRank({ scored }: { scored: ScoredResult }) {
+export function WhyThisRank({ scored, section }: { scored: ScoredResult; section?: SectionId | undefined }) {
   return (
     <details className="panel why">
       <summary>Why this rank?</summary>
+      <Placement scored={scored} section={section} />
       <p>
         Score = sum of (weight × normalized value) ÷ sum of the weights of the factors that are on. Every normalized
         value is between 0 and 1.

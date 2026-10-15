@@ -3,6 +3,7 @@ import {
   createCrossrefProvider,
   createOpenAlexProvider,
   defaultFilters,
+  defaultLayoutSettings,
   defaultScoringSettings,
   measureCoverage,
   parseQuery,
@@ -11,12 +12,11 @@ import {
   renderQuery,
   type ProviderId,
   type Result,
-  type TermMatching,
 } from "@sourcly/core";
 import { makeResult } from "@sourcly/core/testing";
 import { describe, expect, it } from "vitest";
 import { queryChipsModel } from "./chipsModel";
-import { rankResults, scoringContext, type RankedView } from "./pipeline";
+import { allResults, rankResults, scoringContext, type RankedView } from "./pipeline";
 import { prepareSearch } from "./queryText";
 import { idleSearch, searchReducer } from "./searchState";
 // Real answers, recorded on 2026-10-15 from the requests the app made for "caos double pendulum" before
@@ -51,7 +51,7 @@ const providers: { id: ProviderId; syntax: "boolean" | "plain" }[] = [
 ];
 
 /** The recorded pool, ranked for a search typed as `text`, the way the page does it. */
-function rankFor(pool: readonly Result[], text: string, termMatching: TermMatching = "all"): RankedView {
+function rankFor(pool: readonly Result[], text: string): RankedView {
   const parsed = parseQuery(text);
   const state = searchReducer(idleSearch, {
     type: "start",
@@ -62,11 +62,12 @@ function rankFor(pool: readonly Result[], text: string, termMatching: TermMatchi
     skipped: [],
   });
   if (state.phase === "idle") throw new Error("expected an active search");
-  return rankResults(pool, { scoring: { ...defaultScoringSettings(), termMatching }, filters: defaultFilters(), overrides: new Map() }, scoringContext(state, 2026));
+  return rankResults(pool, { scoring: defaultScoringSettings(), filters: defaultFilters(), overrides: new Map(), layout: defaultLayoutSettings() }, scoringContext(state, 2026));
 }
 
 const titleOf = (scored: { result: Result }) => scored.result.title;
 const everyone = (ranked: RankedView) => [...ranked.shown, ...ranked.partial];
+const everything = (ranked: RankedView) => allResults(ranked);
 
 /** Whether a ranked result contains the word as a term of the search, by the coverage that ranking worked out. */
 const contains = (scored: RankedView["shown"][number], term: string) =>
@@ -101,10 +102,12 @@ describe("the recorded answers", () => {
 });
 
 describe("“caos double pendulum”: results that lack “pendulum” never outrank results that have “double pendulum”", () => {
-  it("holds in the one list that Rank by coverage gives", async () => {
+  const adjacent = (r: RankedView["shown"][number]) => r.coverage?.pairs.find((pair) => pair.text === "double pendulum")?.found != null;
+
+  it("holds in the main list and the partial matches read in order", async () => {
     const pool = await recorded();
-    const order = everyone(rankFor(pool, "caos double pendulum", "coverage"));
-    expect(order.length).toBeGreaterThan(40);
+    const order = everyone(rankFor(pool, "caos double pendulum"));
+    expect(order.length).toBeGreaterThan(30);
 
     const without = order.map((r, index) => ({ r, index })).filter(({ r }) => !contains(r, "pendulum"));
     const withBoth = order.map((r, index) => ({ r, index })).filter(({ r }) => contains(r, "double") && contains(r, "pendulum"));
@@ -113,50 +116,63 @@ describe("“caos double pendulum”: results that lack “pendulum” never out
     expect(Math.max(...withBoth.map(({ index }) => index))).toBeLessThan(Math.min(...without.map(({ index }) => index)));
   });
 
-  it("holds in the default view too, where the others are kept apart under “Partial matches”", async () => {
+  it("fails when the order ignores how many words a result contains", async () => {
+    // The same results ordered by score alone: the check above would not hold.
     const pool = await recorded();
     const ranked = rankFor(pool, "caos double pendulum");
-    const order = everyone(ranked);
-    const lastWithBoth = Math.max(...order.map((r, i) => (contains(r, "double") && contains(r, "pendulum") ? i : -1)));
-    const firstWithout = Math.min(...order.map((r, i) => (!contains(r, "pendulum") ? i : Number.MAX_SAFE_INTEGER)));
-    expect(lastWithBoth).toBeLessThan(firstWithout);
+    const byScore = [...ranked.shown, ...ranked.partial].sort((a, b) => b.score - a.score);
+    const lastBoth = Math.max(...byScore.map((r, i) => (contains(r, "double") && contains(r, "pendulum") ? i : -1)));
+    const firstWithout = Math.min(...byScore.map((r, i) => (!contains(r, "pendulum") ? i : Number.MAX_SAFE_INTEGER)));
+    expect(lastBoth).toBeGreaterThan(firstWithout);
   });
 
-  it("keeps each of the three reported results out of the main list, and in Partial matches, not deleted", async () => {
+  it("puts the Spanish paper in Other languages and the CAOS editorials in Partial matches, and deletes none of them", async () => {
     const pool = await recorded();
     const ranked = rankFor(pool, "caos double pendulum");
-    const reported = (r: { result: Result }) => SLAG.test(r.result.title) || SPANISH_CHAOS.test(r.result.title) || CAOS_EDITORIAL(r.result);
-    expect(ranked.shown.filter(reported)).toEqual([]);
-    expect(ranked.partial.filter(reported).length).toBeGreaterThanOrEqual(3);
+    expect(ranked.shown.filter((r) => SPANISH_CHAOS.test(r.result.title) || CAOS_EDITORIAL(r.result))).toEqual([]);
+    expect(ranked.otherLanguages.filter((r) => SPANISH_CHAOS.test(r.result.title))).toHaveLength(1);
+    expect(ranked.partial.filter((r) => CAOS_EDITORIAL(r.result)).length).toBeGreaterThanOrEqual(1);
     expect(ranked.hidden).toEqual([]);
   });
 
-  it("lists only results that contain every term in the main list, and says what each partial match has", async () => {
+  it("lists in the main list only results that lack at most one word, and says what each partial match has", async () => {
     const pool = await recorded();
     const ranked = rankFor(pool, "caos double pendulum");
-    for (const scored of ranked.shown) expect(scored.coverage?.matchedCount).toBe(scored.coverage?.total);
+    for (const scored of ranked.shown) expect(scored.coverage?.matchedCount).toBeGreaterThanOrEqual((scored.coverage?.total ?? 0) - 1);
     for (const scored of ranked.partial) {
-      expect(scored.coverage?.matchedCount).toBeLessThan(scored.coverage?.total ?? 0);
+      expect(scored.coverage?.matchedCount).toBeLessThan((scored.coverage?.total ?? 0) - 1);
       expect(scored.tier).toBeGreaterThan(1);
     }
   });
 
-  it("ranks each of the three reported results below every result that contains every term", async () => {
+  it("ranks the three reported results below every result that contains every word", async () => {
     const pool = await recorded();
-    const order = everyone(rankFor(pool, "caos double pendulum", "coverage"));
+    // The main list and the sections, one after the other: the main list comes first and its full matches come first in it.
+    const ranked = rankFor(pool, "caos double pendulum");
+    const order = [...ranked.shown, ...ranked.partial, ...ranked.otherLanguages, ...ranked.otherTypes];
     const lastFull = Math.max(...order.map((r, i) => (r.tier === 1 ? i : -1)));
     const reported = order.map((r, i) => ({ r, i })).filter(({ r }) => SLAG.test(titleOf(r)) || SPANISH_CHAOS.test(titleOf(r)) || CAOS_EDITORIAL(r.result));
     expect(reported.length).toBeGreaterThanOrEqual(3);
     for (const { i } of reported) expect(i).toBeGreaterThan(lastFull);
   });
 
+  it("ranks the steel slag paper below every result that has the words “double pendulum” next to each other", async () => {
+    const pool = await recorded();
+    const order = everyone(rankFor(pool, "caos double pendulum"));
+    const slag = order.findIndex((r) => SLAG.test(titleOf(r)));
+    const lastAdjacent = Math.max(...order.map((r, i) => (adjacent(r) ? i : -1)));
+    expect(slag).toBeGreaterThan(-1);
+    expect(lastAdjacent).toBeGreaterThan(-1);
+    expect(slag).toBeGreaterThan(lastAdjacent);
+  });
+
   it("matches the Spanish paper and the CAOS editorials on “caos” alone, or on nothing, so they are in the lowest tier", async () => {
     const pool = await recorded();
-    const order = everyone(rankFor(pool, "caos double pendulum", "coverage"));
+    const order = everything(rankFor(pool, "caos double pendulum"));
     const spanish = order.find((r) => SPANISH_CHAOS.test(titleOf(r)));
     expect(spanish?.tier).toBe(3);
     expect(spanish?.coverage?.units.filter((u) => u.matched).map((u) => u.label)).toEqual(["caos"]);
-    // A journal called CAOS is not a match: only a result's title, keywords, topics and abstract are read, not its venue.
+    // A journal called CAOS is not a match: only a result's title, keywords and abstract are read, not its venue.
     const editorials = order.filter((r) => CAOS_EDITORIAL(r.result));
     expect(editorials.length).toBeGreaterThanOrEqual(1);
     for (const editorial of editorials) {
@@ -167,14 +183,15 @@ describe("“caos double pendulum”: results that lack “pendulum” never out
     expect(editorials.some((e) => e.coverage?.matchedCount === 0)).toBe(true);
   });
 
-  it("says why the steel slag paper is where it is: its abstract has “caos” and “pendulum” but not “double”", async () => {
-    // This is how far the word matching goes: a result that has two of the three words is in the middle tier
-    // whatever the words are. It is kept out of the main list, and the card says what it matched and what it did not.
+  it("no longer matches “caos” in the steel slag paper: its abstract says “CaO” (calcium oxide), and “caos” is not “cao”", async () => {
     const pool = await recorded();
-    const slag = everyone(rankFor(pool, "caos double pendulum")).find((r) => SLAG.test(titleOf(r)));
-    expect(slag?.tier).toBe(2);
-    expect(slag?.coverage?.units.map((u) => [u.label, u.matched])).toEqual([["caos", true], ["double", false], ["pendulum", true]]);
-    expect(slag?.coverage?.pairs.every((pair) => pair.found === null)).toBe(true);
+    const ranked = rankFor(pool, "caos double pendulum");
+    const slag = everything(ranked).find((r) => SLAG.test(titleOf(r)));
+    expect(slag?.coverage?.units.map((u) => [u.label, u.matched])).toEqual([["caos", false], ["double", false], ["pendulum", true]]);
+    expect(slag?.tier).toBe(3);
+    // It is kept apart in Partial matches, not deleted, and the card says what it matched.
+    expect(ranked.partial.some((r) => SLAG.test(titleOf(r)))).toBe(true);
+    expect(ranked.shown.some((r) => SLAG.test(titleOf(r)))).toBe(false);
   });
 });
 
@@ -192,7 +209,7 @@ describe("the same words in another order, or with a phrase, give the same top s
 
   it("puts the same ten results at the top for all three", async () => {
     const pool = await recorded();
-    const tops = typed.map((text) => ids(rankFor(pool, text, "coverage").shown.slice(0, 10)));
+    const tops = typed.map((text) => ids(rankFor(pool, text).shown.slice(0, 10)));
     expect(tops[0]).toHaveLength(10);
     expect(tops[1]).toEqual(tops[0]);
     expect(tops[2]).toEqual(tops[0]);

@@ -6,16 +6,15 @@ import {
   type Provider,
   type ProviderStatus,
   type SearchCache,
-  type TermMatching,
 } from "@sourcly/core";
 import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { COUNTER_VIEWS, countViews, selectView, type CounterView } from "./counterView";
 import { CounterTerms } from "./CounterTerms";
-import { describeOrder, pluralize } from "./format";
+import { ORDER_SENTENCE, pluralize } from "./format";
 import { Pagination } from "./Pagination";
-import { PartialMatches } from "./PartialMatches";
+import { ResultSections } from "./ResultSections";
 import { paginate } from "./paginate";
-import { rankResults, scoringContext, type ViewSettings } from "./pipeline";
+import { allResults, rankResults, scoringContext, type ViewSettings } from "./pipeline";
 import { ProviderStatuses } from "./ProviderStatuses";
 import type { CounterRecord } from "./protocolRecord";
 import { QueryNote } from "./QueryNote";
@@ -253,7 +252,6 @@ export function CounterPanel({
             onOverrideChange={onOverrideChange}
             onClearFilters={onClearFilters}
             usedLexicon={searched?.lexicon === true}
-            termMatching={view.scoring.termMatching}
           />
         )}
       </div>
@@ -274,7 +272,6 @@ function CounterResults({
   onOverrideChange,
   onClearFilters,
   usedLexicon,
-  termMatching,
 }: {
   state: ActiveSearch;
   ranked: ReturnType<typeof rankResults>;
@@ -288,10 +285,9 @@ function CounterResults({
   onOverrideChange: (resultId: string, change: LabelOverride) => void;
   onClearFilters: () => void;
   usedLexicon: boolean;
-  termMatching: TermMatching;
 }) {
   const searching = state.phase === "searching";
-  const total = ranked.shown.length + ranked.hidden.length + ranked.partial.length;
+  const total = allResults(ranked).length;
   const counts = countViews(ranked.shown);
   const list = selectView(ranked.shown, panelView);
   const current = paginate(list, page);
@@ -318,9 +314,7 @@ function CounterResults({
         <>
           <p className="summary">
             {pluralize(total, "result")} {usedLexicon ? "for your search plus the terms above" : "for your own search"}.
-            {ranked.partial.length > 0
-              ? ` ${ranked.shown.length} contain every term of your search and ${ranked.shown.length === 1 ? "is" : "are"} sorted by score; ${ranked.partial.length} ${ranked.partial.length === 1 ? "is a partial match, kept" : "are partial matches, kept"} apart under “Partial matches”.`
-              : ` ${describeOrder(termMatching)}`}
+            {` ${ranked.shown.length} ${ranked.shown.length === 1 ? "is" : "are"} in the main list; the rest are kept apart in the collapsed sections below, nothing removed. ${ORDER_SENTENCE}`}
             {usedLexicon &&
               " Sources that cannot ask for “any of these terms” were sent only your search (see the exact queries above), so some of their results contain none of the terms and rank lower."}
             {searching && " More are still arriving, and the order may change as they do."}
@@ -356,13 +350,14 @@ function CounterResults({
               libraryPrefix={libraryPrefix}
               onOverrideChange={onOverrideChange}
               highlight={terms}
+              section="main"
             />
           </li>
         ))}
       </ol>
       {pagination("Counterargument pages (bottom)")}
-      <PartialMatches
-        items={ranked.partial}
+      <ResultSections
+        ranked={ranked}
         overrides={overrides}
         libraryPrefix={libraryPrefix}
         onOverrideChange={onOverrideChange}

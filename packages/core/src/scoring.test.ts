@@ -541,102 +541,30 @@ describe("scoreResults: term coverage comes first", () => {
     for (const order of results) expect(new Set(order.slice(0, 1))).toEqual(new Set(["10.1/all"]));
   });
 
-  it("does not use the tier when term matching is set to ignore coverage", () => {
-    const settings = defaultScoringSettings();
-    settings.termMatching = "ignore";
-    const scored = scoreResults(items(), settings, withSpec("chaos double pendulum"));
-    expect(scored.map((s) => s.score)).toEqual([...scored.map((s) => s.score)].sort((a, b) => b - a));
-    // Every result still reports its tier, so the card can say what matched.
-    expect(scored.find((s) => s.result.id === "10.1/all")?.tier).toBe(1);
+  it("always orders by tier first: a result with every word comes before one with fewer, whatever its score", () => {
+    const scored = scoreResults(items(), defaultScoringSettings(), withSpec("chaos double pendulum"));
+    const tiers = scored.map((s) => s.tier);
+    expect(tiers).toEqual([...tiers].sort((a, b) => a - b));
+    expect(scored[0]?.result.id).toBe("10.1/all");
   });
 
-  it("orders by tier for both 'all' and 'coverage' (the app decides what to do with the partial ones)", () => {
-    for (const mode of ["all", "coverage"] as const) {
-      const settings = defaultScoringSettings();
-      settings.termMatching = mode;
-      expect(ids(scoreResults(items(), settings, withSpec("chaos double pendulum")))[0]).toBe("10.1/all");
-    }
-  });
-
-  it("is tier 1 for everyone, and scores neutral, when there is no query to match", () => {
-    const scored = scoreResults(items(), defaultScoringSettings(), ctx({ queryTerms: [] }));
-    expect(scored.every((s) => s.tier === 1 && s.coverage === null)).toBe(true);
-    const factor = scored[0]?.factors.find((f) => f.factor === "termCoverage");
-    expect(factor).toMatchObject({ raw: null, normalized: 0.5 });
-    expect(factor?.detail).toContain("no terms to look for");
-  });
-
-  it("reports which terms matched, as a list with the count, and the fraction as the normalized value", () => {
-    const scored = scoreResults(items(), only("termCoverage"), withSpec("chaos double pendulum"));
-    const two = scored.find((s) => s.result.id === "10.1/two");
-    const factor = two?.factors.find((f) => f.factor === "termCoverage");
-    expect(factor?.raw).toBe("double, pendulum (2 of 3)");
-    expect(factor?.normalized).toBeCloseTo(2 / 3, 12);
-    expect(factor?.detail).toContain("Found 2 of 3 terms: double (title); pendulum (title)");
-    expect(factor?.detail).toContain("Not found: chaos");
-    expect(factor?.detail).toContain("1 if it is in the title, 0.8 in the author keywords, 0.7 in the provider topics, 0.6 if only in the abstract");
-  });
-
-  it("weighs a term found in the title above one found only in the abstract", () => {
-    const inTitle = item({ id: "10.1/t", title: "Pendulum" });
-    const inAbstract = item({ id: "10.1/a", title: "Other", abstract: "a pendulum" });
-    const scored = scoreResults([inAbstract, inTitle], only("termCoverage"), ctx({ coverage: query("pendulum") }));
-    expect(scored.map((s) => [s.result.id, s.factors.find((f) => f.factor === "termCoverage")?.normalized])).toEqual([
-      ["10.1/t", 1],
-      ["10.1/a", 0.6],
-    ]);
-  });
-
-  it("scores phrase match from query words found next to each other, in the title or the abstract", () => {
-    const together = item({ id: "10.1/together", title: "A double pendulum" });
-    const apart = item({ id: "10.1/apart", title: "A pendulum and a double" });
-    const abstractOnly = item({ id: "10.1/abstract", title: "Other", abstract: "the double pendulum" });
-    const scored = scoreResults([apart, abstractOnly, together], only("phraseMatch"), ctx({ coverage: query("double pendulum") }));
-    const phrase = (id: string) => scored.find((s) => s.result.id === id)?.factors.find((f) => f.factor === "phraseMatch");
-    expect(phrase("10.1/together")).toMatchObject({ normalized: 1, raw: "1 of 1 pairs" });
-    expect(phrase("10.1/abstract")?.normalized).toBe(0.7);
-    expect(phrase("10.1/apart")?.normalized).toBe(0);
-    expect(phrase("10.1/together")?.detail).toContain("double pendulum (title)");
-    expect(phrase("10.1/apart")?.detail).toContain("Not found together: double pendulum");
-  });
-
-  it("scores phrase match neutral when the query has no two words next to each other", () => {
-    const scored = scoreResults([item({ id: "10.1/x", title: "Sleep" })], only("phraseMatch"), ctx({ coverage: query("sleep") }));
-    expect(scored[0]?.factors.find((f) => f.factor === "phraseMatch")).toMatchObject({ raw: null, normalized: 0.5 });
-  });
-
-  it("lets a quoted phrase decide: a result with the words apart is not tier 1", () => {
+  it("orders by phrase match inside a tier, before the score", () => {
+    const adjacent = makeResult({ id: "10.1/adjacent", doi: "10.1/adjacent", title: "The double pendulum", year: 1990, citationCount: 0 });
+    const apart = makeResult({ id: "10.1/apart", doi: "10.1/apart", title: "Pendulum and a double", year: 2026, citationCount: 5000 });
     const scored = scoreResults(
-      [item({ id: "10.1/apart", title: "A pendulum, double" }), item({ id: "10.1/adjacent", title: "The double pendulum" })],
+      [adjacent, apart].map((result) => ({ result, labels: classify(result) })),
       defaultScoringSettings(),
-      ctx({ coverage: query('"double pendulum"') }),
+      withSpec("double pendulum"),
     );
-    expect(scored.map((s) => [s.result.id, s.tier])).toEqual([
-      ["10.1/adjacent", 1],
-      ["10.1/apart", 3],
-    ]);
-  });
-
-  it("can be switched off like any factor, and then adds nothing to the score", () => {
-    const settings = only("relevance");
-    const scored = scoreResults(items(), settings, withSpec("chaos double pendulum"));
-    for (const s of scored) {
-      expect(s.factors.find((f) => f.factor === "termCoverage")).toMatchObject({ enabled: false, contribution: 0 });
-    }
+    expect(scored.map((s) => s.tier)).toEqual([1, 1]);
+    // The newer, much more cited one scores higher, but the words are not next to each other in it.
+    expect(scored.find((s) => s.result.id === "10.1/apart")!.score).toBeGreaterThan(scored.find((s) => s.result.id === "10.1/adjacent")!.score);
+    expect(ids(scored)).toEqual(["10.1/adjacent", "10.1/apart"]);
   });
 
   it("is deterministic and does not depend on the order results arrive in", () => {
     const forwards = scoreResults(items(), defaultScoringSettings(), withSpec("chaos double pendulum"));
     const backwards = scoreResults([...items()].reverse(), defaultScoringSettings(), withSpec("chaos double pendulum"));
     expect(backwards.map((s) => [s.result.id, s.score, s.tier])).toEqual(forwards.map((s) => [s.result.id, s.score, s.tier]));
-  });
-});
-
-describe("defaultScoringSettings: term matching", () => {
-  it("requires all terms by default, and each copy is independent", () => {
-    expect(defaultScoringSettings().termMatching).toBe("all");
-    const one = defaultScoringSettings();
-    one.termMatching = "ignore";
-    expect(defaultScoringSettings().termMatching).toBe("all");
   });
 });

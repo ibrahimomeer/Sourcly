@@ -1,6 +1,8 @@
 import {
+  FEW_FULL_MATCHES,
   coverageSpec,
   defaultFilters,
+  defaultLayoutSettings,
   defaultScoringSettings,
   FACTOR_IDS,
   parseQuery,
@@ -13,7 +15,7 @@ import {
 import { makeResult } from "@sourcly/core/testing";
 import { describe, expect, it } from "vitest";
 import {
-  FEW_FULL_MATCHES,
+  allResults,
   fullMatchCount,
   hasFewFullMatches,
   rankResults,
@@ -57,6 +59,7 @@ const view = (changes: Partial<ViewSettings> = {}): ViewSettings => ({
   scoring: defaultScoringSettings(),
   filters: defaultFilters(),
   overrides: new Map(),
+  layout: defaultLayoutSettings(),
   ...changes,
 });
 
@@ -136,7 +139,7 @@ describe("rankResults", () => {
   });
 
   it("returns empty lists for no results", () => {
-    expect(rankResults([], view(), context())).toEqual({ shown: [], hidden: [], partial: [] });
+    expect(rankResults([], view(), context())).toEqual({ shown: [], hidden: [], partial: [], otherLanguages: [], otherTypes: [] });
   });
 });
 
@@ -285,7 +288,7 @@ describe("relatedFor", () => {
   it("suggests terms from the top results only", () => {
     const top = Array.from({ length: RELATED_FROM_TOP }, (_, i) => withTopics(`10.1/top${i}`, topic("Common Topic")));
     const beyond = withTopics("10.1/beyond", topic("Only Far Down"));
-    const ranked = { shown: [...top, beyond].map((result) => ({ result }) as never), hidden: [], partial: [] };
+    const ranked = { shown: [...top, beyond].map((result) => ({ result }) as never), hidden: [], partial: [], otherLanguages: [], otherTypes: [] };
     const terms = relatedFor(ranked, []).map((t) => t.term);
     expect(terms).toEqual(["Common Topic"]);
   });
@@ -295,12 +298,14 @@ describe("relatedFor", () => {
       shown: [withTopics("10.1/a", topic("Sleep"), topic("Dreaming"))].map((result) => ({ result }) as never),
       hidden: [],
       partial: [],
+      otherLanguages: [],
+      otherTypes: [],
     };
     expect(relatedFor(ranked, ["sleep"]).map((t) => t.term)).toEqual(["Dreaming"]);
   });
 });
 
-describe("rankResults: term coverage", () => {
+describe("rankResults: sections", () => {
   const spec = coverageSpec(parseQuery("chaos double pendulum"));
   const withCoverage = (): ScoringContext => ({ referenceYear: YEAR, queryTerms: ["chaos", "double", "pendulum"], answeredSources: 1, coverage: spec });
   const pile = (): Result[] => [
@@ -309,59 +314,43 @@ describe("rankResults: term coverage", () => {
     makeResult({ id: "10.1/all", doi: "10.1/all", title: "Chaos in a double pendulum", citationCount: 0, year: 1990 }),
     makeResult({ id: "10.1/all2", doi: "10.1/all2", title: "Double pendulum chaos", citationCount: 0, year: 1991 }),
   ];
-  const settings = (termMatching: "all" | "coverage" | "ignore") => view({ scoring: { ...defaultScoringSettings(), termMatching } });
 
-  it("keeps results that lack a term out of the main list, but not out of the page", () => {
-    const { shown, partial, hidden } = rankResults(pile(), settings("all"), withCoverage());
-    // Same tier and same phrase score, so the newer paper comes first.
-    expect(ids(shown)).toEqual(["10.1/all2", "10.1/all"]);
-    expect(ids(partial)).toEqual(["10.1/two", "10.1/slag"]);
+  it("puts results that contain every word in the main list, and, while they are few, those that lack one, after them", () => {
+    const { shown, partial, hidden } = rankResults(pile(), view(), withCoverage());
+    // Same tier and the same phrase score, so the newer paper comes first.
+    expect(ids(shown)).toEqual(["10.1/all2", "10.1/all", "10.1/two"]);
+    expect(ids(partial)).toEqual(["10.1/slag"]);
     expect(hidden).toEqual([]);
-    expect(shown.length + partial.length + hidden.length).toBe(4);
+    expect(allResults({ shown, partial, hidden, otherLanguages: [], otherTypes: [] })).toHaveLength(4);
   });
 
-  it("labels every partial match with what it matched", () => {
-    const { partial } = rankResults(pile(), settings("all"), withCoverage());
-    expect(partial.map((p) => [p.result.id, p.coverage?.matchedCount, p.coverage?.total, p.tier])).toEqual([
-      ["10.1/two", 2, 3, 2],
-      ["10.1/slag", 1, 3, 3],
-    ]);
+  it("keeps a result that lacks two words out of the main list, labelled by what it matched", () => {
+    const { partial } = rankResults(pile(), view(), withCoverage());
+    expect(partial.map((p) => [p.result.id, p.coverage?.matchedCount, p.coverage?.total, p.tier])).toEqual([["10.1/slag", 1, 3, 3]]);
   });
 
-  it("is the default", () => {
-    expect(view().scoring.termMatching).toBe("all");
-  });
-
-  it("puts every result in one list, in tiers, when set to rank by coverage", () => {
-    const { shown, partial } = rankResults(pile(), settings("coverage"), withCoverage());
-    expect(partial).toEqual([]);
-    expect(ids(shown)).toEqual(["10.1/all2", "10.1/all", "10.1/two", "10.1/slag"]);
-  });
-
-  it("orders by score alone when set to ignore coverage", () => {
-    const { shown, partial } = rankResults(pile(), settings("ignore"), withCoverage());
-    expect(partial).toEqual([]);
-    expect(shown.map((s) => s.score)).toEqual([...shown.map((s) => s.score)].sort((a, b) => b - a));
-    expect(shown).toHaveLength(4);
+  it("orders the main list by tier, then phrase match, then score", () => {
+    const { shown } = rankResults(pile(), view(), withCoverage());
+    expect(shown.map((s) => s.tier)).toEqual([1, 1, 2]);
   });
 
   it("has no partial matches when there is no query to match", () => {
-    const { shown, partial } = rankResults(pile(), settings("all"), context());
+    const { shown, partial } = rankResults(pile(), view(), context());
     expect(partial).toEqual([]);
     expect(shown).toHaveLength(4);
   });
 
-  it("applies filters before the split, so a filtered-out result is hidden, not partial", () => {
+  it("applies filters before the sections, so a filtered-out result is hidden, not partial", () => {
     const filters = { ...defaultFilters(), yearFrom: 2000 };
-    const { shown, partial, hidden } = rankResults(pile(), view({ scoring: settings("all").scoring, filters }), withCoverage());
-    expect(ids(shown)).toEqual([]);
-    expect(ids(partial)).toEqual(["10.1/two", "10.1/slag"]);
+    const { shown, partial, hidden } = rankResults(pile(), view({ filters }), withCoverage());
+    expect(ids(shown)).toEqual(["10.1/two"]);
+    expect(ids(partial)).toEqual(["10.1/slag"]);
     expect(ids(hidden).sort()).toEqual(["10.1/all", "10.1/all2"]);
   });
 
   it("gives the same lists whatever order the results arrive in", () => {
-    const forwards = rankResults(pile(), settings("all"), withCoverage());
-    const backwards = rankResults([...pile()].reverse(), settings("all"), withCoverage());
+    const forwards = rankResults(pile(), view(), withCoverage());
+    const backwards = rankResults([...pile()].reverse(), view(), withCoverage());
     expect(ids(backwards.shown)).toEqual(ids(forwards.shown));
     expect(ids(backwards.partial)).toEqual(ids(forwards.partial));
   });
@@ -375,38 +364,38 @@ describe("rankResults: term coverage", () => {
   });
 });
 
-describe("rankResults: the language filter", () => {
+describe("rankResults: other languages and other types", () => {
   const spec = coverageSpec(parseQuery("pendulum"));
   const withCoverage = (): ScoringContext => ({ referenceYear: YEAR, queryTerms: ["pendulum"], answeredSources: 1, coverage: spec });
+  const VIETNAMESE = "Thiết kế và tối ưu hóa bộ điều khiển sử dụng thuật toán di truyền để điều khiển cần cẩu trên cao";
   const pile = (): Result[] => [
     makeResult({ id: "10.1/en", doi: "10.1/en", title: "A pendulum", language: "en" }),
-    makeResult({ id: "10.1/pt", doi: "10.1/pt", title: "O pendulum", language: "pt" }),
+    makeResult({ id: "10.1/vi", doi: "10.1/vi", title: "Pendulum", abstract: VIETNAMESE, language: "en" }),
+    makeResult({ id: "10.1/data", doi: "10.1/data", title: "Pendulum data", type: "dataset", language: "en" }),
     makeResult({ id: "10.1/none", doi: "10.1/none", title: "Pendulum", language: null }),
   ];
-  const byLanguage = (languages: string[]) => view({ filters: { ...defaultFilters(), languages } });
 
-  it("shows every language, including unknown, by default", () => {
-    const { shown, hidden } = rankResults(pile(), view(), withCoverage());
-    expect(shown).toHaveLength(3);
-    expect(hidden).toEqual([]);
+  it("keeps each in its own collapsed section, and the rest in the main list", () => {
+    const ranked = rankResults(pile(), view(), withCoverage());
+    expect(ids(ranked.shown).sort()).toEqual(["10.1/en", "10.1/none"]);
+    expect(ids(ranked.otherLanguages)).toEqual(["10.1/vi"]);
+    expect(ids(ranked.otherTypes)).toEqual(["10.1/data"]);
+    expect(allResults(ranked)).toHaveLength(4);
   });
 
-  it("hides the other languages instead of removing them, and counts them", () => {
-    const { shown, hidden } = rankResults(pile(), byLanguage(["en"]), withCoverage());
-    expect(shown.map((s) => s.result.id)).toEqual(["10.1/en"]);
-    expect(hidden.map((s) => s.result.id).sort()).toEqual(["10.1/none", "10.1/pt"]);
-  });
-
-  it("keeps results of an unknown language when asked to", () => {
-    const { shown } = rankResults(pile(), byLanguage(["en", "unknown"]), withCoverage());
-    expect(shown.map((s) => s.result.id).sort()).toEqual(["10.1/en", "10.1/none"]);
+  it("follows the layout settings: no preferred language, and non-article types shown", () => {
+    const ranked = rankResults(pile(), view({ layout: { preferredLanguages: [], showNonArticleTypes: true } }), withCoverage());
+    expect(ranked.shown).toHaveLength(4);
+    expect(ranked.otherLanguages).toEqual([]);
+    expect(ranked.otherTypes).toEqual([]);
   });
 
   it("never changes a score or a tier", () => {
-    const all = rankResults(pile(), view(), withCoverage()).shown;
-    const some = rankResults(pile(), byLanguage(["pt"]), withCoverage()).shown;
-    expect(some[0]?.score).toBe(all.find((s) => s.result.id === "10.1/pt")?.score);
-    expect(some[0]?.tier).toBe(1);
+    const all = rankResults(pile(), view({ layout: { preferredLanguages: [], showNonArticleTypes: true } }), withCoverage()).shown;
+    const sectioned = rankResults(pile(), view(), withCoverage());
+    const viet = sectioned.otherLanguages[0];
+    expect(viet?.score).toBe(all.find((s) => s.result.id === "10.1/vi")?.score);
+    expect(viet?.tier).toBe(1);
   });
 });
 
@@ -416,19 +405,20 @@ describe("fullMatchCount, hasFewFullMatches and termResultCounts", () => {
   const results = (): Result[] => [
     makeResult({ id: "10.1/both", doi: "10.1/both", title: "Chaos in a pendulum", language: "en" }),
     makeResult({ id: "10.1/one", doi: "10.1/one", title: "A pendulum clock", language: "pt" }),
-    makeResult({ id: "10.1/none", doi: "10.1/none", title: "Gardening" }),
+    makeResult({ id: "10.1/none", doi: "10.1/none", title: "Gardening", language: null }),
   ];
 
-  it("counts the results that contain every term, in the list or set apart", () => {
+  it("counts the results that contain every term, wherever the sections put them", () => {
     expect(fullMatchCount(rankResults(results(), view(), withCoverage()))).toBe(1);
-    const byCoverage = view({ scoring: { ...defaultScoringSettings(), termMatching: "coverage" } });
-    expect(fullMatchCount(rankResults(results(), byCoverage, withCoverage()))).toBe(1);
+    const sectioned = rankResults(results(), view({ layout: { preferredLanguages: ["pt"], showNonArticleTypes: false } }), withCoverage());
+    expect(sectioned.otherLanguages).toHaveLength(1);
+    expect(fullMatchCount(sectioned)).toBe(1);
   });
 
   it("counts results a filter hides, because the advice is about the words, not the filters", () => {
-    const filtered = view({ filters: { ...defaultFilters(), languages: ["pt"] } });
+    const filtered = view({ filters: { ...defaultFilters(), yearFrom: 3000 } });
     const ranked = rankResults(results(), filtered, withCoverage());
-    expect(ranked.shown.map((s) => s.tier)).toEqual([]);
+    expect(ranked.shown).toEqual([]);
     expect(fullMatchCount(ranked)).toBe(1);
   });
 

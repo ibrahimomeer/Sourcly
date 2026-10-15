@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { STOPWORDS } from "./stopwords";
-import { stem, tokenize, wordKey } from "./tokens";
+import { normalizeWord, tokenize, wordKey } from "./tokens";
 
-describe("stem", () => {
+describe("normalizeWord: plurals", () => {
   it.each([
     ["memories", "memory"],
     ["studies", "study"],
@@ -13,19 +13,19 @@ describe("stem", () => {
     ["diseases", "disease"],
     ["patients", "patient"],
   ])("folds the plural %s to %s", (word, expected) => {
-    expect(stem(word)).toBe(expected);
+    expect(normalizeWord(word)).toBe(expected);
   });
 
   it.each([["analysis"], ["status"], ["stress"], ["sleep"], ["consolidation"], ["gas"], ["is"]])(
     "leaves %s alone",
     (word) => {
-      expect(stem(word)).toBe(word);
+      expect(normalizeWord(word)).toBe(word);
     },
   );
 
   it("is the same function for singular and plural, which is all matching needs", () => {
-    expect(stem("memory")).toBe(stem("memories"));
-    expect(stem("study")).toBe(stem("studies"));
+    expect(normalizeWord("memory")).toBe(normalizeWord("memories"));
+    expect(normalizeWord("study")).toBe(normalizeWord("studies"));
   });
 });
 
@@ -72,25 +72,80 @@ describe("STOPWORDS", () => {
   });
 });
 
-describe("stem: words ending in s, and irregular plurals", () => {
+describe("normalizeWord: words ending in s, and irregular plurals", () => {
   it("keeps words that are singular but end in s", () => {
-    for (const word of ["bias", "gas", "atlas", "canvas", "alias", "pancreas", "chaos", "cosmos", "ethos", "pathos", "kudos"]) expect(stem(word)).toBe(word);
+    for (const word of ["bias", "gas", "atlas", "canvas", "alias", "pancreas", "chaos", "cosmos", "ethos", "pathos", "kudos"]) expect(normalizeWord(word)).toBe(word);
   });
 
   it("folds the irregular plurals academic writing uses", () => {
-    expect(stem("biases")).toBe("bias");
-    expect(stem("analyses")).toBe("analysis");
-    expect(stem("hypotheses")).toBe("hypothesis");
-    expect(stem("diagnoses")).toBe("diagnosis");
-    expect(stem("syntheses")).toBe("synthesis");
-    expect(stem("theses")).toBe("thesis");
-    expect(stem("crises")).toBe("crisis");
+    expect(normalizeWord("biases")).toBe("bias");
+    expect(normalizeWord("analyses")).toBe("analysis");
+    expect(normalizeWord("hypotheses")).toBe("hypothesis");
+    expect(normalizeWord("diagnoses")).toBe("diagnosis");
+    expect(normalizeWord("syntheses")).toBe("synthesis");
+    expect(normalizeWord("theses")).toBe("thesis");
+    expect(normalizeWord("crises")).toBe("crisis");
   });
 
   it("still leaves ordinary plurals to the general rules", () => {
-    expect(stem("cases")).toBe("case");
-    expect(stem("diseases")).toBe("disease");
-    expect(stem("databases")).toBe("database");
+    expect(normalizeWord("cases")).toBe("case");
+    expect(normalizeWord("diseases")).toBe("disease");
+    expect(normalizeWord("databases")).toBe("database");
+  });
+});
+
+describe("normalizeWord: short words are left alone", () => {
+  it("does not touch a word under 5 letters, so two different short words are never made one", () => {
+    expect(normalizeWord("caos")).toBe("caos");
+    expect(normalizeWord("cao")).toBe("cao");
+    expect(normalizeWord("caos")).not.toBe(normalizeWord("cao"));
+    for (const word of ["cats", "does", "tens", "pros", "gens", "lens"]) expect(normalizeWord(word)).toBe(word);
+  });
+
+  it("starts folding plurals at 5 letters", () => {
+    expect(normalizeWord("boxes")).toBe("box");
+    expect(normalizeWord("rats")).toBe("rats");
+    expect(normalizeWord("rates")).toBe("rate");
+  });
+
+  it("does not make chaos and chao, or caos and cao, the same word", () => {
+    expect(wordKey("chaos")).toBe("chaos");
+    expect(wordKey("Caos")).toBe("caos");
+    expect(wordKey("Cao")).toBe("cao");
+  });
+});
+
+describe("normalizeWord: -ing and -ed", () => {
+  it.each([
+    ["sleeping", "sleep"],
+    ["learning", "learn"],
+    ["processing", "process"],
+    ["predicting", "predict"],
+    ["running", "run"],
+    ["learned", "learn"],
+    ["predicted", "predict"],
+    ["studied", "study"],
+    ["needed", "need"],
+    ["falling", "fall"],
+  ])("takes %s to %s", (word, expected) => {
+    expect(normalizeWord(word)).toBe(expected);
+  });
+
+  it.each([["string"], ["during"], ["making"], ["bring"], ["spring"], ["speed"], ["breed"], ["need"], ["sing"], ["wing"]])(
+    "leaves %s alone: too short, or too little would be left",
+    (word) => {
+      expect(normalizeWord(word)).toBe(word);
+    },
+  );
+
+  it("does not join words that only look alike: prediction, university and organ keep their endings", () => {
+    expect(normalizeWord("prediction")).toBe("prediction");
+    expect(normalizeWord("university")).toBe("university");
+    expect(normalizeWord("organization")).toBe("organization");
+  });
+
+  it("applies the same steps to the query and to the text, so they always agree", () => {
+    expect(tokenize("sleeping memories")).toEqual(tokenize("sleep memory"));
   });
 });
 
@@ -119,6 +174,6 @@ describe("tokenize: exactly as typed", () => {
   });
 
   it("is unchanged without the option", () => {
-    expect(tokenize("What is the Cats and vitamin C")).toEqual(["cat", "vitamin"]);
+    expect(tokenize("What is the Cats and vitamin C")).toEqual(["cats", "vitamin"]);
   });
 });

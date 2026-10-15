@@ -2,11 +2,12 @@ import type {
   ProtocolInput,
   ProtocolSearch,
   ProviderId,
+  LayoutSettings,
   ResultFilters,
   SavedItem,
   ScoringSettings,
 } from "@sourcly/core";
-import type { RankedView } from "./pipeline";
+import { allResults, type RankedView } from "./pipeline";
 import { droppedWords } from "./queryText";
 import { orderedStatuses, type ActiveSearch } from "./searchState";
 
@@ -22,18 +23,21 @@ export interface CounterRecord {
 
 /** What one search did: the query, what each source received, how each answered, and how many results. */
 export function searchRecord(search: ActiveSearch, ranked: RankedView): ProtocolSearch {
-  const merged = ranked.shown.length + ranked.hidden.length + ranked.partial.length;
+  const merged = allResults(ranked).length;
   return {
     typedQuery: search.parsed.original,
     searchedQuery: search.query,
     commonWordsRemoved: droppedWords(search.parsed),
     sentQueries: search.sent,
     statuses: orderedStatuses(search),
+    expandedPass: search.expansion === null ? null : { sentQueries: search.expansion.sent, statuses: search.expansion.statuses },
     counts: {
       fetched: search.results.length,
       merged,
       shown: ranked.shown.length,
       partialMatches: ranked.partial.length,
+      otherLanguages: ranked.otherLanguages.length,
+      otherTypes: ranked.otherTypes.length,
       hiddenByFilters: ranked.hidden.length,
     },
   };
@@ -47,6 +51,7 @@ export function protocolInputFrom(args: {
   perSource: number;
   filters: ResultFilters;
   scoring: ScoringSettings;
+  layout: LayoutSettings;
   saved: readonly SavedItem[];
   referenceYear: number;
   appVersion: string;
@@ -67,6 +72,7 @@ export function protocolInputFrom(args: {
     resultsPerSource: args.perSource,
     filters: args.filters,
     scoring: args.scoring,
+    layout: args.layout,
     saved: args.saved.map(({ result }) => ({ title: result.title, doi: result.doi, url: result.url })),
   };
 }

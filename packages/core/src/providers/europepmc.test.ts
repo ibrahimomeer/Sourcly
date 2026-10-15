@@ -115,6 +115,7 @@ describe("Europe PMC subjects and syntax", () => {
   it("has none for a record without them, and understands Boolean queries", () => {
     expect(parse(results[1]).subjects).toEqual([]);
     expect(createEuropePmcProvider().syntax).toBe("europepmc");
+    expect(createEuropePmcProvider().expandedSyntax).toBe("plain");
     expect(createEuropePmcProvider().requestNotes).toEqual(["Every word is looked for in the title and abstract only, not in the full text"]);
   });
 });

@@ -197,8 +197,14 @@ describe("findTerms", () => {
     ]);
   });
 
-  it("matches only whole words, never part of a longer one", () => {
-    expect(found("biased, failing, unfailing, bias-free")).toEqual([["bias", "bias"]]);
+  it("matches whole words, with -s, -es, -ing and -ed folded from 6 letters up, never part of a longer word", () => {
+    // "biased" is "bias" with -ed taken off and "failing" is "fail" with -ing taken off; "unfailing" is a different word.
+    expect(found("biased, failing, unfailing, bias-free")).toEqual([
+      ["biased", "bias"],
+      ["failing", "fail"],
+      ["bias", "bias"],
+    ]);
+    expect(found("unfailing biasfree")).toEqual([]);
   });
 
   it("matches a phrase across spaces or a hyphen, and not across a full stop or a comma", () => {

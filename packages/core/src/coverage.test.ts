@@ -9,7 +9,9 @@ const spec = (text: string, options = {}) => coverageSpec(parseQuery(text, optio
 const labels = (text: string, options = {}) => spec(text, options).units.map((unit) => unit.label);
 const pairsOf = (text: string, options = {}) => spec(text, options).pairs.map((pair) => pair.text);
 const doc = (overrides: Partial<Result>) => makeResult({ title: "", abstract: null, subjects: [], ...overrides });
-const keyword = (term: string): Subject => ({ term, kind: "keyword", provider: "openalex" });
+const keyword = (term: string): Subject => ({ term, kind: "keyword", provider: "pubmed" });
+const openAlexKeyword = (term: string): Subject => ({ term, kind: "keyword", provider: "openalex" });
+const mesh = (term: string): Subject => ({ term, kind: "mesh", provider: "pubmed" });
 const topic = (term: string): Subject => ({ term, kind: "topic", provider: "openalex" });
 const cover = (text: string, result: Partial<Result>, options = {}) => measureCoverage(doc(result), spec(text, options));
 
@@ -74,31 +76,58 @@ describe("coverageSpec: what the query asks for", () => {
 });
 
 describe("measureCoverage: where each term is found", () => {
-  it("finds a term in the title, the abstract, the author keywords and the provider topics", () => {
+  it("finds a term in the title, the abstract and the author keywords", () => {
     const result = doc({
       title: "A double pendulum",
       abstract: "We study the motion.",
-      subjects: [keyword("chaos theory"), topic("Nonlinear Dynamics")],
+      subjects: [keyword("chaos theory")],
     });
-    const c = measureCoverage(result, spec("double motion chaos dynamics"));
+    const c = measureCoverage(result, spec("double motion chaos"));
     expect(c.units.map((u) => [u.label, u.fields])).toEqual([
       ["double", ["title"]],
       ["motion", ["abstract"]],
       ["chaos", ["keywords"]],
-      ["dynamics", ["topics"]],
     ]);
-    expect(c.units.map((u) => u.weight)).toEqual([FIELD_WEIGHTS.title, FIELD_WEIGHTS.abstract, FIELD_WEIGHTS.keywords, FIELD_WEIGHTS.topics]);
+    expect(c.units.map((u) => u.weight)).toEqual([FIELD_WEIGHTS.title, FIELD_WEIGHTS.abstract, FIELD_WEIGHTS.keywords]);
+  });
+
+  it("does not count provider topics, MeSH headings, subjects, OpenAlex's own keywords or the venue", () => {
+    const result = doc({
+      title: "A study",
+      abstract: "Some words.",
+      venue: "Journal of Pendulum Studies",
+      subjects: [topic("Nonlinear Dynamics"), mesh("Chaos"), { term: "Physics", kind: "subject", provider: "crossref" }, openAlexKeyword("double pendulum")],
+    });
+    const c = measureCoverage(result, spec("dynamics chaos physics double pendulum"));
+    expect(c.matchedCount).toBe(0);
+    expect(c.units.every((unit) => unit.fields.length === 0)).toBe(true);
+  });
+
+  it("counts a keyword only from a source that gives the authors' keywords", () => {
+    expect(cover("chaos", { subjects: [keyword("chaos")] }).matchedCount).toBe(1);
+    expect(cover("chaos", { subjects: [openAlexKeyword("chaos")] }).matchedCount).toBe(0);
+    expect(cover("chaos", { subjects: [{ term: "chaos", kind: "keyword", provider: "doaj" }] }).matchedCount).toBe(1);
+    expect(cover("chaos", { subjects: [{ term: "chaos", kind: "keyword", provider: "zenodo" }] }).matchedCount).toBe(1);
   });
 
   it("reports every field a term is in, strongest first, and weighs it by the strongest", () => {
-    const c = cover("pendulum", { title: "Pendulum", abstract: "a pendulum", subjects: [topic("Pendulum")] });
-    expect(c.units[0]).toMatchObject({ matched: true, fields: ["title", "topics", "abstract"], weight: 1 });
+    const c = cover("pendulum", { title: "Pendulum", abstract: "a pendulum", subjects: [keyword("Pendulum")] });
+    expect(c.units[0]).toMatchObject({ matched: true, fields: ["title", "keywords", "abstract"], weight: 1 });
   });
 
-  it("weights the title highest, then keywords, topics and the abstract", () => {
-    expect(FIELD_WEIGHTS).toEqual({ title: 1, keywords: 0.8, topics: 0.7, abstract: 0.6 });
+  it("weights the title highest, then the author keywords, then the abstract", () => {
+    expect(FIELD_WEIGHTS).toEqual({ title: 1, keywords: 0.8, abstract: 0.6 });
     expect(cover("pendulum", { title: "pendulum" }).weighted).toBe(1);
+    expect(cover("pendulum", { subjects: [keyword("pendulum")] }).weighted).toBe(0.8);
     expect(cover("pendulum", { abstract: "pendulum" }).weighted).toBe(0.6);
+  });
+
+  it("matches whole words only: caos is not cao, and a word inside a longer word is not a match", () => {
+    expect(cover("caos", { title: "O cao e o gato" }).matchedCount).toBe(0);
+    expect(cover("cao", { title: "A Vietnamese paper: cao hoc" }).matchedCount).toBe(1);
+    expect(cover("caos", { title: "Teoria do Caos" }).matchedCount).toBe(1);
+    expect(cover("pend", { title: "pendulum" }).matchedCount).toBe(0);
+    expect(cover("ring", { title: "string and springs and bring" }).matchedCount).toBe(0);
   });
 
   it("does not match a word that is not there, even as part of a longer word", () => {

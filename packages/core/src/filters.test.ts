@@ -74,34 +74,6 @@ describe("applyFilters", () => {
     expect(ids(filtered({ peerReview: ["unknown"] }).kept)).toEqual(["book"]);
   });
 
-  describe("language", () => {
-    const languages = {
-      english: item({ id: "english", language: "en" }),
-      portuguese: item({ id: "portuguese", language: "pt" }),
-      unknown: item({ id: "unknown-language", language: null }),
-    };
-    const list = Object.values(languages);
-    const byLanguage = (chosen: string[]) => applyFilters(list, { ...defaultFilters(), languages: chosen });
-
-    it("keeps every language by default, including results with none", () => {
-      expect(ids(byLanguage([]).kept)).toEqual(["english", "portuguese", "unknown-language"]);
-    });
-
-    it("keeps only the chosen languages", () => {
-      expect(ids(byLanguage(["en"]).kept)).toEqual(["english"]);
-      expect(ids(byLanguage(["en", "pt"]).kept)).toEqual(["english", "portuguese"]);
-    });
-
-    it("hides a result with no language unless \"unknown\" is chosen as well", () => {
-      expect(ids(byLanguage(["en"]).hidden)).toEqual(["portuguese", "unknown-language"]);
-      expect(ids(byLanguage(["en", "unknown"]).kept)).toEqual(["english", "unknown-language"]);
-    });
-
-    it("counts as filtering once a language is chosen", () => {
-      expect(isFiltering({ ...defaultFilters(), languages: ["en"] })).toBe(true);
-    });
-  });
-
   it("combines filters with AND", () => {
     const result = filtered({ levels: ["primary"], peerReview: ["peer-reviewed"], yearFrom: 2020, openAccessOnly: true });
     expect(ids(result.kept)).toEqual(["article-open"]);

@@ -21,23 +21,26 @@ export interface ProviderOption {
 
 /** The sources the user can switch on and off, in the order they are listed. */
 export const PROVIDER_OPTIONS: readonly ProviderOption[] = [
-  { id: "openalex", name: "OpenAlex", description: "A large open index of scholarly works in every field." },
-  { id: "crossref", name: "Crossref", description: "DOIs registered by publishers. Strong on metadata, light on abstracts." },
+  { id: "openalex", name: "OpenAlex", description: "A large open index of scholarly works in every field. The backbone of the search." },
+  { id: "crossref", name: "Crossref", description: "DOIs registered by publishers. Strong on metadata, light on abstracts; its matching is loose, so at most 25 journal articles, conference papers, preprints and books are asked for." },
   { id: "pubmed", name: "PubMed", description: "Biomedical and life-science literature from the U.S. National Library of Medicine." },
   { id: "europepmc", name: "Europe PMC", description: "Life-science articles and preprints, with citation counts and free full-text links." },
   { id: "doaj", name: "DOAJ", description: "Journals that are fully open access." },
-  { id: "datacite", name: "DataCite", description: "Datasets, theses and other deposits in repositories, each with a DOI." },
-  { id: "zenodo", name: "Zenodo", description: "Whatever researchers upload: papers, datasets, software. At most 25 results per search." },
-  { id: "wikipedia", name: "Wikipedia", description: "An encyclopedia, included as an example of a tertiary source. At most 20 pages per search." },
+  { id: "datacite", name: "DataCite", description: "Datasets, theses and other deposits in repositories. Anyone can deposit, so expect noise." },
+  { id: "zenodo", name: "Zenodo", description: "Anyone can upload, with no review: papers, datasets, slides, software. At most 25 results per search." },
+  { id: "wikipedia", name: "Wikipedia", description: "An encyclopedia, included as an example of a tertiary source. At most 5 pages per search." },
   {
     id: "semanticscholar",
     name: "Semantic Scholar",
-    description: "Its free shared pool is often busy and may refuse requests; if so, that is shown as a status.",
+    description: "Its free shared pool is often busy and refuses requests; if it does, that is shown as a status.",
   },
 ];
 
-/** Provider ids switched on until the user changes it: every source that works from a browser. */
-export const DEFAULT_PROVIDERS: readonly ProviderId[] = PROVIDER_OPTIONS.map((option) => option.id);
+/**
+ * Provider ids switched on until the user changes it: the four sources that give clean scholarly results.
+ * The others are noisier or less reliable, and are one click away in Settings.
+ */
+export const DEFAULT_PROVIDERS: readonly ProviderId[] = ["openalex", "crossref", "pubmed", "europepmc"];
 
 export interface UnavailableProvider {
   id: ProviderId;
@@ -73,28 +76,31 @@ export interface ProviderContext {
   openAlexApiKey: string;
   /** config.contactEmail; "" for none. Sent only to providers that offer a faster pool for it. */
   contactEmail: string;
+  /** Used instead of the browser's fetch (the eval script keeps answers on disk to spare the free allowances). */
+  fetch?: typeof globalThis.fetch;
 }
 
 function create(id: ProviderId, context: ProviderContext): Provider {
+  const f = context.fetch === undefined ? {} : { fetch: context.fetch };
   switch (id) {
     case "openalex":
-      return createOpenAlexProvider({ apiKey: context.openAlexApiKey });
+      return createOpenAlexProvider({ apiKey: context.openAlexApiKey, ...f });
     case "crossref":
-      return createCrossrefProvider({ mailto: context.contactEmail });
+      return createCrossrefProvider({ mailto: context.contactEmail, ...f });
     case "pubmed":
-      return createPubmedProvider({ email: context.contactEmail });
+      return createPubmedProvider({ email: context.contactEmail, ...f });
     case "europepmc":
-      return createEuropePmcProvider();
+      return createEuropePmcProvider(f);
     case "doaj":
-      return createDoajProvider();
+      return createDoajProvider(f);
     case "datacite":
-      return createDataCiteProvider();
+      return createDataCiteProvider(f);
     case "zenodo":
-      return createZenodoProvider();
+      return createZenodoProvider(f);
     case "wikipedia":
-      return createWikipediaProvider();
+      return createWikipediaProvider(f);
     case "semanticscholar":
-      return createSemanticScholarProvider();
+      return createSemanticScholarProvider(f);
     default:
       throw new Error(`No provider is wired up for "${id}"`);
   }

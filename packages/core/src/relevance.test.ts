@@ -177,12 +177,12 @@ describe("relevanceReadings: with counterargument terms", () => {
 });
 
 describe("relevanceReadings: exactly as typed", () => {
-  const set = [makeResult({ id: "10.1/cat", title: "A cat sleeps" }), makeResult({ id: "10.1/cats", title: "Cats sleep" })];
+  const set = [makeResult({ id: "10.1/model", title: "A model sleeps" }), makeResult({ id: "10.1/models", title: "Models sleep" })];
 
-  it("matches a plural only when it is typed, because nothing is stemmed", () => {
-    const stemmed = relevanceReadings(set, ["cats"]);
+  it("matches a plural only when it is typed, because nothing is normalized", () => {
+    const stemmed = relevanceReadings(set, ["models"]);
     expect(stemmed[0]?.raw).toBeGreaterThan(0);
-    const exact = relevanceReadings(set, ["cats"], [], { exact: true });
+    const exact = relevanceReadings(set, ["models"], [], { exact: true });
     expect(exact[0]?.raw).toBe(0);
     expect(exact[1]?.raw).toBeGreaterThan(0);
   });

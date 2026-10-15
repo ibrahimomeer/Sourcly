@@ -37,20 +37,8 @@ export interface FactorSetting {
   weight: number;
 }
 
-/**
- * What term coverage does to the order:
- * - "all": results that contain every term come first; the rest are kept apart as partial matches;
- * - "coverage": results are ordered by tier (all terms, most, few) and the partial ones stay in the list;
- * - "ignore": coverage does not decide the order; only the weighted score does.
- */
-export type TermMatching = "all" | "coverage" | "ignore";
-
-export const TERM_MATCHING_MODES: readonly TermMatching[] = ["all", "coverage", "ignore"];
-
 export interface ScoringSettings {
   factors: Record<FactorId, FactorSetting>;
-  /** How term coverage decides the order. Default "all". */
-  termMatching: TermMatching;
   /** Levels the user prefers; used only by the study-type factor. Empty = neutral. */
   preferredLevels: SourceLevel[];
   /** Years for the recency factor to fall to 0.5. */
@@ -76,7 +64,6 @@ export function defaultScoringSettings(): ScoringSettings {
       providerAgreement: { enabled: true, weight: 0.5 },
       studyType: { enabled: false, weight: 0 },
     },
-    termMatching: "all",
     preferredLevels: [],
     recencyHalfLifeYears: 10,
   };
@@ -194,7 +181,7 @@ function relevanceFactor(reading: { raw: number | null; normalized: number | nul
   return { raw: reading.raw, detail: reading.detail, normalized: reading.normalized ?? NEUTRAL };
 }
 
-const WEIGHT_NOTE = `Each term counts ${FIELD_WEIGHTS.title} if it is in the title, ${FIELD_WEIGHTS.keywords} in the author keywords, ${FIELD_WEIGHTS.topics} in the provider topics, ${FIELD_WEIGHTS.abstract} if only in the abstract`;
+const WEIGHT_NOTE = `Each term counts ${FIELD_WEIGHTS.title} if it is in the title, ${FIELD_WEIGHTS.keywords} in the author keywords, ${FIELD_WEIGHTS.abstract} if only in the abstract`;
 
 function coverageFactor(coverage: Coverage | null): FactorValue {
   if (coverage === null || coverage.total === 0) {
@@ -300,8 +287,16 @@ function studyTypeFactor({ level }: Labels, preferred: readonly SourceLevel[]): 
   };
 }
 
-function compareScored(a: ScoredResult, b: ScoredResult, byTier: boolean): number {
-  if (byTier && a.tier !== b.tier) return a.tier - b.tier;
+/**
+ * The order of results: coverage tier first (all terms, then most, then few), then phrase match (the share of
+ * neighbouring query words found next to each other, in order, in the title or abstract), then the weighted score.
+ * Equal on all three, the DOI or id decides.
+ */
+function compareScored(a: ScoredResult, b: ScoredResult): number {
+  if (a.tier !== b.tier) return a.tier - b.tier;
+  const phraseA = a.coverage?.phraseScore ?? 0;
+  const phraseB = b.coverage?.phraseScore ?? 0;
+  if (phraseA !== phraseB) return phraseB - phraseA;
   if (a.score !== b.score) return b.score - a.score;
   // Deterministic tie-break on the DOI/id, by code unit so it does not depend on locale.
   if (a.result.id === b.result.id) return 0;
@@ -372,8 +367,5 @@ export function scoreResults(
     return { ...item, score: factors.reduce((sum, f) => sum + f.contribution, 0), factors, coverage, tier: coverage?.tier ?? 1 };
   });
 
-  // Unless the person turned it off, coverage comes first: results with every term, then most, then few,
-  // and inside each tier the weighted score decides.
-  const byTier = settings.termMatching !== "ignore";
-  return scored.sort((a, b) => compareScored(a, b, byTier));
+  return scored.sort(compareScored);
 }

@@ -55,8 +55,8 @@ describe("relatedTerms", () => {
     expect(terms).not.toContain("Sleep");
     expect(terms).toContain("Memory Consolidation");
     expect(terms).toContain("Dreams");
-    // "Sleeping" is a different word from "sleep", so this one is still suggested.
-    expect(terms).toContain("Sleeping Memories");
+    // "Sleeping" is "sleep" with -ing taken off, and "Memories" is "memory", so every word of it is already in the query.
+    expect(terms).not.toContain("Sleeping Memories");
   });
 
   it("drops terms with nothing searchable in them and terms that are too long", () => {

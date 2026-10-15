@@ -13,7 +13,8 @@ import { clampLimit, defaultFetch, openAccess, requestJson, sourced, type Fetch 
 // - Wikipedia is included as an example of a tertiary source, and is labelled as one.
 
 const API_URL = "https://en.wikipedia.org/w/api.php";
-const MAX_PAGES = 20;
+/** A deliberate cut from the 20 the API allows: Wikipedia is an example of a tertiary source, not a place to find papers. */
+const MAX_PAGES = 5;
 
 export function parseWikipediaPage(raw: unknown, rank: number, listSize: number): Result | null {
   const page = asRecord(raw);

@@ -1,5 +1,4 @@
 import type { PeerReviewStatus, SourceLevel } from "./classify";
-import { languageOf } from "./language";
 import type { ScoringItem } from "./scoring";
 
 /**
@@ -17,12 +16,10 @@ export interface ResultFilters {
   peerReview: PeerReviewStatus[];
   /** Keep only results the provider says are open access. */
   openAccessOnly: boolean;
-  /** Keep only these languages (ISO 639-1 codes, and "unknown" for results no source gave a language for). Empty = any. */
-  languages: string[];
 }
 
 export function defaultFilters(): ResultFilters {
-  return { yearFrom: null, yearTo: null, levels: [], peerReview: [], openAccessOnly: false, languages: [] };
+  return { yearFrom: null, yearTo: null, levels: [], peerReview: [], openAccessOnly: false };
 }
 
 /** True when at least one filter is set. */
@@ -32,8 +29,7 @@ export function isFiltering(filters: ResultFilters): boolean {
     filters.yearTo !== null ||
     filters.levels.length > 0 ||
     filters.peerReview.length > 0 ||
-    filters.openAccessOnly ||
-    filters.languages.length > 0
+    filters.openAccessOnly
   );
 }
 
@@ -48,8 +44,6 @@ function passes({ result, labels }: ScoringItem, filters: ResultFilters): boolea
   if (filters.levels.length > 0 && !filters.levels.includes(labels.level.value)) return false;
   if (filters.peerReview.length > 0 && !filters.peerReview.includes(labels.peerReview.value)) return false;
   if (filters.openAccessOnly && result.openAccess.isOpen !== true) return false;
-  // A result whose language is not known is hidden by a language filter unless "unknown" is chosen too.
-  if (filters.languages.length > 0 && !filters.languages.includes(languageOf(result))) return false;
   return true;
 }
 

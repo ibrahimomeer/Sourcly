@@ -4,16 +4,21 @@ import {
   classify,
   doiUrl,
   findLexiconMatches,
+  languageBadge,
+  languageExplanation,
+  matchCountLabel,
   noticeKind,
+  resolveLanguage,
   type HighlightGroup,
   type LabelOverride,
   type ScoredResult,
+  type SectionId,
 } from "@sourcly/core";
 import { Badge, type BadgeStyle } from "./Badge";
 import { LabelEditor } from "./LabelEditor";
 import { LabelRows } from "./LabelRows";
 import { useSaved } from "./SavedContext";
-import { accessBadgeText, describeLexiconMatches, formatAuthors, formatNumber, languageBadgeText, reviewBadgeText } from "./format";
+import { accessBadgeText, describeLexiconMatches, formatAuthors, formatNumber, reviewBadgeText } from "./format";
 import { Highlighted } from "./Highlighted";
 import { libraryUrl } from "./libraryLink";
 import { WhyThisRank } from "./WhyThisRank";
@@ -25,9 +30,18 @@ export function ResultCard({
   libraryPrefix,
   onOverrideChange,
   highlight = [],
+  section,
+  detailed = false,
+  heading,
 }: {
+  /** The card of a looked-up work: no score and no "Why this rank?" (there is no search), the abstract open, and more of the record. */
+  detailed?: boolean;
+  /** A line above the title, such as "Closest match for this title". */
+  heading?: string;
   /** 1-based place in the current ordering. */
   position: number;
+  /** Where on the page this card is, for the "Why this rank?" panel and the match count. Left out for cards that are not in a search. */
+  section?: SectionId;
   scored: ScoredResult;
   override: LabelOverride | undefined;
   /** config.libraryProxyPrefix; empty hides the library button. */
@@ -42,6 +56,12 @@ export function ResultCard({
   const libraryHref = libraryUrl(libraryPrefix, result);
   const notice = noticeKind(result);
   const reviewText = reviewBadgeText(result);
+  const language = resolveLanguage(result);
+  // In the main list, a result that lacks a word is there only because few results have them all: say how many it has.
+  const matchCount = section === "main" ? matchCountLabel(scored) : null;
+  // Found only by the expanded second pass, and not containing every word.
+  const expandedOnly =
+    result.hits.length > 0 && result.hits.every((hit) => hit.expanded === true) && matchCountLabel(scored) !== null;
   const matches = findLexiconMatches(result, highlight);
   const coverage = scored.coverage;
   // What to mark: the words of the search that were found (lightly) and the counterargument terms (heavily).
@@ -56,10 +76,15 @@ export function ResultCard({
     openAccess.isOpen === true ? "solid" : openAccess.isOpen === false ? "dashed" : "faint-dashed";
 
   return (
-    <article className="card">
+    <article className={detailed ? "card card-detailed" : "card"}>
+      {heading !== undefined && <p className="card-heading">{heading}</p>}
       <div className="card-head">
         <h3 className="card-title">
-          <span className="position">{position}.</span>{" "}
+          {!detailed && (
+            <>
+              <span className="position">{position}.</span>{" "}
+            </>
+          )}
           {result.url === null ? (
             <Highlighted text={title} groups={groups} />
           ) : (
@@ -68,9 +93,11 @@ export function ResultCard({
             </a>
           )}
         </h3>
-        <p className="score" title="Score from 0 to 1. Open “Why this rank?” for the breakdown.">
-          Score {formatNumber(scored.score)}
-        </p>
+        {!detailed && (
+          <p className="score" title="Score from 0 to 1. Open “Why this rank?” for the breakdown.">
+            Score {formatNumber(scored.score)}
+          </p>
+        )}
       </div>
 
       <p className="meta">{formatAuthors(result.authors)}</p>
@@ -104,13 +131,24 @@ export function ResultCard({
           <Badge style={accessStyle}>{accessBadgeText(openAccess, libraryHref !== null)}</Badge>
         </li>
         <li>
-          <Badge
-            style={result.language === null ? "faint-dashed" : "faint"}
-            title="As reported by the sources that found this work (OpenAlex detects it from the text). “unknown” means none of them gave a language."
-          >
-            {languageBadgeText(result.language)}
+          <Badge style={language.status === "detected" ? "faint" : "faint-dashed"} title={languageExplanation(language)}>
+            {languageBadge(language)}
           </Badge>
         </li>
+        {matchCount !== null && (
+          <li>
+            <Badge style="dotted" title="This result does not contain every word of your search. It is in the main list because few results do.">
+              {matchCount}
+            </Badge>
+          </li>
+        )}
+        {expandedOnly && (
+          <li>
+            <Badge style="dashed" title="Only the second, expanded pass of the search found this result. See “Queries sent”.">
+              Expanded search: not every word matched
+            </Badge>
+          </li>
+        )}
         {result.hits.map((hit) => (
           <li key={hit.provider}>
             <Badge style="faint" title={`Ranked #${hit.rank} of ${hit.listSize} by ${PROVIDER_NAMES[hit.provider]}`}>
@@ -194,7 +232,7 @@ export function ResultCard({
       )}
 
       {result.abstract !== null && (
-        <details className="panel">
+        <details className="panel" open={detailed}>
           <summary>Abstract</summary>
           <p>
             <Highlighted text={result.abstract} groups={groups} />
@@ -202,7 +240,7 @@ export function ResultCard({
         </details>
       )}
 
-      <WhyThisRank scored={scored} />
+      {!detailed && <WhyThisRank scored={scored} section={section} />}
 
       <LabelEditor
         resultId={result.id}
