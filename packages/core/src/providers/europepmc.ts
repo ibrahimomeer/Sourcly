@@ -142,7 +142,8 @@ export function createEuropePmcProvider(options: EuropePmcOptions = {}): Provide
   return {
     id: "europepmc",
     name: "Europe PMC",
-    syntax: "boolean",
+    syntax: "europepmc",
+    requestNotes: ["Every word is looked for in the title and abstract only, not in the full text"],
 
     async search(query: string, { limit, signal }: SearchOptions): Promise<Result[]> {
       const text = query.trim();

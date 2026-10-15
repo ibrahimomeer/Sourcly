@@ -27,7 +27,11 @@ import { doiUrl } from "../doi";
 //   subtype and results carry no language.
 
 const WORKS_URL = "https://api.crossref.org/works";
-const MAX_ROWS = 100;
+/**
+ * Crossref cannot require every word, so its order gets loose: for "chaos double pendulum", 24 of the 27 results in the
+ * first 100 that had all three words were among the first 50 (checked 2026-10-14). Asking for more only adds noise.
+ */
+const MAX_ROWS = 50;
 const SELECT = [
   "DOI",
   "title",
@@ -198,12 +202,16 @@ export function createCrossrefProvider(options: CrossrefOptions = {}): Provider 
     name: "Crossref",
     // Crossref's `query` is free text: it ignores AND, OR, NOT and quotes (checked 2026-10-14).
     syntax: "plain",
+    requestNotes: [
+      "Looks in titles, authors and other bibliographic details. It cannot require every word, so some results contain only some of them; at most 50 results are asked for",
+    ],
 
     async search(query: string, { limit, signal }: SearchOptions): Promise<Result[]> {
       const text = query.trim();
       if (text === "") return [];
       const url = new URL(WORKS_URL);
-      url.searchParams.set("query", text);
+      // query.bibliographic is the documented field query (query.title is deprecated); it finds the same works as plain `query`.
+      url.searchParams.set("query.bibliographic", text);
       url.searchParams.set("rows", String(clampLimit(limit, MAX_ROWS)));
       url.searchParams.set("select", SELECT);
       if (mailto !== "") url.searchParams.set("mailto", mailto);

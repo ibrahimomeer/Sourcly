@@ -84,6 +84,6 @@ describe("createWikipediaProvider", () => {
 describe("Wikipedia subjects and syntax", () => {
   it("gives pages no subjects, and understands Boolean queries", () => {
     expect(parseWikipediaPage(pages[0], 1, 1)?.subjects).toEqual([]);
-    expect(createWikipediaProvider().syntax).toBe("boolean");
+    expect(createWikipediaProvider().syntax).toBe("boolean-flat");
   });
 });

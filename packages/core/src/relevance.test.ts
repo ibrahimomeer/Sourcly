@@ -175,3 +175,23 @@ describe("relevanceReadings: with counterargument terms", () => {
     expect(miss?.normalized).toBe(0);
   });
 });
+
+describe("relevanceReadings: exactly as typed", () => {
+  const set = [makeResult({ id: "10.1/cat", title: "A cat sleeps" }), makeResult({ id: "10.1/cats", title: "Cats sleep" })];
+
+  it("matches a plural only when it is typed, because nothing is stemmed", () => {
+    const stemmed = relevanceReadings(set, ["cats"]);
+    expect(stemmed[0]?.raw).toBeGreaterThan(0);
+    const exact = relevanceReadings(set, ["cats"], [], { exact: true });
+    expect(exact[0]?.raw).toBe(0);
+    expect(exact[1]?.raw).toBeGreaterThan(0);
+  });
+
+  it("counts a common word, because none is dropped", () => {
+    const withThe = [makeResult({ id: "10.1/a", title: "The cat" }), makeResult({ id: "10.1/b", title: "A cat" })];
+    const exact = relevanceReadings(withThe, ["the"], [], { exact: true });
+    expect(exact[0]?.raw).toBeGreaterThan(0);
+    expect(exact[1]?.raw).toBe(0);
+    expect(relevanceReadings(withThe, ["the"])[0]?.raw).toBeNull();
+  });
+});

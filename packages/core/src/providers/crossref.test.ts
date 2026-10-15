@@ -117,13 +117,15 @@ describe("parseCrossrefWork", () => {
 describe("createCrossrefProvider", () => {
   const ok = () => Promise.resolve(Response.json(fixtures.search));
 
-  it("asks for only the fields it uses, 100 rows at most, and sends no email unless configured", async () => {
+  it("asks for only the fields it uses, 50 rows at most, and sends no email unless configured", async () => {
     const fetchMock = vi.fn<typeof fetch>(ok);
     await createCrossrefProvider({ fetch: fetchMock }).search("sleep memory", { limit: 500 });
     const url = new URL(String(fetchMock.mock.calls[0]?.[0]));
     expect(url.origin + url.pathname).toBe("https://api.crossref.org/works");
-    expect(url.searchParams.get("query")).toBe("sleep memory");
-    expect(url.searchParams.get("rows")).toBe("100");
+    expect(url.searchParams.get("query.bibliographic")).toBe("sleep memory");
+    expect(url.searchParams.has("query")).toBe(false);
+    expect(url.searchParams.has("query.title")).toBe(false); // deprecated by Crossref
+    expect(url.searchParams.get("rows")).toBe("50");
     expect(url.searchParams.get("select")?.split(",")).toEqual(expect.arrayContaining(["DOI", "title", "updated-by", "is-referenced-by-count"]));
     expect(url.searchParams.get("select")).not.toMatch(/language|subtype/); // not selectable on this route
     expect(url.searchParams.has("mailto")).toBe(false);

@@ -22,14 +22,20 @@ export interface CounterRecord {
 
 /** What one search did: the query, what each source received, how each answered, and how many results. */
 export function searchRecord(search: ActiveSearch, ranked: RankedView): ProtocolSearch {
-  const merged = ranked.shown.length + ranked.hidden.length;
+  const merged = ranked.shown.length + ranked.hidden.length + ranked.partial.length;
   return {
     typedQuery: search.parsed.original,
     searchedQuery: search.query,
     commonWordsRemoved: droppedWords(search.parsed),
     sentQueries: search.sent,
     statuses: orderedStatuses(search),
-    counts: { fetched: search.results.length, merged, shown: ranked.shown.length, hiddenByFilters: ranked.hidden.length },
+    counts: {
+      fetched: search.results.length,
+      merged,
+      shown: ranked.shown.length,
+      partialMatches: ranked.partial.length,
+      hiddenByFilters: ranked.hidden.length,
+    },
   };
 }
 

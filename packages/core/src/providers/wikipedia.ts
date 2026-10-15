@@ -59,7 +59,7 @@ export function createWikipediaProvider(options: WikipediaOptions = {}): Provide
   return {
     id: "wikipedia",
     name: "Wikipedia",
-    syntax: "boolean",
+    syntax: "boolean-flat",
 
     async search(query: string, { limit, signal }: SearchOptions): Promise<Result[]> {
       const text = query.trim();

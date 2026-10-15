@@ -48,11 +48,14 @@ export interface SearchOutcome {
  * becomes the text a provider receives, so what the page shows is what is sent.
  */
 export function planQueries(
-  providers: readonly Pick<Provider, "id" | "syntax">[],
+  providers: readonly Pick<Provider, "id" | "syntax" | "requestNotes">[],
   query: string | ParsedQuery,
 ): SentQuery[] {
   const parsed = typeof query === "string" ? parseQuery(query) : query;
-  return providers.map((provider) => ({ provider: provider.id, ...renderQuery(parsed, provider.syntax) }));
+  return providers.map((provider) => {
+    const rendered = renderQuery(parsed, provider.syntax);
+    return { provider: provider.id, text: rendered.text, notes: [...rendered.notes, ...(provider.requestNotes ?? [])] };
+  });
 }
 
 /**

@@ -2,10 +2,14 @@ import {
   addSaved,
   buildProtocol,
   canSave,
+  countLanguages,
   createSearchCache,
   defaultFilters,
   defaultScoringSettings,
+  formatQuery,
   isSaved,
+  isUsable,
+  parseQuery,
   protocolJson,
   removeSaved,
   type LabelOverride,
@@ -26,6 +30,8 @@ import { rankResults, relatedFor, scoringContext } from "./pipeline";
 import { ProtocolExport } from "./ProtocolExport";
 import { protocolInputFrom, type CounterRecord } from "./protocolRecord";
 import { createProviders, DEFAULT_PROVIDERS, skippedStatuses } from "./providers";
+import { QueryChips } from "./QueryChips";
+import { queryChipsModel } from "./chipsModel";
 import { addTermToQuery, explainUnusable, prepareSearch } from "./queryText";
 import { Results } from "./Results";
 import { SavedProvider, type SavedApi } from "./SavedContext";
@@ -34,6 +40,7 @@ import { loadSavedList, persistSavedList } from "./savedStore";
 import { SearchBox } from "./SearchBox";
 import { DEFAULT_PER_SOURCE, toggleInList, withOverride } from "./settings";
 import { SettingsPanel } from "./SettingsPanel";
+import { useDidYouMean } from "./useDidYouMean";
 import { useSearch } from "./useSearch";
 import { APP_VERSION } from "./version";
 
@@ -48,6 +55,10 @@ export function App({ config }: { config: SourclyConfig }) {
   const [page, setPage] = useState(1);
   const [queryText, setQueryText] = useState("");
   const [queryProblem, setQueryProblem] = useState<string | null>(null);
+  // How the text is read. The text itself is never changed by any of this.
+  const [ignoreCommon, setIgnoreCommon] = useState(true);
+  const [restored, setRestored] = useState<ReadonlySet<string>>(() => new Set());
+  const [leftOut, setLeftOut] = useState<ReadonlySet<string>>(() => new Set());
 
   const [storage] = useState(browserStorage);
   const [apiKey, setApiKey] = useState(() => loadApiKey(storage));
@@ -86,11 +97,53 @@ export function App({ config }: { config: SourclyConfig }) {
     [state, ranked],
   );
 
+  // The languages of the results on the page, for the Language filter. Counted before filtering, so the list does not shrink as you choose.
+  const languageOptions = useMemo(
+    () => (state.phase === "idle" ? [] : countLanguages(state.results, filters.languages)),
+    [state, filters.languages],
+  );
+
+  // "Did you mean ...?", only after a search that found few results with every word, and only as a link.
+  const suggestion = useDidYouMean(state, ranked, config.contactEmail);
+
   const makeProviders = () =>
     createProviders(enabledProviders, { openAlexApiKey: apiKey, contactEmail: config.contactEmail });
 
-  function handleSearch(text: string) {
-    const prepared = prepareSearch(text);
+  // Changing the text starts the reading afresh: restored and left-out words belong to the text they were chosen for.
+  function changeQueryText(next: string) {
+    setQueryText(next);
+    setRestored(new Set());
+    setLeftOut(new Set());
+  }
+
+  const interpretation = useMemo(
+    () => parseQuery(queryText.trim(), { ignoreCommon, restored, excluded: leftOut }),
+    [queryText, ignoreCommon, restored, leftOut],
+  );
+  const chipsModel = useMemo(
+    () => queryChipsModel(interpretation, isUsable(interpretation) ? formatQuery(interpretation) : ""),
+    [interpretation],
+  );
+  // The terms were changed after the last search of this same text, so the results are for the earlier terms.
+  const needsSearch =
+    state.phase !== "idle" &&
+    state.parsed.exact !== true &&
+    state.parsed.original === interpretation.original &&
+    formatQuery(state.parsed) !== formatQuery(interpretation);
+
+  function handleSearch(text: string, exact: boolean) {
+    runSearch(text, exact ? { exact: true } : { ignoreCommon, restored, excluded: leftOut });
+  }
+
+  // The person chose the suggestion: it replaces the text, and the words are read afresh.
+  function handleUseSuggestion(text: string) {
+    const exact = state.phase !== "idle" && state.parsed.exact === true;
+    changeQueryText(text);
+    runSearch(text, exact ? { exact: true } : { ignoreCommon });
+  }
+
+  function runSearch(text: string, options: Parameters<typeof prepareSearch>[1]) {
+    const prepared = prepareSearch(text, options);
     if (!prepared.usable) {
       setQueryProblem(explainUnusable(prepared.parsed));
       return;
@@ -98,14 +151,13 @@ export function App({ config }: { config: SourclyConfig }) {
     setQueryProblem(null);
     const providers = makeProviders();
     if (providers.length === 0) return;
-    // Show what is being searched: for a question, the keywords it was reduced to.
-    setQueryText(prepared.box);
+    // The text in the box is left exactly as typed.
     setPage(1);
     search(prepared.parsed, providers, { limit: perSource, cache: cache.current, skipped: skippedStatuses() });
   }
 
   function handleAddRelatedTerm(term: string) {
-    setQueryText((current) => addTermToQuery(current, term));
+    changeQueryText(addTermToQuery(queryText, term));
     document.getElementById("query")?.focus();
   }
 
@@ -164,7 +216,29 @@ export function App({ config }: { config: SourclyConfig }) {
       <Header config={config} />
       <main>
         <div className="top">
-          <SearchBox value={queryText} onChange={setQueryText} onSearch={handleSearch} />
+          <SearchBox
+            value={queryText}
+            onChange={changeQueryText}
+            onSearch={handleSearch}
+            ignoreCommon={ignoreCommon}
+            onIgnoreCommonChange={setIgnoreCommon}
+          >
+            {queryText.trim() !== "" && (
+              <QueryChips
+                model={chipsModel}
+                onExclude={(key) => setLeftOut((current) => new Set(current).add(key))}
+                onRestoreCommon={(word) => setRestored((current) => new Set(current).add(word))}
+                onRestoreLeftOut={(key) =>
+                  setLeftOut((current) => {
+                    const next = new Set(current);
+                    next.delete(key);
+                    return next;
+                  })
+                }
+                needsSearch={needsSearch}
+              />
+            )}
+          </SearchBox>
           {queryProblem !== null && <p className="warning">{queryProblem}</p>}
           <p className="notice">
             Labels and rankings are heuristics based on metadata. Verify sources before citing.
@@ -209,6 +283,7 @@ export function App({ config }: { config: SourclyConfig }) {
             onScoringChange={setScoring}
             filters={filters}
             onFiltersChange={setFilters}
+            languageOptions={languageOptions}
             enabledProviders={enabledProviders}
             onToggleProvider={(id) => setEnabledProviders((current) => toggleInList(current, id))}
             perSource={perSource}
@@ -246,6 +321,9 @@ export function App({ config }: { config: SourclyConfig }) {
               related={related}
               onAddRelatedTerm={handleAddRelatedTerm}
               exportSlot={<ProtocolExport build={buildProtocolText} />}
+              termMatching={scoring.termMatching}
+              suggestion={suggestion}
+              onUseSuggestion={handleUseSuggestion}
             />
           </div>
           {state.phase !== "idle" && (

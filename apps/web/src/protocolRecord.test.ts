@@ -64,8 +64,15 @@ describe("searchRecord", () => {
   it("counts what was fetched, merged, shown and hidden by filters", () => {
     const search = finished("sleep memory", ["10.1/a", "10.1/b", "10.1/c"]);
     const filtered = rankResults(search.results, { ...view, filters: { ...defaultFilters(), openAccessOnly: true } }, scoringContext(search, 2026));
-    expect(searchRecord(search, rank(search)).counts).toEqual({ fetched: 3, merged: 3, shown: 3, hiddenByFilters: 0 });
-    expect(searchRecord(search, filtered).counts).toEqual({ fetched: 3, merged: 3, shown: 0, hiddenByFilters: 3 });
+    expect(searchRecord(search, rank(search)).counts).toEqual({ fetched: 3, merged: 3, shown: 3, partialMatches: 0, hiddenByFilters: 0 });
+    expect(searchRecord(search, filtered).counts).toEqual({ fetched: 3, merged: 3, shown: 0, partialMatches: 0, hiddenByFilters: 3 });
+  });
+
+  it("counts results that lack a search word as partial matches, not as shown", () => {
+    const search = finished("sleep memory dreams", ["10.1/a", "10.1/b"]);
+    expect(searchRecord(search, rank(search)).counts).toMatchObject({ fetched: 2, merged: 2, shown: 0, partialMatches: 2 });
+    const byCoverage = rankResults(search.results, { ...view, scoring: { ...view.scoring, termMatching: "coverage" } }, scoringContext(search, 2026));
+    expect(searchRecord(search, byCoverage).counts).toMatchObject({ shown: 2, partialMatches: 0 });
   });
 
   it("counts duplicates as fetched but not as merged", () => {

@@ -5,6 +5,7 @@ import {
   doiUrl,
   findLexiconMatches,
   noticeKind,
+  type HighlightGroup,
   type LabelOverride,
   type ScoredResult,
 } from "@sourcly/core";
@@ -12,7 +13,7 @@ import { Badge, type BadgeStyle } from "./Badge";
 import { LabelEditor } from "./LabelEditor";
 import { LabelRows } from "./LabelRows";
 import { useSaved } from "./SavedContext";
-import { accessBadgeText, describeLexiconMatches, formatAuthors, formatNumber, reviewBadgeText } from "./format";
+import { accessBadgeText, describeLexiconMatches, formatAuthors, formatNumber, languageBadgeText, reviewBadgeText } from "./format";
 import { Highlighted } from "./Highlighted";
 import { libraryUrl } from "./libraryLink";
 import { WhyThisRank } from "./WhyThisRank";
@@ -42,6 +43,12 @@ export function ResultCard({
   const notice = noticeKind(result);
   const reviewText = reviewBadgeText(result);
   const matches = findLexiconMatches(result, highlight);
+  const coverage = scored.coverage;
+  // What to mark: the words of the search that were found (lightly) and the counterargument terms (heavily).
+  const groups: HighlightGroup[] = [
+    { name: "query", terms: coverage?.foundTerms ?? [], query: true, exact: coverage?.exact === true },
+    { name: "counter", terms: highlight },
+  ];
   const saved = useSaved();
   const isSaved = saved.isSaved(result.id);
   // Borders, not color: solid = open, dashed = not open, faint dashed = not stated.
@@ -54,10 +61,10 @@ export function ResultCard({
         <h3 className="card-title">
           <span className="position">{position}.</span>{" "}
           {result.url === null ? (
-            <Highlighted text={title} terms={highlight} />
+            <Highlighted text={title} groups={groups} />
           ) : (
             <a href={result.url} target="_blank" rel="noopener noreferrer">
-              <Highlighted text={title} terms={highlight} />
+              <Highlighted text={title} groups={groups} />
             </a>
           )}
         </h3>
@@ -96,6 +103,14 @@ export function ResultCard({
         <li>
           <Badge style={accessStyle}>{accessBadgeText(openAccess, libraryHref !== null)}</Badge>
         </li>
+        <li>
+          <Badge
+            style={result.language === null ? "faint-dashed" : "faint"}
+            title="As reported by the sources that found this work (OpenAlex detects it from the text). “unknown” means none of them gave a language."
+          >
+            {languageBadgeText(result.language)}
+          </Badge>
+        </li>
         {result.hits.map((hit) => (
           <li key={hit.provider}>
             <Badge style="faint" title={`Ranked #${hit.rank} of ${hit.listSize} by ${PROVIDER_NAMES[hit.provider]}`}>
@@ -109,6 +124,20 @@ export function ResultCard({
         <p className="warning">
           This work is marked as retracted ({retraction.source ?? "source unknown"}). Read the retraction notice before
           citing it.
+        </p>
+      )}
+
+      {coverage !== null && coverage.total > 0 && (
+        <p className="matched-terms">
+          <strong>Matched:</strong>{" "}
+          {coverage.units.filter((unit) => unit.matched).map((unit) => unit.found.join(" ")).join(", ") || "none of your terms"} (
+          {coverage.matchedCount} of {coverage.total})
+          {coverage.matchedCount < coverage.total && (
+            <>
+              {" "}
+              · <strong>Not found:</strong> {coverage.units.filter((unit) => !unit.matched).map((unit) => unit.label).join(", ")}
+            </>
+          )}
         </p>
       )}
 
@@ -168,7 +197,7 @@ export function ResultCard({
         <details className="panel">
           <summary>Abstract</summary>
           <p>
-            <Highlighted text={result.abstract} terms={highlight} />
+            <Highlighted text={result.abstract} groups={groups} />
           </p>
         </details>
       )}

@@ -343,6 +343,41 @@ describe("planQueries", () => {
   it("keeps the provider order", () => {
     expect(planQueries([plain, boolean], "sleep").map((p) => p.provider)).toEqual(["crossref", "openalex"]);
   });
+
+  it("adds what a provider's own request does to the notes, after what it could not apply", () => {
+    const scoped = { id: "openalex" as const, syntax: "boolean" as const, requestNotes: ["Looks in titles and abstracts only, not in the full text"] };
+    const limited = { id: "crossref" as const, syntax: "plain" as const, requestNotes: ["At most 50 results are asked for"] };
+    const [first, second] = planQueries([scoped, limited], "sleep OR nap");
+    expect(first?.notes).toEqual(["Looks in titles and abstracts only, not in the full text"]);
+    expect(second?.notes).toEqual([
+      "This source cannot match “either word”, so it searches for all of the words together",
+      "At most 50 results are asked for",
+    ]);
+  });
+
+  it("keeps the request notes when the search is sent exactly as typed", () => {
+    const scoped = { id: "openalex" as const, syntax: "boolean" as const, requestNotes: ["Looks in titles and abstracts only, not in the full text"] };
+    const [only] = planQueries([scoped], parseQuery("what is chaos", { exact: true }));
+    expect(only).toEqual({
+      provider: "openalex",
+      text: "what is chaos",
+      notes: ["Sent exactly as typed", "Looks in titles and abstracts only, not in the full text"],
+    });
+  });
+
+  it("writes PubMed's and Europe PMC's field names into the text that is sent", () => {
+    const planned = planQueries(
+      [
+        { id: "pubmed" as const, syntax: "pubmed" as const },
+        { id: "europepmc" as const, syntax: "europepmc" as const },
+      ],
+      "chaos double pendulum",
+    );
+    expect(planned.map((p) => p.text)).toEqual([
+      "chaos[tw] AND double[tw] AND pendulum[tw]",
+      "TITLE_ABS:chaos AND TITLE_ABS:double AND TITLE_ABS:pendulum",
+    ]);
+  });
 });
 
 describe("searchProviders: what is sent", () => {

@@ -3,12 +3,16 @@ import {
   FACTOR_LABELS,
   PEER_REVIEW_STATUSES,
   SOURCE_LEVELS,
+  STOPWORDS,
+  defaultFilters,
   defaultScoringSettings,
   isFiltering,
   type FactorId,
+  type LanguageCount,
   type ProviderId,
   type ResultFilters,
   type ScoringSettings,
+  type TermMatching,
 } from "@sourcly/core";
 import { maskApiKey } from "./apiKey";
 import { valueName } from "./format";
@@ -18,9 +22,31 @@ import { PER_SOURCE_CHOICES, toggleInList, withFactor } from "./settings";
 
 const OPENALEX_KEY_URL = "https://openalex.org/settings/api";
 
+const TERM_MATCHING_CHOICES: readonly { id: TermMatching; label: string; help: string }[] = [
+  {
+    id: "all",
+    label: "Require all terms",
+    help: "Only results that contain every term are in the list. The others are kept in a collapsed “Partial matches” section below it, each saying what it matched.",
+  },
+  {
+    id: "coverage",
+    label: "Rank by coverage, show partials",
+    help: "One list: results with every term first, then most, then few. Inside each tier the weighted score decides.",
+  },
+  {
+    id: "ignore",
+    label: "Ignore coverage",
+    help: "Coverage does not decide the order: only the weighted score does. Each card still says what it matched.",
+  },
+];
+
 const FACTOR_HELP: Record<FactorId, string> = {
   relevance:
     "BM25, a standard word-matching formula, over each result's title, abstract and subject terms, worked out on all the results fetched. Rarer words count for more. The best match scores 1.",
+  termCoverage:
+    "How many of your search's words and phrases the result contains, and where: a term in the title counts 1, in the author keywords 0.8, in the provider topics 0.7, only in the abstract 0.6. Averaged over your terms.",
+  phraseMatch:
+    "Words that are next to each other in your search, found next to each other in the same order: in the title counts 1, in the abstract 0.7. Neutral (0.5) when your search has no two such words.",
   citations: "Citations per year since publication, compared with the other results.",
   recency: "Newer publications score higher. The score halves every “half-life”.",
   peerReview: "Likely peer-reviewed scores 1, unknown 0.5, not peer-reviewed 0.",
@@ -35,6 +61,8 @@ export interface SettingsPanelProps {
   onScoringChange: (scoring: ScoringSettings) => void;
   filters: ResultFilters;
   onFiltersChange: (filters: ResultFilters) => void;
+  /** The languages of the results on the page, with how many each has; empty before a search. */
+  languageOptions: readonly LanguageCount[];
   enabledProviders: readonly ProviderId[];
   onToggleProvider: (id: ProviderId) => void;
   /** How many results each source is asked for. */
@@ -58,6 +86,7 @@ export function SettingsPanel(props: SettingsPanelProps) {
         <SourcesSection {...props} />
         <RankingSection {...props} />
         <FiltersSection {...props} />
+        <CommonWordsSection />
         <ApiKeySection {...props} />
       </div>
     </div>
@@ -128,6 +157,27 @@ function RankingSection({ scoring, onScoringChange }: SettingsPanelProps) {
         Results re-rank instantly, without searching again. Score = sum of (weight × factor) ÷ sum of weights, over the
         factors that are on.
       </p>
+
+      <div className="term-matching" role="radiogroup" aria-label="Term matching">
+        <strong>Term matching</strong>
+        <p className="muted help">
+          Whether a result must contain your search's words and phrases. Results are first put in tiers: every term, most
+          terms (more than half), or few. Nothing is ever deleted.
+        </p>
+        {TERM_MATCHING_CHOICES.map((choice) => (
+          <label key={choice.id} className="check">
+            <input
+              type="radio"
+              name="term-matching"
+              checked={scoring.termMatching === choice.id}
+              onChange={() => onScoringChange({ ...scoring, termMatching: choice.id })}
+            />
+            <span>
+              <strong>{choice.label}</strong> <span className="muted">{choice.help}</span>
+            </span>
+          </label>
+        ))}
+      </div>
 
       {FACTOR_IDS.map((id) => {
         const { enabled, weight } = scoring.factors[id];
@@ -200,7 +250,7 @@ function RankingSection({ scoring, onScoringChange }: SettingsPanelProps) {
   );
 }
 
-function FiltersSection({ filters, onFiltersChange }: SettingsPanelProps) {
+function FiltersSection({ filters, onFiltersChange, languageOptions }: SettingsPanelProps) {
   return (
     <fieldset>
       <legend>Filters</legend>
@@ -256,6 +306,27 @@ function FiltersSection({ filters, onFiltersChange }: SettingsPanelProps) {
         ))}
       </div>
 
+      <div className="check-group" role="group" aria-label="Language">
+        <span className="group-label">Language (none ticked = any)</span>
+        {languageOptions.length === 0 && <span className="muted">The languages of the results appear here after a search.</span>}
+        {languageOptions.map((option) => (
+          <label key={option.code} className="check">
+            <input
+              type="checkbox"
+              checked={filters.languages.includes(option.code)}
+              onChange={() => onFiltersChange({ ...filters, languages: toggleInList(filters.languages, option.code) })}
+            />
+            {option.name} <small>{option.count}</small>
+          </label>
+        ))}
+        {languageOptions.length > 0 && (
+          <span className="muted">
+            A result whose sources gave no language is “unknown”. It is hidden when you choose a language, unless you
+            choose “unknown” too.
+          </span>
+        )}
+      </div>
+
       <label className="check">
         <input
           type="checkbox"
@@ -268,12 +339,30 @@ function FiltersSection({ filters, onFiltersChange }: SettingsPanelProps) {
       <button
         type="button"
         disabled={!isFiltering(filters)}
-        onClick={() =>
-          onFiltersChange({ yearFrom: null, yearTo: null, levels: [], peerReview: [], openAccessOnly: false })
-        }
+        onClick={() => onFiltersChange(defaultFilters())}
       >
         Clear filters
       </button>
+    </fieldset>
+  );
+}
+
+const COMMON_WORDS = [...STOPWORDS].sort();
+
+function CommonWordsSection() {
+  return (
+    <fieldset>
+      <legend>Common words</legend>
+      <p className="muted">
+        While “Ignore common words” (next to the search box) is on, these {COMMON_WORDS.length} words are not used in a
+        search, and each one that is left out is shown under the box, where one click puts it back. Words inside quotes are
+        always kept, and so is a word in capitals such as <code>CAN</code> or <code>US</code>. The list is fixed: nothing is
+        learned or guessed.
+      </p>
+      <details className="panel">
+        <summary>Show the list ({COMMON_WORDS.length} words)</summary>
+        <p className="word-list">{COMMON_WORDS.join(" ")}</p>
+      </details>
     </fieldset>
   );
 }

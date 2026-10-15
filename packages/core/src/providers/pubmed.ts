@@ -30,6 +30,10 @@ import { ProviderError } from "../types";
 
 const ESEARCH_URL = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi";
 const EFETCH_URL = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi";
+// espell.fcgi (checked 2026-10-14) takes `db=pubmed&term=...` and answers XML whose <CorrectedQuery> is the
+// term with misspelt words replaced, or empty when it has nothing to suggest. Keyless, `access-control-allow-origin: *`,
+// and it shares the three requests per second of the other E-utilities.
+const ESPELL_URL = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/espell.fcgi";
 const MAX_RESULTS = 100;
 
 const REVIEW_TYPES = new Set(["review", "systematic review", "meta-analysis"]);
@@ -166,7 +170,10 @@ export function createPubmedProvider(options: PubmedOptions = {}): Provider {
   return {
     id: "pubmed",
     name: "PubMed",
-    syntax: "boolean",
+    syntax: "pubmed",
+    requestNotes: [
+      "Every word is looked for in PubMed’s text words (title, abstract, MeSH headings and keywords). PubMed’s own matching of synonyms and word forms is switched off, so “memory” does not find “memories”",
+    ],
 
     async search(query: string, { limit, signal }: SearchOptions): Promise<Result[]> {
       const text = query.trim();
@@ -211,5 +218,35 @@ export function createPubmedProvider(options: PubmedOptions = {}): Provider {
         })
         .filter((result): result is Result => result !== null);
     },
+  };
+}
+
+/** Asks PubMed's spell checker about some words; resolves with its corrected text, or null when it has nothing to suggest. */
+export type Spellchecker = (words: readonly string[], signal?: AbortSignal) => Promise<string | null>;
+
+/**
+ * PubMed's ESpell, used for "Did you mean ...?". It is only called after a search that found few results, and
+ * only with the plain words of the search, so it sends nothing PubMed has not already been sent.
+ */
+export function createPubmedSpellchecker(options: PubmedOptions = {}): Spellchecker {
+  const doFetch = options.fetch ?? defaultFetch;
+  const email = options.email?.trim() ?? "";
+
+  return async (words, signal) => {
+    if (words.length === 0) return null;
+    const url = new URL(ESPELL_URL);
+    url.searchParams.set("db", "pubmed");
+    url.searchParams.set("term", words.join(" "));
+    url.searchParams.set("tool", "sourcly");
+    if (email !== "") url.searchParams.set("email", email);
+
+    try {
+      const root = parseXml(await requestText(doFetch, url, "PubMed", signal));
+      const corrected = textOf(firstChild(root, "CorrectedQuery")).trim();
+      return corrected === "" ? null : corrected;
+    } catch (cause) {
+      if (cause instanceof XmlError) throw new ProviderError("failed", "PubMed's spell checker sent a response that is not valid XML", { cause });
+      throw cause;
+    }
   };
 }

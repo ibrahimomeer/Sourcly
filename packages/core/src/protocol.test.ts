@@ -24,7 +24,7 @@ const search = (typed: string): ProtocolSearch => ({
     { provider: "openalex", state: "ok", count: 100 },
     { provider: "crossref", state: "rate-limited", message: "busy" },
   ],
-  counts: { fetched: 200, merged: 180, shown: 170, hiddenByFilters: 10 },
+  counts: { fetched: 200, merged: 180, shown: 150, partialMatches: 20, hiddenByFilters: 10 },
 });
 
 const input = (changes: Partial<ProtocolInput> = {}): ProtocolInput => ({
@@ -69,14 +69,14 @@ describe("buildProtocol", () => {
       { provider: "openalex", state: "ok", count: 100 },
       { provider: "crossref", state: "rate-limited", message: "busy" },
     ]);
-    expect(recorded.counts).toEqual({ fetched: 200, merged: 180, shown: 170, hiddenByFilters: 10 });
+    expect(recorded.counts).toEqual({ fetched: 200, merged: 180, shown: 150, partialMatches: 20, hiddenByFilters: 10 });
   });
 
   it("records the chosen sources, the number asked for and the filters", () => {
     const protocol = buildProtocol(input());
     expect(protocol.sources).toEqual(["openalex", "crossref"]);
     expect(protocol.resultsPerSource).toBe(100);
-    expect(protocol.filters).toEqual({ yearFrom: 2015, yearTo: null, levels: [], peerReview: [], openAccessOnly: true });
+    expect(protocol.filters).toEqual({ yearFrom: 2015, yearTo: null, levels: [], peerReview: [], openAccessOnly: true, languages: [] });
   });
 
   it("records every weight and switch, the half-life and the reference year, so a ranking can be repeated", () => {
@@ -85,8 +85,11 @@ describe("buildProtocol", () => {
     expect(ranking.recencyHalfLifeYears).toBe(10);
     expect(ranking.relevance).toContain("BM25 (k1 = 1.2, b = 0.75)");
     expect(ranking.formula).toContain("sum(weight * factor) / sum(weight)");
+    expect(ranking.termMatching).toBe("all");
     expect(Object.keys(ranking.factors)).toEqual([
       "relevance",
+      "termCoverage",
+      "phraseMatch",
       "citations",
       "recency",
       "peerReview",
@@ -95,6 +98,8 @@ describe("buildProtocol", () => {
       "studyType",
     ]);
     expect(ranking.factors.relevance).toEqual({ label: "Relevance (BM25)", enabled: true, weight: 3 });
+    expect(ranking.factors.termCoverage).toEqual({ label: "Term coverage", enabled: true, weight: 2 });
+    expect(ranking.factors.phraseMatch).toEqual({ label: "Phrase match", enabled: true, weight: 1 });
     expect(ranking.factors.openAccess).toEqual({ label: "Open access", enabled: true, weight: 0 });
     expect(ranking.factors.providerAgreement.weight).toBe(0.5);
     expect(ranking.factors.studyType.enabled).toBe(false);

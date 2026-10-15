@@ -252,12 +252,15 @@ export function createOpenAlexProvider(options: OpenAlexOptions = {}): Provider 
     id: "openalex",
     name: "OpenAlex",
     syntax: "boolean",
+    requestNotes: ["Looks in titles and abstracts only, not in the full text"],
 
     async search(query: string, { limit, signal }: SearchOptions): Promise<Result[]> {
       const text = query.trim();
       if (text === "") return [];
       const url = new URL(WORKS_URL);
-      url.searchParams.set("search", text);
+      // The plain `search` parameter also reads the full text, which brought back works that only mention
+      // the words in passing (checked 2026-10-14). OpenAlex documents this scoped form as "title and abstract text only".
+      url.searchParams.set("search.title_and_abstract", text);
       url.searchParams.set("per_page", String(Math.min(MAX_PER_PAGE, Math.max(1, Math.floor(limit)))));
       url.searchParams.set("select", SELECT_FIELDS.join(","));
       if (apiKey !== "") url.searchParams.set("api_key", apiKey);

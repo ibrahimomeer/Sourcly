@@ -4,6 +4,9 @@ import { describe, expect, it } from "vitest";
 import {
   accessBadgeText,
   describeLexiconMatches,
+  describeOrder,
+  fewResultsMessage,
+  languageBadgeText,
   formatAuthors,
   formatNumber,
   formatRaw,
@@ -151,5 +154,40 @@ describe("describeLexiconMatches", () => {
 
   it("is empty for no matches", () => {
     expect(describeLexiconMatches([])).toBe("");
+  });
+});
+
+describe("describeOrder", () => {
+  it("says results are sorted by score when partial matches are set apart", () => {
+    expect(describeOrder("all")).toBe("Sorted by score.");
+  });
+
+  it("explains the tiers when results are ranked by coverage", () => {
+    expect(describeOrder("coverage")).toBe(
+      "Results with every term come first, then those with most terms, then those with few; inside each group they are sorted by score.",
+    );
+  });
+
+  it("says coverage does not decide the order when it is ignored", () => {
+    expect(describeOrder("ignore")).toBe("Sorted by score alone; how many of your terms a result contains does not decide the order.");
+  });
+});
+
+describe("languageBadgeText", () => {
+  it("names the language, or says it is unknown", () => {
+    expect(languageBadgeText("en")).toBe("Language: English");
+    expect(languageBadgeText("pt")).toBe("Language: Portuguese");
+    expect(languageBadgeText(null)).toBe("Language: unknown");
+  });
+});
+
+describe("fewResultsMessage", () => {
+  it("is the requested message when results lacking a word are set apart", () => {
+    expect(fewResultsMessage("all")).toBe("Few results match all your words. Check spelling, try synonyms, or loosen the term matching setting.");
+  });
+
+  it("does not tell a person to loosen a setting that is already loose", () => {
+    expect(fewResultsMessage("coverage")).toBe("Few results match all your words. Check spelling or try synonyms.");
+    expect(fewResultsMessage("ignore")).toBe("Few results match all your words. Check spelling or try synonyms.");
   });
 });

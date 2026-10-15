@@ -25,7 +25,7 @@ interface Case {
 }
 
 const cases: Case[] = [
-  { name: "Crossref", make: (fetch) => createCrossrefProvider({ fetch }), host: "api.crossref.org", limitParam: "rows", max: 100, queryOf: (url) => url.searchParams.get("query") },
+  { name: "Crossref", make: (fetch) => createCrossrefProvider({ fetch }), host: "api.crossref.org", limitParam: "rows", max: 50, queryOf: (url) => url.searchParams.get("query.bibliographic") },
   { name: "Europe PMC", make: (fetch) => createEuropePmcProvider({ fetch }), host: "www.ebi.ac.uk", limitParam: "pageSize", max: 100, queryOf: (url) => url.searchParams.get("query") },
   { name: "DOAJ", make: (fetch) => createDoajProvider({ fetch }), host: "doaj.org", limitParam: "pageSize", max: 100, queryOf: (url) => decodeURIComponent(url.pathname.replace("/api/search/articles/", "")) },
   { name: "DataCite", make: (fetch) => createDataCiteProvider({ fetch }), host: "api.datacite.org", limitParam: "page[size]", max: 100, queryOf: (url) => url.searchParams.get("query") },

@@ -298,14 +298,15 @@ describe("createOpenAlexProvider", () => {
     const [input, init] = fetchMock.mock.calls[0] ?? [];
     const url = new URL(String(input));
     expect(url.origin + url.pathname).toBe("https://api.openalex.org/works");
-    expect(url.searchParams.get("search")).toBe("sleep and memory");
+    expect(url.searchParams.get("search.title_and_abstract")).toBe("sleep and memory");
+    expect(url.searchParams.has("search")).toBe(false); // the plain parameter would also read the full text
     expect(url.searchParams.get("per_page")).toBe("50");
     expect(url.searchParams.get("select")?.split(",")).toEqual(
       expect.arrayContaining([
         "id", "doi", "title", "relevance_score", "type", "is_retracted", "abstract_inverted_index", "best_oa_location",
       ]),
     );
-    expect([...url.searchParams.keys()].sort()).toEqual(["per_page", "search", "select"]);
+    expect([...url.searchParams.keys()].sort()).toEqual(["per_page", "search.title_and_abstract", "select"]);
     expect(init).toEqual({ signal: controller.signal });
   });
 

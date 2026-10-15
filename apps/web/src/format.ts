@@ -1,4 +1,4 @@
-import type { Author, Label, LexiconMatch, OpenAccessInfo, PeerReviewStatus, Result, SourceLevel } from "@sourcly/core";
+import { languageName, type Author, type Label, type LexiconMatch, type OpenAccessInfo, type PeerReviewStatus, type Result, type SourceLevel, type TermMatching } from "@sourcly/core";
 
 const MAX_AUTHORS_SHOWN = 6;
 
@@ -72,4 +72,28 @@ export function reviewBadgeText(result: Pick<Result, "type" | "rawType">): strin
 /** "limitation (title), bias (abstract)": which terms a result matched and where. */
 export function describeLexiconMatches(matches: readonly LexiconMatch[]): string {
   return matches.map((match) => `${match.term} (${match.fields.join(" and ")})`).join(", ");
+}
+
+/** The language badge on a card: "Language: English" or "Language: unknown". */
+export function languageBadgeText(code: string | null): string {
+  return `Language: ${languageName(code)}`;
+}
+
+/**
+ * The note shown when few results contain every word of the search. Under "Require all terms" it names the
+ * setting that would let the others in; under the other settings they already are in, so it does not.
+ */
+export function fewResultsMessage(termMatching: TermMatching): string {
+  return termMatching === "all"
+    ? "Few results match all your words. Check spelling, try synonyms, or loosen the term matching setting."
+    : "Few results match all your words. Check spelling or try synonyms.";
+}
+
+/** How the list below is ordered, for the line under the results heading. */
+export function describeOrder(termMatching: TermMatching): string {
+  if (termMatching === "coverage") {
+    return "Results with every term come first, then those with most terms, then those with few; inside each group they are sorted by score.";
+  }
+  if (termMatching === "ignore") return "Sorted by score alone; how many of your terms a result contains does not decide the order.";
+  return "Sorted by score.";
 }

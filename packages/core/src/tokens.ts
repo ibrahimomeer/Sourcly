@@ -8,7 +8,7 @@ function removeDiacritics(text: string): string {
 }
 
 /** Words ending in "s" that are already singular, which the plural rule would otherwise cut. */
-const SINGULAR_IN_S: ReadonlySet<string> = new Set(["bias", "gas", "atlas", "canvas", "alias", "pancreas"]);
+const SINGULAR_IN_S: ReadonlySet<string> = new Set(["bias", "gas", "atlas", "canvas", "alias", "pancreas", "chaos", "cosmos", "ethos", "pathos", "kudos"]);
 
 /** Plurals that common academic words form irregularly (analysis/analyses). */
 const IRREGULAR_PLURALS: ReadonlyMap<string, string> = new Map([
@@ -46,15 +46,37 @@ export function wordKey(word: string): string {
   return stem(removeDiacritics(word).toLowerCase().replace(/['’]/g, ""));
 }
 
+export interface TokenizeOptions {
+  /**
+   * "Search exactly as typed": keep stopwords and one-letter words, and do not stem. Lowercase,
+   * accent-free words only.
+   */
+  exact?: boolean;
+}
+
 /**
  * Splits text into lowercase, accent-free, stemmed word tokens, dropping stopwords
- * and one-letter words. Numbers are kept.
+ * and one-letter words. Numbers are kept. With `exact`, nothing is dropped or stemmed.
  */
-export function tokenize(text: string): string[] {
+export function tokenize(text: string, options: TokenizeOptions = {}): string[] {
   const tokens: string[] = [];
   for (const raw of removeDiacritics(text).toLowerCase().replace(/['’]/g, "").split(/[^\p{L}\p{N}]+/u)) {
-    if (raw.length < 2 || STOPWORDS.has(raw)) continue;
-    tokens.push(stem(raw));
+    if (raw === "") continue;
+    if (options.exact === true) tokens.push(raw);
+    else if (raw.length >= 2 && !STOPWORDS.has(raw)) tokens.push(stem(raw));
   }
   return tokens;
+}
+
+/**
+ * Every word of a text as it is compared, stopwords and one-letter words included: lowercase, accents
+ * and apostrophes removed, split at anything that is not a letter or digit, and (unless `exact`) with
+ * plurals folded. Matching a phrase needs the common words, so none are dropped here.
+ */
+export function wordKeys(text: string, options: TokenizeOptions = {}): string[] {
+  const keys: string[] = [];
+  for (const raw of removeDiacritics(text).toLowerCase().replace(/['’]/g, "").split(/[^\p{L}\p{N}]+/u)) {
+    if (raw !== "") keys.push(options.exact === true ? raw : stem(raw));
+  }
+  return keys;
 }

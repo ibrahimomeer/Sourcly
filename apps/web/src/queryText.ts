@@ -1,29 +1,28 @@
-import { formatQuery, isUsable, parseQuery, queryTerms, type ParsedQuery } from "@sourcly/core";
+import { isUsable, parseQuery, queryTerms, type ParseOptions, type ParsedQuery } from "@sourcly/core";
 
 export interface PreparedSearch {
   parsed: ParsedQuery;
   /** Whether there is anything to search for. */
   usable: boolean;
-  /** What the search box should hold afterwards: the tidy query if common words were removed, otherwise what was typed. */
-  box: string;
 }
 
 /**
- * Reads the text of the search box. A question such as "what is the effect of sleep on memory?"
- * is reduced to its keywords by removing common words (a fixed list, no guessing), and the box
- * is then filled with those keywords so the person can see and edit exactly what was searched.
+ * Reads the text of the search box. The text itself is never changed: a question such as "what is
+ * the effect of sleep on memory?" is read as keywords by leaving out common words (a fixed list, no
+ * guessing), and the words left out are shown to the person, who can restore any of them.
  */
-export function prepareSearch(text: string): PreparedSearch {
-  const trimmed = text.trim();
-  const parsed = parseQuery(trimmed);
-  const usable = isUsable(parsed);
-  return { parsed, usable, box: usable && parsed.droppedStopwords.length > 0 ? formatQuery(parsed) : trimmed };
+export function prepareSearch(text: string, options: ParseOptions = {}): PreparedSearch {
+  const parsed = parseQuery(text.trim(), options);
+  return { parsed, usable: isUsable(parsed) };
 }
 
 /** Why a query cannot be searched, in plain words. */
 export function explainUnusable(parsed: ParsedQuery): string {
   if (parsed.droppedStopwords.length > 0 && parsed.root === null) {
-    return `Everything in “${parsed.original}” is a common word that searches leave out (${[...new Set(parsed.droppedStopwords)].join(", ")}). Add a more specific word.`;
+    return `Everything in “${parsed.original}” is a common word that searches leave out (${[...new Set(parsed.droppedStopwords)].join(", ")}). Click one of the dashed words below to use it, turn off “Ignore common words”, or add a more specific word.`;
+  }
+  if (parsed.root === null && (parsed.excludedTerms?.length ?? 0) > 0) {
+    return "Every term has been left out. Click a dashed word below to use it again.";
   }
   if (parsed.root !== null && queryTerms(parsed).length === 0) {
     return "A search needs at least one word to look for, not only words to leave out.";

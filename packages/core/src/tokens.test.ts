@@ -74,7 +74,7 @@ describe("STOPWORDS", () => {
 
 describe("stem: words ending in s, and irregular plurals", () => {
   it("keeps words that are singular but end in s", () => {
-    for (const word of ["bias", "gas", "atlas", "canvas", "alias", "pancreas"]) expect(stem(word)).toBe(word);
+    for (const word of ["bias", "gas", "atlas", "canvas", "alias", "pancreas", "chaos", "cosmos", "ethos", "pathos", "kudos"]) expect(stem(word)).toBe(word);
   });
 
   it("folds the irregular plurals academic writing uses", () => {
@@ -106,5 +106,19 @@ describe("wordKey", () => {
   it("keeps common words, because phrases such as 'no evidence' need them", () => {
     expect(wordKey("No")).toBe("no");
     expect(wordKey("The")).toBe("the");
+  });
+});
+
+describe("tokenize: exactly as typed", () => {
+  it("keeps stopwords and one-letter words and does not stem", () => {
+    expect(tokenize("What is the Cats and vitamin C", { exact: true })).toEqual(["what", "is", "the", "cats", "and", "vitamin", "c"]);
+  });
+
+  it("still lowercases and removes accents and apostrophes", () => {
+    expect(tokenize("Café's Biases", { exact: true })).toEqual(["cafes", "biases"]);
+  });
+
+  it("is unchanged without the option", () => {
+    expect(tokenize("What is the Cats and vitamin C")).toEqual(["cat", "vitamin"]);
   });
 });

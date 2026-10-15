@@ -27,6 +27,8 @@ export interface ProtocolSearch {
     /** Distinct works after merging duplicates. */
     merged: number;
     shown: number;
+    /** Results kept apart as partial matches (they lack some of the query's terms). */
+    partialMatches: number;
     hiddenByFilters: number;
   };
 }
@@ -83,11 +85,14 @@ export function buildProtocol(input: ProtocolInput) {
       levels: [...input.filters.levels],
       peerReview: [...input.filters.peerReview],
       openAccessOnly: input.filters.openAccessOnly,
+      languages: [...input.filters.languages],
     },
     ranking: {
       formula: "score = sum(weight * factor) / sum(weight), over the factors that are on; every factor is 0 to 1",
       relevance: `BM25 (k1 = ${BM25_K1}, b = ${BM25_B}) over title, abstract and subject terms of the merged results`,
       referenceYear: input.referenceYear,
+      // How term coverage decides the order: "all" (all terms first, partial matches apart), "coverage" or "ignore".
+      termMatching: input.scoring.termMatching,
       recencyHalfLifeYears: input.scoring.recencyHalfLifeYears,
       preferredLevels: [...input.scoring.preferredLevels],
       factors,

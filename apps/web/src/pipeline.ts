@@ -2,6 +2,7 @@ import {
   applyFilters,
   applyOverride,
   classify,
+  coverageSpec,
   mergeResults,
   scoreResults,
   relatedTerms,
@@ -23,10 +24,12 @@ export interface ViewSettings {
 }
 
 export interface RankedView {
-  /** Results that pass the filters, best score first. */
+  /** Results that pass the filters, in order. With "Require all terms", only those that contain every term. */
   shown: ScoredResult[];
   /** Results hidden by the user's filters (never by anything else). */
   hidden: ScoredResult[];
+  /** With "Require all terms": results that pass the filters but lack some term. Kept apart, never deleted. */
+  partial: ScoredResult[];
 }
 
 /**
@@ -50,7 +53,10 @@ export function rankResults(
   }));
   const scored = scoreResults(items, settings.scoring, context);
   const { kept, hidden } = applyFilters(scored, settings.filters);
-  return { shown: kept, hidden };
+  if (settings.scoring.termMatching === "all") {
+    return { shown: kept.filter((item) => item.tier === 1), hidden, partial: kept.filter((item) => item.tier > 1) };
+  }
+  return { shown: kept, hidden, partial: [] };
 }
 
 /**
@@ -68,7 +74,33 @@ export function scoringContext(
     queryTerms: search.terms,
     answeredSources: search.statuses.filter((status) => status.state === "ok").length,
     ...(signalTerms === undefined ? {} : { signalTerms }),
+    ...(search.parsed.exact === true ? { exact: true } : {}),
+    coverage: coverageSpec(search.parsed),
   };
+}
+
+/** Fewer merged results than this containing every term of the search is "few": the page then says so. */
+export const FEW_FULL_MATCHES = 10;
+
+/** How many merged results contain every term of the search, wherever the filters and the term-matching setting put them. */
+export function fullMatchCount(ranked: RankedView): number {
+  return [...ranked.shown, ...ranked.partial, ...ranked.hidden].filter((item) => item.tier === 1).length;
+}
+
+export function hasFewFullMatches(ranked: RankedView): boolean {
+  return fullMatchCount(ranked) < FEW_FULL_MATCHES;
+}
+
+/** For each term of the search (its label, lowercase), how many merged results contain it. Filters do not change it. */
+export function termResultCounts(ranked: RankedView): Map<string, number> {
+  const counts = new Map<string, number>();
+  for (const item of [...ranked.shown, ...ranked.partial, ...ranked.hidden]) {
+    for (const unit of item.coverage?.units ?? []) {
+      const label = unit.label.toLowerCase();
+      counts.set(label, (counts.get(label) ?? 0) + (unit.matched ? 1 : 0));
+    }
+  }
+  return counts;
 }
 
 /** How many of the best-ranked results the related terms are taken from. */

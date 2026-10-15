@@ -8,6 +8,8 @@ import {
   type ScoringContext,
   type ScoringItem,
 } from "./scoring";
+import { coverageSpec } from "./coverage";
+import { parseQuery } from "./query";
 import { makeResult } from "./testing/make-result";
 import type { ProviderId, Result } from "./types";
 
@@ -35,9 +37,10 @@ function only(...enabled: FactorId[]) {
   return settings;
 }
 
-// Three results, worked out by hand with the default weights
-// (relevance 3, citations 1, recency 1, peer review 1, open access 0, provider agreement 0.5; total 6.5),
-// for the query "sleep memory" with two sources answering.
+// Three results, worked out by hand with the default weights (relevance 3, term coverage 2, phrase match 1,
+// citations 1, recency 1, peer review 1, open access 0, provider agreement 0.5; total 9.5), for the query
+// "sleep memory" with two sources answering. These tests give no coverage spec, so term coverage and phrase
+// match score neutral (0.5) for everyone: 2 * 0.5 + 1 * 0.5 = 1.5 of the sum.
 //
 //   All three have the title "sleep and memory", so BM25 scores them the same: relevance 1 each.
 //
@@ -47,9 +50,9 @@ function only(...enabled: FactorId[]) {
 //   C    0/20   = 0   -> 1/6           2006: 2^-2 = .25  preprint = 0   one source   1/2 = .5
 //
 // Percentile = (below + ties/2) / 3. Open access has weight 0, so it adds nothing.
-//   A = (3*1 + 2/3 + 1   + 1 + 0.5*1)  / 6.5 = 37/39
-//   B = (3*1 + 2/3 + .5  + .5 + 0.5*.5) / 6.5 = 59/78
-//   C = (3*1 + 1/6 + .25 + 0 + 0.5*.5) / 6.5 = 22/39
+//   A = (3*1 + 2/3 + 1   + 1 + 0.5*1   + 1.5) / 9.5 = (37/6 + 3/2) / 9.5 = 46/57
+//   B = (3*1 + 2/3 + .5  + .5 + 0.5*.5 + 1.5) / 9.5 = (59/12 + 3/2) / 9.5 = 77/114
+//   C = (3*1 + 1/6 + .25 + 0 + 0.5*.5  + 1.5) / 9.5 = (11/3 + 3/2) / 9.5 = 31/57
 const QUERY = ["sleep", "memory"];
 const TITLE = "sleep and memory";
 
@@ -75,9 +78,9 @@ describe("scoreResults: the documented formula", () => {
   it("matches the hand-computed scores and order", () => {
     const scored = scoreResults(threeResults(), defaultScoringSettings(), scenario());
     expect(scored.map((s) => s.result.id)).toEqual(["10.1000/a", "10.1000/b", "10.1000/c"]);
-    expect(scored[0]?.score).toBeCloseTo(37 / 39, 12);
-    expect(scored[1]?.score).toBeCloseTo(59 / 78, 12);
-    expect(scored[2]?.score).toBeCloseTo(22 / 39, 12);
+    expect(scored[0]?.score).toBeCloseTo(46 / 57, 12);
+    expect(scored[1]?.score).toBeCloseTo(77 / 114, 12);
+    expect(scored[2]?.score).toBeCloseTo(31 / 57, 12);
   });
 
   it("normalizes each factor as documented", () => {
@@ -111,15 +114,15 @@ describe("scoreResults: the documented formula", () => {
     const [a] = scoreResults(threeResults(), defaultScoringSettings(), scenario());
     expect(a?.factors.map((f) => f.factor)).toEqual([...FACTOR_IDS]);
 
-    const relevance = a?.factors[0];
+    const relevance = a?.factors.find((f) => f.factor === "relevance");
     expect(relevance).toMatchObject({ factor: "relevance", label: "Relevance (BM25)", enabled: true, weight: 3, normalized: 1 });
     // Three identical documents, each containing both words: each word has idf ln(1 + 0.5/3.5).
     expect(relevance?.raw).toBeCloseTo(2 * Math.log(1 + 0.5 / 3.5), 12);
-    expect(relevance?.contribution).toBeCloseTo(3 / 6.5, 12);
+    expect(relevance?.contribution).toBeCloseTo(3 / 9.5, 12);
     expect(relevance?.detail).toContain("BM25 score");
     expect(relevance?.detail).toContain("sleep ×1");
 
-    const citations = a?.factors[1];
+    const citations = a?.factors.find((f) => f.factor === "citations");
     expect(citations?.raw).toBe(10);
     expect(citations?.detail).toContain("10 citations over 1 year = 10.0 per year");
     expect(citations?.detail).toContain("67th percentile among the 3 results");
@@ -350,7 +353,8 @@ describe("scoreResults: user control", () => {
     settings.factors.recency.weight = Number.POSITIVE_INFINITY;
     const scored = scoreResults(threeResults(), settings, scenario());
     expect(scored.every((s) => s.score === 0)).toBe(true);
-    expect(scored[0]?.factors.map((f) => f.weight)).toEqual([0, 0, 0, 1, 1, 1, 1]);
+    // relevance (NaN) 0, term coverage 1, phrase match 1, citations (-5) 0, recency (infinite) 0, then 1, 1, 1, 1.
+    expect(scored[0]?.factors.map((f) => f.weight)).toEqual([0, 1, 1, 0, 0, 1, 1, 1, 1]);
   });
 
   it("scores 0 and falls back to id order when no factor is active", () => {
@@ -477,6 +481,8 @@ describe("defaultScoringSettings", () => {
     const { factors, preferredLevels, recencyHalfLifeYears } = defaultScoringSettings();
     expect(Object.fromEntries(FACTOR_IDS.map((id) => [id, factors[id].weight]))).toEqual({
       relevance: 3,
+      termCoverage: 2,
+      phraseMatch: 1,
       citations: 1,
       recency: 1,
       peerReview: 1,
@@ -499,5 +505,138 @@ describe("defaultScoringSettings", () => {
     const two = defaultScoringSettings();
     expect(two.factors.relevance.weight).toBe(3);
     expect(two.preferredLevels).toEqual([]);
+  });
+});
+
+describe("scoreResults: term coverage comes first", () => {
+  const query = (text: string, options = {}) => coverageSpec(parseQuery(text, options));
+  const withSpec = (text: string, changes: Partial<ScoringContext> = {}) =>
+    ctx({ queryTerms: ["chaos", "double", "pendulum"], coverage: query(text), ...changes });
+
+  // A is the weakest by every other factor, but is the only one with all three words.
+  const items = () => [
+    item({ id: "10.1/slag", title: "Chaos in steel slag asphalt", citationCount: 900, year: 2026 }),
+    item({ id: "10.1/caos", title: "CAOS editorial", citationCount: 500, year: 2026 }),
+    item({ id: "10.1/two", title: "A double pendulum", citationCount: 100, year: 2026 }),
+    item({ id: "10.1/all", title: "Chaos in a double pendulum", citationCount: 0, year: 1990 }),
+  ];
+  const ids = (scored: ReturnType<typeof scoreResults>) => scored.map((s) => s.result.id);
+
+  it("puts results with every term first, then most, then few, whatever their score", () => {
+    const scored = scoreResults(items(), defaultScoringSettings(), withSpec("chaos double pendulum"));
+    expect(ids(scored)).toEqual(["10.1/all", "10.1/two", "10.1/slag", "10.1/caos"]);
+    expect(scored.map((s) => s.tier)).toEqual([1, 2, 3, 3]);
+  });
+
+  it("orders inside a tier by the weighted score", () => {
+    const scored = scoreResults(items(), defaultScoringSettings(), withSpec("chaos double pendulum"));
+    // slag (1 of 3 terms, many citations) beats caos (0 of 3, fewer citations): both are tier 3.
+    expect(ids(scored).slice(2)).toEqual(["10.1/slag", "10.1/caos"]);
+  });
+
+  it("keeps the same order whatever order the words were typed in", () => {
+    const orders = ["chaos double pendulum", "double pendulum chaos", '"double pendulum" chaos', "pendulum chaos double"];
+    const results = orders.map((text) => ids(scoreResults(items(), defaultScoringSettings(), withSpec(text))));
+    for (const order of results) expect(order[0]).toBe("10.1/all");
+    for (const order of results) expect(new Set(order.slice(0, 1))).toEqual(new Set(["10.1/all"]));
+  });
+
+  it("does not use the tier when term matching is set to ignore coverage", () => {
+    const settings = defaultScoringSettings();
+    settings.termMatching = "ignore";
+    const scored = scoreResults(items(), settings, withSpec("chaos double pendulum"));
+    expect(scored.map((s) => s.score)).toEqual([...scored.map((s) => s.score)].sort((a, b) => b - a));
+    // Every result still reports its tier, so the card can say what matched.
+    expect(scored.find((s) => s.result.id === "10.1/all")?.tier).toBe(1);
+  });
+
+  it("orders by tier for both 'all' and 'coverage' (the app decides what to do with the partial ones)", () => {
+    for (const mode of ["all", "coverage"] as const) {
+      const settings = defaultScoringSettings();
+      settings.termMatching = mode;
+      expect(ids(scoreResults(items(), settings, withSpec("chaos double pendulum")))[0]).toBe("10.1/all");
+    }
+  });
+
+  it("is tier 1 for everyone, and scores neutral, when there is no query to match", () => {
+    const scored = scoreResults(items(), defaultScoringSettings(), ctx({ queryTerms: [] }));
+    expect(scored.every((s) => s.tier === 1 && s.coverage === null)).toBe(true);
+    const factor = scored[0]?.factors.find((f) => f.factor === "termCoverage");
+    expect(factor).toMatchObject({ raw: null, normalized: 0.5 });
+    expect(factor?.detail).toContain("no terms to look for");
+  });
+
+  it("reports which terms matched, as a list with the count, and the fraction as the normalized value", () => {
+    const scored = scoreResults(items(), only("termCoverage"), withSpec("chaos double pendulum"));
+    const two = scored.find((s) => s.result.id === "10.1/two");
+    const factor = two?.factors.find((f) => f.factor === "termCoverage");
+    expect(factor?.raw).toBe("double, pendulum (2 of 3)");
+    expect(factor?.normalized).toBeCloseTo(2 / 3, 12);
+    expect(factor?.detail).toContain("Found 2 of 3 terms: double (title); pendulum (title)");
+    expect(factor?.detail).toContain("Not found: chaos");
+    expect(factor?.detail).toContain("1 if it is in the title, 0.8 in the author keywords, 0.7 in the provider topics, 0.6 if only in the abstract");
+  });
+
+  it("weighs a term found in the title above one found only in the abstract", () => {
+    const inTitle = item({ id: "10.1/t", title: "Pendulum" });
+    const inAbstract = item({ id: "10.1/a", title: "Other", abstract: "a pendulum" });
+    const scored = scoreResults([inAbstract, inTitle], only("termCoverage"), ctx({ coverage: query("pendulum") }));
+    expect(scored.map((s) => [s.result.id, s.factors.find((f) => f.factor === "termCoverage")?.normalized])).toEqual([
+      ["10.1/t", 1],
+      ["10.1/a", 0.6],
+    ]);
+  });
+
+  it("scores phrase match from query words found next to each other, in the title or the abstract", () => {
+    const together = item({ id: "10.1/together", title: "A double pendulum" });
+    const apart = item({ id: "10.1/apart", title: "A pendulum and a double" });
+    const abstractOnly = item({ id: "10.1/abstract", title: "Other", abstract: "the double pendulum" });
+    const scored = scoreResults([apart, abstractOnly, together], only("phraseMatch"), ctx({ coverage: query("double pendulum") }));
+    const phrase = (id: string) => scored.find((s) => s.result.id === id)?.factors.find((f) => f.factor === "phraseMatch");
+    expect(phrase("10.1/together")).toMatchObject({ normalized: 1, raw: "1 of 1 pairs" });
+    expect(phrase("10.1/abstract")?.normalized).toBe(0.7);
+    expect(phrase("10.1/apart")?.normalized).toBe(0);
+    expect(phrase("10.1/together")?.detail).toContain("double pendulum (title)");
+    expect(phrase("10.1/apart")?.detail).toContain("Not found together: double pendulum");
+  });
+
+  it("scores phrase match neutral when the query has no two words next to each other", () => {
+    const scored = scoreResults([item({ id: "10.1/x", title: "Sleep" })], only("phraseMatch"), ctx({ coverage: query("sleep") }));
+    expect(scored[0]?.factors.find((f) => f.factor === "phraseMatch")).toMatchObject({ raw: null, normalized: 0.5 });
+  });
+
+  it("lets a quoted phrase decide: a result with the words apart is not tier 1", () => {
+    const scored = scoreResults(
+      [item({ id: "10.1/apart", title: "A pendulum, double" }), item({ id: "10.1/adjacent", title: "The double pendulum" })],
+      defaultScoringSettings(),
+      ctx({ coverage: query('"double pendulum"') }),
+    );
+    expect(scored.map((s) => [s.result.id, s.tier])).toEqual([
+      ["10.1/adjacent", 1],
+      ["10.1/apart", 3],
+    ]);
+  });
+
+  it("can be switched off like any factor, and then adds nothing to the score", () => {
+    const settings = only("relevance");
+    const scored = scoreResults(items(), settings, withSpec("chaos double pendulum"));
+    for (const s of scored) {
+      expect(s.factors.find((f) => f.factor === "termCoverage")).toMatchObject({ enabled: false, contribution: 0 });
+    }
+  });
+
+  it("is deterministic and does not depend on the order results arrive in", () => {
+    const forwards = scoreResults(items(), defaultScoringSettings(), withSpec("chaos double pendulum"));
+    const backwards = scoreResults([...items()].reverse(), defaultScoringSettings(), withSpec("chaos double pendulum"));
+    expect(backwards.map((s) => [s.result.id, s.score, s.tier])).toEqual(forwards.map((s) => [s.result.id, s.score, s.tier]));
+  });
+});
+
+describe("defaultScoringSettings: term matching", () => {
+  it("requires all terms by default, and each copy is independent", () => {
+    expect(defaultScoringSettings().termMatching).toBe("all");
+    const one = defaultScoringSettings();
+    one.termMatching = "ignore";
+    expect(defaultScoringSettings().termMatching).toBe("all");
   });
 });

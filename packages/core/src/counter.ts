@@ -1,5 +1,5 @@
 import { formatQuery, termNode, type ParsedQuery, type QueryNode } from "./query";
-import { tokenize, wordKey } from "./tokens";
+import { tokenize, wordKey, wordKeys } from "./tokens";
 import type { Result } from "./types";
 
 // The counterargument search: the user's query, narrowed to results that also contain one of
@@ -97,11 +97,11 @@ const WORD = /[\p{L}\p{N}]+(?:['’][\p{L}\p{N}]+)*/gu;
 /** Between the words of a phrase there may only be spaces or hyphens ("no-evidence"), never a full stop. */
 const JOINER = /^[\s\-–—]+$/;
 
-function spansOf(text: string): Span[] {
+function spansOf(text: string, exact = false): Span[] {
   return [...text.matchAll(WORD)].map((match) => ({
     start: match.index,
     end: match.index + match[0].length,
-    key: wordKey(match[0]),
+    key: exact ? (wordKeys(match[0], { exact: true })[0] ?? "") : wordKey(match[0]),
   }));
 }
 
@@ -126,8 +126,29 @@ export interface TermMatch {
 
 /** Where the terms occur in the text, left to right, without overlaps. A word matches itself and its plural. */
 export function findTerms(text: string, terms: readonly string[]): TermMatch[] {
-  const entries = termKeys(terms);
-  const words = spansOf(text);
+  return findEntries(text, termKeys(terms), false);
+}
+
+/**
+ * Like `findTerms`, for the words and phrases of a search: any term is looked for, including a common
+ * word the person restored, a word with a hyphen (its parts next to each other) and a phrase. With
+ * `exact`, words are compared as typed.
+ */
+export function findQueryTerms(text: string, terms: readonly string[], exact = false): TermMatch[] {
+  const seen = new Set<string>();
+  const entries: TermKeys[] = [];
+  for (const term of terms) {
+    const keys = wordKeys(term, { exact });
+    const id = keys.join(" ");
+    if (keys.length === 0 || seen.has(id)) continue;
+    seen.add(id);
+    entries.push({ term, keys });
+  }
+  return findEntries(text, entries.sort((a, b) => b.keys.length - a.keys.length), exact);
+}
+
+function findEntries(text: string, entries: TermKeys[], exact: boolean): TermMatch[] {
+  const words = spansOf(text, exact);
   const matches: TermMatch[] = [];
   let i = 0;
   while (i < words.length) {
@@ -187,4 +208,47 @@ export function findLexiconMatches(result: Pick<Result, "title" | "abstract">, t
       term,
       fields: [...(inTitle.has(term) ? (["title"] as const) : []), ...(inAbstract.has(term) ? (["abstract"] as const) : [])],
     }));
+}
+
+export interface HighlightGroup {
+  /** Names the group in the result, e.g. "query" or "counter". */
+  name: string;
+  terms: readonly string[];
+  /** Look terms up as a search does (common words and hyphens allowed) rather than as counterargument terms. */
+  query?: boolean;
+  exact?: boolean;
+}
+
+export interface MarkedSegment {
+  text: string;
+  /** The term it matched, or null for ordinary text. */
+  term: string | null;
+  /** The group of the term, or null. */
+  group: string | null;
+}
+
+/**
+ * The text cut into plain stretches and stretches that matched, for several groups of terms at once (the
+ * words of the search, and the counterargument terms). Where two groups match the same stretch, the group
+ * listed first wins. The pieces add up to the original text.
+ */
+export function markText(text: string, groups: readonly HighlightGroup[]): MarkedSegment[] {
+  const accepted: (TermMatch & { group: string })[] = [];
+  for (const group of groups) {
+    const found = group.query === true ? findQueryTerms(text, group.terms, group.exact === true) : findTerms(text, group.terms);
+    for (const match of found) {
+      if (!accepted.some((other) => match.start < other.end && other.start < match.end)) accepted.push({ ...match, group: group.name });
+    }
+  }
+  accepted.sort((a, b) => a.start - b.start);
+
+  const segments: MarkedSegment[] = [];
+  let cursor = 0;
+  for (const match of accepted) {
+    if (match.start > cursor) segments.push({ text: text.slice(cursor, match.start), term: null, group: null });
+    segments.push({ text: text.slice(match.start, match.end), term: match.term, group: match.group });
+    cursor = match.end;
+  }
+  if (cursor < text.length) segments.push({ text: text.slice(cursor), term: null, group: null });
+  return segments;
 }

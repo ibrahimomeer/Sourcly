@@ -1,4 +1,5 @@
 import type { Labels, SourceLevel } from "./classify";
+import { FIELD_WEIGHTS, PHRASE_WEIGHTS, measureCoverage, type Coverage, type CoverageSpec, type Tier } from "./coverage";
 import { relevanceReadings } from "./relevance";
 import { PROVIDER_NAMES, type Result } from "./types";
 
@@ -8,6 +9,8 @@ import { PROVIDER_NAMES, type Result } from "./types";
 
 export const FACTOR_IDS = [
   "relevance",
+  "termCoverage",
+  "phraseMatch",
   "citations",
   "recency",
   "peerReview",
@@ -19,6 +22,8 @@ export type FactorId = (typeof FACTOR_IDS)[number];
 
 export const FACTOR_LABELS: Record<FactorId, string> = {
   relevance: "Relevance (BM25)",
+  termCoverage: "Term coverage",
+  phraseMatch: "Phrase match",
   citations: "Citations",
   recency: "Recency",
   peerReview: "Peer review",
@@ -32,8 +37,20 @@ export interface FactorSetting {
   weight: number;
 }
 
+/**
+ * What term coverage does to the order:
+ * - "all": results that contain every term come first; the rest are kept apart as partial matches;
+ * - "coverage": results are ordered by tier (all terms, most, few) and the partial ones stay in the list;
+ * - "ignore": coverage does not decide the order; only the weighted score does.
+ */
+export type TermMatching = "all" | "coverage" | "ignore";
+
+export const TERM_MATCHING_MODES: readonly TermMatching[] = ["all", "coverage", "ignore"];
+
 export interface ScoringSettings {
   factors: Record<FactorId, FactorSetting>;
+  /** How term coverage decides the order. Default "all". */
+  termMatching: TermMatching;
   /** Levels the user prefers; used only by the study-type factor. Empty = neutral. */
   preferredLevels: SourceLevel[];
   /** Years for the recency factor to fall to 0.5. */
@@ -45,6 +62,10 @@ export function defaultScoringSettings(): ScoringSettings {
   return {
     factors: {
       relevance: { enabled: true, weight: 3 },
+      // Which of the query's words and phrases the result contains, and where (title most).
+      termCoverage: { enabled: true, weight: 2 },
+      // Query words that sit next to each other in the query also sit next to each other in the title or abstract.
+      phraseMatch: { enabled: true, weight: 1 },
       citations: { enabled: true, weight: 1 },
       recency: { enabled: true, weight: 1 },
       peerReview: { enabled: true, weight: 1 },
@@ -55,6 +76,7 @@ export function defaultScoringSettings(): ScoringSettings {
       providerAgreement: { enabled: true, weight: 0.5 },
       studyType: { enabled: false, weight: 0 },
     },
+    termMatching: "all",
     preferredLevels: [],
     recencyHalfLifeYears: 10,
   };
@@ -76,6 +98,10 @@ export interface ScoringContext {
    * relevance multiplies a second BM25 reading of these terms into the usual one.
    */
   signalTerms?: readonly string[];
+  /** The search was sent exactly as typed, so words are matched as they are: no stemming, nothing dropped. */
+  exact?: boolean;
+  /** What the query asks for, from `coverageSpec`. Without it, term coverage and phrase match score neutral. */
+  coverage?: CoverageSpec;
 }
 
 export interface ScoringItem {
@@ -103,6 +129,10 @@ export interface ScoredResult extends ScoringItem {
   /** 0..1 */
   score: number;
   factors: FactorBreakdown[];
+  /** Which terms of the query the result contains and where; null when there was no query to match. */
+  coverage: Coverage | null;
+  /** 1 = every term found, 2 = most, 3 = few. Always 1 when there is no query to match. */
+  tier: Tier;
 }
 
 interface FactorValue {
@@ -162,6 +192,45 @@ function agreementFactor(result: Result, answeredSources: number): FactorValue {
 function relevanceFactor(reading: { raw: number | null; normalized: number | null; detail: string } | undefined): FactorValue {
   if (reading === undefined) return { raw: null, detail: "No relevance reading", normalized: NEUTRAL };
   return { raw: reading.raw, detail: reading.detail, normalized: reading.normalized ?? NEUTRAL };
+}
+
+const WEIGHT_NOTE = `Each term counts ${FIELD_WEIGHTS.title} if it is in the title, ${FIELD_WEIGHTS.keywords} in the author keywords, ${FIELD_WEIGHTS.topics} in the provider topics, ${FIELD_WEIGHTS.abstract} if only in the abstract`;
+
+function coverageFactor(coverage: Coverage | null): FactorValue {
+  if (coverage === null || coverage.total === 0) {
+    return { raw: null, detail: "The query has no terms to look for, so this scores neutral (0.5)", normalized: NEUTRAL };
+  }
+  const found = coverage.units.filter((unit) => unit.matched);
+  const missing = coverage.units.filter((unit) => !unit.matched).map((unit) => unit.label);
+  const where = found.map((unit) => `${unit.found.join(" and ")} (${unit.fields.join(", ")})`).join("; ");
+  return {
+    raw: `${found.map((unit) => unit.found.join(" ")).join(", ") || "none"} (${coverage.matchedCount} of ${coverage.total})`,
+    detail:
+      `Found ${coverage.matchedCount} of ${coverage.total} terms${where === "" ? "" : `: ${where}`}. ` +
+      `${missing.length > 0 ? `Not found: ${missing.join(", ")}. ` : ""}${WEIGHT_NOTE}.`,
+    normalized: clamp01(coverage.weighted),
+  };
+}
+
+function phraseFactor(coverage: Coverage | null): FactorValue {
+  if (coverage === null || coverage.phraseScore === null) {
+    return {
+      raw: null,
+      detail: "The query has no two words next to each other, so this scores neutral (0.5)",
+      normalized: NEUTRAL,
+    };
+  }
+  const together = coverage.pairs.filter((pair) => pair.found !== null);
+  const apart = coverage.pairs.filter((pair) => pair.found === null).map((pair) => pair.text);
+  return {
+    raw: `${together.length} of ${coverage.pairs.length} pairs`,
+    detail:
+      `Query words that are next to each other in the query and in the text: ` +
+      `${together.length === 0 ? "none" : together.map((pair) => `${pair.text} (${pair.found})`).join(", ")}. ` +
+      `${apart.length > 0 ? `Not found together: ${apart.join(", ")}. ` : ""}` +
+      `A pair in the title counts ${PHRASE_WEIGHTS.title}, in the abstract ${PHRASE_WEIGHTS.abstract}.`,
+    normalized: clamp01(coverage.phraseScore),
+  };
 }
 
 function citationsFactor(
@@ -231,7 +300,8 @@ function studyTypeFactor({ level }: Labels, preferred: readonly SourceLevel[]): 
   };
 }
 
-function compareScored(a: ScoredResult, b: ScoredResult): number {
+function compareScored(a: ScoredResult, b: ScoredResult, byTier: boolean): number {
+  if (byTier && a.tier !== b.tier) return a.tier - b.tier;
   if (a.score !== b.score) return b.score - a.score;
   // Deterministic tie-break on the DOI/id, by code unit so it does not depend on locale.
   if (a.result.id === b.result.id) return 0;
@@ -250,7 +320,7 @@ export function scoreResults(
   settings: ScoringSettings,
   context: ScoringContext,
 ): ScoredResult[] {
-  const { referenceYear, queryTerms, answeredSources, signalTerms } = context;
+  const { referenceYear, queryTerms, answeredSources, signalTerms, exact, coverage: spec } = context;
   const halfLife =
     Number.isFinite(settings.recencyHalfLifeYears) && settings.recencyHalfLifeYears > 0
       ? settings.recencyHalfLifeYears
@@ -260,6 +330,7 @@ export function scoreResults(
     items.map(({ result }) => result),
     queryTerms,
     signalTerms,
+    exact === true ? { exact: true } : {},
   );
   const rates = items.map(({ result }) => citationRate(result, referenceYear));
   const population = rates.filter((rate): rate is number => rate !== null);
@@ -271,8 +342,11 @@ export function scoreResults(
 
   const scored = items.map((item, index): ScoredResult => {
     const { result, labels } = item;
+    const coverage = spec === undefined || spec.units.length === 0 ? null : measureCoverage(result, spec);
     const values: Record<FactorId, FactorValue> = {
       relevance: relevanceFactor(relevance[index]),
+      termCoverage: coverageFactor(coverage),
+      phraseMatch: phraseFactor(coverage),
       citations: citationsFactor(result, rates[index] ?? null, population, referenceYear),
       recency: recencyFactor(result, referenceYear, halfLife),
       peerReview: peerReviewFactor(labels),
@@ -295,8 +369,11 @@ export function scoreResults(
       };
     });
 
-    return { ...item, score: factors.reduce((sum, f) => sum + f.contribution, 0), factors };
+    return { ...item, score: factors.reduce((sum, f) => sum + f.contribution, 0), factors, coverage, tier: coverage?.tier ?? 1 };
   });
 
-  return scored.sort(compareScored);
+  // Unless the person turned it off, coverage comes first: results with every term, then most, then few,
+  // and inside each tier the weighted score decides.
+  const byTier = settings.termMatching !== "ignore";
+  return scored.sort((a, b) => compareScored(a, b, byTier));
 }

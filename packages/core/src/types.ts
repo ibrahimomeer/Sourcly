@@ -159,10 +159,18 @@ export interface Result {
 }
 
 /**
- * How a provider reads a query. "boolean" sources understand AND, OR, NOT, quoted
- * phrases and parentheses; "plain" sources take only a list of words.
+ * How a provider reads a query.
+ * - "boolean": AND, OR, NOT, quoted phrases and parentheses.
+ * - "boolean-flat": the same, except that a group of alternatives inside a larger search is
+ *   ignored by the source, so it is left out and the notes say so (Wikipedia).
+ * - "pubmed": boolean, with every word and phrase searched in PubMed's text-word field, which
+ *   turns off PubMed's own guessing at synonyms and word forms.
+ * - "europepmc": boolean, with every word and phrase searched in the title and abstract only.
+ * - "plain": only a list of words.
+ * - "plain-spaced": a list of words in which a hyphen is read as a space, because the source
+ *   finds nothing for a hyphenated word (Semantic Scholar).
  */
-export type QuerySyntax = "boolean" | "plain";
+export type QuerySyntax = "boolean" | "boolean-flat" | "pubmed" | "europepmc" | "plain" | "plain-spaced";
 
 export interface SearchOptions {
   /** Maximum number of results to return from one provider. */
@@ -175,6 +183,11 @@ export interface Provider {
   readonly name: string;
   /** How this provider reads the query it is given. */
   readonly syntax: QuerySyntax;
+  /**
+   * What the provider's request does beyond the query text, in plain language (which text it
+   * looks in, how many results it asks for). Shown beside the query that was sent.
+   */
+  readonly requestNotes?: readonly string[];
   /**
    * Resolves with normalized results, best match first. Throws `ProviderError`
    * when the provider cannot answer; callers decide what to show.

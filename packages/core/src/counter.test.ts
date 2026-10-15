@@ -5,8 +5,10 @@ import {
   NOTICE_TERMS,
   counterQuery,
   findLexiconMatches,
+  findQueryTerms,
   findTerms,
   highlightSegments,
+  markText,
   parseCounterTerm,
 } from "./counter";
 import { formatQuery, parseQuery, queryTerms, renderQuery } from "./query";
@@ -286,5 +288,72 @@ describe("findLexiconMatches", () => {
       { term: "sleep", fields: ["title"] },
       { term: "memory", fields: ["abstract"] },
     ]);
+  });
+});
+
+describe("findQueryTerms: the words of a search", () => {
+  const found = (text: string, terms: string[], exact = false) => findQueryTerms(text, terms, exact).map((m) => [text.slice(m.start, m.end), m.term]);
+
+  it("finds words and phrases, with plurals", () => {
+    expect(found("A double pendulum and pendulums", ["double pendulum", "pendulum"])).toEqual([
+      ["double pendulum", "double pendulum"],
+      ["pendulums", "pendulum"],
+    ]);
+  });
+
+  it("finds a common word the person restored, which a counterargument term could not be", () => {
+    expect(found("What is chaos", ["is"])).toEqual([["is", "is"]]);
+    expect(findTerms("What is chaos", ["is"])).toEqual([]);
+  });
+
+  it("finds a word with a hyphen as its parts next to each other", () => {
+    expect(found("COVID 19 and covid-19", ["covid-19"])).toEqual([
+      ["COVID 19", "covid-19"],
+      ["covid-19", "covid-19"],
+    ]);
+  });
+
+  it("compares words as typed when exact", () => {
+    expect(found("Pendulums", ["pendulum"], true)).toEqual([]);
+    expect(found("Pendulums", ["pendulums"], true)).toEqual([["Pendulums", "pendulums"]]);
+    expect(found("Pendulums", ["pendulum"])).toEqual([["Pendulums", "pendulum"]]);
+  });
+
+  it("finds nothing for no terms, and ignores a term with no words", () => {
+    expect(found("text", [])).toEqual([]);
+    expect(found("text", ["", "--"])).toEqual([]);
+  });
+});
+
+describe("markText: several groups of terms in one text", () => {
+  it("marks the words of the search and the counterargument terms, and the pieces add up to the text", () => {
+    const text = "Limitations of the double pendulum model";
+    const segments = markText(text, [
+      { name: "query", terms: ["double", "pendulum"], query: true },
+      { name: "counter", terms: ["limitation"] },
+    ]);
+    expect(segments.filter((s) => s.group !== null).map((s) => [s.text, s.group])).toEqual([
+      ["Limitations", "counter"],
+      ["double", "query"],
+      ["pendulum", "query"],
+    ]);
+    expect(segments.map((s) => s.text).join("")).toBe(text);
+  });
+
+  it("lets the group listed first win when two match the same words", () => {
+    const first = markText("bias study", [{ name: "query", terms: ["bias"], query: true }, { name: "counter", terms: ["bias"] }]);
+    expect(first.filter((s) => s.group !== null).map((s) => s.group)).toEqual(["query"]);
+    const other = markText("bias study", [{ name: "counter", terms: ["bias"] }, { name: "query", terms: ["bias"], query: true }]);
+    expect(other.filter((s) => s.group !== null).map((s) => s.group)).toEqual(["counter"]);
+  });
+
+  it("does not overlap: a phrase that contains a single word keeps the phrase if listed first", () => {
+    const segments = markText("the double pendulum", [{ name: "query", terms: ["double pendulum", "pendulum"], query: true }]);
+    expect(segments.filter((s) => s.group !== null).map((s) => s.text)).toEqual(["double pendulum"]);
+  });
+
+  it("returns the text whole when nothing matches, and nothing for empty text", () => {
+    expect(markText("plain text", [{ name: "query", terms: ["zebra"], query: true }])).toEqual([{ text: "plain text", term: null, group: null }]);
+    expect(markText("", [{ name: "query", terms: ["zebra"], query: true }])).toEqual([]);
   });
 });
