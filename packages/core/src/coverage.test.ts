@@ -155,9 +155,9 @@ describe("measureCoverage: variants from the thesaurus", () => {
   });
 
   it("prefers the word that was typed when the result has both", () => {
-    const c = cover("odor", { title: "Odour and odor", abstract: "smell" });
+    const c = cover("odor", { title: "Odour and odor", abstract: "the sense of smell" });
     expect(c.units[0]).toMatchObject({ variant: "odor", fromThesaurus: false });
-    expect(c.units[0]?.found).toEqual(["odor", "odour", "smell"]);
+    expect(c.units[0]?.found).toEqual(["odor", "odour", "sense of smell"]);
   });
 
   it("matches AI by 'machine learning', and does not need the word AI", () => {

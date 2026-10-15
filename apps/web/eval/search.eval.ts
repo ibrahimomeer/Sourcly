@@ -27,7 +27,11 @@ const check = (label: string, ok: boolean, detail = "", incomplete = false) => {
 const text = (result: Pick<Result, "title" | "abstract" | "subjects">) =>
   `${result.title} ${result.abstract ?? ""} ${result.subjects.filter((s) => s.kind === "keyword" && s.provider !== "openalex").map((s) => s.term).join(" ; ")}`;
 const DOUBLE_PENDULUM = /double[\s-]+(inverted\s+|compound\s+)?pendul/i;
-const ML_TERM = /\b(machine[\s-]learning|deep[\s-]learning|neural[\s-]network|artificial[\s-]intelligence|AI|ML|graph[\s-]neural|random[\s-]forest|support[\s-]vector|predictive[\s-]model|prediction[\s-]model|data[\s-]driven|QSOR|language[\s-]model)\b/;
+// Machine-learning words are matched without regard to capitals ("ARTIFICIAL INTELLIGENCE" in an old title is one); the
+// abbreviations AI and ML only with their capitals, so "ai" inside a word or a name is not one.
+const ML_WORDS = /\b(machine[\s-]learning|deep[\s-]learning|neural[\s-]networks?|artificial[\s-]intelligen(?:ce|t)|graph[\s-]neural|random[\s-]forest|support[\s-]vector|predictive[\s-]model|prediction[\s-]model|data[\s-]driven|QSOR|language[\s-]model)/i;
+const ML_ABBREVIATIONS = /\b(AI|ML)\b/;
+const ML_TERM = { test: (text: string) => ML_WORDS.test(text) || ML_ABBREVIATIONS.test(text) };
 const FOOD_FLAVOUR = /\b(food|foods|flavou?rs?|aroma|aromas|wine|wines|beer|coffee|tea|fruit|fruits|apple|apples|cheese|meat|olive|spices?|essential oils?|fragrances?)\b/i;
 const CAN_PROTOCOL = /\bCANs?\b|controller[\s-]area[\s-]network/;
 

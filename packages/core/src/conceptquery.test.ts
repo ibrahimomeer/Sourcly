@@ -9,7 +9,7 @@ const render = (text: string, syntax: Parameters<typeof renderConcepts>[1], opti
 describe("renderConcepts: Boolean sources", () => {
   it("writes each concept as an OR-group, with AND between concepts", () => {
     expect(render("How AI understand odor", "boolean").text).toBe(
-      '(AI OR "artificial intelligence" OR "machine learning" OR "deep learning" OR "neural network") AND (odor OR odour OR odorant OR olfaction OR olfactory OR smell)',
+      '(AI OR "artificial intelligence" OR "machine learning" OR "deep learning" OR "neural network") AND (odor OR odour OR odorant OR olfaction OR olfactory OR "sense of smell")',
     );
   });
 
@@ -20,13 +20,13 @@ describe("renderConcepts: Boolean sources", () => {
 
   it("writes PubMed's title-and-abstract field on every term", () => {
     expect(render("machine learning odor", "pubmed").text).toBe(
-      '("machine learning"[tiab] OR ML[tiab] OR "deep learning"[tiab] OR "neural network"[tiab]) AND (odor[tiab] OR odour[tiab] OR odorant[tiab] OR olfaction[tiab] OR olfactory[tiab] OR smell[tiab])',
+      '("machine learning"[tiab] OR ML[tiab] OR "deep learning"[tiab] OR "neural network"[tiab]) AND (odor[tiab] OR odour[tiab] OR odorant[tiab] OR olfaction[tiab] OR olfactory[tiab] OR "sense of smell"[tiab])',
     );
   });
 
   it("writes Europe PMC's title-and-abstract field on every term", () => {
     expect(render("machine learning odor", "europepmc").text).toBe(
-      '(TITLE_ABS:"machine learning" OR TITLE_ABS:ML OR TITLE_ABS:"deep learning" OR TITLE_ABS:"neural network") AND (TITLE_ABS:odor OR TITLE_ABS:odour OR TITLE_ABS:odorant OR TITLE_ABS:olfaction OR TITLE_ABS:olfactory OR TITLE_ABS:smell)',
+      '(TITLE_ABS:"machine learning" OR TITLE_ABS:ML OR TITLE_ABS:"deep learning" OR TITLE_ABS:"neural network") AND (TITLE_ABS:odor OR TITLE_ABS:odour OR TITLE_ABS:odorant OR TITLE_ABS:olfaction OR TITLE_ABS:olfactory OR TITLE_ABS:"sense of smell")',
     );
   });
 

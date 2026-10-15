@@ -4,8 +4,9 @@
 //
 // Rules for an entry (the same ones docs/methodology.md and CONTRIBUTING.md give):
 //  - A variant must be something a paper would write INSTEAD of the term, in the same sense. Narrow, not broad:
-//    odor may stand for odour, odorant, olfaction, olfactory and smell, but NOT for aroma or flavor (those are other
-//    things: a food paper about the aroma of apples is not a paper about odor perception).
+//    odor may stand for odour, odorant, olfaction, olfactory and "sense of smell", but NOT for aroma or flavor (those are
+//    other things: a food paper about the aroma of apples is not a paper about odor perception) and NOT for the bare word
+//    smell (a code smell is a software term: 13 of the first 70 results of a live "How AI understand odor" search were about code smells).
 //  - "spelling": a US/UK pair or another plain spelling variant. Works both ways.
 //  - "abbreviation": an abbreviation and what it stands for. Works both ways.
 //  - "synonym": a tight near-synonym or word form. Works ONE way: the term brings its variants, a variant does not
@@ -161,7 +162,7 @@ export const THESAURUS: readonly ThesaurusEntry[] = [
 
   // ---- Near-synonyms (work one way)
   synonym("AI", ["machine learning", "deep learning", "neural network"], "AI work is usually written as one of these"),
-  synonym(["odor", "odour"], ["odorant", "olfaction", "olfactory", "smell"], "the same subject; not aroma or flavor, which are other things"),
+  synonym(["odor", "odour"], ["odorant", "olfaction", "olfactory", "sense of smell"], "the same subject; not aroma or flavor, which are other things; the phrase \"sense of smell\" and not the bare word, because \"smell\" is also what software engineers call a code smell"),
   synonym("smell", ["odor", "odour", "olfaction", "olfactory"], "the sense of smell, written several ways"),
   synonym("olfaction", ["olfactory", "sense of smell"], "the same sense"),
   synonym("olfactory", ["olfaction", "sense of smell"], "the same sense"),

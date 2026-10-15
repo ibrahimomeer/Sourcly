@@ -69,7 +69,7 @@ describe("buildProtocol", () => {
       ["odorant", "curated thesaurus"],
       ["olfaction", "curated thesaurus"],
       ["olfactory", "curated thesaurus"],
-      ["smell", "curated thesaurus"],
+      ["sense of smell", "curated thesaurus"],
     ]);
     expect(recorded.reading.concepts[1]?.variants[1]).toMatchObject({ entryType: "spelling" });
     expect(recorded.sentQueries).toEqual([

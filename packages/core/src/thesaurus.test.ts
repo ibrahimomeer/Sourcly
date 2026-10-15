@@ -60,6 +60,15 @@ describe("the thesaurus is data a person can check", () => {
     }
   });
 
+  it("does not let odor bring the bare word smell, which is also a software term (a code smell)", () => {
+    const odor = parseConcepts("odor").blocks[0];
+    const texts = odor?.variants.map((v) => v.text) ?? [];
+    expect(texts).toContain("sense of smell");
+    expect(texts).not.toContain("smell");
+    // A person who types smell still gets the sense of smell.
+    expect(parseConcepts("smell").blocks[0]?.variants.map((v) => v.text)).toEqual(["smell", "odor", "odour", "olfaction", "olfactory"]);
+  });
+
   it("expands AI to the four tight terms and no further", () => {
     const ai = parseConcepts("AI").blocks[0];
     expect(ai?.variants.map((v) => v.text)).toEqual(["AI", "artificial intelligence", "machine learning", "deep learning", "neural network"]);

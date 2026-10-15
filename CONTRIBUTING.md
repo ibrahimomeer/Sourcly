@@ -50,12 +50,12 @@ scripts/         the single-file build checker and the version tools.
 ```ts
 spelling("odor", "odour"),                                    // a US/UK pair or other spelling: works both ways
 abbreviation("GNN", "graph neural network"),                  // an abbreviation and what it stands for: works both ways
-synonym("odor", ["odorant", "olfaction", "smell"], "the same subject; not aroma or flavor"),  // one way only
+synonym("odor", ["odorant", "olfaction", "sense of smell"], "the same subject; not aroma or flavor"),  // one way only
 ```
 
 Rules (a pull request that breaks one is sent back):
 
-1. **Narrow, not broad.** A variant must be something a paper writes *instead of* the term, in the same sense. `odor` may stand for `olfaction` but not for `aroma` or `flavor`: a food paper about the aroma of apples is not about odor perception. When in doubt, leave it out, and check a few real abstracts.
+1. **Narrow, not broad.** A variant must be something a paper writes *instead of* the term, in the same sense. `odor` may stand for `olfaction` but not for `aroma` or `flavor`: a food paper about the aroma of apples is not about odor perception. A bare word that means something else in another field is written as a phrase or left out: `odor` brings `sense of smell` and not `smell`, because a *code smell* is a software term (in a live search for "How AI understand odor", 13 of the first 70 results were about code smells). When in doubt, leave it out, and check a few real abstracts.
 2. **Give the entry its type and a one-line note** saying why it is there. A synonym works one way (the term brings its variants, not the other way round), so `machine learning` does not bring `AI`.
 3. **Abbreviations of 2 to 6 capitals or digits** are matched with their capitals, as whole words. Do not add an abbreviation whose capitals are also an ordinary word in capitals-heavy text unless you accept that.
 4. **Word forms are listed, not stemmed.** Sourcly folds only a plural `-s`/`-es`. If `predicting` and `predicted` matter, they are entries (see `prediction`).

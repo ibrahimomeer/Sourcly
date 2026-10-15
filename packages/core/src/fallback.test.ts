@@ -36,7 +36,7 @@ describe("countConcepts: how many works each concept matches on its own", () => 
       asked.push(text);
       return 1;
     });
-    expect(asked[0]).toBe("(odor OR odour OR odorant OR olfaction OR olfactory OR smell)");
+    expect(asked[0]).toBe('(odor OR odour OR odorant OR olfaction OR olfactory OR "sense of smell")');
   });
 
   it("remembers answers between searches: the same concept is asked once", async () => {

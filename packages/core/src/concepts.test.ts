@@ -126,7 +126,7 @@ describe("parseConcepts: phrases, abbreviations and the words around them", () =
 describe("parseConcepts: the curated thesaurus", () => {
   it("adds spellings, abbreviations and tight synonyms to a block, the typed word first", () => {
     const query = parseConcepts("How AI understand odor");
-    expect(variantsOf(query, "odor")).toEqual(["odor", "odour", "odorant", "olfaction", "olfactory", "smell"]);
+    expect(variantsOf(query, "odor")).toEqual(["odor", "odour", "odorant", "olfaction", "olfactory", "sense of smell"]);
     expect(variantsOf(query, "AI")).toEqual(["AI", "artificial intelligence", "machine learning", "deep learning", "neural network"]);
     expect(query.expanded).toBe(true);
   });
@@ -181,7 +181,7 @@ describe("blocks: helpers", () => {
   });
 
   it("describes a block as the typed word and its variants", () => {
-    expect(describeBlock(hardBlocks(parseConcepts("odor"))[0] as never)).toBe("odor (odour, odorant, olfaction, olfactory, smell)");
+    expect(describeBlock(hardBlocks(parseConcepts("odor"))[0] as never)).toBe("odor (odour, odorant, olfaction, olfactory, sense of smell)");
   });
 
   it("drops one block", () => {

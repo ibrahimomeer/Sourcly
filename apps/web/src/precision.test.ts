@@ -253,7 +253,7 @@ describe("“what is the best way to predict odor”", () => {
 
   it("sends the concepts, each with its alternatives, joined by AND, to a source that reads Boolean searches", () => {
     expect(renderConcepts(prepareSearch(text).concepts, "boolean").text).toBe(
-      "(predict OR prediction OR predicting OR predictive OR predicted OR predictor) AND (odor OR odour OR odorant OR olfaction OR olfactory OR smell)",
+      '(predict OR prediction OR predicting OR predictive OR predicted OR predictor) AND (odor OR odour OR odorant OR olfaction OR olfactory OR "sense of smell")',
     );
   });
 });
@@ -285,7 +285,7 @@ describe("all-capital words, quoted phrases and single words", () => {
   it("still works for a single word: it is a concept, it is sent with its alternatives, and results are ranked by it", async () => {
     const concepts = parseConcepts("odor");
     expect(hardBlocks(concepts).map((block) => block.label)).toEqual(["odor"]);
-    expect(renderConcepts(concepts, "boolean").text).toBe("(odor OR odour OR odorant OR olfaction OR olfactory OR smell)");
+    expect(renderConcepts(concepts, "boolean").text).toBe('(odor OR odour OR odorant OR olfaction OR olfactory OR "sense of smell")');
     expect(renderConcepts(concepts, "plain").text).toBe("odor");
     const pool = [
       makeResult({ id: "10.1/a", doi: "10.1/a", title: "Odor prediction from molecules" }),
