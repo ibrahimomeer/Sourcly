@@ -1,6 +1,6 @@
 import { scoreBm25, scoreBm25FromCounts } from "./bm25";
 import { findTerms, usableCounterTerms } from "./counter";
-import { tokenize } from "./tokens";
+import { tokenize, type TokenizeOptions } from "./tokens";
 import type { Result } from "./types";
 
 /**
@@ -20,8 +20,12 @@ export interface RelevanceReading {
   detail: string;
 }
 
-function topicReadings(results: readonly Result[], queryTerms: readonly string[]): RelevanceReading[] {
-  const queryTokens = [...new Set(queryTerms.flatMap(tokenize))];
+function topicReadings(
+  results: readonly Result[],
+  queryTerms: readonly string[],
+  tokenizeOptions: TokenizeOptions,
+): RelevanceReading[] {
+  const queryTokens = [...new Set(queryTerms.flatMap((term) => tokenize(term, tokenizeOptions)))];
   if (queryTokens.length === 0) {
     return results.map(() => ({
       raw: null,
@@ -30,7 +34,7 @@ function topicReadings(results: readonly Result[], queryTerms: readonly string[]
     }));
   }
 
-  const bm25 = scoreBm25(results.map((result) => tokenize(documentText(result))), queryTokens);
+  const bm25 = scoreBm25(results.map((result) => tokenize(documentText(result), tokenizeOptions)), queryTokens);
   return results.map((_, index) => {
     const raw = bm25.scores[index] ?? 0;
     if (raw === 0) {
@@ -73,8 +77,9 @@ export function relevanceReadings(
   results: readonly Result[],
   queryTerms: readonly string[],
   signalTerms: readonly string[] = [],
+  tokenizeOptions: TokenizeOptions = {},
 ): RelevanceReading[] {
-  const topic = topicReadings(results, queryTerms);
+  const topic = topicReadings(results, queryTerms, tokenizeOptions);
   const terms = usableCounterTerms(signalTerms);
   if (terms.length === 0) return topic;
 

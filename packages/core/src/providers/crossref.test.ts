@@ -117,13 +117,19 @@ describe("parseCrossrefWork", () => {
 describe("createCrossrefProvider", () => {
   const ok = () => Promise.resolve(Response.json(fixtures.search));
 
-  it("asks for only the fields it uses, 100 rows at most, and sends no email unless configured", async () => {
+  it("asks for only the fields it uses, 25 rows at most, only scholarly types, and sends no email unless configured", async () => {
     const fetchMock = vi.fn<typeof fetch>(ok);
     await createCrossrefProvider({ fetch: fetchMock }).search("sleep memory", { limit: 500 });
     const url = new URL(String(fetchMock.mock.calls[0]?.[0]));
     expect(url.origin + url.pathname).toBe("https://api.crossref.org/works");
-    expect(url.searchParams.get("query")).toBe("sleep memory");
-    expect(url.searchParams.get("rows")).toBe("100");
+    expect(url.searchParams.get("query.bibliographic")).toBe("sleep memory");
+    expect(url.searchParams.has("query")).toBe(false);
+    expect(url.searchParams.has("query.title")).toBe(false); // deprecated by Crossref
+    expect(url.searchParams.get("rows")).toBe("25");
+    // Several type filters are ORed: articles, conference papers, preprints, chapters and books; no datasets or components.
+    expect(url.searchParams.get("filter")).toBe(
+      "type:journal-article,type:proceedings-article,type:posted-content,type:book-chapter,type:book,type:monograph",
+    );
     expect(url.searchParams.get("select")?.split(",")).toEqual(expect.arrayContaining(["DOI", "title", "updated-by", "is-referenced-by-count"]));
     expect(url.searchParams.get("select")).not.toMatch(/language|subtype/); // not selectable on this route
     expect(url.searchParams.has("mailto")).toBe(false);
@@ -154,6 +160,8 @@ describe("Crossref subjects and syntax", () => {
   it("has none when Crossref lists none, and reads the query as plain words", () => {
     expect(parseCrossrefWork(items[0], 1, 1)?.subjects).toEqual([]);
     expect(createCrossrefProvider().syntax).toBe("plain");
+    // Asking again in a looser way would repeat the same request, so Crossref has no expanded pass.
+    expect(createCrossrefProvider().expandedSyntax).toBeUndefined();
   });
 });
 describe("Crossref: volume, issue and pages", () => {

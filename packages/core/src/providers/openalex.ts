@@ -31,7 +31,8 @@ const MAX_PER_PAGE = 100;
 /** Guards against a corrupt abstract_inverted_index asking for a huge array. */
 const MAX_ABSTRACT_WORDS = 20_000;
 
-const SELECT_FIELDS = [
+/** The fields asked for from OpenAlex: only what the app reads. */
+export const SELECT_FIELDS = [
   "id",
   "doi",
   "title",
@@ -252,12 +253,18 @@ export function createOpenAlexProvider(options: OpenAlexOptions = {}): Provider 
     id: "openalex",
     name: "OpenAlex",
     syntax: "boolean",
+    requestNotes: ["Looks in titles and abstracts only, not in the full text"],
+    expandedSyntax: "plain",
+    expandedRequestNotes: ["OpenAlex’s default relevance search: it also reads keywords and the full text, and does not require every word"],
 
-    async search(query: string, { limit, signal }: SearchOptions): Promise<Result[]> {
+    async search(query: string, { limit, signal, expanded }: SearchOptions): Promise<Result[]> {
       const text = query.trim();
       if (text === "") return [];
       const url = new URL(WORKS_URL);
-      url.searchParams.set("search", text);
+      // The plain `search` parameter also reads the full text, which brought back works that only mention
+      // the words in passing (checked 2026-10-14). OpenAlex documents this scoped form as "title and abstract text only".
+      // The expanded pass uses OpenAlex's default relevance search, which is the looser one.
+      url.searchParams.set(expanded === true ? "search" : "search.title_and_abstract", text);
       url.searchParams.set("per_page", String(Math.min(MAX_PER_PAGE, Math.max(1, Math.floor(limit)))));
       url.searchParams.set("select", SELECT_FIELDS.join(","));
       if (apiKey !== "") url.searchParams.set("api_key", apiKey);

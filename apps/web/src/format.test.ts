@@ -4,6 +4,8 @@ import { describe, expect, it } from "vitest";
 import {
   accessBadgeText,
   describeLexiconMatches,
+  fewResultsMessage,
+  ORDER_SENTENCE,
   formatAuthors,
   formatNumber,
   formatRaw,
@@ -151,5 +153,17 @@ describe("describeLexiconMatches", () => {
 
   it("is empty for no matches", () => {
     expect(describeLexiconMatches([])).toBe("");
+  });
+});
+
+describe("ORDER_SENTENCE and fewResultsMessage", () => {
+  it("says how the main list is ordered: words, then adjacency, then score", () => {
+    expect(ORDER_SENTENCE).toBe("Sorted by how many of your words each result contains, then by whether your words appear next to each other in order, then by score.");
+  });
+
+  it("says what the page does when few results contain every word", () => {
+    expect(fewResultsMessage()).toBe(
+      "Few results match all your words, so results that match all but one are listed too, labelled “Matches N of M words”. Check spelling or try synonyms.",
+    );
   });
 });

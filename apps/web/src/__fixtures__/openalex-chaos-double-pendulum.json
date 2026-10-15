@@ -1,0 +1,5060 @@
+{
+ "meta": {
+  "count": 294,
+  "db_response_time_ms": 21,
+  "page": 1,
+  "per_page": 12,
+  "groups_count": null,
+  "x_query": {
+   "oql": "get works where title-abstract has (chaos AND double AND pendulum)",
+   "x_new_oql": "get works with (chaos AND double AND pendulum) in the title or abstract",
+   "oqo": {
+    "get_rows": "works",
+    "filter_rows": [
+     {
+      "column_id": "title_and_abstract.search",
+      "value": "chaos",
+      "operator": "has"
+     },
+     {
+      "column_id": "title_and_abstract.search",
+      "value": "double",
+      "operator": "has"
+     },
+     {
+      "column_id": "title_and_abstract.search",
+      "value": "pendulum",
+      "operator": "has"
+     }
+    ]
+   },
+   "url": "/works?filter=title_and_abstract.search:chaos,title_and_abstract.search:double,title_and_abstract.search:pendulum&per_page=12"
+  },
+  "cost_usd": 0.001
+ },
+ "results": [
+  {
+   "id": "https://openalex.org/W2039671349",
+   "doi": "https://doi.org/10.1119/1.16860",
+   "title": "Chaos in a double pendulum",
+   "relevance_score": 45.093163,
+   "publication_year": 1992,
+   "language": "en",
+   "type": "article",
+   "open_access": {
+    "is_oa": true,
+    "oa_status": "green",
+    "oa_url": "https://hal.science/hal-01403609",
+    "any_repository_has_fulltext": true
+   },
+   "cited_by_count": 193,
+   "is_retracted": false,
+   "authorships": [
+    {
+     "author_position": "first",
+     "author": {
+      "id": "https://openalex.org/A5013813249",
+      "display_name": "Troy Shinbrot",
+      "orcid": "https://orcid.org/0000-0001-8006-3025",
+      "observed_orcids": [
+       "https://orcid.org/0000-0001-8006-3025"
+      ]
+     },
+     "institutions": [
+      {
+       "id": "https://openalex.org/I66946132",
+       "display_name": "University of Maryland, College Park",
+       "ror": "https://ror.org/047s2c258",
+       "country_code": "US",
+       "type": "education",
+       "lineage": [
+        "https://openalex.org/I66946132"
+       ]
+      }
+     ],
+     "countries": [
+      "US"
+     ],
+     "is_corresponding": false,
+     "raw_author_name": "Troy Shinbrot",
+     "raw_affiliation_strings": [
+      "Institute for Physical Science and Technology and Department of Physics, University of Maryland, College Park, Maryland 20742"
+     ],
+     "raw_orcid": null,
+     "affiliations": [
+      {
+       "raw_affiliation_string": "Institute for Physical Science and Technology and Department of Physics, University of Maryland, College Park, Maryland 20742",
+       "institution_ids": [
+        "https://openalex.org/I66946132"
+       ]
+      }
+     ]
+    },
+    {
+     "author_position": "middle",
+     "author": {
+      "id": "https://openalex.org/A5019554559",
+      "display_name": "Celso Grebogi",
+      "orcid": "https://orcid.org/0000-0002-9811-4617",
+      "observed_orcids": [
+       "https://orcid.org/0000-0002-9811-4617"
+      ]
+     },
+     "institutions": [
+      {
+       "id": "https://openalex.org/I4210106276",
+       "display_name": "Institute for Plasma Research",
+       "ror": "https://ror.org/01hznc410",
+       "country_code": "IN",
+       "type": "facility",
+       "lineage": [
+        "https://openalex.org/I2799351866",
+        "https://openalex.org/I3149292468",
+        "https://openalex.org/I4210106276"
+       ]
+      },
+      {
+       "id": "https://openalex.org/I66946132",
+       "display_name": "University of Maryland, College Park",
+       "ror": "https://ror.org/047s2c258",
+       "country_code": "US",
+       "type": "education",
+       "lineage": [
+        "https://openalex.org/I66946132"
+       ]
+      }
+     ],
+     "countries": [
+      "IN",
+      "US"
+     ],
+     "is_corresponding": false,
+     "raw_author_name": "Celso Grebogi",
+     "raw_affiliation_strings": [
+      "Laboratory for Plasma Research, University of Maryland and Institute for Physical Science and Technology and Department of Mathematics, University of Maryland, College Park, Maryland 20742",
+      "Department  of  Mathematics (United States)",
+      "Institute for Plasma Research (United States)"
+     ],
+     "raw_orcid": null,
+     "affiliations": [
+      {
+       "raw_affiliation_string": "Laboratory for Plasma Research, University of Maryland and Institute for Physical Science and Technology and Department of Mathematics, University of Maryland, College Park, Maryland 20742",
+       "institution_ids": [
+        "https://openalex.org/I66946132"
+       ]
+      },
+      {
+       "raw_affiliation_string": "Department  of  Mathematics (United States)",
+       "institution_ids": []
+      },
+      {
+       "raw_affiliation_string": "Institute for Plasma Research (United States)",
+       "institution_ids": [
+        "https://openalex.org/I4210106276"
+       ]
+      }
+     ]
+    },
+    {
+     "author_position": "middle",
+     "author": {
+      "id": "https://openalex.org/A5048892543",
+      "display_name": "Jack Wisdom",
+      "orcid": "https://orcid.org/0000-0002-6142-0653",
+      "observed_orcids": [
+       "https://orcid.org/0000-0002-6142-0653"
+      ]
+     },
+     "institutions": [
+      {
+       "id": "https://openalex.org/I63966007",
+       "display_name": "Massachusetts Institute of Technology",
+       "ror": "https://ror.org/042nb2s44",
+       "country_code": "US",
+       "type": "education",
+       "lineage": [
+        "https://openalex.org/I63966007"
+       ]
+      }
+     ],
+     "countries": [
+      "US"
+     ],
+     "is_corresponding": false,
+     "raw_author_name": "Jack Wisdom",
+     "raw_affiliation_strings": [
+      "Department of Earth and Atmospheric Sciences, Massachusetts Institute of Technology, Cambridge, Massachusetts 02139",
+      "EAPS - Department of Earth, Atmospheric and Planetary Sciences [MIT, Cambridge] (Massachusetts Institute of Technology 77 Massachusetts Avenue Cambridge, MA 02139-4307 - United States)"
+     ],
+     "raw_orcid": null,
+     "affiliations": [
+      {
+       "raw_affiliation_string": "Department of Earth and Atmospheric Sciences, Massachusetts Institute of Technology, Cambridge, Massachusetts 02139",
+       "institution_ids": [
+        "https://openalex.org/I63966007"
+       ]
+      },
+      {
+       "raw_affiliation_string": "EAPS - Department of Earth, Atmospheric and Planetary Sciences [MIT, Cambridge] (Massachusetts Institute of Technology 77 Massachusetts Avenue Cambridge, MA 02139-4307 - United States)",
+       "institution_ids": [
+        "https://openalex.org/I63966007"
+       ]
+      }
+     ]
+    },
+    {
+     "author_position": "last",
+     "author": {
+      "id": "https://openalex.org/A5022360238",
+      "display_name": "James A. Yorke",
+      "orcid": "https://orcid.org/0000-0002-9599-0136",
+      "observed_orcids": [
+       "https://orcid.org/0000-0002-9599-0136"
+      ]
+     },
+     "institutions": [
+      {
+       "id": "https://openalex.org/I66946132",
+       "display_name": "University of Maryland, College Park",
+       "ror": "https://ror.org/047s2c258",
+       "country_code": "US",
+       "type": "education",
+       "lineage": [
+        "https://openalex.org/I66946132"
+       ]
+      }
+     ],
+     "countries": [
+      "US"
+     ],
+     "is_corresponding": false,
+     "raw_author_name": "James A. Yorke",
+     "raw_affiliation_strings": [
+      "Institute for Physical Science and Technology and Department of Mathematics, University of Maryland, College Park, Maryland 20742"
+     ],
+     "raw_orcid": null,
+     "affiliations": [
+      {
+       "raw_affiliation_string": "Institute for Physical Science and Technology and Department of Mathematics, University of Maryland, College Park, Maryland 20742",
+       "institution_ids": [
+        "https://openalex.org/I66946132"
+       ]
+      }
+     ]
+    }
+   ],
+   "primary_location": {
+    "id": "doi:10.1119/1.16860",
+    "doi": "https://doi.org/10.1119/1.16860",
+    "is_oa": false,
+    "landing_page_url": "https://doi.org/10.1119/1.16860",
+    "pdf_url": null,
+    "source": {
+     "id": "https://openalex.org/S38866342",
+     "display_name": "American Journal of Physics",
+     "issn_l": "0002-9505",
+     "issn": [
+      "0002-9505",
+      "1943-2909"
+     ],
+     "is_oa": false,
+     "is_in_doaj": false,
+     "is_core": true,
+     "listed_in": [
+      "anvur-scientific",
+      "cwts-core",
+      "dongbi-b",
+      "jufo-1",
+      "norway-1",
+      "poland-70",
+      "russia-white-list-3"
+     ],
+     "host_organization": "https://openalex.org/P4310320257",
+     "host_organization_name": "American Institute of Physics",
+     "host_organization_lineage": [
+      "https://openalex.org/P4310320257"
+     ],
+     "host_organization_lineage_names": [
+      "American Institute of Physics"
+     ],
+     "type": "journal"
+    },
+    "license": null,
+    "license_id": null,
+    "version": "publishedVersion",
+    "is_accepted": true,
+    "is_published": true,
+    "raw_source_name": "American Journal of Physics",
+    "raw_type": "journal-article"
+   },
+   "biblio": {
+    "volume": "60",
+    "issue": "6",
+    "first_page": "491",
+    "last_page": "499"
+   },
+   "best_oa_location": {
+    "id": "pmh:oai:HAL:hal-01403609v1",
+    "doi": null,
+    "is_oa": true,
+    "landing_page_url": "https://hal.science/hal-01403609",
+    "pdf_url": null,
+    "source": {
+     "id": "https://openalex.org/S4306402512",
+     "display_name": "HAL (Le Centre pour la Communication Scientifique Directe)",
+     "issn_l": null,
+     "issn": null,
+     "is_oa": false,
+     "is_in_doaj": false,
+     "is_core": false,
+     "listed_in": [],
+     "host_organization": "https://openalex.org/I1294671590",
+     "host_organization_name": "Centre National de la Recherche Scientifique",
+     "host_organization_lineage": [
+      "https://openalex.org/I1294671590"
+     ],
+     "host_organization_lineage_names": [],
+     "type": "repository"
+    },
+    "license": "cc-by",
+    "license_id": "https://openalex.org/licenses/cc-by",
+    "version": "submittedVersion",
+    "is_accepted": false,
+    "is_published": false,
+    "raw_source_name": "American Journal of Physics, 1992, 60, pp.491 - 491. &#x27E8;10.1119/1.16860&#x27E9;",
+    "raw_type": "info:eu-repo/semantics/article"
+   },
+   "topics": [
+    {
+     "id": "https://openalex.org/T10588",
+     "display_name": "Mathematical Dynamics and Fractals",
+     "score": 0.6122999787330627,
+     "subfield": {
+      "id": "https://openalex.org/subfields/2610",
+      "display_name": "Mathematical Physics"
+     },
+     "field": {
+      "id": "https://openalex.org/fields/26",
+      "display_name": "Mathematics"
+     },
+     "domain": {
+      "id": "https://openalex.org/domains/3",
+      "display_name": "Physical Sciences"
+     }
+    },
+    {
+     "id": "https://openalex.org/T10244",
+     "display_name": "Chaos control and synchronization",
+     "score": 0.25119999051094055,
+     "subfield": {
+      "id": "https://openalex.org/subfields/3109",
+      "display_name": "Statistical and Nonlinear Physics"
+     },
+     "field": {
+      "id": "https://openalex.org/fields/31",
+      "display_name": "Physics and Astronomy"
+     },
+     "domain": {
+      "id": "https://openalex.org/domains/3",
+      "display_name": "Physical Sciences"
+     }
+    },
+    {
+     "id": "https://openalex.org/T12250",
+     "display_name": "Experimental and Theoretical Physics Studies",
+     "score": 0.11829999834299088,
+     "subfield": {
+      "id": "https://openalex.org/subfields/3109",
+      "display_name": "Statistical and Nonlinear Physics"
+     },
+     "field": {
+      "id": "https://openalex.org/fields/31",
+      "display_name": "Physics and Astronomy"
+     },
+     "domain": {
+      "id": "https://openalex.org/domains/3",
+      "display_name": "Physical Sciences"
+     }
+    }
+   ],
+   "keywords": [
+    {
+     "id": "https://openalex.org/keywords/double-pendulum",
+     "display_name": "double pendulum",
+     "score": 0.9890000224113464
+    },
+    {
+     "id": "https://openalex.org/keywords/chaos",
+     "display_name": "chaos",
+     "score": 0.9480000138282776
+    },
+    {
+     "id": "https://openalex.org/keywords/sensitivity-to-initial-conditions",
+     "display_name": "sensitivity to initial conditions",
+     "score": 0.9980000257492065
+    },
+    {
+     "id": "https://openalex.org/keywords/lyapunov-exponents",
+     "display_name": "Lyapunov exponents",
+     "score": 0.9490000009536743
+    },
+    {
+     "id": "https://openalex.org/keywords/chaotic-dynamics",
+     "display_name": "chaotic dynamics",
+     "score": 0.49399998784065247
+    },
+    {
+     "id": "https://openalex.org/keywords/physics-demonstration",
+     "display_name": "physics demonstration",
+     "score": 0.3409999907016754
+    }
+   ],
+   "abstract_inverted_index": {
+    "A": [
+     0
+    ],
+    "novel": [
+     1
+    ],
+    "demonstration": [
+     2
+    ],
+    "of": [
+     3,
+     20,
+     23,
+     39
+    ],
+    "chaos": [
+     4
+    ],
+    "in": [
+     5
+    ],
+    "the": [
+     6,
+     14,
+     21,
+     24,
+     33,
+     59
+    ],
+    "double": [
+     7,
+     25
+    ],
+    "pendulum": [
+     8,
+     26
+    ],
+    "is": [
+     9,
+     42
+    ],
+    "discussed.": [
+     10
+    ],
+    "Experiments": [
+     11
+    ],
+    "to": [
+     12
+    ],
+    "evaluate": [
+     13
+    ],
+    "sensitive": [
+     15
+    ],
+    "dependence": [
+     16
+    ],
+    "on": [
+     17,
+     51
+    ],
+    "initial": [
+     18,
+     31
+    ],
+    "conditions": [
+     19
+    ],
+    "motion": [
+     22
+    ],
+    "are": [
+     27,
+     65
+    ],
+    "described.": [
+     28
+    ],
+    "For": [
+     29
+    ],
+    "typical": [
+     30
+    ],
+    "conditions,": [
+     32
+    ],
+    "proposed": [
+     34
+    ],
+    "experiment": [
+     35
+    ],
+    "exhibits": [
+     36
+    ],
+    "a": [
+     37,
+     70
+    ],
+    "growth": [
+     38
+    ],
+    "uncertainties": [
+     40
+    ],
+    "which": [
+     41
+    ],
+    "exponential": [
+     43
+    ],
+    "with": [
+     44,
+     58
+    ],
+    "exponent": [
+     45
+    ],
+    "λ=7.5±1.5": [
+     46
+    ],
+    "s−1.": [
+     47,
+     62
+    ],
+    "Numerical": [
+     48
+    ],
+    "simulations": [
+     49
+    ],
+    "performed": [
+     50
+    ],
+    "an": [
+     52
+    ],
+    "idealized": [
+     53
+    ],
+    "model": [
+     54
+    ],
+    "give": [
+     55
+    ],
+    "good": [
+     56
+    ],
+    "agreement,": [
+     57
+    ],
+    "value": [
+     60
+    ],
+    "λ=7.9±0.4": [
+     61
+    ],
+    "The": [
+     63
+    ],
+    "exponents": [
+     64
+    ],
+    "positive,": [
+     66
+    ],
+    "as": [
+     67
+    ],
+    "expected": [
+     68
+    ],
+    "for": [
+     69
+    ],
+    "chaotic": [
+     71
+    ],
+    "system.": [
+     72
+    ]
+   }
+  },
+  {
+   "id": "https://openalex.org/W2000280087",
+   "doi": "https://doi.org/10.1119/1.17335",
+   "title": "Double pendulum: An experiment in chaos",
+   "relevance_score": 39.389786,
+   "publication_year": 1993,
+   "language": "en",
+   "type": "article",
+   "open_access": {
+    "is_oa": false,
+    "oa_status": "closed",
+    "oa_url": null,
+    "any_repository_has_fulltext": false
+   },
+   "cited_by_count": 88,
+   "is_retracted": false,
+   "authorships": [
+    {
+     "author_position": "first",
+     "author": {
+      "id": "https://openalex.org/A5052277025",
+      "display_name": "Richard Ben Levien",
+      "orcid": null,
+      "observed_orcids": []
+     },
+     "institutions": [
+      {
+       "id": "https://openalex.org/I20089843",
+       "display_name": "Princeton University",
+       "ror": "https://ror.org/00hx57361",
+       "country_code": "US",
+       "type": "education",
+       "lineage": [
+        "https://openalex.org/I20089843"
+       ]
+      }
+     ],
+     "countries": [
+      "US"
+     ],
+     "is_corresponding": false,
+     "raw_author_name": "R. B. Levien",
+     "raw_affiliation_strings": [
+      "Department of Physics, Princeton University, Princeton, New Jersey 08544"
+     ],
+     "raw_orcid": null,
+     "affiliations": [
+      {
+       "raw_affiliation_string": "Department of Physics, Princeton University, Princeton, New Jersey 08544",
+       "institution_ids": [
+        "https://openalex.org/I20089843"
+       ]
+      }
+     ]
+    },
+    {
+     "author_position": "last",
+     "author": {
+      "id": null,
+      "display_name": "S. M. Tan",
+      "orcid": null,
+      "observed_orcids": []
+     },
+     "institutions": [
+      {
+       "id": "https://openalex.org/I154130895",
+       "display_name": "University of Auckland",
+       "ror": "https://ror.org/03b94tp07",
+       "country_code": "NZ",
+       "type": "education",
+       "lineage": [
+        "https://openalex.org/I154130895"
+       ]
+      }
+     ],
+     "countries": [
+      "NZ"
+     ],
+     "is_corresponding": false,
+     "raw_author_name": "S. M. Tan",
+     "raw_affiliation_strings": [
+      "Department of Physics, University of Auckland, Auckland, New Zealand"
+     ],
+     "raw_orcid": null,
+     "affiliations": [
+      {
+       "raw_affiliation_string": "Department of Physics, University of Auckland, Auckland, New Zealand",
+       "institution_ids": [
+        "https://openalex.org/I154130895"
+       ]
+      }
+     ]
+    }
+   ],
+   "primary_location": {
+    "id": "doi:10.1119/1.17335",
+    "doi": "https://doi.org/10.1119/1.17335",
+    "is_oa": false,
+    "landing_page_url": "https://doi.org/10.1119/1.17335",
+    "pdf_url": null,
+    "source": {
+     "id": "https://openalex.org/S38866342",
+     "display_name": "American Journal of Physics",
+     "issn_l": "0002-9505",
+     "issn": [
+      "0002-9505",
+      "1943-2909"
+     ],
+     "is_oa": false,
+     "is_in_doaj": false,
+     "is_core": true,
+     "listed_in": [
+      "anvur-scientific",
+      "cwts-core",
+      "dongbi-b",
+      "jufo-1",
+      "norway-1",
+      "poland-70",
+      "russia-white-list-3"
+     ],
+     "host_organization": "https://openalex.org/P4310320257",
+     "host_organization_name": "American Institute of Physics",
+     "host_organization_lineage": [
+      "https://openalex.org/P4310320257"
+     ],
+     "host_organization_lineage_names": [
+      "American Institute of Physics"
+     ],
+     "type": "journal"
+    },
+    "license": null,
+    "license_id": null,
+    "version": "publishedVersion",
+    "is_accepted": true,
+    "is_published": true,
+    "raw_source_name": "American Journal of Physics",
+    "raw_type": "journal-article"
+   },
+   "biblio": {
+    "volume": "61",
+    "issue": "11",
+    "first_page": "1038",
+    "last_page": "1044"
+   },
+   "best_oa_location": null,
+   "topics": [
+    {
+     "id": "https://openalex.org/T12250",
+     "display_name": "Experimental and Theoretical Physics Studies",
+     "score": 0.7827000021934509,
+     "subfield": {
+      "id": "https://openalex.org/subfields/3109",
+      "display_name": "Statistical and Nonlinear Physics"
+     },
+     "field": {
+      "id": "https://openalex.org/fields/31",
+      "display_name": "Physics and Astronomy"
+     },
+     "domain": {
+      "id": "https://openalex.org/domains/3",
+      "display_name": "Physical Sciences"
+     }
+    },
+    {
+     "id": "https://openalex.org/T10244",
+     "display_name": "Chaos control and synchronization",
+     "score": 0.1696999967098236,
+     "subfield": {
+      "id": "https://openalex.org/subfields/3109",
+      "display_name": "Statistical and Nonlinear Physics"
+     },
+     "field": {
+      "id": "https://openalex.org/fields/31",
+      "display_name": "Physics and Astronomy"
+     },
+     "domain": {
+      "id": "https://openalex.org/domains/3",
+      "display_name": "Physical Sciences"
+     }
+    },
+    {
+     "id": "https://openalex.org/T10588",
+     "display_name": "Mathematical Dynamics and Fractals",
+     "score": 0.030700000002980232,
+     "subfield": {
+      "id": "https://openalex.org/subfields/2610",
+      "display_name": "Mathematical Physics"
+     },
+     "field": {
+      "id": "https://openalex.org/fields/26",
+      "display_name": "Mathematics"
+     },
+     "domain": {
+      "id": "https://openalex.org/domains/3",
+      "display_name": "Physical Sciences"
+     }
+    }
+   ],
+   "keywords": [
+    {
+     "id": "https://openalex.org/keywords/double-pendulum",
+     "display_name": "double pendulum",
+     "score": 1.0
+    },
+    {
+     "id": "https://openalex.org/keywords/chaos",
+     "display_name": "chaos",
+     "score": 0.8679999709129333
+    },
+    {
+     "id": "https://openalex.org/keywords/sensitivity-to-initial-conditions",
+     "display_name": "sensitivity to initial conditions",
+     "score": 0.9959999918937683
+    },
+    {
+     "id": "https://openalex.org/keywords/nonlinear-dynamics",
+     "display_name": "nonlinear dynamics",
+     "score": 0.8949999809265137
+    },
+    {
+     "id": "https://openalex.org/keywords/undergraduate-laboratory-experiment",
+     "display_name": "undergraduate laboratory experiment",
+     "score": 0.7549999952316284
+    },
+    {
+     "id": "https://openalex.org/keywords/small-angle-approximation",
+     "display_name": "small-angle approximation",
+     "score": 0.4580000042915344
+    }
+   ],
+   "abstract_inverted_index": {
+    "We": [
+     0
+    ],
+    "describe": [
+     1
+    ],
+    "an": [
+     2
+    ],
+    "experiment": [
+     3,
+     87
+    ],
+    "which": [
+     4
+    ],
+    "takes": [
+     5
+    ],
+    "advantage": [
+     6
+    ],
+    "of": [
+     7,
+     11,
+     13,
+     33
+    ],
+    "the": [
+     8,
+     14,
+     18,
+     31,
+     53,
+     91
+    ],
+    "surprising": [
+     9
+    ],
+    "complexity": [
+     10
+    ],
+    "one": [
+     12
+    ],
+    "simplest": [
+     15
+    ],
+    "physical": [
+     16
+    ],
+    "systems,": [
+     17
+    ],
+    "passive": [
+     19
+    ],
+    "double": [
+     20
+    ],
+    "pendulum.": [
+     21
+    ],
+    "For": [
+     22
+    ],
+    "large": [
+     23
+    ],
+    "angle": [
+     24,
+     46
+    ],
+    "swings": [
+     25
+    ],
+    "sensitive": [
+     26
+    ],
+    "dependence": [
+     27
+    ],
+    "on": [
+     28
+    ],
+    "initial": [
+     29
+    ],
+    "conditions,": [
+     30
+    ],
+    "signature": [
+     32
+    ],
+    "chaos,": [
+     34
+    ],
+    "may": [
+     35,
+     60
+    ],
+    "be": [
+     36,
+     62
+    ],
+    "demonstrated": [
+     37
+    ],
+    "and": [
+     38,
+     48,
+     70,
+     76,
+     80
+    ],
+    "quantified": [
+     39
+    ],
+    "in": [
+     40,
+     56
+    ],
+    "a": [
+     41,
+     57,
+     83
+    ],
+    "very": [
+     42,
+     68
+    ],
+    "direct": [
+     43
+    ],
+    "way.": [
+     44
+    ],
+    "Small": [
+     45
+    ],
+    "experiments": [
+     47,
+     51
+    ],
+    "zero": [
+     49
+    ],
+    "gravity": [
+     50
+    ],
+    "(with": [
+     52
+    ],
+    "pendulum": [
+     54
+    ],
+    "swinging": [
+     55
+    ],
+    "horizontal": [
+     58
+    ],
+    "plane)": [
+     59
+    ],
+    "also": [
+     61
+    ],
+    "performed.": [
+     63
+    ],
+    "The": [
+     64,
+     86
+    ],
+    "angles": [
+     65
+    ],
+    "are": [
+     66,
+     78
+    ],
+    "measured": [
+     67
+    ],
+    "precisely": [
+     69
+    ],
+    "reliably": [
+     71
+    ],
+    "using": [
+     72,
+     82
+    ],
+    "optical": [
+     73
+    ],
+    "encoder": [
+     74
+    ],
+    "wheels,": [
+     75
+    ],
+    "data": [
+     77
+    ],
+    "acquired": [
+     79
+    ],
+    "displayed": [
+     81
+    ],
+    "personal": [
+     84
+    ],
+    "computer.": [
+     85
+    ],
+    "is": [
+     88
+    ],
+    "suitable": [
+     89
+    ],
+    "for": [
+     90
+    ],
+    "undergraduate": [
+     92
+    ],
+    "laboratory.": [
+     93
+    ]
+   }
+  },
+  {
+   "id": "https://openalex.org/W2000252897",
+   "doi": "https://doi.org/10.1016/j.chaos.2005.08.032",
+   "title": "A numerical analysis of chaos in the double pendulum",
+   "relevance_score": 38.379555,
+   "publication_year": 2005,
+   "language": "en",
+   "type": "article",
+   "open_access": {
+    "is_oa": true,
+    "oa_status": "green",
+    "oa_url": "https://hal.science/hal-01389907",
+    "any_repository_has_fulltext": true
+   },
+   "cited_by_count": 133,
+   "is_retracted": false,
+   "authorships": [
+    {
+     "author_position": "first",
+     "author": {
+      "id": "https://openalex.org/A5041819987",
+      "display_name": "Tomasz Stachowiak",
+      "orcid": "https://orcid.org/0000-0001-9851-9131",
+      "observed_orcids": [
+       "https://orcid.org/0000-0001-9851-9131"
+      ]
+     },
+     "institutions": [
+      {
+       "id": "https://openalex.org/I126596746",
+       "display_name": "Jagiellonian University",
+       "ror": "https://ror.org/03bqmcz70",
+       "country_code": "PL",
+       "type": "education",
+       "lineage": [
+        "https://openalex.org/I126596746"
+       ]
+      }
+     ],
+     "countries": [
+      "PL"
+     ],
+     "is_corresponding": false,
+     "raw_author_name": "Tomasz Stachowiak",
+     "raw_affiliation_strings": [
+      "Astronomical Observatory, Jagiellonian University, Orla 171, 30-244 Kraków, Poland",
+      "Astronomical Observatory, Jagiellonian University,   Orla 171, 30-244 Krakow, Poland"
+     ],
+     "raw_orcid": null,
+     "affiliations": [
+      {
+       "raw_affiliation_string": "Astronomical Observatory, Jagiellonian University, Orla 171, 30-244 Kraków, Poland",
+       "institution_ids": [
+        "https://openalex.org/I126596746"
+       ]
+      },
+      {
+       "raw_affiliation_string": "Astronomical Observatory, Jagiellonian University,   Orla 171, 30-244 Krakow, Poland",
+       "institution_ids": [
+        "https://openalex.org/I126596746"
+       ]
+      }
+     ]
+    },
+    {
+     "author_position": "last",
+     "author": {
+      "id": null,
+      "display_name": "Toshio Okada",
+      "orcid": null,
+      "observed_orcids": []
+     },
+     "institutions": [
+      {
+       "id": "https://openalex.org/I92614990",
+       "display_name": "Tokyo University of Agriculture and Technology",
+       "ror": "https://ror.org/00qg0kr10",
+       "country_code": "JP",
+       "type": "education",
+       "lineage": [
+        "https://openalex.org/I92614990"
+       ]
+      }
+     ],
+     "countries": [
+      "JP"
+     ],
+     "is_corresponding": true,
+     "raw_author_name": "Toshio Okada",
+     "raw_affiliation_strings": [
+      "Tokyo University of Agriculture and Technology, Naka-machi, Koganei-shi, Tokyo 184-8588, Japan",
+      "Tokyo University of Agriculture  and Technology, Naka-machi, Koganei-shi, Tokyo 184-8588,  Japan"
+     ],
+     "raw_orcid": null,
+     "affiliations": [
+      {
+       "raw_affiliation_string": "Tokyo University of Agriculture and Technology, Naka-machi, Koganei-shi, Tokyo 184-8588, Japan",
+       "institution_ids": [
+        "https://openalex.org/I92614990"
+       ]
+      },
+      {
+       "raw_affiliation_string": "Tokyo University of Agriculture  and Technology, Naka-machi, Koganei-shi, Tokyo 184-8588,  Japan",
+       "institution_ids": [
+        "https://openalex.org/I92614990"
+       ]
+      }
+     ]
+    }
+   ],
+   "primary_location": {
+    "id": "doi:10.1016/j.chaos.2005.08.032",
+    "doi": "https://doi.org/10.1016/j.chaos.2005.08.032",
+    "is_oa": false,
+    "landing_page_url": "https://doi.org/10.1016/j.chaos.2005.08.032",
+    "pdf_url": null,
+    "source": {
+     "id": "https://openalex.org/S70718007",
+     "display_name": "Chaos Solitons & Fractals",
+     "issn_l": "0960-0779",
+     "issn": [
+      "0960-0779",
+      "1873-2887"
+     ],
+     "is_oa": false,
+     "is_in_doaj": false,
+     "is_core": true,
+     "listed_in": [
+      "anvur-class-a",
+      "anvur-scientific",
+      "cwts-core",
+      "dongbi-a",
+      "jufo-1",
+      "ki-jl-1",
+      "norway-1",
+      "poland-70",
+      "russia-white-list-1",
+      "vabb-shw"
+     ],
+     "host_organization": "https://openalex.org/P4310320990",
+     "host_organization_name": "Elsevier BV",
+     "host_organization_lineage": [
+      "https://openalex.org/P4310320990"
+     ],
+     "host_organization_lineage_names": [
+      "Elsevier BV"
+     ],
+     "type": "journal"
+    },
+    "license": null,
+    "license_id": null,
+    "version": "publishedVersion",
+    "is_accepted": true,
+    "is_published": true,
+    "raw_source_name": "Chaos, Solitons &amp; Fractals",
+    "raw_type": "journal-article"
+   },
+   "biblio": {
+    "volume": "29",
+    "issue": "2",
+    "first_page": "417",
+    "last_page": "422"
+   },
+   "best_oa_location": {
+    "id": "pmh:oai:HAL:hal-01389907v1",
+    "doi": null,
+    "is_oa": true,
+    "landing_page_url": "https://hal.science/hal-01389907",
+    "pdf_url": null,
+    "source": {
+     "id": "https://openalex.org/S4306402512",
+     "display_name": "HAL (Le Centre pour la Communication Scientifique Directe)",
+     "issn_l": null,
+     "issn": null,
+     "is_oa": false,
+     "is_in_doaj": false,
+     "is_core": false,
+     "listed_in": [],
+     "host_organization": "https://openalex.org/I1294671590",
+     "host_organization_name": "Centre National de la Recherche Scientifique",
+     "host_organization_lineage": [
+      "https://openalex.org/I1294671590"
+     ],
+     "host_organization_lineage_names": [],
+     "type": "repository"
+    },
+    "license": "cc-by",
+    "license_id": "https://openalex.org/licenses/cc-by",
+    "version": "submittedVersion",
+    "is_accepted": false,
+    "is_published": false,
+    "raw_source_name": "Chaos, Solitons & Fractals, 2006, 29 (2), pp.417 - 422. &#x27E8;10.1016/j.chaos.2005.08.032&#x27E9;",
+    "raw_type": "info:eu-repo/semantics/article"
+   },
+   "topics": [
+    {
+     "id": "https://openalex.org/T10588",
+     "display_name": "Mathematical Dynamics and Fractals",
+     "score": 0.7788000106811523,
+     "subfield": {
+      "id": "https://openalex.org/subfields/2610",
+      "display_name": "Mathematical Physics"
+     },
+     "field": {
+      "id": "https://openalex.org/fields/26",
+      "display_name": "Mathematics"
+     },
+     "domain": {
+      "id": "https://openalex.org/domains/3",
+      "display_name": "Physical Sciences"
+     }
+    },
+    {
+     "id": "https://openalex.org/T10244",
+     "display_name": "Chaos control and synchronization",
+     "score": 0.15760000050067902,
+     "subfield": {
+      "id": "https://openalex.org/subfields/3109",
+      "display_name": "Statistical and Nonlinear Physics"
+     },
+     "field": {
+      "id": "https://openalex.org/fields/31",
+      "display_name": "Physics and Astronomy"
+     },
+     "domain": {
+      "id": "https://openalex.org/domains/3",
+      "display_name": "Physical Sciences"
+     }
+    },
+    {
+     "id": "https://openalex.org/T11261",
+     "display_name": "Quantum chaos and dynamical systems",
+     "score": 0.041600000113248825,
+     "subfield": {
+      "id": "https://openalex.org/subfields/3109",
+      "display_name": "Statistical and Nonlinear Physics"
+     },
+     "field": {
+      "id": "https://openalex.org/fields/31",
+      "display_name": "Physics and Astronomy"
+     },
+     "domain": {
+      "id": "https://openalex.org/domains/3",
+      "display_name": "Physical Sciences"
+     }
+    }
+   ],
+   "keywords": [
+    {
+     "id": "https://openalex.org/keywords/double-pendulum",
+     "display_name": "double pendulum",
+     "score": 1.0
+    },
+    {
+     "id": "https://openalex.org/keywords/chaos",
+     "display_name": "chaos",
+     "score": 0.8539999723434448
+    },
+    {
+     "id": "https://openalex.org/keywords/poincare-sections",
+     "display_name": "Poincaré sections",
+     "score": 0.7860000133514404
+    },
+    {
+     "id": "https://openalex.org/keywords/bifurcation-diagrams",
+     "display_name": "bifurcation diagrams",
+     "score": 0.9990000128746033
+    },
+    {
+     "id": "https://openalex.org/keywords/lyapunov-exponents",
+     "display_name": "Lyapunov exponents",
+     "score": 0.9039999842643738
+    },
+    {
+     "id": "https://openalex.org/keywords/energy-dependence",
+     "display_name": "energy dependence",
+     "score": 0.6809999942779541
+    },
+    {
+     "id": "https://openalex.org/keywords/regular-to-chaotic-transition",
+     "display_name": "regular-to-chaotic transition",
+     "score": 0.7229999899864197
+    }
+   ],
+   "abstract_inverted_index": null
+  },
+  {
+   "id": "https://openalex.org/W7161040027",
+   "doi": "https://doi.org/10.1201/9781003734062-19",
+   "title": "Chaos in Double Pendulums",
+   "relevance_score": 33.82323,
+   "publication_year": 2026,
+   "language": "en",
+   "type": "book-chapter",
+   "open_access": {
+    "is_oa": false,
+    "oa_status": "closed",
+    "oa_url": null,
+    "any_repository_has_fulltext": false
+   },
+   "cited_by_count": 0,
+   "is_retracted": false,
+   "authorships": [
+    {
+     "author_position": "first",
+     "author": {
+      "id": "https://openalex.org/A5033959580",
+      "display_name": "Maciej Matyka",
+      "orcid": "https://orcid.org/0000-0002-7060-6038",
+      "observed_orcids": [
+       "https://orcid.org/0000-0002-7060-6038"
+      ]
+     },
+     "institutions": [],
+     "countries": [],
+     "is_corresponding": true,
+     "raw_author_name": "Maciej Matyka",
+     "raw_affiliation_strings": [],
+     "raw_orcid": null,
+     "affiliations": []
+    }
+   ],
+   "primary_location": {
+    "id": "doi:10.1201/9781003734062-19",
+    "doi": "https://doi.org/10.1201/9781003734062-19",
+    "is_oa": false,
+    "landing_page_url": "https://doi.org/10.1201/9781003734062-19",
+    "pdf_url": null,
+    "source": {
+     "id": "https://openalex.org/S4306463075",
+     "display_name": "CRC Press eBooks",
+     "issn_l": null,
+     "issn": null,
+     "is_oa": false,
+     "is_in_doaj": false,
+     "is_core": false,
+     "listed_in": [],
+     "host_organization": "https://openalex.org/P4310320584",
+     "host_organization_name": "CRC Press",
+     "host_organization_lineage": [
+      "https://openalex.org/P4310320584",
+      "https://openalex.org/P4310320547"
+     ],
+     "host_organization_lineage_names": [
+      "CRC Press",
+      "Taylor & Francis"
+     ],
+     "type": "ebook platform"
+    },
+    "license": null,
+    "license_id": null,
+    "version": "publishedVersion",
+    "is_accepted": true,
+    "is_published": true,
+    "raw_source_name": "Computational Modelling with Single Prompts",
+    "raw_type": "book-chapter"
+   },
+   "biblio": {
+    "volume": null,
+    "issue": null,
+    "first_page": "49",
+    "last_page": "51"
+   },
+   "best_oa_location": null,
+   "topics": [
+    {
+     "id": "https://openalex.org/T10588",
+     "display_name": "Mathematical Dynamics and Fractals",
+     "score": 0.7588000297546387,
+     "subfield": {
+      "id": "https://openalex.org/subfields/2610",
+      "display_name": "Mathematical Physics"
+     },
+     "field": {
+      "id": "https://openalex.org/fields/26",
+      "display_name": "Mathematics"
+     },
+     "domain": {
+      "id": "https://openalex.org/domains/3",
+      "display_name": "Physical Sciences"
+     }
+    },
+    {
+     "id": "https://openalex.org/T10244",
+     "display_name": "Chaos control and synchronization",
+     "score": 0.2101999968290329,
+     "subfield": {
+      "id": "https://openalex.org/subfields/3109",
+      "display_name": "Statistical and Nonlinear Physics"
+     },
+     "field": {
+      "id": "https://openalex.org/fields/31",
+      "display_name": "Physics and Astronomy"
+     },
+     "domain": {
+      "id": "https://openalex.org/domains/3",
+      "display_name": "Physical Sciences"
+     }
+    },
+    {
+     "id": "https://openalex.org/T11261",
+     "display_name": "Quantum chaos and dynamical systems",
+     "score": 0.013500000350177288,
+     "subfield": {
+      "id": "https://openalex.org/subfields/3109",
+      "display_name": "Statistical and Nonlinear Physics"
+     },
+     "field": {
+      "id": "https://openalex.org/fields/31",
+      "display_name": "Physics and Astronomy"
+     },
+     "domain": {
+      "id": "https://openalex.org/domains/3",
+      "display_name": "Physical Sciences"
+     }
+    }
+   ],
+   "keywords": [
+    {
+     "id": "https://openalex.org/keywords/double-pendulum",
+     "display_name": "double pendulum",
+     "score": 0.996999979019165
+    },
+    {
+     "id": "https://openalex.org/keywords/chaos",
+     "display_name": "chaos",
+     "score": 0.8989999890327454
+    },
+    {
+     "id": "https://openalex.org/keywords/lyapunov-exponents",
+     "display_name": "Lyapunov exponents",
+     "score": 0.8410000205039978
+    },
+    {
+     "id": "https://openalex.org/keywords/trajectory-divergence",
+     "display_name": "trajectory divergence",
+     "score": 0.765999972820282
+    },
+    {
+     "id": "https://openalex.org/keywords/sensitivity-to-initial-conditions",
+     "display_name": "sensitivity to initial conditions",
+     "score": 0.8339999914169312
+    },
+    {
+     "id": "https://openalex.org/keywords/coupled-pendulums",
+     "display_name": "coupled pendulums",
+     "score": 0.550000011920929
+    }
+   ],
+   "abstract_inverted_index": {
+    "Suppose": [
+     0
+    ],
+    "we": [
+     1,
+     41
+    ],
+    "track": [
+     2
+    ],
+    "the": [
+     3,
+     29,
+     91,
+     95,
+     99,
+     110,
+     114
+    ],
+    "motion": [
+     4
+    ],
+    "of": [
+     5,
+     9,
+     66,
+     101,
+     113,
+     120
+    ],
+    "a": [
+     6,
+     33,
+     73,
+     117
+    ],
+    "large": [
+     7
+    ],
+    "number": [
+     8
+    ],
+    "double": [
+     10,
+     67
+    ],
+    "pendulums": [
+     11,
+     68,
+     104
+    ],
+    "that": [
+     12,
+     21,
+     44
+    ],
+    "start": [
+     13
+    ],
+    "from": [
+     14
+    ],
+    "slightly": [
+     15
+    ],
+    "(infinitesimally)": [
+     16
+    ],
+    "different": [
+     17
+    ],
+    "boundary": [
+     18
+    ],
+    "conditions.": [
+     19
+    ],
+    "In": [
+     20,
+     93
+    ],
+    "case,": [
+     22
+    ],
+    "they": [
+     23
+    ],
+    "will": [
+     24,
+     42
+    ],
+    "initially": [
+     25
+    ],
+    "move": [
+     26
+    ],
+    "together": [
+     27
+    ],
+    "along": [
+     28
+    ],
+    "same": [
+     30
+    ],
+    "trajectory": [
+     31
+    ],
+    "for": [
+     32,
+     98
+    ],
+    "short": [
+     34
+    ],
+    "time.": [
+     35,
+     121
+    ],
+    "A": [
+     36
+    ],
+    "few": [
+     37
+    ],
+    "oscillations": [
+     38
+    ],
+    "later,": [
+     39
+    ],
+    "however,": [
+     40
+    ],
+    "notice": [
+     43
+    ],
+    "their": [
+     45
+    ],
+    "trajectories": [
+     46,
+     100
+    ],
+    "diverge.": [
+     47
+    ],
+    "At": [
+     48
+    ],
+    "one": [
+     49
+    ],
+    "time,": [
+     50
+    ],
+    "visualizations": [
+     51
+    ],
+    "posted": [
+     52
+    ],
+    "on": [
+     53
+    ],
+    "social": [
+     54
+    ],
+    "media": [
+     55
+    ],
+    "became": [
+     56
+    ],
+    "very": [
+     57
+    ],
+    "popular,": [
+     58
+    ],
+    "in": [
+     59,
+     72,
+     80,
+     90
+    ],
+    "which": [
+     60,
+     83,
+     107
+    ],
+    "hundreds,": [
+     61
+    ],
+    "thousands,": [
+     62
+    ],
+    "and": [
+     63
+    ],
+    "even": [
+     64
+    ],
+    "millions": [
+     65
+    ],
+    "are": [
+     69
+    ],
+    "visualized": [
+     70
+    ],
+    "simultaneously": [
+     71
+    ],
+    "single": [
+     74
+    ],
+    "animation.": [
+     75
+    ],
+    "I": [
+     76
+    ],
+    "set": [
+     77
+    ],
+    "this": [
+     78,
+     81
+    ],
+    "task": [
+     79
+    ],
+    "chapter,": [
+     82
+    ],
+    "allowed": [
+     84
+    ],
+    "us": [
+     85
+    ],
+    "to": [
+     86
+    ],
+    "observe": [
+     87
+    ],
+    "chaotic": [
+     88,
+     111
+    ],
+    "behavior": [
+     89,
+     112
+    ],
+    "visualization.": [
+     92
+    ],
+    "addition,": [
+     94
+    ],
+    "Lyapunov": [
+     96
+    ],
+    "exponent": [
+     97
+    ],
+    "two": [
+     102
+    ],
+    "selected": [
+     103
+    ],
+    "was": [
+     105
+    ],
+    "calculated,": [
+     106
+    ],
+    "clearly": [
+     108
+    ],
+    "indicates": [
+     109
+    ],
+    "system": [
+     115
+    ],
+    "after": [
+     116
+    ],
+    "specific": [
+     118
+    ],
+    "period": [
+     119
+    ]
+   }
+  },
+  {
+   "id": "https://openalex.org/W2511482659",
+   "doi": "https://doi.org/10.7210/jrsj.15.1104",
+   "title": "Chaos and Robots. Double Pendulum and Chaos.",
+   "relevance_score": 33.260708,
+   "publication_year": 1997,
+   "language": "en",
+   "type": "article",
+   "open_access": {
+    "is_oa": true,
+    "oa_status": "bronze",
+    "oa_url": "https://www.jstage.jst.go.jp/article/jrsj1983/15/8/15_8_1104/_pdf",
+    "any_repository_has_fulltext": false
+   },
+   "cited_by_count": 1,
+   "is_retracted": false,
+   "authorships": [
+    {
+     "author_position": "first",
+     "author": {
+      "id": "https://openalex.org/A5103708667",
+      "display_name": "Motomasa Komuro",
+      "orcid": "https://orcid.org/0009-0009-2304-590X",
+      "observed_orcids": [
+       "https://orcid.org/0009-0009-2304-590X"
+      ]
+     },
+     "institutions": [
+      {
+       "id": "https://openalex.org/I144705627",
+       "display_name": "Teikyo University of Science",
+       "ror": "https://ror.org/025vmw012",
+       "country_code": "JP",
+       "type": "education",
+       "lineage": [
+        "https://openalex.org/I144705627"
+       ]
+      }
+     ],
+     "countries": [
+      "JP"
+     ],
+     "is_corresponding": true,
+     "raw_author_name": "Motomasa Komuro",
+     "raw_affiliation_strings": [
+      "TEIKYO UNIVERSITY OF SCIENCE & TECHNOLOGY"
+     ],
+     "raw_orcid": null,
+     "affiliations": [
+      {
+       "raw_affiliation_string": "TEIKYO UNIVERSITY OF SCIENCE & TECHNOLOGY",
+       "institution_ids": [
+        "https://openalex.org/I144705627"
+       ]
+      }
+     ]
+    }
+   ],
+   "primary_location": {
+    "id": "doi:10.7210/jrsj.15.1104",
+    "doi": "https://doi.org/10.7210/jrsj.15.1104",
+    "is_oa": true,
+    "landing_page_url": "https://doi.org/10.7210/jrsj.15.1104",
+    "pdf_url": "https://www.jstage.jst.go.jp/article/jrsj1983/15/8/15_8_1104/_pdf",
+    "source": {
+     "id": "https://openalex.org/S2913450704",
+     "display_name": "Journal of the Robotics Society of Japan",
+     "issn_l": "0289-1824",
+     "issn": [
+      "0289-1824",
+      "1884-7145"
+     ],
+     "is_oa": false,
+     "is_in_doaj": false,
+     "is_core": false,
+     "listed_in": [],
+     "host_organization": "https://openalex.org/P4320800634",
+     "host_organization_name": "Robotics Society of Japan",
+     "host_organization_lineage": [
+      "https://openalex.org/P4320800634"
+     ],
+     "host_organization_lineage_names": [
+      "Robotics Society of Japan"
+     ],
+     "type": "journal"
+    },
+    "license": null,
+    "license_id": null,
+    "version": "publishedVersion",
+    "is_accepted": true,
+    "is_published": true,
+    "raw_source_name": "Journal of the Robotics Society of Japan",
+    "raw_type": "journal-article"
+   },
+   "biblio": {
+    "volume": "15",
+    "issue": "8",
+    "first_page": "1104",
+    "last_page": "1109"
+   },
+   "best_oa_location": {
+    "id": "doi:10.7210/jrsj.15.1104",
+    "doi": "https://doi.org/10.7210/jrsj.15.1104",
+    "is_oa": true,
+    "landing_page_url": "https://doi.org/10.7210/jrsj.15.1104",
+    "pdf_url": "https://www.jstage.jst.go.jp/article/jrsj1983/15/8/15_8_1104/_pdf",
+    "source": {
+     "id": "https://openalex.org/S2913450704",
+     "display_name": "Journal of the Robotics Society of Japan",
+     "issn_l": "0289-1824",
+     "issn": [
+      "0289-1824",
+      "1884-7145"
+     ],
+     "is_oa": false,
+     "is_in_doaj": false,
+     "is_core": false,
+     "listed_in": [],
+     "host_organization": "https://openalex.org/P4320800634",
+     "host_organization_name": "Robotics Society of Japan",
+     "host_organization_lineage": [
+      "https://openalex.org/P4320800634"
+     ],
+     "host_organization_lineage_names": [
+      "Robotics Society of Japan"
+     ],
+     "type": "journal"
+    },
+    "license": null,
+    "license_id": null,
+    "version": "publishedVersion",
+    "is_accepted": true,
+    "is_published": true,
+    "raw_source_name": "Journal of the Robotics Society of Japan",
+    "raw_type": "journal-article"
+   },
+   "topics": [
+    {
+     "id": "https://openalex.org/T10244",
+     "display_name": "Chaos control and synchronization",
+     "score": 0.6523000001907349,
+     "subfield": {
+      "id": "https://openalex.org/subfields/3109",
+      "display_name": "Statistical and Nonlinear Physics"
+     },
+     "field": {
+      "id": "https://openalex.org/fields/31",
+      "display_name": "Physics and Astronomy"
+     },
+     "domain": {
+      "id": "https://openalex.org/domains/3",
+      "display_name": "Physical Sciences"
+     }
+    },
+    {
+     "id": "https://openalex.org/T10588",
+     "display_name": "Mathematical Dynamics and Fractals",
+     "score": 0.19679999351501465,
+     "subfield": {
+      "id": "https://openalex.org/subfields/2610",
+      "display_name": "Mathematical Physics"
+     },
+     "field": {
+      "id": "https://openalex.org/fields/26",
+      "display_name": "Mathematics"
+     },
+     "domain": {
+      "id": "https://openalex.org/domains/3",
+      "display_name": "Physical Sciences"
+     }
+    },
+    {
+     "id": "https://openalex.org/T12772",
+     "display_name": "Control and Stability of Dynamical Systems",
+     "score": 0.04259999841451645,
+     "subfield": {
+      "id": "https://openalex.org/subfields/2207",
+      "display_name": "Control and Systems Engineering"
+     },
+     "field": {
+      "id": "https://openalex.org/fields/22",
+      "display_name": "Engineering"
+     },
+     "domain": {
+      "id": "https://openalex.org/domains/3",
+      "display_name": "Physical Sciences"
+     }
+    }
+   ],
+   "keywords": [
+    {
+     "id": "https://openalex.org/keywords/chaos",
+     "display_name": "chaos",
+     "score": 0.8180000185966492
+    },
+    {
+     "id": "https://openalex.org/keywords/double-pendulum",
+     "display_name": "double pendulum",
+     "score": 0.9909999966621399
+    },
+    {
+     "id": "https://openalex.org/keywords/nonlinear-dynamics",
+     "display_name": "nonlinear dynamics",
+     "score": 0.6159999966621399
+    },
+    {
+     "id": "https://openalex.org/keywords/robots",
+     "display_name": "robots",
+     "score": 0.42800000309944153
+    },
+    {
+     "id": "https://openalex.org/keywords/chaotic-dynamics",
+     "display_name": "chaotic dynamics",
+     "score": 0.6399999856948853
+    }
+   ],
+   "abstract_inverted_index": null
+  },
+  {
+   "id": "https://openalex.org/W2007201084",
+   "doi": "https://doi.org/10.1007/978-3-642-69591-9_9",
+   "title": "Chaos in Classical Mechanics: The Double Pendulum",
+   "relevance_score": 33.20533,
+   "publication_year": 1984,
+   "language": "en",
+   "type": "book-chapter",
+   "open_access": {
+    "is_oa": false,
+    "oa_status": "closed",
+    "oa_url": null,
+    "any_repository_has_fulltext": false
+   },
+   "cited_by_count": 27,
+   "is_retracted": false,
+   "authorships": [
+    {
+     "author_position": "first",
+     "author": {
+      "id": "https://openalex.org/A5065830330",
+      "display_name": "Peter Hinnerk Richter",
+      "orcid": "https://orcid.org/0009-0000-1335-4228",
+      "observed_orcids": [
+       "https://orcid.org/0009-0000-1335-4228"
+      ]
+     },
+     "institutions": [
+      {
+       "id": "https://openalex.org/I180437899",
+       "display_name": "University of Bremen",
+       "ror": "https://ror.org/04ers2y35",
+       "country_code": "DE",
+       "type": "education",
+       "lineage": [
+        "https://openalex.org/I180437899"
+       ]
+      }
+     ],
+     "countries": [
+      "DE"
+     ],
+     "is_corresponding": false,
+     "raw_author_name": "P. H. Richter",
+     "raw_affiliation_strings": [
+      "Fachbereich Physik, Universität Bremen, Bremen 33, D-2800, Fed. Rep. of Germany"
+     ],
+     "raw_orcid": null,
+     "affiliations": [
+      {
+       "raw_affiliation_string": "Fachbereich Physik, Universität Bremen, Bremen 33, D-2800, Fed. Rep. of Germany",
+       "institution_ids": [
+        "https://openalex.org/I180437899"
+       ]
+      }
+     ]
+    },
+    {
+     "author_position": "last",
+     "author": {
+      "id": "https://openalex.org/A5054210728",
+      "display_name": "H. J. Scholz",
+      "orcid": null,
+      "observed_orcids": []
+     },
+     "institutions": [
+      {
+       "id": "https://openalex.org/I180437899",
+       "display_name": "University of Bremen",
+       "ror": "https://ror.org/04ers2y35",
+       "country_code": "DE",
+       "type": "education",
+       "lineage": [
+        "https://openalex.org/I180437899"
+       ]
+      }
+     ],
+     "countries": [
+      "DE"
+     ],
+     "is_corresponding": false,
+     "raw_author_name": "H.-J. Scholz",
+     "raw_affiliation_strings": [
+      "Fachbereich Physik, Universität Bremen, Bremen 33, D-2800, Fed. Rep. of Germany"
+     ],
+     "raw_orcid": null,
+     "affiliations": [
+      {
+       "raw_affiliation_string": "Fachbereich Physik, Universität Bremen, Bremen 33, D-2800, Fed. Rep. of Germany",
+       "institution_ids": [
+        "https://openalex.org/I180437899"
+       ]
+      }
+     ]
+    }
+   ],
+   "primary_location": {
+    "id": "doi:10.1007/978-3-642-69591-9_9",
+    "doi": "https://doi.org/10.1007/978-3-642-69591-9_9",
+    "is_oa": false,
+    "landing_page_url": "https://doi.org/10.1007/978-3-642-69591-9_9",
+    "pdf_url": null,
+    "source": {
+     "id": "https://openalex.org/S4210227470",
+     "display_name": "Springer series in synergetics",
+     "issn_l": "0172-7389",
+     "issn": [
+      "0172-7389",
+      "2198-333X"
+     ],
+     "is_oa": false,
+     "is_in_doaj": false,
+     "is_core": true,
+     "listed_in": [
+      "cwts-core"
+     ],
+     "host_organization": "https://openalex.org/P4310319965",
+     "host_organization_name": "Springer Nature",
+     "host_organization_lineage": [
+      "https://openalex.org/P4310319965"
+     ],
+     "host_organization_lineage_names": [
+      "Springer Nature"
+     ],
+     "type": "book series"
+    },
+    "license": null,
+    "license_id": null,
+    "version": "publishedVersion",
+    "is_accepted": true,
+    "is_published": true,
+    "raw_source_name": "Springer Series in Synergetics",
+    "raw_type": "book-chapter"
+   },
+   "biblio": {
+    "volume": null,
+    "issue": null,
+    "first_page": "86",
+    "last_page": "97"
+   },
+   "best_oa_location": null,
+   "topics": [
+    {
+     "id": "https://openalex.org/T10588",
+     "display_name": "Mathematical Dynamics and Fractals",
+     "score": 0.9092000126838684,
+     "subfield": {
+      "id": "https://openalex.org/subfields/2610",
+      "display_name": "Mathematical Physics"
+     },
+     "field": {
+      "id": "https://openalex.org/fields/26",
+      "display_name": "Mathematics"
+     },
+     "domain": {
+      "id": "https://openalex.org/domains/3",
+      "display_name": "Physical Sciences"
+     }
+    },
+    {
+     "id": "https://openalex.org/T11261",
+     "display_name": "Quantum chaos and dynamical systems",
+     "score": 0.04619999974966049,
+     "subfield": {
+      "id": "https://openalex.org/subfields/3109",
+      "display_name": "Statistical and Nonlinear Physics"
+     },
+     "field": {
+      "id": "https://openalex.org/fields/31",
+      "display_name": "Physics and Astronomy"
+     },
+     "domain": {
+      "id": "https://openalex.org/domains/3",
+      "display_name": "Physical Sciences"
+     }
+    },
+    {
+     "id": "https://openalex.org/T10244",
+     "display_name": "Chaos control and synchronization",
+     "score": 0.03620000183582306,
+     "subfield": {
+      "id": "https://openalex.org/subfields/3109",
+      "display_name": "Statistical and Nonlinear Physics"
+     },
+     "field": {
+      "id": "https://openalex.org/fields/31",
+      "display_name": "Physics and Astronomy"
+     },
+     "domain": {
+      "id": "https://openalex.org/domains/3",
+      "display_name": "Physical Sciences"
+     }
+    }
+   ],
+   "keywords": [
+    {
+     "id": "https://openalex.org/keywords/double-pendulum",
+     "display_name": "double pendulum",
+     "score": 0.9980000257492065
+    },
+    {
+     "id": "https://openalex.org/keywords/chaos",
+     "display_name": "chaos",
+     "score": 0.8169999718666077
+    },
+    {
+     "id": "https://openalex.org/keywords/poincare-sections",
+     "display_name": "Poincaré sections",
+     "score": 0.9240000247955322
+    },
+    {
+     "id": "https://openalex.org/keywords/non-integrable-hamiltonian-systems",
+     "display_name": "non-integrable Hamiltonian systems",
+     "score": 0.9829999804496765
+    },
+    {
+     "id": "https://openalex.org/keywords/classical-mechanics",
+     "display_name": "classical mechanics",
+     "score": 0.8500000238418579
+    },
+    {
+     "id": "https://openalex.org/keywords/nonlinear-dynamics",
+     "display_name": "nonlinear dynamics",
+     "score": 0.6129999756813049
+    },
+    {
+     "id": "https://openalex.org/keywords/phase-space",
+     "display_name": "phase space",
+     "score": 0.4169999957084656
+    }
+   ],
+   "abstract_inverted_index": null
+  },
+  {
+   "id": "https://openalex.org/W1963494060",
+   "doi": "https://doi.org/10.1109/icetet.2013.50",
+   "title": "Analysis of Chaos in Double Pendulum",
+   "relevance_score": 32.776127,
+   "publication_year": 2013,
+   "language": "en",
+   "type": "conference-paper",
+   "open_access": {
+    "is_oa": false,
+    "oa_status": "closed",
+    "oa_url": null,
+    "any_repository_has_fulltext": false
+   },
+   "cited_by_count": 6,
+   "is_retracted": false,
+   "authorships": [
+    {
+     "author_position": "first",
+     "author": {
+      "id": null,
+      "display_name": "Himanshu Jain",
+      "orcid": null,
+      "observed_orcids": []
+     },
+     "institutions": [
+      {
+       "id": "https://openalex.org/I68891433",
+       "display_name": "Indian Institute of Technology Delhi",
+       "ror": "https://ror.org/049tgcd06",
+       "country_code": "IN",
+       "type": "education",
+       "lineage": [
+        "https://openalex.org/I68891433"
+       ]
+      }
+     ],
+     "countries": [
+      "IN"
+     ],
+     "is_corresponding": false,
+     "raw_author_name": "Himanshu Jain",
+     "raw_affiliation_strings": [
+      "Mechanical Engineering Department, Indian Institute of Technology, Delhi New Delhi, India",
+      "Mech. Eng. Dept., Indian Inst. of Technol. Delhi, New Delhi, India"
+     ],
+     "raw_orcid": null,
+     "affiliations": [
+      {
+       "raw_affiliation_string": "Mechanical Engineering Department, Indian Institute of Technology, Delhi New Delhi, India",
+       "institution_ids": [
+        "https://openalex.org/I68891433"
+       ]
+      },
+      {
+       "raw_affiliation_string": "Mech. Eng. Dept., Indian Inst. of Technol. Delhi, New Delhi, India",
+       "institution_ids": [
+        "https://openalex.org/I68891433"
+       ]
+      }
+     ]
+    },
+    {
+     "author_position": "middle",
+     "author": {
+      "id": null,
+      "display_name": "Ashish Ranjan",
+      "orcid": null,
+      "observed_orcids": []
+     },
+     "institutions": [
+      {
+       "id": "https://openalex.org/I68891433",
+       "display_name": "Indian Institute of Technology Delhi",
+       "ror": "https://ror.org/049tgcd06",
+       "country_code": "IN",
+       "type": "education",
+       "lineage": [
+        "https://openalex.org/I68891433"
+       ]
+      }
+     ],
+     "countries": [
+      "IN"
+     ],
+     "is_corresponding": false,
+     "raw_author_name": "Ashish Ranjan",
+     "raw_affiliation_strings": [
+      "Mechanical Engineering Department, Indian Institute of Technology, Delhi New Delhi, India",
+      "Mech. Eng. Dept., Indian Inst. of Technol. Delhi, New Delhi, India"
+     ],
+     "raw_orcid": null,
+     "affiliations": [
+      {
+       "raw_affiliation_string": "Mechanical Engineering Department, Indian Institute of Technology, Delhi New Delhi, India",
+       "institution_ids": [
+        "https://openalex.org/I68891433"
+       ]
+      },
+      {
+       "raw_affiliation_string": "Mech. Eng. Dept., Indian Inst. of Technol. Delhi, New Delhi, India",
+       "institution_ids": [
+        "https://openalex.org/I68891433"
+       ]
+      }
+     ]
+    },
+    {
+     "author_position": "last",
+     "author": {
+      "id": "https://openalex.org/A5102340917",
+      "display_name": "Kshitij Gupta",
+      "orcid": null,
+      "observed_orcids": []
+     },
+     "institutions": [
+      {
+       "id": "https://openalex.org/I68891433",
+       "display_name": "Indian Institute of Technology Delhi",
+       "ror": "https://ror.org/049tgcd06",
+       "country_code": "IN",
+       "type": "education",
+       "lineage": [
+        "https://openalex.org/I68891433"
+       ]
+      }
+     ],
+     "countries": [
+      "IN"
+     ],
+     "is_corresponding": false,
+     "raw_author_name": "Kshitij Gupta",
+     "raw_affiliation_strings": [
+      "Mechanical Engineering Department, Indian Institute of Technology, Delhi New Delhi, India",
+      "Mech. Eng. Dept., Indian Inst. of Technol. Delhi, New Delhi, India"
+     ],
+     "raw_orcid": null,
+     "affiliations": [
+      {
+       "raw_affiliation_string": "Mechanical Engineering Department, Indian Institute of Technology, Delhi New Delhi, India",
+       "institution_ids": [
+        "https://openalex.org/I68891433"
+       ]
+      },
+      {
+       "raw_affiliation_string": "Mech. Eng. Dept., Indian Inst. of Technol. Delhi, New Delhi, India",
+       "institution_ids": [
+        "https://openalex.org/I68891433"
+       ]
+      }
+     ]
+    }
+   ],
+   "primary_location": {
+    "id": "doi:10.1109/icetet.2013.50",
+    "doi": "https://doi.org/10.1109/icetet.2013.50",
+    "is_oa": false,
+    "landing_page_url": "https://doi.org/10.1109/icetet.2013.50",
+    "pdf_url": null,
+    "source": {
+     "id": "https://openalex.org/S4363608317",
+     "display_name": "International Conference on Emerging Trends in Engineering and Technology (ICETET)",
+     "issn_l": null,
+     "issn": null,
+     "is_oa": false,
+     "is_in_doaj": false,
+     "is_core": false,
+     "listed_in": [],
+     "host_organization": null,
+     "host_organization_name": null,
+     "host_organization_lineage": [],
+     "host_organization_lineage_names": [],
+     "type": "conference"
+    },
+    "license": null,
+    "license_id": null,
+    "version": "publishedVersion",
+    "is_accepted": true,
+    "is_published": true,
+    "raw_source_name": "2013 6th International Conference on Emerging Trends in Engineering and Technology",
+    "raw_type": "proceedings-article"
+   },
+   "biblio": {
+    "volume": null,
+    "issue": null,
+    "first_page": "171",
+    "last_page": "176"
+   },
+   "best_oa_location": null,
+   "topics": [
+    {
+     "id": "https://openalex.org/T10244",
+     "display_name": "Chaos control and synchronization",
+     "score": 0.4936999976634979,
+     "subfield": {
+      "id": "https://openalex.org/subfields/3109",
+      "display_name": "Statistical and Nonlinear Physics"
+     },
+     "field": {
+      "id": "https://openalex.org/fields/31",
+      "display_name": "Physics and Astronomy"
+     },
+     "domain": {
+      "id": "https://openalex.org/domains/3",
+      "display_name": "Physical Sciences"
+     }
+    },
+    {
+     "id": "https://openalex.org/T10588",
+     "display_name": "Mathematical Dynamics and Fractals",
+     "score": 0.38920000195503235,
+     "subfield": {
+      "id": "https://openalex.org/subfields/2610",
+      "display_name": "Mathematical Physics"
+     },
+     "field": {
+      "id": "https://openalex.org/fields/26",
+      "display_name": "Mathematics"
+     },
+     "domain": {
+      "id": "https://openalex.org/domains/3",
+      "display_name": "Physical Sciences"
+     }
+    },
+    {
+     "id": "https://openalex.org/T12250",
+     "display_name": "Experimental and Theoretical Physics Studies",
+     "score": 0.07959999889135361,
+     "subfield": {
+      "id": "https://openalex.org/subfields/3109",
+      "display_name": "Statistical and Nonlinear Physics"
+     },
+     "field": {
+      "id": "https://openalex.org/fields/31",
+      "display_name": "Physics and Astronomy"
+     },
+     "domain": {
+      "id": "https://openalex.org/domains/3",
+      "display_name": "Physical Sciences"
+     }
+    }
+   ],
+   "keywords": [
+    {
+     "id": "https://openalex.org/keywords/double-pendulum",
+     "display_name": "double pendulum",
+     "score": 0.9990000128746033
+    },
+    {
+     "id": "https://openalex.org/keywords/chaotic-oscillations",
+     "display_name": "chaotic oscillations",
+     "score": 0.7960000038146973
+    },
+    {
+     "id": "https://openalex.org/keywords/sensitivity-to-initial-conditions",
+     "display_name": "sensitivity to initial conditions",
+     "score": 0.9539999961853027
+    },
+    {
+     "id": "https://openalex.org/keywords/video-processing",
+     "display_name": "video processing",
+     "score": 0.44999998807907104
+    },
+    {
+     "id": "https://openalex.org/keywords/pendulum-motion",
+     "display_name": "pendulum motion",
+     "score": 0.6899999976158142
+    },
+    {
+     "id": "https://openalex.org/keywords/energy-levels",
+     "display_name": "energy levels",
+     "score": 0.7929999828338623
+    },
+    {
+     "id": "https://openalex.org/keywords/nonlinear-dynamics",
+     "display_name": "nonlinear dynamics",
+     "score": 0.8199999928474426
+    }
+   ],
+   "abstract_inverted_index": {
+    "In": [
+     0
+    ],
+    "this": [
+     1
+    ],
+    "paper,": [
+     2
+    ],
+    "we": [
+     3,
+     44,
+     110
+    ],
+    "present": [
+     4,
+     45
+    ],
+    "the": [
+     5,
+     19,
+     28,
+     34,
+     46,
+     57,
+     68,
+     71,
+     85,
+     90,
+     98,
+     115,
+     124,
+     142
+    ],
+    "analysis": [
+     6
+    ],
+    "of": [
+     7,
+     21,
+     30,
+     48,
+     59,
+     70,
+     73,
+     75,
+     101,
+     117,
+     144
+    ],
+    "chaotic": [
+     8,
+     81
+    ],
+    "vibrations": [
+     9
+    ],
+    "in": [
+     10,
+     62,
+     88,
+     97,
+     106,
+     137
+    ],
+    "double": [
+     11,
+     60,
+     76,
+     138
+    ],
+    "pendulum": [
+     12,
+     32,
+     61,
+     77
+    ],
+    "by": [
+     13
+    ],
+    "experimental": [
+     14,
+     53
+    ],
+    "means.": [
+     15
+    ],
+    "We": [
+     16,
+     65
+    ],
+    "shall": [
+     17
+    ],
+    "illustrate": [
+     18
+    ],
+    "sensitivity": [
+     20
+    ],
+    "its": [
+     22
+    ],
+    "motion": [
+     23,
+     58,
+     74
+    ],
+    "to": [
+     24,
+     55,
+     103
+    ],
+    "initial": [
+     25,
+     40,
+     86
+    ],
+    "conditions": [
+     26,
+     87
+    ],
+    "i.e.,": [
+     27
+    ],
+    "angles": [
+     29,
+     91
+    ],
+    "each": [
+     31
+    ],
+    "from": [
+     33
+    ],
+    "vertical,": [
+     35
+    ],
+    "θ": [
+     36,
+     92
+    ],
+    "and": [
+     37,
+     82,
+     93
+    ],
+    "Φ": [
+     38,
+     94
+    ],
+    "at": [
+     39
+    ],
+    "time": [
+     41,
+     63
+    ],
+    "t=0.": [
+     42
+    ],
+    "Here": [
+     43
+    ],
+    "method": [
+     47
+    ],
+    "video": [
+     49
+    ],
+    "processing": [
+     50
+    ],
+    "as": [
+     51
+    ],
+    "an": [
+     52
+    ],
+    "technique": [
+     54
+    ],
+    "study": [
+     56
+    ],
+    "domain.": [
+     64
+    ],
+    "have": [
+     66
+    ],
+    "studied": [
+     67
+    ],
+    "dependence": [
+     69
+    ],
+    "nature": [
+     72
+    ],
+    "broadly": [
+     78
+    ],
+    "classified": [
+     79
+    ],
+    "into": [
+     80
+    ],
+    "non-chaotic,": [
+     83
+    ],
+    "on": [
+     84,
+     123
+    ],
+    "which": [
+     89
+    ],
+    "acquire": [
+     95
+    ],
+    "values": [
+     96
+    ],
+    "full": [
+     99
+    ],
+    "range": [
+     100
+    ],
+    "-180": [
+     102
+    ],
+    "180": [
+     104
+    ],
+    "degrees": [
+     105
+    ],
+    "various": [
+     107
+    ],
+    "combinations.": [
+     108
+    ],
+    "Also,": [
+     109
+    ],
+    "would": [
+     111
+    ],
+    "be": [
+     112
+    ],
+    "showing": [
+     113
+    ],
+    "that": [
+     114
+    ],
+    "phenomenon": [
+     116
+    ],
+    "chaos": [
+     118
+    ],
+    "does": [
+     119
+    ],
+    "not": [
+     120
+    ],
+    "only": [
+     121
+    ],
+    "depend": [
+     122
+    ],
+    "energy": [
+     125
+    ],
+    "levels": [
+     126
+    ],
+    "but": [
+     127
+    ],
+    "there": [
+     128
+    ],
+    "are": [
+     129
+    ],
+    "other": [
+     130
+    ],
+    "governing": [
+     131
+    ],
+    "factors": [
+     132
+    ],
+    "also.": [
+     133
+    ],
+    "As": [
+     134
+    ],
+    "for": [
+     135
+    ],
+    "example,": [
+     136
+    ],
+    "pendulum,": [
+     139
+    ],
+    "it": [
+     140
+    ],
+    "is": [
+     141
+    ],
+    "orientation": [
+     143
+    ],
+    "pendulums.": [
+     145
+    ]
+   }
+  },
+  {
+   "id": "https://openalex.org/W2911475614",
+   "doi": "https://doi.org/10.1016/j.ymssp.2019.01.037",
+   "title": "Energy harvesting from chaos in base excited double pendulum",
+   "relevance_score": 32.34032,
+   "publication_year": 2019,
+   "language": "en",
+   "type": "article",
+   "open_access": {
+    "is_oa": false,
+    "oa_status": "closed",
+    "oa_url": null,
+    "any_repository_has_fulltext": false
+   },
+   "cited_by_count": 102,
+   "is_retracted": false,
+   "authorships": [
+    {
+     "author_position": "first",
+     "author": {
+      "id": "https://openalex.org/A5039044320",
+      "display_name": "Rahul Kumar",
+      "orcid": "https://orcid.org/0000-0003-3707-9210",
+      "observed_orcids": [
+       "https://orcid.org/0000-0003-3707-9210"
+      ]
+     },
+     "institutions": [
+      {
+       "id": "https://openalex.org/I24676775",
+       "display_name": "Indian Institute of Technology Madras",
+       "ror": "https://ror.org/03v0r5n49",
+       "country_code": "IN",
+       "type": "education",
+       "lineage": [
+        "https://openalex.org/I24676775"
+       ]
+      }
+     ],
+     "countries": [
+      "IN"
+     ],
+     "is_corresponding": false,
+     "raw_author_name": "Rahul Kumar",
+     "raw_affiliation_strings": [
+      "Department of Applied Mechanics, Indian Institute of Technology Madras, Chennai 600036, India"
+     ],
+     "raw_orcid": null,
+     "affiliations": [
+      {
+       "raw_affiliation_string": "Department of Applied Mechanics, Indian Institute of Technology Madras, Chennai 600036, India",
+       "institution_ids": [
+        "https://openalex.org/I24676775"
+       ]
+      }
+     ]
+    },
+    {
+     "author_position": "middle",
+     "author": {
+      "id": "https://openalex.org/A5070732290",
+      "display_name": "Sayan Gupta",
+      "orcid": "https://orcid.org/0000-0002-0970-3795",
+      "observed_orcids": [
+       "https://orcid.org/0000-0002-0970-3795",
+       "https://orcid.org/0000-0003-4752-068X"
+      ]
+     },
+     "institutions": [
+      {
+       "id": "https://openalex.org/I24676775",
+       "display_name": "Indian Institute of Technology Madras",
+       "ror": "https://ror.org/03v0r5n49",
+       "country_code": "IN",
+       "type": "education",
+       "lineage": [
+        "https://openalex.org/I24676775"
+       ]
+      }
+     ],
+     "countries": [
+      "IN"
+     ],
+     "is_corresponding": false,
+     "raw_author_name": "Sayan Gupta",
+     "raw_affiliation_strings": [
+      "Department of Applied Mechanics, Indian Institute of Technology Madras, Chennai 600036, India"
+     ],
+     "raw_orcid": "https://orcid.org/0000-0002-0970-3795",
+     "affiliations": [
+      {
+       "raw_affiliation_string": "Department of Applied Mechanics, Indian Institute of Technology Madras, Chennai 600036, India",
+       "institution_ids": [
+        "https://openalex.org/I24676775"
+       ]
+      }
+     ]
+    },
+    {
+     "author_position": "last",
+     "author": {
+      "id": "https://openalex.org/A5082702613",
+      "display_name": "Shaikh Faruque Ali",
+      "orcid": "https://orcid.org/0000-0003-4651-9548",
+      "observed_orcids": [
+       "https://orcid.org/0000-0003-4651-9548"
+      ]
+     },
+     "institutions": [
+      {
+       "id": "https://openalex.org/I24676775",
+       "display_name": "Indian Institute of Technology Madras",
+       "ror": "https://ror.org/03v0r5n49",
+       "country_code": "IN",
+       "type": "education",
+       "lineage": [
+        "https://openalex.org/I24676775"
+       ]
+      }
+     ],
+     "countries": [
+      "IN"
+     ],
+     "is_corresponding": true,
+     "raw_author_name": "Shaikh Faruque Ali",
+     "raw_affiliation_strings": [
+      "Department of Applied Mechanics, Indian Institute of Technology Madras, Chennai 600036, India"
+     ],
+     "raw_orcid": "https://orcid.org/0000-0003-4651-9548",
+     "affiliations": [
+      {
+       "raw_affiliation_string": "Department of Applied Mechanics, Indian Institute of Technology Madras, Chennai 600036, India",
+       "institution_ids": [
+        "https://openalex.org/I24676775"
+       ]
+      }
+     ]
+    }
+   ],
+   "primary_location": {
+    "id": "doi:10.1016/j.ymssp.2019.01.037",
+    "doi": "https://doi.org/10.1016/j.ymssp.2019.01.037",
+    "is_oa": false,
+    "landing_page_url": "https://doi.org/10.1016/j.ymssp.2019.01.037",
+    "pdf_url": null,
+    "source": {
+     "id": "https://openalex.org/S128368299",
+     "display_name": "Mechanical Systems and Signal Processing",
+     "issn_l": "0888-3270",
+     "issn": [
+      "0888-3270",
+      "1096-1216"
+     ],
+     "is_oa": false,
+     "is_in_doaj": false,
+     "is_core": true,
+     "listed_in": [
+      "cwts-core",
+      "dongbi-b",
+      "jufo-3",
+      "norway-1",
+      "poland-200",
+      "russia-white-list-1",
+      "vabb-shw"
+     ],
+     "host_organization": "https://openalex.org/P4310320990",
+     "host_organization_name": "Elsevier BV",
+     "host_organization_lineage": [
+      "https://openalex.org/P4310320990"
+     ],
+     "host_organization_lineage_names": [
+      "Elsevier BV"
+     ],
+     "type": "journal"
+    },
+    "license": null,
+    "license_id": null,
+    "version": "publishedVersion",
+    "is_accepted": true,
+    "is_published": true,
+    "raw_source_name": "Mechanical Systems and Signal Processing",
+    "raw_type": "journal-article"
+   },
+   "biblio": {
+    "volume": "124",
+    "issue": null,
+    "first_page": "49",
+    "last_page": "64"
+   },
+   "best_oa_location": null,
+   "topics": [
+    {
+     "id": "https://openalex.org/T11230",
+     "display_name": "Innovative Energy Harvesting Technologies",
+     "score": 0.9945999979972839,
+     "subfield": {
+      "id": "https://openalex.org/subfields/2210",
+      "display_name": "Mechanical Engineering"
+     },
+     "field": {
+      "id": "https://openalex.org/fields/22",
+      "display_name": "Engineering"
+     },
+     "domain": {
+      "id": "https://openalex.org/domains/3",
+      "display_name": "Physical Sciences"
+     }
+    },
+    {
+     "id": "https://openalex.org/T10244",
+     "display_name": "Chaos control and synchronization",
+     "score": 0.002300000051036477,
+     "subfield": {
+      "id": "https://openalex.org/subfields/3109",
+      "display_name": "Statistical and Nonlinear Physics"
+     },
+     "field": {
+      "id": "https://openalex.org/fields/31",
+      "display_name": "Physics and Astronomy"
+     },
+     "domain": {
+      "id": "https://openalex.org/domains/3",
+      "display_name": "Physical Sciences"
+     }
+    },
+    {
+     "id": "https://openalex.org/T12206",
+     "display_name": "Vibration and Dynamic Analysis",
+     "score": 0.00039999998989515007,
+     "subfield": {
+      "id": "https://openalex.org/subfields/2207",
+      "display_name": "Control and Systems Engineering"
+     },
+     "field": {
+      "id": "https://openalex.org/fields/22",
+      "display_name": "Engineering"
+     },
+     "domain": {
+      "id": "https://openalex.org/domains/3",
+      "display_name": "Physical Sciences"
+     }
+    }
+   ],
+   "keywords": [
+    {
+     "id": "https://openalex.org/keywords/energy-harvesting",
+     "display_name": "energy harvesting",
+     "score": 0.9639999866485596
+    },
+    {
+     "id": "https://openalex.org/keywords/chaos",
+     "display_name": "chaos",
+     "score": 0.5559999942779541
+    },
+    {
+     "id": "https://openalex.org/keywords/double-pendulum",
+     "display_name": "double pendulum",
+     "score": 0.9430000185966492
+    },
+    {
+     "id": "https://openalex.org/keywords/base-excitation",
+     "display_name": "base excitation",
+     "score": 0.9869999885559082
+    },
+    {
+     "id": "https://openalex.org/keywords/electromagnetic-induction",
+     "display_name": "electromagnetic induction",
+     "score": 0.7789999842643738
+    },
+    {
+     "id": "https://openalex.org/keywords/chaotic-dynamics",
+     "display_name": "chaotic dynamics",
+     "score": 0.7429999709129333
+    },
+    {
+     "id": "https://openalex.org/keywords/small-oscillations",
+     "display_name": "small oscillations",
+     "score": 0.7400000095367432
+    },
+    {
+     "id": "https://openalex.org/keywords/parameter-optimization",
+     "display_name": "parameter optimization",
+     "score": 0.6859999895095825
+    },
+    {
+     "id": "https://openalex.org/keywords/time-series-analysis",
+     "display_name": "time series analysis",
+     "score": 0.5049999952316284
+    }
+   ],
+   "abstract_inverted_index": null
+  },
+  {
+   "id": "https://openalex.org/W4315589408",
+   "doi": "https://doi.org/10.1007/s11071-023-08232-0",
+   "title": "Saddle transport and chaos in the double pendulum",
+   "relevance_score": 31.73865,
+   "publication_year": 2023,
+   "language": "en",
+   "type": "article",
+   "open_access": {
+    "is_oa": true,
+    "oa_status": "green",
+    "oa_url": "https://arxiv.org/pdf/2209.10132",
+    "any_repository_has_fulltext": true
+   },
+   "cited_by_count": 13,
+   "is_retracted": false,
+   "authorships": [
+    {
+     "author_position": "first",
+     "author": {
+      "id": "https://openalex.org/A5017403086",
+      "display_name": "Kadierdan Kaheman",
+      "orcid": "https://orcid.org/0000-0003-2279-2793",
+      "observed_orcids": [
+       "https://orcid.org/0000-0003-2279-2793"
+      ]
+     },
+     "institutions": [
+      {
+       "id": "https://openalex.org/I201448701",
+       "display_name": "University of Washington",
+       "ror": "https://ror.org/00cvxb145",
+       "country_code": "US",
+       "type": "education",
+       "lineage": [
+        "https://openalex.org/I201448701"
+       ]
+      }
+     ],
+     "countries": [
+      "US"
+     ],
+     "is_corresponding": false,
+     "raw_author_name": "Kadierdan Kaheman",
+     "raw_affiliation_strings": [
+      "Department of Mechanical Engineering, University of Washington, Seattle, WA, 98105, USA"
+     ],
+     "raw_orcid": null,
+     "affiliations": [
+      {
+       "raw_affiliation_string": "Department of Mechanical Engineering, University of Washington, Seattle, WA, 98105, USA",
+       "institution_ids": [
+        "https://openalex.org/I201448701"
+       ]
+      }
+     ]
+    },
+    {
+     "author_position": "middle",
+     "author": {
+      "id": "https://openalex.org/A5017009058",
+      "display_name": "Jason J. Bramburger",
+      "orcid": "https://orcid.org/0000-0002-4687-4956",
+      "observed_orcids": [
+       "https://orcid.org/0000-0002-4687-4956"
+      ]
+     },
+     "institutions": [
+      {
+       "id": "https://openalex.org/I60158472",
+       "display_name": "Concordia University",
+       "ror": "https://ror.org/0420zvk78",
+       "country_code": "CA",
+       "type": "education",
+       "lineage": [
+        "https://openalex.org/I60158472"
+       ]
+      }
+     ],
+     "countries": [
+      "CA"
+     ],
+     "is_corresponding": true,
+     "raw_author_name": "Jason J. Bramburger",
+     "raw_affiliation_strings": [
+      "Department of Mathematics and Statistics, Concordia University, Montreal, QC, H3G 1M8, Canada"
+     ],
+     "raw_orcid": "https://orcid.org/0000-0002-4687-4956",
+     "affiliations": [
+      {
+       "raw_affiliation_string": "Department of Mathematics and Statistics, Concordia University, Montreal, QC, H3G 1M8, Canada",
+       "institution_ids": [
+        "https://openalex.org/I60158472"
+       ]
+      }
+     ]
+    },
+    {
+     "author_position": "middle",
+     "author": {
+      "id": "https://openalex.org/A5083450863",
+      "display_name": "J. Nathan Kutz",
+      "orcid": "https://orcid.org/0000-0002-6004-2275",
+      "observed_orcids": [
+       "https://orcid.org/0000-0002-6004-2275"
+      ]
+     },
+     "institutions": [
+      {
+       "id": "https://openalex.org/I201448701",
+       "display_name": "University of Washington",
+       "ror": "https://ror.org/00cvxb145",
+       "country_code": "US",
+       "type": "education",
+       "lineage": [
+        "https://openalex.org/I201448701"
+       ]
+      }
+     ],
+     "countries": [
+      "US"
+     ],
+     "is_corresponding": false,
+     "raw_author_name": "J. Nathan Kutz",
+     "raw_affiliation_strings": [
+      "Department of Mechanical Engineering, University of Washington, Seattle, WA, 98105, USA"
+     ],
+     "raw_orcid": null,
+     "affiliations": [
+      {
+       "raw_affiliation_string": "Department of Mechanical Engineering, University of Washington, Seattle, WA, 98105, USA",
+       "institution_ids": [
+        "https://openalex.org/I201448701"
+       ]
+      }
+     ]
+    },
+    {
+     "author_position": "last",
+     "author": {
+      "id": "https://openalex.org/A5062653961",
+      "display_name": "Steven L. Brunton",
+      "orcid": "https://orcid.org/0000-0002-6565-5118",
+      "observed_orcids": [
+       "https://orcid.org/0000-0002-6565-5118"
+      ]
+     },
+     "institutions": [
+      {
+       "id": "https://openalex.org/I201448701",
+       "display_name": "University of Washington",
+       "ror": "https://ror.org/00cvxb145",
+       "country_code": "US",
+       "type": "education",
+       "lineage": [
+        "https://openalex.org/I201448701"
+       ]
+      }
+     ],
+     "countries": [
+      "US"
+     ],
+     "is_corresponding": false,
+     "raw_author_name": "Steven L. Brunton",
+     "raw_affiliation_strings": [
+      "Department of Mechanical Engineering, University of Washington, Seattle, WA, 98105, USA"
+     ],
+     "raw_orcid": null,
+     "affiliations": [
+      {
+       "raw_affiliation_string": "Department of Mechanical Engineering, University of Washington, Seattle, WA, 98105, USA",
+       "institution_ids": [
+        "https://openalex.org/I201448701"
+       ]
+      }
+     ]
+    }
+   ],
+   "primary_location": {
+    "id": "doi:10.1007/s11071-023-08232-0",
+    "doi": "https://doi.org/10.1007/s11071-023-08232-0",
+    "is_oa": false,
+    "landing_page_url": "https://doi.org/10.1007/s11071-023-08232-0",
+    "pdf_url": null,
+    "source": {
+     "id": "https://openalex.org/S138681734",
+     "display_name": "Nonlinear Dynamics",
+     "issn_l": "0924-090X",
+     "issn": [
+      "0924-090X",
+      "1573-269X"
+     ],
+     "is_oa": false,
+     "is_in_doaj": false,
+     "is_core": true,
+     "listed_in": [
+      "anvur-class-a",
+      "anvur-scientific",
+      "cwts-core",
+      "dongbi-b",
+      "jufo-2",
+      "norway-1",
+      "poland-140",
+      "russia-white-list-1"
+     ],
+     "host_organization": "https://openalex.org/P4310319900",
+     "host_organization_name": "Springer Science+Business Media",
+     "host_organization_lineage": [
+      "https://openalex.org/P4310319900",
+      "https://openalex.org/P4310319965"
+     ],
+     "host_organization_lineage_names": [
+      "Springer Science+Business Media",
+      "Springer Nature"
+     ],
+     "type": "journal"
+    },
+    "license": null,
+    "license_id": null,
+    "version": "publishedVersion",
+    "is_accepted": true,
+    "is_published": true,
+    "raw_source_name": "Nonlinear Dynamics",
+    "raw_type": "journal-article"
+   },
+   "biblio": {
+    "volume": "111",
+    "issue": "8",
+    "first_page": "7199",
+    "last_page": "7233"
+   },
+   "best_oa_location": {
+    "id": "pmh:oai:arXiv.org:2209.10132",
+    "doi": null,
+    "is_oa": true,
+    "landing_page_url": "http://arxiv.org/abs/2209.10132",
+    "pdf_url": "https://arxiv.org/pdf/2209.10132",
+    "source": {
+     "id": "https://openalex.org/S4306400194",
+     "display_name": "arXiv (Cornell University)",
+     "issn_l": "2331-8422",
+     "issn": [
+      "2331-8422"
+     ],
+     "is_oa": true,
+     "is_in_doaj": false,
+     "is_core": false,
+     "listed_in": [],
+     "host_organization": "https://openalex.org/I205783295",
+     "host_organization_name": "Cornell University",
+     "host_organization_lineage": [
+      "https://openalex.org/I205783295"
+     ],
+     "host_organization_lineage_names": [],
+     "type": "repository"
+    },
+    "license": null,
+    "license_id": null,
+    "version": "submittedVersion",
+    "is_accepted": false,
+    "is_published": false,
+    "raw_source_name": null,
+    "raw_type": "text"
+   },
+   "topics": [
+    {
+     "id": "https://openalex.org/T10588",
+     "display_name": "Mathematical Dynamics and Fractals",
+     "score": 0.8490999937057495,
+     "subfield": {
+      "id": "https://openalex.org/subfields/2610",
+      "display_name": "Mathematical Physics"
+     },
+     "field": {
+      "id": "https://openalex.org/fields/26",
+      "display_name": "Mathematics"
+     },
+     "domain": {
+      "id": "https://openalex.org/domains/3",
+      "display_name": "Physical Sciences"
+     }
+    },
+    {
+     "id": "https://openalex.org/T11261",
+     "display_name": "Quantum chaos and dynamical systems",
+     "score": 0.06849999725818634,
+     "subfield": {
+      "id": "https://openalex.org/subfields/3109",
+      "display_name": "Statistical and Nonlinear Physics"
+     },
+     "field": {
+      "id": "https://openalex.org/fields/31",
+      "display_name": "Physics and Astronomy"
+     },
+     "domain": {
+      "id": "https://openalex.org/domains/3",
+      "display_name": "Physical Sciences"
+     }
+    },
+    {
+     "id": "https://openalex.org/T10244",
+     "display_name": "Chaos control and synchronization",
+     "score": 0.05339999869465828,
+     "subfield": {
+      "id": "https://openalex.org/subfields/3109",
+      "display_name": "Statistical and Nonlinear Physics"
+     },
+     "field": {
+      "id": "https://openalex.org/fields/31",
+      "display_name": "Physics and Astronomy"
+     },
+     "domain": {
+      "id": "https://openalex.org/domains/3",
+      "display_name": "Physical Sciences"
+     }
+    }
+   ],
+   "keywords": [
+    {
+     "id": "https://openalex.org/keywords/double-pendulum",
+     "display_name": "double pendulum",
+     "score": 1.0
+    },
+    {
+     "id": "https://openalex.org/keywords/chaotic-dynamics",
+     "display_name": "chaotic dynamics",
+     "score": 0.6140000224113464
+    },
+    {
+     "id": "https://openalex.org/keywords/separatrices",
+     "display_name": "separatrices",
+     "score": 0.7720000147819519
+    },
+    {
+     "id": "https://openalex.org/keywords/unstable-periodic-orbits",
+     "display_name": "unstable periodic orbits",
+     "score": 0.8270000219345093
+    },
+    {
+     "id": "https://openalex.org/keywords/hamiltonian-systems",
+     "display_name": "Hamiltonian systems",
+     "score": 0.7889999747276306
+    },
+    {
+     "id": "https://openalex.org/keywords/two-degree-of-freedom-system",
+     "display_name": "two-degree-of-freedom system",
+     "score": 0.7429999709129333
+    },
+    {
+     "id": "https://openalex.org/keywords/three-body-problem",
+     "display_name": "three-body problem",
+     "score": 0.8980000019073486
+    },
+    {
+     "id": "https://openalex.org/keywords/solar-system-dynamics",
+     "display_name": "solar system dynamics",
+     "score": 0.5659999847412109
+    }
+   ],
+   "abstract_inverted_index": null
+  },
+  {
+   "id": "https://openalex.org/W2058236317",
+   "doi": "https://doi.org/10.1103/physreva.26.3483",
+   "title": "Chaotic states and routes to chaos in the forced pendulum",
+   "relevance_score": 30.800867,
+   "publication_year": 1982,
+   "language": "en",
+   "type": "article",
+   "open_access": {
+    "is_oa": false,
+    "oa_status": "closed",
+    "oa_url": null,
+    "any_repository_has_fulltext": false
+   },
+   "cited_by_count": 490,
+   "is_retracted": false,
+   "authorships": [
+    {
+     "author_position": "first",
+     "author": {
+      "id": "https://openalex.org/A5035685387",
+      "display_name": "Dominique d’Humières",
+      "orcid": null,
+      "observed_orcids": []
+     },
+     "institutions": [
+      {
+       "id": "https://openalex.org/I29607241",
+       "display_name": "École Normale Supérieure - PSL",
+       "ror": "https://ror.org/05a0dhs15",
+       "country_code": "FR",
+       "type": "other",
+       "lineage": [
+        "https://openalex.org/I2746051580",
+        "https://openalex.org/I29607241"
+       ]
+      }
+     ],
+     "countries": [
+      "FR"
+     ],
+     "is_corresponding": false,
+     "raw_author_name": "D. D'Humieres",
+     "raw_affiliation_strings": [
+      "Groupe de Physique des Solides, Ecole Normale Superieure, 24 rue Lhomond, 75231 Paris, Cedex 05, France",
+      "Groupe de Physique des Solides, Ecole Normale Supérieure 24, rue Lhomond 75231 Paris cedex 05, France"
+     ],
+     "raw_orcid": null,
+     "affiliations": [
+      {
+       "raw_affiliation_string": "Groupe de Physique des Solides, Ecole Normale Superieure, 24 rue Lhomond, 75231 Paris, Cedex 05, France",
+       "institution_ids": [
+        "https://openalex.org/I29607241"
+       ]
+      },
+      {
+       "raw_affiliation_string": "Groupe de Physique des Solides, Ecole Normale Supérieure 24, rue Lhomond 75231 Paris cedex 05, France",
+       "institution_ids": [
+        "https://openalex.org/I29607241"
+       ]
+      }
+     ]
+    },
+    {
+     "author_position": "middle",
+     "author": {
+      "id": "https://openalex.org/A5103153752",
+      "display_name": "M. R. Beasley",
+      "orcid": "https://orcid.org/0009-0006-6279-8144",
+      "observed_orcids": [
+       "https://orcid.org/0009-0006-6279-8144"
+      ]
+     },
+     "institutions": [
+      {
+       "id": "https://openalex.org/I29607241",
+       "display_name": "École Normale Supérieure - PSL",
+       "ror": "https://ror.org/05a0dhs15",
+       "country_code": "FR",
+       "type": "other",
+       "lineage": [
+        "https://openalex.org/I2746051580",
+        "https://openalex.org/I29607241"
+       ]
+      }
+     ],
+     "countries": [
+      "FR"
+     ],
+     "is_corresponding": false,
+     "raw_author_name": "M. R. Beasley",
+     "raw_affiliation_strings": [
+      "Groupe de Physique des Solides, Ecole Normale Superieure, 24 rue Lhomond, 75231 Paris, Cedex 05, France",
+      "Groupe de Physique des Solides, Ecole Normale Supérieure 24, rue Lhomond 75231 Paris cedex 05, France"
+     ],
+     "raw_orcid": null,
+     "affiliations": [
+      {
+       "raw_affiliation_string": "Groupe de Physique des Solides, Ecole Normale Superieure, 24 rue Lhomond, 75231 Paris, Cedex 05, France",
+       "institution_ids": [
+        "https://openalex.org/I29607241"
+       ]
+      },
+      {
+       "raw_affiliation_string": "Groupe de Physique des Solides, Ecole Normale Supérieure 24, rue Lhomond 75231 Paris cedex 05, France",
+       "institution_ids": [
+        "https://openalex.org/I29607241"
+       ]
+      }
+     ]
+    },
+    {
+     "author_position": "middle",
+     "author": {
+      "id": "https://openalex.org/A5114406750",
+      "display_name": "Bernardo A. Huberman",
+      "orcid": "https://orcid.org/0000-0002-6783-0864",
+      "observed_orcids": [
+       "https://orcid.org/0000-0002-6783-0864"
+      ]
+     },
+     "institutions": [
+      {
+       "id": "https://openalex.org/I29607241",
+       "display_name": "École Normale Supérieure - PSL",
+       "ror": "https://ror.org/05a0dhs15",
+       "country_code": "FR",
+       "type": "other",
+       "lineage": [
+        "https://openalex.org/I2746051580",
+        "https://openalex.org/I29607241"
+       ]
+      }
+     ],
+     "countries": [
+      "FR"
+     ],
+     "is_corresponding": false,
+     "raw_author_name": "B. A. Huberman",
+     "raw_affiliation_strings": [
+      "Groupe de Physique des Solides, Ecole Normale Superieure, 24 rue Lhomond, 75231 Paris, Cedex 05, France",
+      "Groupe de Physique des Solides, Ecole Normale Supérieure 24, rue Lhomond 75231 Paris cedex 05, France"
+     ],
+     "raw_orcid": null,
+     "affiliations": [
+      {
+       "raw_affiliation_string": "Groupe de Physique des Solides, Ecole Normale Superieure, 24 rue Lhomond, 75231 Paris, Cedex 05, France",
+       "institution_ids": [
+        "https://openalex.org/I29607241"
+       ]
+      },
+      {
+       "raw_affiliation_string": "Groupe de Physique des Solides, Ecole Normale Supérieure 24, rue Lhomond 75231 Paris cedex 05, France",
+       "institution_ids": [
+        "https://openalex.org/I29607241"
+       ]
+      }
+     ]
+    },
+    {
+     "author_position": "last",
+     "author": {
+      "id": "https://openalex.org/A5066230869",
+      "display_name": "Albert J. Libchaber",
+      "orcid": "https://orcid.org/0009-0004-7874-9326",
+      "observed_orcids": [
+       "https://orcid.org/0009-0004-7874-9326"
+      ]
+     },
+     "institutions": [
+      {
+       "id": "https://openalex.org/I29607241",
+       "display_name": "École Normale Supérieure - PSL",
+       "ror": "https://ror.org/05a0dhs15",
+       "country_code": "FR",
+       "type": "other",
+       "lineage": [
+        "https://openalex.org/I2746051580",
+        "https://openalex.org/I29607241"
+       ]
+      }
+     ],
+     "countries": [
+      "FR"
+     ],
+     "is_corresponding": false,
+     "raw_author_name": "A. Libchaber",
+     "raw_affiliation_strings": [
+      "Groupe de Physique des Solides, Ecole Normale Superieure, 24 rue Lhomond, 75231 Paris, Cedex 05, France",
+      "Groupe de Physique des Solides, Ecole Normale Supérieure 24, rue Lhomond 75231 Paris cedex 05, France"
+     ],
+     "raw_orcid": null,
+     "affiliations": [
+      {
+       "raw_affiliation_string": "Groupe de Physique des Solides, Ecole Normale Superieure, 24 rue Lhomond, 75231 Paris, Cedex 05, France",
+       "institution_ids": [
+        "https://openalex.org/I29607241"
+       ]
+      },
+      {
+       "raw_affiliation_string": "Groupe de Physique des Solides, Ecole Normale Supérieure 24, rue Lhomond 75231 Paris cedex 05, France",
+       "institution_ids": [
+        "https://openalex.org/I29607241"
+       ]
+      }
+     ]
+    }
+   ],
+   "primary_location": {
+    "id": "doi:10.1103/physreva.26.3483",
+    "doi": "https://doi.org/10.1103/physreva.26.3483",
+    "is_oa": false,
+    "landing_page_url": "https://doi.org/10.1103/physreva.26.3483",
+    "pdf_url": null,
+    "source": {
+     "id": "https://openalex.org/S164566984",
+     "display_name": "Physical Review A",
+     "issn_l": "0556-2791",
+     "issn": [
+      "0556-2791",
+      "1050-2947",
+      "1094-1622",
+      "1538-4446",
+      "2469-9926",
+      "2469-9934",
+      "2469-9942"
+     ],
+     "is_oa": false,
+     "is_in_doaj": false,
+     "is_core": true,
+     "listed_in": [
+      "anvur-scientific",
+      "cwts-core",
+      "dongbi-a",
+      "jufo-2",
+      "ki-jl-1",
+      "norway-2",
+      "poland-100",
+      "poland-70",
+      "russia-white-list-1",
+      "vabb-shw"
+     ],
+     "host_organization": "https://openalex.org/P4310320261",
+     "host_organization_name": "American Physical Society",
+     "host_organization_lineage": [
+      "https://openalex.org/P4310320261"
+     ],
+     "host_organization_lineage_names": [
+      "American Physical Society"
+     ],
+     "type": "journal"
+    },
+    "license": null,
+    "license_id": null,
+    "version": "publishedVersion",
+    "is_accepted": true,
+    "is_published": true,
+    "raw_source_name": "Physical Review A",
+    "raw_type": "journal-article"
+   },
+   "biblio": {
+    "volume": "26",
+    "issue": "6",
+    "first_page": "3483",
+    "last_page": "3496"
+   },
+   "best_oa_location": null,
+   "topics": [
+    {
+     "id": "https://openalex.org/T10244",
+     "display_name": "Chaos control and synchronization",
+     "score": 0.9829000234603882,
+     "subfield": {
+      "id": "https://openalex.org/subfields/3109",
+      "display_name": "Statistical and Nonlinear Physics"
+     },
+     "field": {
+      "id": "https://openalex.org/fields/31",
+      "display_name": "Physics and Astronomy"
+     },
+     "domain": {
+      "id": "https://openalex.org/domains/3",
+      "display_name": "Physical Sciences"
+     }
+    },
+    {
+     "id": "https://openalex.org/T10588",
+     "display_name": "Mathematical Dynamics and Fractals",
+     "score": 0.014299999922513962,
+     "subfield": {
+      "id": "https://openalex.org/subfields/2610",
+      "display_name": "Mathematical Physics"
+     },
+     "field": {
+      "id": "https://openalex.org/fields/26",
+      "display_name": "Mathematics"
+     },
+     "domain": {
+      "id": "https://openalex.org/domains/3",
+      "display_name": "Physical Sciences"
+     }
+    },
+    {
+     "id": "https://openalex.org/T11261",
+     "display_name": "Quantum chaos and dynamical systems",
+     "score": 0.000699999975040555,
+     "subfield": {
+      "id": "https://openalex.org/subfields/3109",
+      "display_name": "Statistical and Nonlinear Physics"
+     },
+     "field": {
+      "id": "https://openalex.org/fields/31",
+      "display_name": "Physics and Astronomy"
+     },
+     "domain": {
+      "id": "https://openalex.org/domains/3",
+      "display_name": "Physical Sciences"
+     }
+    }
+   ],
+   "keywords": [
+    {
+     "id": "https://openalex.org/keywords/driven-pendulum",
+     "display_name": "driven pendulum",
+     "score": 0.8429999947547913
+    },
+    {
+     "id": "https://openalex.org/keywords/chaos",
+     "display_name": "chaos",
+     "score": 0.5879999995231628
+    },
+    {
+     "id": "https://openalex.org/keywords/routes-to-chaos",
+     "display_name": "route to chaos",
+     "score": 0.9869999885559082
+    },
+    {
+     "id": "https://openalex.org/keywords/phase-locked-states",
+     "display_name": "phase-locked states",
+     "score": 0.7549999952316284
+    },
+    {
+     "id": "https://openalex.org/keywords/symmetry-breaking",
+     "display_name": "symmetry breaking",
+     "score": 0.8600000143051147
+    },
+    {
+     "id": "https://openalex.org/keywords/bifurcation-cascade",
+     "display_name": "bifurcation cascade",
+     "score": 0.8650000095367432
+    },
+    {
+     "id": "https://openalex.org/keywords/intermittency",
+     "display_name": "intermittency",
+     "score": 0.8180000185966492
+    },
+    {
+     "id": "https://openalex.org/keywords/quality-factor",
+     "display_name": "quality factor",
+     "score": 0.7739999890327454
+    },
+    {
+     "id": "https://openalex.org/keywords/nonlinear-dynamics",
+     "display_name": "nonlinear dynamics",
+     "score": 0.5329999923706055
+    }
+   ],
+   "abstract_inverted_index": {
+    "An": [
+     0
+    ],
+    "experimental": [
+     1
+    ],
+    "study": [
+     2
+    ],
+    "of": [
+     3,
+     29,
+     58,
+     66,
+     78,
+     81,
+     117
+    ],
+    "the": [
+     4,
+     8,
+     13,
+     30,
+     36,
+     46,
+     64,
+     67,
+     99,
+     114,
+     118
+    ],
+    "chaotic": [
+     5,
+     37
+    ],
+    "states": [
+     6,
+     71,
+     116,
+     136
+    ],
+    "and": [
+     7,
+     61,
+     63,
+     74
+    ],
+    "routes": [
+     9
+    ],
+    "to": [
+     10,
+     41,
+     91,
+     98,
+     109
+    ],
+    "chaos": [
+     11,
+     68,
+     82
+    ],
+    "in": [
+     12,
+     44,
+     69,
+     76,
+     83,
+     113,
+     126
+    ],
+    "driven": [
+     14,
+     87
+    ],
+    "pendulum": [
+     15,
+     88
+    ],
+    "as": [
+     16,
+     55,
+     95
+    ],
+    "simulated": [
+     17
+    ],
+    "by": [
+     18
+    ],
+    "a": [
+     19,
+     26,
+     56,
+     96
+    ],
+    "phase-locked-loop": [
+     20
+    ],
+    "electronic": [
+     21
+    ],
+    "circuit": [
+     22
+    ],
+    "is": [
+     23,
+     39,
+     53,
+     72,
+     89,
+     107,
+     137
+    ],
+    "presented.": [
+     24
+    ],
+    "For": [
+     25
+    ],
+    "particular": [
+     27
+    ],
+    "value": [
+     28
+    ],
+    "quality": [
+     31
+    ],
+    "factor": [
+     32
+    ],
+    "($Q=4$),": [
+     33
+    ],
+    "for": [
+     34,
+     102
+    ],
+    "which": [
+     35
+    ],
+    "behavior": [
+     38,
+     131
+    ],
+    "found": [
+     40,
+     90,
+     108
+    ],
+    "be": [
+     42,
+     110
+    ],
+    "rich": [
+     43
+    ],
+    "structure,": [
+     45
+    ],
+    "state": [
+     47
+    ],
+    "diagram": [
+     48
+    ],
+    "(phase": [
+     49
+    ],
+    "locked": [
+     50
+    ],
+    "or": [
+     51
+    ],
+    "unlocked)": [
+     52
+    ],
+    "established": [
+     54
+    ],
+    "function": [
+     57
+    ],
+    "driving": [
+     59
+    ],
+    "frequency": [
+     60
+    ],
+    "amplitude,": [
+     62
+    ],
+    "nature": [
+     65
+    ],
+    "these": [
+     70
+    ],
+    "investigated": [
+     73
+    ],
+    "discussed": [
+     75
+    ],
+    "light": [
+     77
+    ],
+    "recent": [
+     79
+    ],
+    "models": [
+     80
+    ],
+    "dynamical": [
+     84
+    ],
+    "systems.": [
+     85
+    ],
+    "The": [
+     86
+    ],
+    "exhibit": [
+     92
+    ],
+    "symmetry": [
+     93
+    ],
+    "breaking": [
+     94
+    ],
+    "precursor": [
+     97
+    ],
+    "period-doubling": [
+     100
+    ],
+    "route": [
+     101
+    ],
+    "chaos.": [
+     103
+    ],
+    "Although": [
+     104
+    ],
+    "period": [
+     105
+    ],
+    "doubling": [
+     106
+    ],
+    "fairly": [
+     111
+    ],
+    "common": [
+     112
+    ],
+    "phase-locked": [
+     115,
+     135
+    ],
+    "pendulum,": [
+     119
+    ],
+    "it": [
+     120
+    ],
+    "does": [
+     121
+    ],
+    "not": [
+     122
+    ],
+    "always": [
+     123
+    ],
+    "manifest": [
+     124
+    ],
+    "itself": [
+     125
+    ],
+    "complete": [
+     127
+    ],
+    "bifurcation": [
+     128
+    ],
+    "cascades.": [
+     129
+    ],
+    "Intermittent": [
+     130
+    ],
+    "between": [
+     132
+    ],
+    "two": [
+     133
+    ],
+    "unstable": [
+     134
+    ],
+    "also": [
+     138
+    ],
+    "commonly": [
+     139
+    ],
+    "observed.": [
+     140
+    ]
+   }
+  },
+  {
+   "id": "https://openalex.org/W2160316505",
+   "doi": "https://doi.org/10.1007/s10778-011-0483-9",
+   "title": "Estimating the chaos boundaries of a double pendulum",
+   "relevance_score": 30.37848,
+   "publication_year": 2011,
+   "language": "en",
+   "type": "article",
+   "open_access": {
+    "is_oa": false,
+    "oa_status": "closed",
+    "oa_url": null,
+    "any_repository_has_fulltext": false
+   },
+   "cited_by_count": 3,
+   "is_retracted": false,
+   "authorships": [
+    {
+     "author_position": "first",
+     "author": {
+      "id": "https://openalex.org/A5110666432",
+      "display_name": "Н. В. Никитина",
+      "orcid": null,
+      "observed_orcids": []
+     },
+     "institutions": [
+      {
+       "id": "https://openalex.org/I149851306",
+       "display_name": "National Academy of Sciences of Ukraine",
+       "ror": "https://ror.org/00je4t102",
+       "country_code": "UA",
+       "type": "government",
+       "lineage": [
+        "https://openalex.org/I149851306"
+       ]
+      },
+      {
+       "id": "https://openalex.org/I4210157439",
+       "display_name": "S.P. Timoshenko Institute of Mechanics",
+       "ror": "https://ror.org/05fm1bt30",
+       "country_code": "UA",
+       "type": "facility",
+       "lineage": [
+        "https://openalex.org/I149851306",
+        "https://openalex.org/I4210157439"
+       ]
+      }
+     ],
+     "countries": [
+      "UA"
+     ],
+     "is_corresponding": true,
+     "raw_author_name": "N. V. Nikitina",
+     "raw_affiliation_strings": [
+      "S. P. Timoshenko Institute of Mechanics, National Academy of Sciences of Ukraine, 3 Nesterov St., Kyiv, Ukraine, 03057",
+      "S. P. Timoshenko Institute of Mechanics, National Academy of Sciences of Ukraine, Kyiv, Ukraine"
+     ],
+     "raw_orcid": null,
+     "affiliations": [
+      {
+       "raw_affiliation_string": "S. P. Timoshenko Institute of Mechanics, National Academy of Sciences of Ukraine, 3 Nesterov St., Kyiv, Ukraine, 03057",
+       "institution_ids": [
+        "https://openalex.org/I149851306",
+        "https://openalex.org/I4210157439"
+       ]
+      },
+      {
+       "raw_affiliation_string": "S. P. Timoshenko Institute of Mechanics, National Academy of Sciences of Ukraine, Kyiv, Ukraine",
+       "institution_ids": [
+        "https://openalex.org/I149851306",
+        "https://openalex.org/I4210157439"
+       ]
+      }
+     ]
+    }
+   ],
+   "primary_location": {
+    "id": "doi:10.1007/s10778-011-0483-9",
+    "doi": "https://doi.org/10.1007/s10778-011-0483-9",
+    "is_oa": false,
+    "landing_page_url": "https://doi.org/10.1007/s10778-011-0483-9",
+    "pdf_url": null,
+    "source": {
+     "id": "https://openalex.org/S202340841",
+     "display_name": "International Applied Mechanics",
+     "issn_l": "0038-5298",
+     "issn": [
+      "0038-5298",
+      "1063-7095",
+      "1573-8582"
+     ],
+     "is_oa": false,
+     "is_in_doaj": false,
+     "is_core": false,
+     "listed_in": [
+      "dongbi-c",
+      "jufo-1",
+      "norway-1",
+      "poland-70",
+      "russia-white-list-3"
+     ],
+     "host_organization": "https://openalex.org/P4310319900",
+     "host_organization_name": "Springer Science+Business Media",
+     "host_organization_lineage": [
+      "https://openalex.org/P4310319900",
+      "https://openalex.org/P4310319965"
+     ],
+     "host_organization_lineage_names": [
+      "Springer Science+Business Media",
+      "Springer Nature"
+     ],
+     "type": "journal"
+    },
+    "license": null,
+    "license_id": null,
+    "version": "publishedVersion",
+    "is_accepted": true,
+    "is_published": true,
+    "raw_source_name": "International Applied Mechanics",
+    "raw_type": "journal-article"
+   },
+   "biblio": {
+    "volume": "47",
+    "issue": "5",
+    "first_page": "600",
+    "last_page": "606"
+   },
+   "best_oa_location": null,
+   "topics": [
+    {
+     "id": "https://openalex.org/T10588",
+     "display_name": "Mathematical Dynamics and Fractals",
+     "score": 0.7681000232696533,
+     "subfield": {
+      "id": "https://openalex.org/subfields/2610",
+      "display_name": "Mathematical Physics"
+     },
+     "field": {
+      "id": "https://openalex.org/fields/26",
+      "display_name": "Mathematics"
+     },
+     "domain": {
+      "id": "https://openalex.org/domains/3",
+      "display_name": "Physical Sciences"
+     }
+    },
+    {
+     "id": "https://openalex.org/T10244",
+     "display_name": "Chaos control and synchronization",
+     "score": 0.14560000598430634,
+     "subfield": {
+      "id": "https://openalex.org/subfields/3109",
+      "display_name": "Statistical and Nonlinear Physics"
+     },
+     "field": {
+      "id": "https://openalex.org/fields/31",
+      "display_name": "Physics and Astronomy"
+     },
+     "domain": {
+      "id": "https://openalex.org/domains/3",
+      "display_name": "Physical Sciences"
+     }
+    },
+    {
+     "id": "https://openalex.org/T11261",
+     "display_name": "Quantum chaos and dynamical systems",
+     "score": 0.03009999915957451,
+     "subfield": {
+      "id": "https://openalex.org/subfields/3109",
+      "display_name": "Statistical and Nonlinear Physics"
+     },
+     "field": {
+      "id": "https://openalex.org/fields/31",
+      "display_name": "Physics and Astronomy"
+     },
+     "domain": {
+      "id": "https://openalex.org/domains/3",
+      "display_name": "Physical Sciences"
+     }
+    }
+   ],
+   "keywords": [
+    {
+     "id": "https://openalex.org/keywords/double-pendulum",
+     "display_name": "double pendulum",
+     "score": 1.0
+    },
+    {
+     "id": "https://openalex.org/keywords/lyapunov-exponents",
+     "display_name": "Lyapunov exponents",
+     "score": 0.9110000133514404
+    },
+    {
+     "id": "https://openalex.org/keywords/orbital-stability",
+     "display_name": "orbital stability",
+     "score": 0.828000009059906
+    },
+    {
+     "id": "https://openalex.org/keywords/stochastic-motion",
+     "display_name": "stochastic motion",
+     "score": 0.8360000252723694
+    },
+    {
+     "id": "https://openalex.org/keywords/bifurcation",
+     "display_name": "bifurcation",
+     "score": 0.9240000247955322
+    },
+    {
+     "id": "https://openalex.org/keywords/chaotic-dynamics",
+     "display_name": "chaotic dynamics",
+     "score": 0.5580000281333923
+    },
+    {
+     "id": "https://openalex.org/keywords/nonlinear-oscillations",
+     "display_name": "nonlinear oscillations",
+     "score": 0.460999995470047
+    }
+   ],
+   "abstract_inverted_index": null
+  },
+  {
+   "id": "https://openalex.org/W7204512652",
+   "doi": null,
+   "title": "The physical double pendulum : order and chaos",
+   "relevance_score": 30.238197,
+   "publication_year": 2026,
+   "language": "el",
+   "type": "article",
+   "open_access": {
+    "is_oa": false,
+    "oa_status": "closed",
+    "oa_url": null,
+    "any_repository_has_fulltext": false
+   },
+   "cited_by_count": 0,
+   "is_retracted": false,
+   "authorships": [
+    {
+     "author_position": "first",
+     "author": {
+      "id": null,
+      "display_name": "Καραγκούνης, Παναγιώτης",
+      "orcid": null,
+      "observed_orcids": []
+     },
+     "institutions": [],
+     "countries": [],
+     "is_corresponding": true,
+     "raw_author_name": "Καραγκούνης, Παναγιώτης",
+     "raw_affiliation_strings": [],
+     "raw_orcid": null,
+     "affiliations": []
+    }
+   ],
+   "primary_location": {
+    "id": "pmh:oai:nemertes.library.upatras.gr:10889/32683",
+    "doi": null,
+    "is_oa": false,
+    "landing_page_url": "https://hdl.handle.net/10889/32683",
+    "pdf_url": null,
+    "source": {
+     "id": "https://openalex.org/S7407055135",
+     "display_name": "Νημερτής",
+     "issn_l": null,
+     "issn": null,
+     "is_oa": false,
+     "is_in_doaj": false,
+     "is_core": false,
+     "listed_in": [],
+     "host_organization": null,
+     "host_organization_name": null,
+     "host_organization_lineage": [],
+     "host_organization_lineage_names": [],
+     "type": "repository"
+    },
+    "license": null,
+    "license_id": null,
+    "version": "submittedVersion",
+    "is_accepted": false,
+    "is_published": false,
+    "raw_source_name": null,
+    "raw_type": null
+   },
+   "biblio": {
+    "volume": null,
+    "issue": null,
+    "first_page": null,
+    "last_page": null
+   },
+   "best_oa_location": null,
+   "topics": [
+    {
+     "id": "https://openalex.org/T10588",
+     "display_name": "Mathematical Dynamics and Fractals",
+     "score": 0.6772000193595886,
+     "subfield": {
+      "id": "https://openalex.org/subfields/2610",
+      "display_name": "Mathematical Physics"
+     },
+     "field": {
+      "id": "https://openalex.org/fields/26",
+      "display_name": "Mathematics"
+     },
+     "domain": {
+      "id": "https://openalex.org/domains/3",
+      "display_name": "Physical Sciences"
+     }
+    },
+    {
+     "id": "https://openalex.org/T10244",
+     "display_name": "Chaos control and synchronization",
+     "score": 0.11460000276565552,
+     "subfield": {
+      "id": "https://openalex.org/subfields/3109",
+      "display_name": "Statistical and Nonlinear Physics"
+     },
+     "field": {
+      "id": "https://openalex.org/fields/31",
+      "display_name": "Physics and Astronomy"
+     },
+     "domain": {
+      "id": "https://openalex.org/domains/3",
+      "display_name": "Physical Sciences"
+     }
+    },
+    {
+     "id": "https://openalex.org/T11394",
+     "display_name": "Dynamics and Control of Mechanical Systems",
+     "score": 0.06620000302791595,
+     "subfield": {
+      "id": "https://openalex.org/subfields/2207",
+      "display_name": "Control and Systems Engineering"
+     },
+     "field": {
+      "id": "https://openalex.org/fields/22",
+      "display_name": "Engineering"
+     },
+     "domain": {
+      "id": "https://openalex.org/domains/3",
+      "display_name": "Physical Sciences"
+     }
+    }
+   ],
+   "keywords": [
+    {
+     "id": "https://openalex.org/keywords/double-pendulum",
+     "display_name": "double pendulum",
+     "score": 0.8429999947547913
+    },
+    {
+     "id": "https://openalex.org/keywords/phase-space",
+     "display_name": "phase space",
+     "score": 0.5509999990463257
+    },
+    {
+     "id": "https://openalex.org/keywords/order-and-chaos",
+     "display_name": "order and chaos",
+     "score": 0.6819999814033508
+    },
+    {
+     "id": "https://openalex.org/keywords/nonlinear-dynamics",
+     "display_name": "nonlinear dynamics",
+     "score": 0.5299999713897705
+    },
+    {
+     "id": "https://openalex.org/keywords/euler-lagrange-equations",
+     "display_name": "Euler-Lagrange equations",
+     "score": 0.7289999723434448
+    },
+    {
+     "id": "https://openalex.org/keywords/chaotic-dynamics",
+     "display_name": "chaotic dynamics",
+     "score": 0.37400001287460327
+    },
+    {
+     "id": "https://openalex.org/keywords/periodic-orbits",
+     "display_name": "periodic orbits",
+     "score": 0.4950000047683716
+    },
+    {
+     "id": "https://openalex.org/keywords/stability-of-equilibrium",
+     "display_name": "equilibrium stability",
+     "score": 0.421999990940094
+    },
+    {
+     "id": "https://openalex.org/keywords/lyapunov-exponents",
+     "display_name": "Lyapunov exponents",
+     "score": 0.6299999952316284
+    },
+    {
+     "id": "https://openalex.org/keywords/poincare-sections",
+     "display_name": "Poincaré sections",
+     "score": 0.6970000267028809
+    },
+    {
+     "id": "https://openalex.org/keywords/bifurcation",
+     "display_name": "bifurcation",
+     "score": 0.4350000023841858
+    },
+    {
+     "id": "https://openalex.org/keywords/poincare-bendixson-theorem",
+     "display_name": "Poincaré-Bendixson theorem",
+     "score": 0.7080000042915344
+    },
+    {
+     "id": "https://openalex.org/keywords/strange-attractors",
+     "display_name": "chaotic attractors",
+     "score": 0.4490000009536743
+    },
+    {
+     "id": "https://openalex.org/keywords/lyapunov-dimension",
+     "display_name": "Lyapunov dimension",
+     "score": 0.46000000834465027
+    },
+    {
+     "id": "https://openalex.org/keywords/fractal-dimension",
+     "display_name": "fractal dimension",
+     "score": 0.45399999618530273
+    },
+    {
+     "id": "https://openalex.org/keywords/lyapunov-spectrum",
+     "display_name": "Lyapunov spectrum",
+     "score": 0.4819999933242798
+    }
+   ],
+   "abstract_inverted_index": {
+    "Στην": [
+     0
+    ],
+    "παρούσα": [
+     1
+    ],
+    "διπλωματική": [
+     2
+    ],
+    "εργασία": [
+     3
+    ],
+    "επικεντρωνόμαστε": [
+     4
+    ],
+    "στη": [
+     5,
+     52,
+     69
+    ],
+    "μελέτη": [
+     6
+    ],
+    "της": [
+     7,
+     21,
+     113,
+     146
+    ],
+    "δυναμικής": [
+     8
+    ],
+    "του-φυσικού": [
+     9
+    ],
+    "διπλού": [
+     10,
+     57,
+     160
+    ],
+    "εκκρεμούς": [
+     11,
+     161
+    ],
+    "στον": [
+     12,
+     162
+    ],
+    "χώρο": [
+     13,
+     163
+    ],
+    "των": [
+     14,
+     122,
+     138,
+     164
+    ],
+    "φάσεων,": [
+     15
+    ],
+    "ενός": [
+     16
+    ],
+    "συστήματος": [
+     17
+    ],
+    "που": [
+     18,
+     152
+    ],
+    "συνδυάζει": [
+     19
+    ],
+    "την-απλότητα": [
+     20
+    ],
+    "κλασικής": [
+     22
+    ],
+    "μηχανικής": [
+     23
+    ],
+    "με": [
+     24,
+     124,
+     154
+    ],
+    "τη": [
+     25,
+     117,
+     136,
+     141
+    ],
+    "σύνθετη,": [
+     26
+    ],
+    "μη": [
+     27
+    ],
+    "γραμμική": [
+     28
+    ],
+    "συμπεριφορά.": [
+     29
+    ],
+    "Για": [
+     30,
+     66
+    ],
+    "τον-σκοπό": [
+     31
+    ],
+    "αυτό,": [
+     32
+    ],
+    "εφαρμόζεται": [
+     33
+    ],
+    "ο": [
+     34
+    ],
+    "φορμαλισμός": [
+     35
+    ],
+    "Euler–Lagrange,": [
+     36
+    ],
+    "μέσω": [
+     37
+    ],
+    "του": [
+     38,
+     55,
+     71,
+     115,
+     128,
+     158
+    ],
+    "οποίου": [
+     39
+    ],
+    "προκύπτουν": [
+     40,
+     148
+    ],
+    "οι-εξισώσεις": [
+     41
+    ],
+    "κίνησης": [
+     42
+    ],
+    "και": [
+     43,
+     86,
+     105,
+     119,
+     140,
+     150
+    ],
+    "διαμορφώνεται": [
+     44
+    ],
+    "το": [
+     45,
+     82,
+     95,
+     120
+    ],
+    "αντίστοιχο": [
+     46
+    ],
+    "δυναμικό": [
+     47
+    ],
+    "σύστημα.": [
+     48
+    ],
+    "Η": [
+     49
+    ],
+    "ανάλυση": [
+     50
+    ],
+    "εστιάζει": [
+     51
+    ],
+    "διπλή": [
+     53
+    ],
+    "φύση": [
+     54
+    ],
+    "φυσικού": [
+     56,
+     159
+    ],
+    "εκκρεμούς,": [
+     58
+    ],
+    "εξετάζοντας": [
+     59
+    ],
+    "τη-μετάβαση": [
+     60
+    ],
+    "από": [
+     61,
+     94
+    ],
+    "την": [
+     62,
+     126,
+     155
+    ],
+    "τάξη": [
+     63
+    ],
+    "στο": [
+     64
+    ],
+    "χάος.": [
+     65
+    ],
+    "αρχικές": [
+     67,
+     91,
+     103
+    ],
+    "συνθήκες": [
+     68,
+     92,
+     104
+    ],
+    "γειτονιά": [
+     70
+    ],
+    "σταθερού": [
+     72
+    ],
+    "σημείου-(θ1,": [
+     73
+    ],
+    "θ2,": [
+     74
+    ],
+    "θ′1,": [
+     75
+    ],
+    "θ′2)": [
+     76
+    ],
+    "=": [
+     77
+    ],
+    "(0,": [
+     78
+    ],
+    "0,": [
+     79,
+     80
+    ],
+    "0),": [
+     81
+    ],
+    "σύστημα": [
+     83
+    ],
+    "παρουσιάζει": [
+     84
+    ],
+    "περιοδική": [
+     85
+    ],
+    "ευσταθής": [
+     87
+    ],
+    "δυναμική,": [
+     88
+    ],
+    "ενώ-όταν": [
+     89
+    ],
+    "οι": [
+     90,
+     132
+    ],
+    "απομακρύνονται": [
+     93
+    ],
+    "εν": [
+     96
+    ],
+    "λόγω": [
+     97
+    ],
+    "σταθερό": [
+     98
+    ],
+    "σημείο,": [
+     99
+    ],
+    "αναδεικνύεται-η": [
+     100
+    ],
+    "ευαισθησία": [
+     101
+    ],
+    "στις": [
+     102
+    ],
+    "η": [
+     106
+    ],
+    "εμφάνιση": [
+     107
+    ],
+    "χαοτικής": [
+     108
+    ],
+    "συμπεριφοράς.": [
+     109
+    ],
+    "Παράλληλα,": [
+     110
+    ],
+    "πραγματοποιούνται": [
+     111
+    ],
+    "συγκρίσεις": [
+     112
+    ],
+    "συμπεριφοράς": [
+     114
+    ],
+    "συστήματος-μεταβάλλοντας": [
+     116
+    ],
+    "μάζα": [
+     118
+    ],
+    "μήκος": [
+     121
+    ],
+    "ράβδων,": [
+     123
+    ],
+    "στόχο": [
+     125
+    ],
+    "κατανόηση": [
+     127
+    ],
+    "τρόπου": [
+     129
+    ],
+    "με-τον": [
+     130
+    ],
+    "οποίο": [
+     131
+    ],
+    "παράμετροι": [
+     133
+    ],
+    "αυτοί": [
+     134
+    ],
+    "επηρεάζουν": [
+     135
+    ],
+    "σταθερότητα": [
+     137
+    ],
+    "τροχιών": [
+     139
+    ],
+    "μετάβαση": [
+     142
+    ],
+    "στο-χάος.": [
+     143
+    ],
+    "Μέσω": [
+     144
+    ],
+    "αυτής": [
+     145
+    ],
+    "μελέτης,": [
+     147
+    ],
+    "συμπεράσματα": [
+     149
+    ],
+    "παρατηρήσεις": [
+     151
+    ],
+    "συνδέονται-άμεσα": [
+     153
+    ],
+    "περίπλοκη": [
+     156
+    ],
+    "δυναμική": [
+     157
+    ],
+    "φάσεων.": [
+     165
+    ]
+   }
+  }
+ ],
+ "group_by": []
+}

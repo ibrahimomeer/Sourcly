@@ -2,6 +2,7 @@ import { BM25_B, BM25_K1 } from "./bm25";
 import type { ResultFilters } from "./filters";
 import { FACTOR_IDS, FACTOR_LABELS, type FactorId, type ScoringSettings } from "./scoring";
 import type { SentQuery } from "./search";
+import { FEW_FULL_MATCHES, type LayoutSettings } from "./sections";
 import type { ProviderId, ProviderStatus } from "./types";
 
 // The search protocol: a plain JSON record of one search, so it can be written up, checked and
@@ -21,12 +22,20 @@ export interface ProtocolSearch {
   sentQueries: SentQuery[];
   /** How each source answered. */
   statuses: ProviderStatus[];
+  /** The expanded second pass, when it ran: what each source asked in it received, and how each answered. */
+  expandedPass: { sentQueries: SentQuery[]; statuses: ProviderStatus[] } | null;
   counts: {
     /** Records returned by all sources together, before duplicates were merged. */
     fetched: number;
     /** Distinct works after merging duplicates. */
     merged: number;
     shown: number;
+    /** Results kept apart as partial matches (they lack some of the query's terms). */
+    partialMatches: number;
+    /** Results kept apart because they are in a language that is not preferred. */
+    otherLanguages: number;
+    /** Results kept apart because they are datasets, theses, reports and other non-article types. */
+    otherTypes: number;
     hiddenByFilters: number;
   };
 }
@@ -43,6 +52,7 @@ export interface ProtocolInput {
   resultsPerSource: number;
   filters: ResultFilters;
   scoring: ScoringSettings;
+  layout: LayoutSettings;
   /** The sources the user saved to their list. */
   saved: readonly { title: string; doi: string | null; url: string | null }[];
 }
@@ -53,6 +63,13 @@ const copySearch = (search: ProtocolSearch) => ({
   commonWordsRemoved: [...search.commonWordsRemoved],
   sentQueries: search.sentQueries.map(({ provider, text, notes }) => ({ source: provider, query: text, notes: [...notes] })),
   statuses: search.statuses.map((status) => ({ ...status })),
+  expandedPass:
+    search.expandedPass === null
+      ? null
+      : {
+          sentQueries: search.expandedPass.sentQueries.map(({ provider, text, notes }) => ({ source: provider, query: text, notes: [...notes] })),
+          statuses: search.expandedPass.statuses.map((status) => ({ ...status })),
+        },
   counts: { ...search.counts },
 });
 
@@ -88,6 +105,12 @@ export function buildProtocol(input: ProtocolInput) {
       formula: "score = sum(weight * factor) / sum(weight), over the factors that are on; every factor is 0 to 1",
       relevance: `BM25 (k1 = ${BM25_K1}, b = ${BM25_B}) over title, abstract and subject terms of the merged results`,
       referenceYear: input.referenceYear,
+      // How term coverage decides the order: "all" (all terms first, partial matches apart), "coverage" or "ignore".
+      layout: {
+        preferredLanguages: [...input.layout.preferredLanguages],
+        showNonArticleTypes: input.layout.showNonArticleTypes,
+        fewFullMatches: FEW_FULL_MATCHES,
+      },
       recencyHalfLifeYears: input.scoring.recencyHalfLifeYears,
       preferredLevels: [...input.scoring.preferredLevels],
       factors,

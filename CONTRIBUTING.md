@@ -46,7 +46,7 @@ scripts/         the single-file build checker and the version tools.
 
 - TypeScript everywhere, no `any`. Keep dependencies minimal: ask before adding one.
 - **Never invent an API field or parameter.** Check the source's current official documentation, and check real behaviour (a real request, from a browser origin and from `file://`). Say what was checked and when in a comment or in `docs/methodology.md`.
-- Test fixtures are **real recorded responses**, never hand-written ones that pretend to be real. Scrub anything personal (researchers' email addresses become `redacted@example.org`). Hand-written test input is fine when it is clearly a small case.
+- Test fixtures are **real recorded responses**, never hand-written ones that pretend to be real. One provider's answers live in `packages/core/src/providers/__fixtures__/`; answers from several sources used together to test ranking live in `apps/web/src/__fixtures__/`, and the test that reads them says how they were recorded and which items were kept. Scrub anything personal (researchers' email addresses become `redacted@example.org`). Hand-written test input is fine when it is clearly a small case.
 - **No secrets and no personal data** in the repository: no API keys, no email addresses, no personal names beyond what is public metadata inside a recorded fixture. The copyright holder is "Sourcly".
 - Plain grayscale UI: no colours, gradients, shadows, animations or icon sets. Things are told apart by text and border style.
 - Anything that talks to a source must fail gracefully: one source failing never breaks the search, and its status is shown.

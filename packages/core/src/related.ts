@@ -31,7 +31,7 @@ export function relatedTerms(
   options: { limit?: number } = {},
 ): RelatedTerm[] {
   const limit = options.limit ?? 12;
-  const queryTokens = new Set(queryTerms.flatMap(tokenize));
+  const queryTokens = new Set(queryTerms.flatMap((term) => tokenize(term)));
   const found = new Map<string, { term: string; count: number; kinds: Set<SubjectKind> }>();
 
   for (const result of results) {

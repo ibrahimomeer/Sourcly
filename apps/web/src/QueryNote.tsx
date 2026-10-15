@@ -1,15 +1,15 @@
-import { PROVIDER_NAMES, type SentQuery } from "@sourcly/core";
+import { FEW_FULL_MATCHES, PROVIDER_NAMES, type SentQuery } from "@sourcly/core";
 import { droppedWords } from "./queryText";
 import type { ActiveSearch } from "./searchState";
 
 /** The exact text each source received, and what it could not apply, so nothing about the query is hidden. */
-export function SentQueries({ sent }: { sent: readonly SentQuery[] }) {
+export function SentQueries({ sent, title = "Queries sent", intro }: { sent: readonly SentQuery[]; title?: string; intro?: string }) {
   return (
     <details className="panel sent-queries">
-      <summary>Exact query sent to each source</summary>
+      <summary>{title}</summary>
       <p className="muted">
-        Sources read queries differently, so each one gets the same query written in the way it understands. This is the
-        text each one received.
+        {intro ??
+          "Sources read queries differently, so each one gets the same query written in the way it understands. This is the exact text each source received."}
       </p>
       <ul>
         {sent.map((entry) => (
@@ -29,18 +29,38 @@ export function SentQueries({ sent }: { sent: readonly SentQuery[] }) {
 }
 
 /** What was actually searched for: a note when common words were removed from the question, then the exact queries. */
-export function QueryNote({ search }: { search: ActiveSearch }) {
+export function QueryNote({ search, restorable = false }: { search: ActiveSearch; restorable?: boolean }) {
   const dropped = droppedWords(search.parsed);
 
   return (
     <div className="query-note">
-      {dropped.length > 0 && (
+      {search.parsed.exact === true && (
         <p>
-          Common words were removed from “{search.parsed.original}” ({dropped.join(", ")}). Searched for:{" "}
-          <strong>{search.query}</strong>. The box now shows these words, so you can edit them and search again.
+          Searched exactly as typed: <strong>{search.query}</strong>. Nothing was removed, and no operators were added.
+        </p>
+      )}
+      {search.parsed.exact !== true && dropped.length > 0 && (
+        <p>
+          Common words not used in “{search.parsed.original}”: {dropped.join(", ")}. Searched for:{" "}
+          <strong>{search.query}</strong>.
+          {restorable && " Click a dashed word under the search box to use one of them."}
         </p>
       )}
       <SentQueries sent={search.sent} />
+      {search.expansion !== null && (
+        <>
+          <p>
+            <strong>A second, expanded pass ran</strong>, because fewer than {FEW_FULL_MATCHES} results contained every word.
+            {search.expansion.phase === "searching" && " It is still running."} Its results are labelled “Expanded search:
+            not every word matched”.
+          </p>
+          <SentQueries
+            sent={search.expansion.sent}
+            title="Queries sent in the expanded pass"
+            intro="The expanded pass asks the sources that have a looser way of searching, with the same words and without requiring every word. This is the exact text each one received."
+          />
+        </>
+      )}
     </div>
   );
 }

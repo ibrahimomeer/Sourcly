@@ -149,7 +149,7 @@ export function createSemanticScholarProvider(options: SemanticScholarOptions = 
     id: "semanticscholar",
     name: "Semantic Scholar",
     // Its relevance search takes plain text: no query syntax is supported (per its API docs).
-    syntax: "plain",
+    syntax: "plain-spaced",
 
     async search(query: string, { limit, signal }: SearchOptions): Promise<Result[]> {
       const searchText = query.trim();

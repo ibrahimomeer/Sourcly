@@ -3,11 +3,17 @@ import {
   FACTOR_LABELS,
   PEER_REVIEW_STATUSES,
   SOURCE_LEVELS,
+  STOPWORDS,
+  UNKNOWN_LANGUAGE,
+  defaultFilters,
   defaultScoringSettings,
   isFiltering,
+  languageName,
   type FactorId,
+  type LanguageCount,
   type ProviderId,
   type ResultFilters,
+  type LayoutSettings,
   type ScoringSettings,
 } from "@sourcly/core";
 import { maskApiKey } from "./apiKey";
@@ -21,6 +27,10 @@ const OPENALEX_KEY_URL = "https://openalex.org/settings/api";
 const FACTOR_HELP: Record<FactorId, string> = {
   relevance:
     "BM25, a standard word-matching formula, over each result's title, abstract and subject terms, worked out on all the results fetched. Rarer words count for more. The best match scores 1.",
+  termCoverage:
+    "How many of your search's words and phrases the result contains, and where: a term in the title counts 1, in the author keywords 0.8, only in the abstract 0.6. Averaged over your terms. Topic tags and the journal name are not read.",
+  phraseMatch:
+    "Words that are next to each other in your search, found next to each other in the same order: in the title counts 1, in the abstract 0.7. Neutral (0.5) when your search has no two such words.",
   citations: "Citations per year since publication, compared with the other results.",
   recency: "Newer publications score higher. The score halves every “half-life”.",
   peerReview: "Likely peer-reviewed scores 1, unknown 0.5, not peer-reviewed 0.",
@@ -35,6 +45,11 @@ export interface SettingsPanelProps {
   onScoringChange: (scoring: ScoringSettings) => void;
   filters: ResultFilters;
   onFiltersChange: (filters: ResultFilters) => void;
+  /** How results are sectioned: preferred languages, and whether non-article types are in the main list. */
+  layout: LayoutSettings;
+  onLayoutChange: (layout: LayoutSettings) => void;
+  /** The languages of the results on the page, with how many each has; empty before a search. */
+  languageOptions: readonly LanguageCount[];
   enabledProviders: readonly ProviderId[];
   onToggleProvider: (id: ProviderId) => void;
   /** How many results each source is asked for. */
@@ -57,7 +72,9 @@ export function SettingsPanel(props: SettingsPanelProps) {
       <div id="settings-panel" className="settings-panel" hidden={!props.open}>
         <SourcesSection {...props} />
         <RankingSection {...props} />
+        <LayoutSection {...props} />
         <FiltersSection {...props} />
+        <CommonWordsSection />
         <ApiKeySection {...props} />
       </div>
     </div>
@@ -126,7 +143,8 @@ function RankingSection({ scoring, onScoringChange }: SettingsPanelProps) {
       <legend>Ranking weights</legend>
       <p className="muted">
         Results re-rank instantly, without searching again. Score = sum of (weight × factor) ÷ sum of weights, over the
-        factors that are on.
+        factors that are on. The score is used after two things that always come first: how many of your words a result
+        contains, and whether they appear next to each other.
       </p>
 
       {FACTOR_IDS.map((id) => {
@@ -200,6 +218,53 @@ function RankingSection({ scoring, onScoringChange }: SettingsPanelProps) {
   );
 }
 
+function LayoutSection({ layout, onLayoutChange, languageOptions }: SettingsPanelProps) {
+  // English is always offered, and so is every language a result was detected in, and every one already chosen.
+  const options = languageOptions.some((option) => option.code === "en")
+    ? languageOptions
+    : [{ code: "en", name: languageName("en"), count: 0 }, ...languageOptions];
+  return (
+    <fieldset>
+      <legend>Results layout</legend>
+      <p className="muted">
+        Nothing is ever deleted. The main list holds results that contain every word of your search (and, while there are
+        fewer than 10 of those, results that lack one word). Everything else is kept in collapsed sections below it, each
+        with a count.
+      </p>
+      <div className="check-group" role="group" aria-label="Preferred languages">
+        <span className="group-label">Preferred languages (none ticked = any)</span>
+        {options
+          .filter((option) => option.code !== UNKNOWN_LANGUAGE)
+          .map((option) => (
+            <label key={option.code} className="check">
+              <input
+                type="checkbox"
+                checked={layout.preferredLanguages.includes(option.code)}
+                onChange={() => onLayoutChange({ ...layout, preferredLanguages: toggleInList(layout.preferredLanguages, option.code) })}
+              />
+              {option.name} <small>{option.count}</small>
+            </label>
+          ))}
+        <span className="muted">
+          A result in any other language goes to “Other languages”. The language is detected from the title and abstract
+          (and is shown on each card); a result whose language cannot be told stays where its words put it.
+        </span>
+      </div>
+      <label className="check">
+        <input
+          type="checkbox"
+          checked={layout.showNonArticleTypes}
+          onChange={(event) => onLayoutChange({ ...layout, showNonArticleTypes: event.target.checked })}
+        />
+        <span>
+          Show non-article types in the main list{" "}
+          <span className="muted">(datasets, theses, reports, presentations, and works only Zenodo or DataCite hold)</span>
+        </span>
+      </label>
+    </fieldset>
+  );
+}
+
 function FiltersSection({ filters, onFiltersChange }: SettingsPanelProps) {
   return (
     <fieldset>
@@ -268,12 +333,30 @@ function FiltersSection({ filters, onFiltersChange }: SettingsPanelProps) {
       <button
         type="button"
         disabled={!isFiltering(filters)}
-        onClick={() =>
-          onFiltersChange({ yearFrom: null, yearTo: null, levels: [], peerReview: [], openAccessOnly: false })
-        }
+        onClick={() => onFiltersChange(defaultFilters())}
       >
         Clear filters
       </button>
+    </fieldset>
+  );
+}
+
+const COMMON_WORDS = [...STOPWORDS].sort();
+
+function CommonWordsSection() {
+  return (
+    <fieldset>
+      <legend>Common words</legend>
+      <p className="muted">
+        While “Ignore common words” (next to the search box) is on, these {COMMON_WORDS.length} words are not used in a
+        search, and each one that is left out is shown under the box, where one click puts it back. Words inside quotes are
+        always kept, and so is a word in capitals such as <code>CAN</code> or <code>US</code>. The list is fixed: nothing is
+        learned or guessed.
+      </p>
+      <details className="panel">
+        <summary>Show the list ({COMMON_WORDS.length} words)</summary>
+        <p className="word-list">{COMMON_WORDS.join(" ")}</p>
+      </details>
     </fieldset>
   );
 }

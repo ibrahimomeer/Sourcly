@@ -1,8 +1,11 @@
 import { describe, expect, it } from "vitest";
+import { counterQuery } from "./counter";
 import {
   excludedTerms,
+  isAllCapsTerm,
   formatQuery,
   isUsable,
+  looksLikeQuestion,
   parseQuery,
   queryTerms,
   renderQuery,
@@ -271,6 +274,120 @@ describe("renderQuery: sources that take only words", () => {
   });
 });
 
+describe("renderQuery: PubMed, every word looked for in its text words", () => {
+  const pubmed = (text: string) => renderQuery(parseQuery(text), "pubmed");
+
+  it("tags each word and phrase on its own, which also turns off PubMed's term mapping", () => {
+    expect(pubmed("chaos double pendulum").text).toBe("chaos[tw] AND double[tw] AND pendulum[tw]");
+    expect(pubmed('"double pendulum" chaos').text).toBe('"double pendulum"[tw] AND chaos[tw]');
+  });
+
+  it("keeps groups and NOT, with the tag on every word inside them", () => {
+    expect(pubmed("sleep (memory OR dreams) NOT rats").text).toBe("sleep[tw] AND (memory[tw] OR dreams[tw]) NOT rats[tw]");
+    expect(pubmed("sleep NOT (rats OR mice)").text).toBe("sleep[tw] NOT (rats[tw] OR mice[tw])");
+  });
+
+  it("quotes a hyphenated word and a word spelled like an operator", () => {
+    expect(pubmed("self-organizing").text).toBe('"self-organizing"[tw]');
+    expect(pubmed('"AND" sleep').text).toBe('"AND"[tw] AND sleep[tw]');
+  });
+
+  it("writes accented and non-Latin words as they are", () => {
+    expect(pubmed("cafe café").text).toBe("cafe[tw] AND café[tw]");
+  });
+
+  it("is told what it could not apply the same way as any boolean source", () => {
+    expect(pubmed("sleep OR NOT rats")).toEqual({
+      text: "sleep[tw]",
+      notes: ["Ignored a part that only said what to leave out, because it had nothing to search for"],
+    });
+  });
+});
+
+describe("renderQuery: Europe PMC, every word looked for in the title and abstract", () => {
+  const europepmc = (text: string) => renderQuery(parseQuery(text), "europepmc");
+
+  it("names the field in front of each word and phrase", () => {
+    expect(europepmc("chaos double pendulum").text).toBe("TITLE_ABS:chaos AND TITLE_ABS:double AND TITLE_ABS:pendulum");
+    expect(europepmc('"memory consolidation" sleep').text).toBe('TITLE_ABS:"memory consolidation" AND TITLE_ABS:sleep');
+  });
+
+  it("keeps groups and NOT", () => {
+    expect(europepmc("sleep (memory OR dreams) NOT rats").text).toBe(
+      "TITLE_ABS:sleep AND (TITLE_ABS:memory OR TITLE_ABS:dreams) NOT TITLE_ABS:rats",
+    );
+  });
+
+  it("quotes a hyphenated word, because Europe PMC would otherwise read the hyphen as a minus", () => {
+    expect(europepmc("self-organizing").text).toBe('TITLE_ABS:"self-organizing"');
+  });
+});
+
+describe("renderQuery: a source that ignores a group inside a larger search (flat)", () => {
+  const flat = (text: string) => renderQuery(parseQuery(text), "boolean-flat");
+
+  it("writes words, phrases and NOT as a boolean source does", () => {
+    expect(flat('"memory consolidation" sleep NOT rats')).toEqual({ text: '"memory consolidation" AND sleep NOT rats', notes: [] });
+    expect(flat("sleep NOT rats NOT mice").text).toBe("sleep NOT rats NOT mice");
+  });
+
+  it("keeps an OR of single words that stands alone", () => {
+    expect(flat("sleep OR nap")).toEqual({ text: "sleep OR nap", notes: [] });
+    expect(flat('sleep OR "memory consolidation"').text).toBe('sleep OR "memory consolidation"');
+  });
+
+  it("leaves out a group of alternatives inside a larger search, and says so", () => {
+    expect(flat("sleep (nap OR rest)")).toEqual({
+      text: "sleep",
+      notes: ["Ignored a group of alternatives (“either word”), because this source ignores such a group inside a larger search"],
+    });
+  });
+
+  it("leaves out the counterargument terms the way a plain source does, with the same words", () => {
+    const rendered = renderQuery(counterQuery(parseQuery("sleep memory"), ["limitation", "criticism"]), "boolean-flat");
+    expect(rendered.text).toBe("sleep AND memory");
+    expect(rendered.notes).toEqual([
+      "This source cannot ask for “any of these terms”, so it was sent only the rest of your search; its results that contain none of the terms rank lower",
+    ]);
+  });
+
+  it("leaves out a group to exclude", () => {
+    expect(flat("sleep NOT (rats OR mice)")).toEqual({
+      text: "sleep",
+      notes: ["Ignored a group to leave out, because this source reads only single words and phrases after NOT"],
+    });
+  });
+
+  it("flattens parentheses that only group words together", () => {
+    expect(flat("sleep (memory dreams)").text).toBe("sleep AND memory AND dreams");
+  });
+});
+
+describe("renderQuery: a plain source that cannot read a hyphen", () => {
+  const spaced = (text: string) => renderQuery(parseQuery(text), "plain-spaced");
+
+  it("replaces a hyphen by a space and says so", () => {
+    expect(spaced("self-organizing systems")).toEqual({
+      text: "self organizing systems",
+      notes: ["Hyphens were replaced by spaces, because this source finds nothing for a hyphenated word"],
+    });
+  });
+
+  it("says nothing when there is no hyphen, and is otherwise the same as plain", () => {
+    expect(spaced("sleep memory")).toEqual(renderQuery(parseQuery("sleep memory"), "plain"));
+    expect(spaced('"memory consolidation" sleep NOT rats').notes).toEqual(renderQuery(parseQuery('"memory consolidation" sleep NOT rats'), "plain").notes);
+  });
+});
+
+describe("renderQuery: searching exactly as typed", () => {
+  it("sends the same text to every kind of source", () => {
+    const query = parseQuery("what is  self-organizing?", { exact: true });
+    for (const syntax of ["boolean", "boolean-flat", "pubmed", "europepmc", "plain", "plain-spaced"] as const) {
+      expect(renderQuery(query, syntax)).toEqual({ text: "what is  self-organizing?", notes: ["Sent exactly as typed"] });
+    }
+  });
+});
+
 describe("determinism", () => {
   it("gives the same parse and the same text every time", () => {
     const input = 'What is "memory consolidation" (sleep OR nap) NOT rats?';
@@ -348,5 +465,173 @@ describe("requiredTerms", () => {
 
   it("is empty for a query with nothing in it", () => {
     expect(requiredTerms(parseQuery(""))).toEqual([]);
+  });
+});
+
+describe("parseQuery: options (nothing is dropped behind your back)", () => {
+  const sentence = "what is the best way to predict odor";
+  const words = (text: string, options = {}) => queryTerms(parseQuery(text, options));
+
+  it("drops common words by default and reports every one", () => {
+    const parsed = parseQuery(sentence);
+    expect(queryTerms(parsed)).toEqual(["best", "way", "predict", "odor"]);
+    expect(parsed.droppedStopwords).toEqual(["what", "is", "the", "to"]);
+    expect(parsed.excludedTerms).toEqual([]);
+  });
+
+  it("uses every word typed when dropping is off, and drops nothing", () => {
+    const parsed = parseQuery(sentence, { ignoreCommon: false });
+    expect(queryTerms(parsed)).toEqual(["what", "is", "the", "best", "way", "to", "predict", "odor"]);
+    expect(parsed.droppedStopwords).toEqual([]);
+  });
+
+  it("turns a restored common word into an ordinary term, and leaves the others dropped", () => {
+    const parsed = parseQuery(sentence, { restored: new Set(["is"]) });
+    expect(queryTerms(parsed)).toEqual(["is", "best", "way", "predict", "odor"]);
+    expect(parsed.droppedStopwords).toEqual(["what", "the", "to"]);
+  });
+
+  it("restores a word wherever it appears, whatever its capitals", () => {
+    expect(words("the cat and The dog", { restored: new Set(["the"]) })).toEqual(["the", "cat", "dog"]);
+    expect(parseQuery("the cat and The dog", { restored: new Set(["the"]) }).droppedStopwords).toEqual(["and"]);
+  });
+
+  it("leaves out a term the person excluded, and reports it", () => {
+    const parsed = parseQuery("sleep memory way", { excluded: new Set(["way"]) });
+    expect(queryTerms(parsed)).toEqual(["sleep", "memory"]);
+    expect(parsed.excludedTerms).toEqual(["way"]);
+    expect(parsed.droppedStopwords).toEqual([]);
+  });
+
+  it("leaves out a quoted phrase as one term, matched by its lowercase words", () => {
+    const parsed = parseQuery('"Double Pendulum" chaos', { excluded: new Set(["double pendulum"]) });
+    expect(parsed.root).toEqual(word("chaos"));
+    expect(parsed.excludedTerms).toEqual(["Double Pendulum"]);
+  });
+
+  it("leaves out every occurrence once, and an excluded common word is excluded, not dropped", () => {
+    const parsed = parseQuery("odor the odor", { excluded: new Set(["odor", "the"]) });
+    expect(parsed.root).toBeNull();
+    expect(parsed.excludedTerms).toEqual(["odor", "the"]);
+    expect(parsed.droppedStopwords).toEqual([]);
+  });
+
+  it("keeps the other parts of the query when a term inside an OR is left out", () => {
+    expect(parseQuery("sleep OR nap", { excluded: new Set(["sleep"]) }).root).toEqual(word("nap"));
+  });
+
+  it("keeps every word inside quotes, common words included, as one phrase", () => {
+    const parsed = parseQuery('"state of the art" review');
+    expect(parsed.root).toEqual(and(phrase("state of the art"), word("review")));
+    expect(parsed.droppedStopwords).toEqual([]);
+    expect(root('"the"')).toEqual(word("the"));
+  });
+
+  it("keeps a quoted phrase's words even when dropping is on and the text is a question", () => {
+    expect(parseQuery('what is "the best way"').root).toEqual(phrase("the best way"));
+  });
+
+  it("treats an all-caps word of two or more letters as a term: CAN bus, US, IT", () => {
+    expect(words("CAN bus protocol")).toEqual(["CAN", "bus", "protocol"]);
+    expect(words("US election results")).toEqual(["US", "election", "results"]);
+    expect(words("IT support for the clinic")).toEqual(["IT", "support", "clinic"]);
+    expect(parseQuery("CAN bus").droppedStopwords).toEqual([]);
+  });
+
+  it("still drops the same word when it is not in capitals", () => {
+    expect(words("can bus")).toEqual(["bus"]);
+    expect(words("Can bus")).toEqual(["bus"]);
+    expect(parseQuery("can bus").droppedStopwords).toEqual(["can"]);
+  });
+
+  it("does not exempt anything when the whole query is typed in capitals", () => {
+    expect(words("WHAT IS THE BEST WAY")).toEqual(["BEST", "WAY"]);
+  });
+
+  it("follows the ordinary rule for a single capital letter", () => {
+    expect(words("vitamin A deficiency")).toEqual(["vitamin", "deficiency"]);
+    expect(parseQuery("vitamin A deficiency").droppedStopwords).toEqual(["a"]);
+    expect(words("vitamin C")).toEqual(["vitamin", "C"]);
+  });
+
+  it("still reads AND, OR and NOT in capitals as operators, not as all-caps terms", () => {
+    expect(root("sleep OR nap NOT rats")).toEqual(or(word("sleep"), and(word("nap"), not(word("rats")))));
+  });
+
+  it("still works for a single word", () => {
+    expect(root("sleep")).toEqual(word("sleep"));
+    expect(root("the")).toBeNull();
+    expect(parseQuery("the").droppedStopwords).toEqual(["the"]);
+  });
+
+  it("gives the same result for the same text and options", () => {
+    const options = { restored: new Set(["is"]), excluded: new Set(["way"]) };
+    expect(parseQuery(sentence, options)).toEqual(parseQuery(sentence, options));
+  });
+
+  it("does not change the sets it is given", () => {
+    const restored = new Set(["is"]);
+    parseQuery(sentence, { restored });
+    expect([...restored]).toEqual(["is"]);
+  });
+});
+
+describe("isAllCapsTerm", () => {
+  it("needs two or more capital letters or digits, with a letter, in a text that also has lowercase", () => {
+    expect(isAllCapsTerm("CAN", true)).toBe(true);
+    expect(isAllCapsTerm("US", true)).toBe(true);
+    expect(isAllCapsTerm("CD4", true)).toBe(true);
+    expect(isAllCapsTerm("A", true)).toBe(false);
+    expect(isAllCapsTerm("Can", true)).toBe(false);
+    expect(isAllCapsTerm("can", true)).toBe(false);
+    expect(isAllCapsTerm("19", true)).toBe(false);
+    expect(isAllCapsTerm("CAN", false)).toBe(false);
+  });
+});
+
+describe("looksLikeQuestion", () => {
+  it("is true for a question word first, or a question mark last", () => {
+    for (const text of ["what is the best way to predict odor", "How does sleep help memory", "is sleep good", "Can we predict chaos", "Why do we dream", "sleep and memory?", "  which drug works?  "]) {
+      expect(looksLikeQuestion(text), text).toBe(true);
+    }
+  });
+
+  it("is false for a plain list of words", () => {
+    for (const text of ["sleep memory consolidation", "double pendulum chaos", '"double pendulum"', "whatever works", "", "   "]) {
+      expect(looksLikeQuestion(text), text).toBe(false);
+    }
+  });
+
+  it("is recorded on the parsed query", () => {
+    expect(parseQuery("what is chaos").looksLikeQuestion).toBe(true);
+    expect(parseQuery("chaos theory").looksLikeQuestion).toBe(false);
+  });
+});
+
+describe("parseQuery: exactly as typed", () => {
+  const typed = '  what is the "best way" to predict  odor ';
+
+  it("keeps every word, marks the query exact, and sends the text unchanged to every kind of source", () => {
+    const parsed = parseQuery(typed, { exact: true });
+    expect(parsed.exact).toBe(true);
+    expect(parsed.droppedStopwords).toEqual([]);
+    expect(queryTerms(parsed)).toEqual(["what", "is", "the", "best", "way", "to", "predict", "odor"]);
+    expect(renderQuery(parsed, "boolean")).toEqual({ text: 'what is the "best way" to predict  odor', notes: ["Sent exactly as typed"] });
+    expect(renderQuery(parsed, "plain")).toEqual({ text: 'what is the "best way" to predict  odor', notes: ["Sent exactly as typed"] });
+    expect(formatQuery(parsed)).toBe('what is the "best way" to predict  odor');
+  });
+
+  it("is not exact unless asked", () => {
+    expect(parseQuery(typed).exact).toBeUndefined();
+    expect(renderQuery(parseQuery("sleep memory"), "boolean").text).toBe("sleep AND memory");
+  });
+
+  it("ignores dropping options, since nothing is dropped", () => {
+    expect(parseQuery("what is chaos", { exact: true, ignoreCommon: true }).droppedStopwords).toEqual([]);
+  });
+
+  it("is still usable only when it has a word", () => {
+    expect(isUsable(parseQuery("the of", { exact: true }))).toBe(true);
+    expect(isUsable(parseQuery("   ", { exact: true }))).toBe(false);
   });
 });

@@ -108,6 +108,6 @@ describe("createSemanticScholarProvider", () => {
 describe("Semantic Scholar subjects and syntax", () => {
   it("gives papers no subjects here, and takes plain text only", () => {
     expect(parse(papers[0]).subjects).toEqual([]);
-    expect(createSemanticScholarProvider().syntax).toBe("plain");
+    expect(createSemanticScholarProvider().syntax).toBe("plain-spaced");
   });
 });

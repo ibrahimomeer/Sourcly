@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { defaultFilters } from "./filters";
+import { defaultLayoutSettings } from "./sections";
 import {
   PROTOCOL_SCHEMA,
   PROTOCOL_SCHEMA_VERSION,
@@ -24,7 +25,8 @@ const search = (typed: string): ProtocolSearch => ({
     { provider: "openalex", state: "ok", count: 100 },
     { provider: "crossref", state: "rate-limited", message: "busy" },
   ],
-  counts: { fetched: 200, merged: 180, shown: 170, hiddenByFilters: 10 },
+  expandedPass: null,
+  counts: { fetched: 200, merged: 180, shown: 130, partialMatches: 20, otherLanguages: 12, otherTypes: 8, hiddenByFilters: 10 },
 });
 
 const input = (changes: Partial<ProtocolInput> = {}): ProtocolInput => ({
@@ -37,6 +39,7 @@ const input = (changes: Partial<ProtocolInput> = {}): ProtocolInput => ({
   resultsPerSource: 100,
   filters: { ...defaultFilters(), yearFrom: 2015, openAccessOnly: true },
   scoring: defaultScoringSettings(),
+  layout: defaultLayoutSettings(),
   saved: [{ title: "A saved paper", doi: "10.1/a", url: "https://doi.org/10.1/a" }],
   ...changes,
 });
@@ -69,7 +72,15 @@ describe("buildProtocol", () => {
       { provider: "openalex", state: "ok", count: 100 },
       { provider: "crossref", state: "rate-limited", message: "busy" },
     ]);
-    expect(recorded.counts).toEqual({ fetched: 200, merged: 180, shown: 170, hiddenByFilters: 10 });
+    expect(recorded.counts).toEqual({
+      fetched: 200,
+      merged: 180,
+      shown: 130,
+      partialMatches: 20,
+      otherLanguages: 12,
+      otherTypes: 8,
+      hiddenByFilters: 10,
+    });
   });
 
   it("records the chosen sources, the number asked for and the filters", () => {
@@ -79,14 +90,31 @@ describe("buildProtocol", () => {
     expect(protocol.filters).toEqual({ yearFrom: 2015, yearTo: null, levels: [], peerReview: [], openAccessOnly: true });
   });
 
+  it("records the expanded second pass, with what each source asked in it received, when it ran", () => {
+    const withPass = search("sleep");
+    withPass.expandedPass = {
+      sentQueries: [{ provider: "openalex", text: "sleep memory", notes: ["a looser note"] }],
+      statuses: [{ provider: "openalex", state: "ok", count: 100 }],
+    };
+    const { search: recorded } = buildProtocol(input({ main: withPass }));
+    expect(recorded.expandedPass).toEqual({
+      sentQueries: [{ source: "openalex", query: "sleep memory", notes: ["a looser note"] }],
+      statuses: [{ provider: "openalex", state: "ok", count: 100 }],
+    });
+    expect(buildProtocol(input()).search.expandedPass).toBeNull();
+  });
+
   it("records every weight and switch, the half-life and the reference year, so a ranking can be repeated", () => {
     const { ranking } = buildProtocol(input());
     expect(ranking.referenceYear).toBe(2026);
     expect(ranking.recencyHalfLifeYears).toBe(10);
     expect(ranking.relevance).toContain("BM25 (k1 = 1.2, b = 0.75)");
     expect(ranking.formula).toContain("sum(weight * factor) / sum(weight)");
+    expect(ranking.layout).toEqual({ preferredLanguages: ["en"], showNonArticleTypes: false, fewFullMatches: 10 });
     expect(Object.keys(ranking.factors)).toEqual([
       "relevance",
+      "termCoverage",
+      "phraseMatch",
       "citations",
       "recency",
       "peerReview",
@@ -95,6 +123,8 @@ describe("buildProtocol", () => {
       "studyType",
     ]);
     expect(ranking.factors.relevance).toEqual({ label: "Relevance (BM25)", enabled: true, weight: 3 });
+    expect(ranking.factors.termCoverage).toEqual({ label: "Term coverage", enabled: true, weight: 2 });
+    expect(ranking.factors.phraseMatch).toEqual({ label: "Phrase match", enabled: true, weight: 1 });
     expect(ranking.factors.openAccess).toEqual({ label: "Open access", enabled: true, weight: 0 });
     expect(ranking.factors.providerAgreement.weight).toBe(0.5);
     expect(ranking.factors.studyType.enabled).toBe(false);

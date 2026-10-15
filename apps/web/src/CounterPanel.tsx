@@ -10,10 +10,11 @@ import {
 import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { COUNTER_VIEWS, countViews, selectView, type CounterView } from "./counterView";
 import { CounterTerms } from "./CounterTerms";
-import { pluralize } from "./format";
+import { ORDER_SENTENCE, pluralize } from "./format";
 import { Pagination } from "./Pagination";
+import { ResultSections } from "./ResultSections";
 import { paginate } from "./paginate";
-import { rankResults, scoringContext, type ViewSettings } from "./pipeline";
+import { allResults, rankResults, scoringContext, type ViewSettings } from "./pipeline";
 import { ProviderStatuses } from "./ProviderStatuses";
 import type { CounterRecord } from "./protocolRecord";
 import { QueryNote } from "./QueryNote";
@@ -123,7 +124,7 @@ export function CounterPanel({
         return;
       }
       setOwnProblem(null);
-      setOwnText(prepared.box);
+      // The text in the box is left as typed; the common words not used are listed under the results.
       parsed = prepared.parsed;
     }
     const providers = makeProviders();
@@ -286,7 +287,7 @@ function CounterResults({
   usedLexicon: boolean;
 }) {
   const searching = state.phase === "searching";
-  const total = ranked.shown.length + ranked.hidden.length;
+  const total = allResults(ranked).length;
   const counts = countViews(ranked.shown);
   const list = selectView(ranked.shown, panelView);
   const current = paginate(list, page);
@@ -312,8 +313,8 @@ function CounterResults({
       {total > 0 && (
         <>
           <p className="summary">
-            {pluralize(total, "result")} {usedLexicon ? "for your search plus the terms above" : "for your own search"}, sorted
-            by score.
+            {pluralize(total, "result")} {usedLexicon ? "for your search plus the terms above" : "for your own search"}.
+            {` ${ranked.shown.length} ${ranked.shown.length === 1 ? "is" : "are"} in the main list; the rest are kept apart in the collapsed sections below, nothing removed. ${ORDER_SENTENCE}`}
             {usedLexicon &&
               " Sources that cannot ask for “any of these terms” were sent only your search (see the exact queries above), so some of their results contain none of the terms and rank lower."}
             {searching && " More are still arriving, and the order may change as they do."}
@@ -349,11 +350,19 @@ function CounterResults({
               libraryPrefix={libraryPrefix}
               onOverrideChange={onOverrideChange}
               highlight={terms}
+              section="main"
             />
           </li>
         ))}
       </ol>
       {pagination("Counterargument pages (bottom)")}
+      <ResultSections
+        ranked={ranked}
+        overrides={overrides}
+        libraryPrefix={libraryPrefix}
+        onOverrideChange={onOverrideChange}
+        highlight={terms}
+      />
     </div>
   );
 }

@@ -116,6 +116,8 @@ export interface ProviderHit {
   listSize: number;
   /** The provider's own relevance score, when it gives one. */
   score: number | null;
+  /** True when the work was returned by the second, expanded pass of a search and not by the strict first one. */
+  expanded?: true;
 }
 
 /** The single normalized record every provider produces. */
@@ -159,15 +161,25 @@ export interface Result {
 }
 
 /**
- * How a provider reads a query. "boolean" sources understand AND, OR, NOT, quoted
- * phrases and parentheses; "plain" sources take only a list of words.
+ * How a provider reads a query.
+ * - "boolean": AND, OR, NOT, quoted phrases and parentheses.
+ * - "boolean-flat": the same, except that a group of alternatives inside a larger search is
+ *   ignored by the source, so it is left out and the notes say so (Wikipedia).
+ * - "pubmed": boolean, with every word and phrase searched in PubMed's text-word field, which
+ *   turns off PubMed's own guessing at synonyms and word forms.
+ * - "europepmc": boolean, with every word and phrase searched in the title and abstract only.
+ * - "plain": only a list of words.
+ * - "plain-spaced": a list of words in which a hyphen is read as a space, because the source
+ *   finds nothing for a hyphenated word (Semantic Scholar).
  */
-export type QuerySyntax = "boolean" | "plain";
+export type QuerySyntax = "boolean" | "boolean-flat" | "pubmed" | "europepmc" | "plain" | "plain-spaced";
 
 export interface SearchOptions {
   /** Maximum number of results to return from one provider. */
   limit: number;
   signal?: AbortSignal;
+  /** The expanded pass: ask in the provider's looser way (see `Provider.expandedSyntax`). */
+  expanded?: boolean;
 }
 
 export interface Provider {
@@ -175,6 +187,19 @@ export interface Provider {
   readonly name: string;
   /** How this provider reads the query it is given. */
   readonly syntax: QuerySyntax;
+  /**
+   * What the provider's request does beyond the query text, in plain language (which text it
+   * looks in, how many results it asks for). Shown beside the query that was sent.
+   */
+  readonly requestNotes?: readonly string[];
+  /**
+   * Set when the provider takes part in the expanded pass that runs when a strict search finds few results
+   * that contain every word. It is how the query is written for that pass, and the provider's `search`
+   * is called with `expanded: true`. Left out when a second request would only repeat the first.
+   */
+  readonly expandedSyntax?: QuerySyntax;
+  /** Notes about the expanded request, shown beside the query it sent. */
+  readonly expandedRequestNotes?: readonly string[];
   /**
    * Resolves with normalized results, best match first. Throws `ProviderError`
    * when the provider cannot answer; callers decide what to show.

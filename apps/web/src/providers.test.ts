@@ -21,14 +21,29 @@ describe("provider registry", () => {
     }
   });
 
-  it("switches every available source on by default", () => {
-    expect([...DEFAULT_PROVIDERS]).toEqual(PROVIDER_OPTIONS.map((option) => option.id));
+  it("switches on only the four sources that give clean scholarly results, and offers the rest", () => {
+    expect([...DEFAULT_PROVIDERS]).toEqual(["openalex", "crossref", "pubmed", "europepmc"]);
+    const off = PROVIDER_OPTIONS.map((option) => option.id).filter((id) => !DEFAULT_PROVIDERS.includes(id));
+    expect(off).toEqual(["doaj", "datacite", "zenodo", "wikipedia", "semanticscholar"]);
+  });
+
+  it("says in a line why the noisy ones are off: Zenodo and DataCite take anything, Wikipedia is capped, Semantic Scholar is often refused", () => {
+    const describe = (id: ProviderId) => PROVIDER_OPTIONS.find((option) => option.id === id)?.description ?? "";
+    expect(describe("zenodo")).toContain("Anyone can upload, with no review");
+    expect(describe("datacite")).toContain("Anyone can deposit");
+    expect(describe("wikipedia")).toContain("At most 5 pages");
+    expect(describe("semanticscholar")).toContain("often busy");
   });
 
   it("builds a provider for each id, with matching ids, in the listed order", () => {
-    const providers = createProviders([...DEFAULT_PROVIDERS], context);
-    expect(providers.map((provider) => provider.id)).toEqual(PROVIDER_OPTIONS.map((option) => option.id));
+    const all = PROVIDER_OPTIONS.map((option) => option.id);
+    const providers = createProviders(all, context);
+    expect(providers.map((provider) => provider.id)).toEqual(all);
     expect(providers.map((provider) => provider.name)).toEqual(PROVIDER_OPTIONS.map((option) => option.name));
+  });
+
+  it("builds only the default four when nothing else is chosen, so a source that is off is never asked and shows no status", () => {
+    expect(createProviders([...DEFAULT_PROVIDERS], context).map((provider) => provider.id)).toEqual(["openalex", "crossref", "pubmed", "europepmc"]);
   });
 
   it("builds only the providers that are switched on, in the listed order whatever the selection order", () => {

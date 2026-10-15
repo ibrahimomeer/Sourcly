@@ -73,3 +73,12 @@ export function reviewBadgeText(result: Pick<Result, "type" | "rawType">): strin
 export function describeLexiconMatches(matches: readonly LexiconMatch[]): string {
   return matches.map((match) => `${match.term} (${match.fields.join(" and ")})`).join(", ");
 }
+
+/** How the main list is ordered, for the line under the results heading. */
+export const ORDER_SENTENCE =
+  "Sorted by how many of your words each result contains, then by whether your words appear next to each other in order, then by score.";
+
+/** The note shown when few results contain every word of the search. */
+export function fewResultsMessage(): string {
+  return "Few results match all your words, so results that match all but one are listed too, labelled “Matches N of M words”. Check spelling or try synonyms.";
+}

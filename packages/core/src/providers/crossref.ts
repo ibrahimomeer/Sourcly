@@ -27,7 +27,17 @@ import { doiUrl } from "../doi";
 //   subtype and results carry no language.
 
 const WORKS_URL = "https://api.crossref.org/works";
-const MAX_ROWS = 100;
+/**
+ * Crossref cannot require every word, so its order gets loose: for "chaos double pendulum", 24 of the 27 results in the
+ * first 100 that had all three words were among the first 50 (checked 2026-10-14), and the others add noise. 25 is a
+ * further cut: Crossref is one of four default sources, and its fuzzy matches must not dominate the pool.
+ */
+const MAX_ROWS = 25;
+/**
+ * Only scholarly types (checked 2026-10-14: several `type` filters are ORed, and without them datasets, components,
+ * reference entries and peer-review records come back): journal articles, conference papers, preprints, book chapters, books.
+ */
+const SCHOLARLY_TYPES = ["journal-article", "proceedings-article", "posted-content", "book-chapter", "book", "monograph"];
 const SELECT = [
   "DOI",
   "title",
@@ -198,13 +208,18 @@ export function createCrossrefProvider(options: CrossrefOptions = {}): Provider 
     name: "Crossref",
     // Crossref's `query` is free text: it ignores AND, OR, NOT and quotes (checked 2026-10-14).
     syntax: "plain",
+    requestNotes: [
+      "Looks in titles, authors and other bibliographic details, only for journal articles, conference papers, preprints, book chapters and books. It cannot require every word, so some results contain only some of them; at most 25 results are asked for",
+    ],
 
     async search(query: string, { limit, signal }: SearchOptions): Promise<Result[]> {
       const text = query.trim();
       if (text === "") return [];
       const url = new URL(WORKS_URL);
-      url.searchParams.set("query", text);
+      // query.bibliographic is the documented field query (query.title is deprecated); it finds the same works as plain `query`.
+      url.searchParams.set("query.bibliographic", text);
       url.searchParams.set("rows", String(clampLimit(limit, MAX_ROWS)));
+      url.searchParams.set("filter", SCHOLARLY_TYPES.map((type) => `type:${type}`).join(","));
       url.searchParams.set("select", SELECT);
       if (mailto !== "") url.searchParams.set("mailto", mailto);
 

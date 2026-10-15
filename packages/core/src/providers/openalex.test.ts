@@ -298,15 +298,30 @@ describe("createOpenAlexProvider", () => {
     const [input, init] = fetchMock.mock.calls[0] ?? [];
     const url = new URL(String(input));
     expect(url.origin + url.pathname).toBe("https://api.openalex.org/works");
-    expect(url.searchParams.get("search")).toBe("sleep and memory");
+    expect(url.searchParams.get("search.title_and_abstract")).toBe("sleep and memory");
+    expect(url.searchParams.has("search")).toBe(false); // the plain parameter would also read the full text
     expect(url.searchParams.get("per_page")).toBe("50");
     expect(url.searchParams.get("select")?.split(",")).toEqual(
       expect.arrayContaining([
         "id", "doi", "title", "relevance_score", "type", "is_retracted", "abstract_inverted_index", "best_oa_location",
       ]),
     );
-    expect([...url.searchParams.keys()].sort()).toEqual(["per_page", "search", "select"]);
+    expect([...url.searchParams.keys()].sort()).toEqual(["per_page", "search.title_and_abstract", "select"]);
     expect(init).toEqual({ signal: controller.signal });
+  });
+
+  it("uses the scoped title-and-abstract search for the strict pass and the default relevance search for the expanded pass", async () => {
+    const fetchMock = vi.fn<typeof fetch>(() => jsonResponse({ results: [] }));
+    const provider = createOpenAlexProvider({ fetch: fetchMock });
+    await provider.search("sleep memory", { limit: 5 });
+    await provider.search("sleep memory", { limit: 5, expanded: true });
+    const [strict, expanded] = fetchMock.mock.calls.map((call) => new URL(String(call[0])));
+    expect(strict?.searchParams.get("search.title_and_abstract")).toBe("sleep memory");
+    expect(strict?.searchParams.has("search")).toBe(false);
+    expect(expanded?.searchParams.get("search")).toBe("sleep memory");
+    expect(expanded?.searchParams.has("search.title_and_abstract")).toBe(false);
+    expect(provider.expandedSyntax).toBe("plain");
+    expect(provider.expandedRequestNotes?.join(" ")).toMatch(/default relevance search/);
   });
 
   it.each([

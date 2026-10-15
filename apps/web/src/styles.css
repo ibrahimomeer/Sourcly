@@ -934,3 +934,147 @@ mark {
   padding: 0.2rem 0.7rem;
   font-size: 0.85rem;
 }
+
+/* How the search text is read: chips under the search box */
+
+.search-options {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1.25rem;
+  margin: 0.5rem 0 0;
+  font-size: 0.875rem;
+}
+
+.small-button {
+  padding: 0.25rem 0.75rem;
+  font-size: 0.875rem;
+}
+
+.query-chips {
+  margin: 0.5rem 0 0;
+  font-size: 0.875rem;
+}
+
+.chips-line {
+  margin: 0.35rem 0 0;
+  line-height: 2.1;
+}
+
+.chips-label {
+  font-weight: 600;
+}
+
+.query-chips .chip {
+  padding: 0.1rem 0.6rem;
+  font-size: 0.875rem;
+}
+
+.chip-dashed {
+  border-style: dashed;
+  color: var(--muted);
+}
+
+.chip-op {
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.chips-note {
+  margin: 0.35rem 0 0;
+}
+
+.word-list {
+  font-size: 0.85rem;
+  line-height: 1.8;
+  overflow-wrap: anywhere;
+}
+
+/* Matched terms */
+
+.matched-terms {
+  margin: 0.35rem 0 0;
+  font-size: 0.875rem;
+}
+
+/* The words of the search that were found: lighter than the counterargument terms. */
+mark.mark-query {
+  background: #efefef;
+  font-weight: 600;
+  text-decoration: none;
+  border-bottom: 2px solid var(--text);
+}
+
+.partial {
+  margin: 1.5rem 0 0;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border);
+}
+
+.partial > summary {
+  font-size: 1rem;
+}
+
+.few-results {
+  margin: 0.75rem 0;
+  padding: 0.5rem 0.75rem;
+  border: 1px dashed var(--border-strong);
+}
+
+.few-results p {
+  margin: 0.25rem 0;
+}
+
+.did-you-mean .link-button {
+  font-weight: 600;
+}
+
+.detected {
+  margin: 0.5rem 0;
+  font-size: 0.875rem;
+}
+
+.card-heading {
+  margin: 0 0 0.25rem;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.card-detailed {
+  border-width: 2px;
+}
+
+dl.record {
+  margin: 0.5rem 0;
+}
+
+dl.record > div {
+  display: grid;
+  grid-template-columns: 9rem 1fr;
+  gap: 0.5rem;
+  padding: 0.25rem 0;
+  border-top: 1px solid var(--border);
+}
+
+dl.record dt {
+  font-weight: 600;
+}
+
+dl.record dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.placement ol {
+  margin: 0.25rem 0 0.5rem;
+  padding-left: 1.25rem;
+}
+
+@media (max-width: 40rem) {
+  dl.record > div {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+}

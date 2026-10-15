@@ -166,7 +166,12 @@ export function createPubmedProvider(options: PubmedOptions = {}): Provider {
   return {
     id: "pubmed",
     name: "PubMed",
-    syntax: "boolean",
+    syntax: "pubmed",
+    expandedSyntax: "plain",
+    expandedRequestNotes: ["PubMed’s own matching of synonyms and word forms is on for this pass"],
+    requestNotes: [
+      "Every word is looked for in PubMed’s text words (title, abstract, MeSH headings and keywords). PubMed’s own matching of synonyms and word forms is switched off, so “memory” does not find “memories”",
+    ],
 
     async search(query: string, { limit, signal }: SearchOptions): Promise<Result[]> {
       const text = query.trim();

@@ -1,0 +1,1093 @@
+{
+ "status": "ok",
+ "message-type": "work-list",
+ "message-version": "1.0.0",
+ "message": {
+  "facets": {},
+  "total-results": 509491,
+  "items": [
+   {
+    "DOI": "10.3840/000311",
+    "type": "dataset",
+    "is-referenced-by-count": 0,
+    "title": [
+     "Double Pendulum"
+    ],
+    "container-title": [
+     "Wolfram Demonstrations Project"
+    ],
+    "score": 23.115273,
+    "issued": {
+     "date-parts": [
+      [
+       2007,
+       4,
+       27
+      ]
+     ]
+    },
+    "URL": "https://doi.org/10.3840/000311"
+   },
+   {
+    "DOI": "10.3840/07000311",
+    "type": "dataset",
+    "is-referenced-by-count": 0,
+    "title": [
+     "Double Pendulum"
+    ],
+    "container-title": [
+     "Wolfram Demonstrations Project"
+    ],
+    "score": 22.947407,
+    "issued": {
+     "date-parts": [
+      [
+       2007,
+       4,
+       27
+      ]
+     ]
+    },
+    "URL": "https://doi.org/10.3840/07000311"
+   },
+   {
+    "DOI": "10.1093/oso/9780198567547.005.0003",
+    "type": "book-section",
+    "page": "267-269",
+    "is-referenced-by-count": 0,
+    "title": [
+     "Appendix C: The double pendulum"
+    ],
+    "author": [
+     {
+      "given": "Gregory L",
+      "family": "Baker",
+      "sequence": "first",
+      "affiliation": [
+       {
+        "name": "Bryn Athyn College of the New Church, Pennsylvania, USA"
+       }
+      ],
+      "role": [
+       {
+        "role": "author",
+        "vocabulary": "crossref"
+       }
+      ]
+     },
+     {
+      "given": "James A",
+      "family": "Blackburn",
+      "sequence": "additional",
+      "affiliation": [
+       {
+        "name": "Wilfrid Laurier University, Ontario, Canada"
+       }
+      ],
+      "role": [
+       {
+        "role": "author",
+        "vocabulary": "crossref"
+       }
+      ]
+     }
+    ],
+    "container-title": [
+     "The Pendulum"
+    ],
+    "score": 22.38731,
+    "issued": {
+     "date-parts": [
+      [
+       2005,
+       6,
+       2
+      ]
+     ]
+    },
+    "URL": "https://doi.org/10.1093/oso/9780198567547.005.0003"
+   },
+   {
+    "DOI": "10.1007/978-0-387-49514-9_14",
+    "type": "book-chapter",
+    "page": "303-309",
+    "is-referenced-by-count": 0,
+    "title": [
+     "Double Pendulum"
+    ],
+    "container-title": [
+     "Essentials of Mathematica"
+    ],
+    "score": 22.283262,
+    "issued": {
+     "date-parts": [
+      [
+       null
+      ]
+     ]
+    },
+    "URL": "https://doi.org/10.1007/978-0-387-49514-9_14"
+   },
+   {
+    "abstract": "<jats:p xml:lang=\"en\">Most of the systems in our lives are inherently nonlinear and unstable. In control problems in the field of engineering, the aim is to define the control laws that maximize the operating efficiency of these systems under diverse security coefficients, and constraints and minimize error rates. This study aimed to model and optimally control a Double-Inverted Pendulum System on a Cart (DIPSC). A DIPSC was modeled using the Lagrange-Euler method, and classical and optimal Linear Quadratic Regulator (LQR) control methods were designed for the control of the system. The purpose of the designed controllers is to keep the arms of the double inverted pendulum on the moving cart vertically in balance and to bring the cart to the determined balance position. The critically important Q and R parameters of the LQR control technique that is one of the optimal control techniques were obtained using the Genetic Algorithm (GA), Particle Swarm Optimization (PSO), and Grey Wolf Optimization (GWO) algorithms. The DIPSC system was checked using classical LQR and optimal LQR methods. All obtained results are given graphically. The proposed methods are presented and analyzed in tabular form using Settling time and Mean-Square-Error (MSE) performance criteria.</jats:p>",
+    "DOI": "10.24012/dumf.1253331",
+    "type": "journal-article",
+    "is-referenced-by-count": 4,
+    "title": [
+     "Optimal LQR Controller Methods for Double Inverted Pendulum System on a Cart"
+    ],
+    "author": [
+     {
+      "ORCID": "https://orcid.org/0000-0003-4646-3345",
+      "authenticated-orcid": true,
+      "given": "Tayfun",
+      "family": "ABUT",
+      "sequence": "first",
+      "affiliation": [
+       {
+        "name": "MUŞ ALPARSLAN ÜNİVERSİTESİ"
+       }
+      ],
+      "role": [
+       {
+        "role": "author",
+        "vocabulary": "crossref"
+       }
+      ]
+     }
+    ],
+    "container-title": [
+     "DÜMF Mühendislik Dergisi"
+    ],
+    "score": 21.288704,
+    "issued": {
+     "date-parts": [
+      [
+       2023,
+       6,
+       17
+      ]
+     ]
+    },
+    "URL": "https://doi.org/10.24012/dumf.1253331"
+   },
+   {
+    "abstract": "<jats:p>This paper presents the stabilization control of the rotational double inverted pendulum system. It is generally a non-linear, non-minimum phase, unstable, and underactuated system of high order. It has some significant real-life applications such as position control, aerospace vehicle control, and robotics. The objective is to determine the control law to the motor’s output torque such that the inverted pendulum motion will be stabilized about a vertical axis and position the rotary arm to a commanded angular position. In this study, multi-PID controllers, Linear-Quadratic Regulator (LQR), and Internal Model Control (IMC) controllers are designed and MATLAB-based simulations are performed to understand and compare the performance of the three control schemes.</jats:p>",
+    "DOI": "10.2139/ssrn.4215195",
+    "type": "posted-content",
+    "is-referenced-by-count": 2,
+    "title": [
+     "Advanced Control Strategies for Rotary Double Inverted Pendulum"
+    ],
+    "author": [
+     {
+      "given": "Susheel Sriram",
+      "family": "Ananthan",
+      "sequence": "first",
+      "affiliation": [],
+      "role": [
+       {
+        "vocabulary": "crossref",
+        "role": "author"
+       }
+      ]
+     }
+    ],
+    "score": 20.752895,
+    "issued": {
+     "date-parts": [
+      [
+       2022
+      ]
+     ]
+    },
+    "URL": "https://doi.org/10.2139/ssrn.4215195"
+   },
+   {
+    "DOI": "10.1201/9781003734062-18",
+    "type": "book-chapter",
+    "page": "46-48",
+    "is-referenced-by-count": 0,
+    "title": [
+     "Double Pendulum"
+    ],
+    "author": [
+     {
+      "given": "Maciej",
+      "family": "Matyka",
+      "sequence": "first",
+      "affiliation": [],
+      "role": [
+       {
+        "role": "author",
+        "vocabulary": "crossref"
+       }
+      ]
+     }
+    ],
+    "container-title": [
+     "Computational Modelling with Single Prompts"
+    ],
+    "score": 20.697376,
+    "issued": {
+     "date-parts": [
+      [
+       2026,
+       5,
+       13
+      ]
+     ]
+    },
+    "URL": "https://doi.org/10.1201/9781003734062-18"
+   },
+   {
+    "DOI": "10.1007/978-1-4612-2250-7_14",
+    "type": "book-chapter",
+    "page": "187-202",
+    "is-referenced-by-count": 0,
+    "title": [
+     "A Double Pendulum"
+    ],
+    "author": [
+     {
+      "given": "Dan",
+      "family": "Schwalbe",
+      "sequence": "first",
+      "affiliation": [],
+      "role": [
+       {
+        "role": "author",
+        "vocabulary": "crossref"
+       }
+      ]
+     },
+     {
+      "given": "Stan",
+      "family": "Wagon",
+      "sequence": "additional",
+      "affiliation": [],
+      "role": [
+       {
+        "role": "author",
+        "vocabulary": "crossref"
+       }
+      ]
+     }
+    ],
+    "container-title": [
+     "VisualDSolve"
+    ],
+    "score": 20.334002,
+    "issued": {
+     "date-parts": [
+      [
+       1997
+      ]
+     ]
+    },
+    "URL": "https://doi.org/10.1007/978-1-4612-2250-7_14"
+   },
+   {
+    "DOI": "10.1049/pbce111e_ch11",
+    "type": "book-chapter",
+    "page": "263-282",
+    "is-referenced-by-count": 1,
+    "title": [
+     "Bipedal-double-pendulum walking robot control using recurrent hybrid neural network"
+    ],
+    "container-title": [
+     "The Inverted Pendulum in Control Theory and Robotics: From theory to new innovations"
+    ],
+    "score": 20.163689,
+    "issued": {
+     "date-parts": [
+      [
+       2017,
+       11,
+       30
+      ]
+     ]
+    },
+    "URL": "https://doi.org/10.1049/pbce111e_ch11"
+   },
+   {
+    "abstract": "<jats:p>The AUN/SEED-Net benchmark problem rendered at the field wise seminar in Bangkok, Thailand in 2006 is a rotary double inverted pendulum (RDIP). The primary objective of this research is to a design robust controller for the RDIP using Linear Matrix Inequalities (LMIs). The system is required to be stable at the upright unstable position regardless of some parametric uncertainties and disturbances. In addition, the minimization of a given criterion function must be considered. The effect of the disturbances on the system needs to be attenuated. The LMIs tool is a very powerful one in the study of design controllers. Many design problems can be cast as convex problems such as an LMI minimization problem and a robust stability test of closed-loop systems. This thesis is concerned with the design of a robust H[infinity] state feedback controller and a robust H[infinity] output feedback controller.</jats:p>",
+    "DOI": "10.58837/chula.the.2007.1572",
+    "type": "dissertation",
+    "is-referenced-by-count": 0,
+    "title": [
+     "Robust controller design for a rotary double inverted pendulum using linear matrix inequalities"
+    ],
+    "author": [
+     {
+      "sequence": "additional",
+      "affiliation": [],
+      "role": [
+       {
+        "role": "author",
+        "vocabulary": "crossref"
+       }
+      ]
+     },
+     {
+      "given": "Ha,",
+      "family": "Hoang",
+      "sequence": "first",
+      "affiliation": [],
+      "role": [
+       {
+        "role": "author",
+        "vocabulary": "crossref"
+       }
+      ]
+     }
+    ],
+    "score": 20.046144,
+    "issued": {
+     "date-parts": [
+      [
+       null
+      ]
+     ]
+    },
+    "URL": "https://doi.org/10.58837/chula.the.2007.1572"
+   },
+   {
+    "DOI": "10.25144/15120",
+    "type": "proceedings-article",
+    "is-referenced-by-count": 0,
+    "title": [
+     "THE DOUBLE-PENDULUM PIANO ACTION"
+    ],
+    "author": [
+     {
+      "given": "AY",
+      "family": "GOKHSHTEIN",
+      "sequence": "first",
+      "affiliation": [],
+      "role": [
+       {
+        "role": "author",
+        "vocabulary": "crossref"
+       }
+      ]
+     }
+    ],
+    "container-title": [
+     "INTERNATIONAL SYMPOSIUM ON MUSICAL ACOUSTICS (ISMA) 1997"
+    ],
+    "score": 19.930096,
+    "issued": {
+     "date-parts": [
+      [
+       2023,
+       3,
+       27
+      ]
+     ]
+    },
+    "URL": "https://doi.org/10.25144/15120"
+   },
+   {
+    "DOI": "10.1007/978-3-662-02991-6_5",
+    "type": "book-chapter",
+    "page": "89-114",
+    "is-referenced-by-count": 0,
+    "title": [
+     "The Double Pendulum"
+    ],
+    "author": [
+     {
+      "given": "H. J.",
+      "family": "Korsch",
+      "sequence": "first",
+      "affiliation": [],
+      "role": [
+       {
+        "role": "author",
+        "vocabulary": "crossref"
+       }
+      ]
+     },
+     {
+      "given": "H.-J.",
+      "family": "Jodl",
+      "sequence": "additional",
+      "affiliation": [],
+      "role": [
+       {
+        "role": "author",
+        "vocabulary": "crossref"
+       }
+      ]
+     }
+    ],
+    "container-title": [
+     "Chaos"
+    ],
+    "score": 19.801537,
+    "issued": {
+     "date-parts": [
+      [
+       1994
+      ]
+     ]
+    },
+    "URL": "https://doi.org/10.1007/978-3-662-02991-6_5"
+   },
+   {
+    "DOI": "10.5220/0011306100003274",
+    "type": "proceedings-article",
+    "page": "102-111",
+    "is-referenced-by-count": 2,
+    "title": [
+     "Modeling of Modified Vehicle Crashworthiness using a Double Compound Pendulum"
+    ],
+    "author": [
+     {
+      "given": "Gulshan",
+      "family": "Noorsumar",
+      "sequence": "first",
+      "affiliation": [
+       {
+        "name": "Department of Engineering Sciences, University of Agder, Grimstad, Norway, --- Select a Country ---"
+       }
+      ],
+      "role": [
+       {
+        "role": "author",
+        "vocabulary": "crossref"
+       }
+      ]
+     },
+     {
+      "given": "Svitlana",
+      "family": "Rogovchenko",
+      "sequence": "additional",
+      "affiliation": [
+       {
+        "name": "Department of Engineering Sciences, University of Agder, Grimstad, Norway, --- Select a Country ---"
+       }
+      ],
+      "role": [
+       {
+        "role": "author",
+        "vocabulary": "crossref"
+       }
+      ]
+     },
+     {
+      "given": "Dmitry",
+      "family": "Vysochinskiy",
+      "sequence": "additional",
+      "affiliation": [
+       {
+        "name": "Department of Engineering Sciences, University of Agder, Grimstad, Norway, --- Select a Country ---"
+       }
+      ],
+      "role": [
+       {
+        "role": "author",
+        "vocabulary": "crossref"
+       }
+      ]
+     },
+     {
+      "given": "Kjell",
+      "family": "Robbersmyr",
+      "sequence": "additional",
+      "affiliation": [
+       {
+        "name": "Department of Engineering Sciences, University of Agder, Grimstad, Norway, --- Select a Country ---"
+       }
+      ],
+      "role": [
+       {
+        "role": "author",
+        "vocabulary": "crossref"
+       }
+      ]
+     }
+    ],
+    "container-title": [
+     "Proceedings of the 12th International Conference on Simulation and Modeling Methodologies, Technologies and Applications"
+    ],
+    "score": 19.794199,
+    "issued": {
+     "date-parts": [
+      [
+       2022
+      ]
+     ]
+    },
+    "URL": "https://doi.org/10.5220/0011306100003274"
+   },
+   {
+    "DOI": "10.1007/978-3-662-03866-6_5",
+    "type": "book-chapter",
+    "page": "89-114",
+    "is-referenced-by-count": 0,
+    "title": [
+     "The Double Pendulum"
+    ],
+    "author": [
+     {
+      "given": "H. J.",
+      "family": "Korsch",
+      "sequence": "first",
+      "affiliation": [],
+      "role": [
+       {
+        "role": "author",
+        "vocabulary": "crossref"
+       }
+      ]
+     },
+     {
+      "given": "H.-J.",
+      "family": "Jodl",
+      "sequence": "additional",
+      "affiliation": [],
+      "role": [
+       {
+        "role": "author",
+        "vocabulary": "crossref"
+       }
+      ]
+     }
+    ],
+    "container-title": [
+     "Chaos"
+    ],
+    "score": 19.776829,
+    "issued": {
+     "date-parts": [
+      [
+       1999
+      ]
+     ]
+    },
+    "URL": "https://doi.org/10.1007/978-3-662-03866-6_5"
+   },
+   {
+    "DOI": "10.1109/caos69069.2026.11665979",
+    "type": "proceedings-article",
+    "page": "c1-c1",
+    "is-referenced-by-count": 0,
+    "title": [
+     "CAOS 2026 Cover Page"
+    ],
+    "container-title": [
+     "2026 IEEE Canadian Atlantic Ocean Symposium (CAOS)"
+    ],
+    "score": 18.233744,
+    "issued": {
+     "date-parts": [
+      [
+       2026,
+       7
+      ]
+     ]
+    },
+    "URL": "https://doi.org/10.1109/caos69069.2026.11665979"
+   },
+   {
+    "DOI": "10.1109/caos69069.2026.11666229",
+    "type": "proceedings-article",
+    "page": "II-III",
+    "is-referenced-by-count": 0,
+    "title": [
+     "CAOS 2026 Oceanic Engineering Society"
+    ],
+    "container-title": [
+     "2026 IEEE Canadian Atlantic Ocean Symposium (CAOS)"
+    ],
+    "score": 18.233578,
+    "issued": {
+     "date-parts": [
+      [
+       2026,
+       7
+      ]
+     ]
+    },
+    "URL": "https://doi.org/10.1109/caos69069.2026.11666229"
+   },
+   {
+    "DOI": "10.1109/caos69069.2026.11666161",
+    "type": "proceedings-article",
+    "page": "1-1",
+    "is-referenced-by-count": 0,
+    "title": [
+     "CAOS 2026 Technical Program Committee"
+    ],
+    "container-title": [
+     "2026 IEEE Canadian Atlantic Ocean Symposium (CAOS)"
+    ],
+    "score": 18.20197,
+    "issued": {
+     "date-parts": [
+      [
+       2026,
+       7
+      ]
+     ]
+    },
+    "URL": "https://doi.org/10.1109/caos69069.2026.11666161"
+   },
+   {
+    "issue": "23",
+    "abstract": "<jats:p>Apresentação do número 23.</jats:p>",
+    "DOI": "10.46906/caos.n23.50105.p8-11",
+    "type": "journal-article",
+    "page": "8-11",
+    "is-referenced-by-count": 0,
+    "title": [
+     "EDITORIAL"
+    ],
+    "volume": "2",
+    "author": [
+     {
+      "ORCID": "https://orcid.org/0000-0003-4022-7165",
+      "authenticated-orcid": false,
+      "given": "Giovanni",
+      "family": "Boaes",
+      "sequence": "first",
+      "affiliation": [],
+      "role": [
+       {
+        "role": "author",
+        "vocabulary": "crossref"
+       }
+      ]
+     }
+    ],
+    "container-title": [
+     "CAOS – Revista Eletrônica de Ciências Sociais"
+    ],
+    "score": 18.17916,
+    "issued": {
+     "date-parts": [
+      [
+       2019,
+       12,
+       28
+      ]
+     ]
+    },
+    "URL": "https://doi.org/10.46906/caos.n23.50105.p8-11"
+   },
+   {
+    "DOI": "10.48021/978-65-252-6270-3",
+    "type": "edited-book",
+    "is-referenced-by-count": 0,
+    "title": [
+     "Caos e Hipercaos: estudo da transição para caos e hipercaos em magnetoconvecção"
+    ],
+    "author": [
+     {
+      "given": "F. F.",
+      "family": "FRANCO",
+      "sequence": "first",
+      "affiliation": [],
+      "role": [
+       {
+        "role": "author",
+        "vocabulary": "crossref"
+       }
+      ]
+     }
+    ],
+    "score": 18.105852,
+    "issued": {
+     "date-parts": [
+      [
+       2022
+      ]
+     ]
+    },
+    "URL": "https://doi.org/10.48021/978-65-252-6270-3"
+   },
+   {
+    "issue": "35",
+    "abstract": "<jats:p>Apresentação do número 35.</jats:p>",
+    "DOI": "10.46906/caos.n35.77452.p6-12",
+    "type": "journal-article",
+    "page": "6-12",
+    "is-referenced-by-count": 0,
+    "title": [
+     "Editorial"
+    ],
+    "volume": "2",
+    "author": [
+     {
+      "ORCID": "https://orcid.org/0000-0003-4022-7165",
+      "authenticated-orcid": false,
+      "given": "Giovanni",
+      "family": "Boaes",
+      "sequence": "first",
+      "affiliation": [],
+      "role": [
+       {
+        "role": "author",
+        "vocabulary": "crossref"
+       }
+      ]
+     }
+    ],
+    "container-title": [
+     "CAOS – Revista Eletrônica de Ciências Sociais"
+    ],
+    "score": 18.064482,
+    "issued": {
+     "date-parts": [
+      [
+       2025,
+       12,
+       10
+      ]
+     ]
+    },
+    "URL": "https://doi.org/10.46906/caos.n35.77452.p6-12"
+   },
+   {
+    "issue": "32",
+    "abstract": "<jats:p>Este editorial tem como objetivo apresentar o número 32 da revista, destacando tanto algumas circunstâncias do processo editorial quanto os textos que compõem o corpus desta edição.  Esta apresentação pretende situar os leitores no contexto editorial e motivá-los à leitura.</jats:p>",
+    "DOI": "10.46906/caos.n32.70206.p6-14",
+    "type": "journal-article",
+    "page": "6-14",
+    "is-referenced-by-count": 0,
+    "title": [
+     "EDITORIAL"
+    ],
+    "volume": "1",
+    "author": [
+     {
+      "ORCID": "https://orcid.org/0000-0003-4022-7165",
+      "authenticated-orcid": false,
+      "given": "Giovanni",
+      "family": "Boaes",
+      "sequence": "first",
+      "affiliation": [],
+      "role": [
+       {
+        "role": "author",
+        "vocabulary": "crossref"
+       }
+      ]
+     }
+    ],
+    "container-title": [
+     "CAOS – Revista Eletrônica de Ciências Sociais"
+    ],
+    "score": 18.022816,
+    "issued": {
+     "date-parts": [
+      [
+       2024,
+       6,
+       5
+      ]
+     ]
+    },
+    "URL": "https://doi.org/10.46906/caos.n32.70206.p6-14"
+   },
+   {
+    "issue": "33",
+    "abstract": "<jats:p>Este ano, a revista Caos celebra 25 anos de uma trajetória marcada por manuscritos, leituras, palavras entrelaçadas, ideias inovadoras e as inquietações de alunos, professores e pesquisadores das ciências sociais. Em nossa 33ª edição, que também comemora o quinto ano de publicações ininterruptas desde o nosso retorno em 2019; olhar para o passado com um misto de orgulho pelas conquistas é inevitável como antecipação para o que ainda está por vir.</jats:p>",
+    "DOI": "10.46906/caos.n33.72357.p7-12",
+    "type": "journal-article",
+    "page": "7-12",
+    "is-referenced-by-count": 0,
+    "title": [
+     "Editorial: Celebrando 25 anos da Revista Caos e 5 anos de sua reativação"
+    ],
+    "volume": "2",
+    "author": [
+     {
+      "ORCID": "https://orcid.org/0000-0002-6877-7284",
+      "authenticated-orcid": false,
+      "given": "Mohana Ellen Brito Morais",
+      "family": "Cavalcante",
+      "sequence": "first",
+      "affiliation": [],
+      "role": [
+       {
+        "role": "author",
+        "vocabulary": "crossref"
+       }
+      ]
+     }
+    ],
+    "container-title": [
+     "CAOS – Revista Eletrônica de Ciências Sociais"
+    ],
+    "score": 18.012089,
+    "issued": {
+     "date-parts": [
+      [
+       2024,
+       12,
+       7
+      ]
+     ]
+    },
+    "URL": "https://doi.org/10.46906/caos.n33.72357.p7-12"
+   },
+   {
+    "issue": "28",
+    "abstract": "<jats:p>Apresentação do número 28.</jats:p>",
+    "DOI": "10.46906/caos.n28.63228.p6-11",
+    "type": "journal-article",
+    "page": "6-11",
+    "is-referenced-by-count": 0,
+    "title": [
+     "EDITORIAL"
+    ],
+    "volume": "1",
+    "author": [
+     {
+      "ORCID": "https://orcid.org/0000-0003-4022-7165",
+      "authenticated-orcid": false,
+      "given": "Giovanni",
+      "family": "Boaes",
+      "sequence": "first",
+      "affiliation": [],
+      "role": [
+       {
+        "role": "author",
+        "vocabulary": "crossref"
+       }
+      ]
+     },
+     {
+      "ORCID": "https://orcid.org/0000-0002-5690-6069",
+      "authenticated-orcid": false,
+      "given": "Adailton",
+      "family": "Aragão",
+      "sequence": "additional",
+      "affiliation": [],
+      "role": [
+       {
+        "role": "author",
+        "vocabulary": "crossref"
+       }
+      ]
+     }
+    ],
+    "container-title": [
+     "CAOS – Revista Eletrônica de Ciências Sociais"
+    ],
+    "score": 17.862036,
+    "issued": {
+     "date-parts": [
+      [
+       2022,
+       6,
+       10
+      ]
+     ]
+    },
+    "URL": "https://doi.org/10.46906/caos.n28.63228.p6-11"
+   },
+   {
+    "issue": "24",
+    "abstract": "<jats:p>Apresentação do número 24.</jats:p>",
+    "DOI": "10.46906/caos.n24.52856.p7-10",
+    "type": "journal-article",
+    "page": "7-10",
+    "is-referenced-by-count": 0,
+    "title": [
+     "EDITORIAL"
+    ],
+    "volume": "1",
+    "author": [
+     {
+      "ORCID": "https://orcid.org/0000-0003-4022-7165",
+      "authenticated-orcid": false,
+      "given": "Giovanni",
+      "family": "Boaes",
+      "sequence": "first",
+      "affiliation": [],
+      "role": [
+       {
+        "role": "author",
+        "vocabulary": "crossref"
+       }
+      ]
+     }
+    ],
+    "container-title": [
+     "CAOS – Revista Eletrônica de Ciências Sociais"
+    ],
+    "score": 17.836414,
+    "issued": {
+     "date-parts": [
+      [
+       2020,
+       5,
+       28
+      ]
+     ]
+    },
+    "URL": "https://doi.org/10.46906/caos.n24.52856.p7-10"
+   },
+   {
+    "issue": "24",
+    "abstract": "<jats:p>Os registros fotográficos aqui apresentados foram feitos no Instituto Federal da Paraíba, campus Jaguaribe, como uma das atividades realizadas pelo PIBID Sociologia 2018/2019 e teve como principal objetivo refletir como se dão as relações no ambiente escolar. Mas para além disso, os registros nos revelaram um conjunto de limitações para que essas relações aconteçam. Os portões, grades e cercas levam os estudantes a vivenciar os seus momentos de lazer, descanso e estudo extra classe quase sempre nos corredores e pátios. Faltam um restaurante universitário, espaços de estudo onde possam conversar entre si e lugares onde possam se recuperar da agenda de um dia todo de atividades. Diante da falta, improvisam camas, mesas e tabuleiros, enquanto sonham e lutam pela escola que gostariam. As imagens foram inseridas também no curta produzido por mim e Paula Cavalcante e denominado “Por dentro do IF”, disponível no ciberespaço.</jats:p>",
+    "DOI": "10.46906/caos.n24.50772.p132-138",
+    "type": "journal-article",
+    "page": "132-138",
+    "is-referenced-by-count": 0,
+    "title": [
+     "ESCOLA CERCADA"
+    ],
+    "volume": "1",
+    "author": [
+     {
+      "given": "Raiana",
+      "family": "Martins",
+      "sequence": "first",
+      "affiliation": [],
+      "role": [
+       {
+        "role": "author",
+        "vocabulary": "crossref"
+       }
+      ]
+     }
+    ],
+    "container-title": [
+     "CAOS – Revista Eletrônica de Ciências Sociais"
+    ],
+    "score": 17.750017,
+    "issued": {
+     "date-parts": [
+      [
+       2020,
+       5,
+       17
+      ]
+     ]
+    },
+    "URL": "https://doi.org/10.46906/caos.n24.50772.p132-138"
+   },
+   {
+    "issue": "25",
+    "abstract": "<jats:p>Apresentação do número 25.</jats:p>",
+    "DOI": "10.46906/caos.n25.56556.p6-9",
+    "type": "journal-article",
+    "page": "6-9",
+    "is-referenced-by-count": 0,
+    "title": [
+     "EDITORIAL"
+    ],
+    "volume": "2",
+    "author": [
+     {
+      "ORCID": "https://orcid.org/0000-0003-4022-7165",
+      "authenticated-orcid": false,
+      "given": "Giovanni",
+      "family": "Boaes",
+      "sequence": "first",
+      "affiliation": [],
+      "role": [
+       {
+        "role": "author",
+        "vocabulary": "crossref"
+       }
+      ]
+     },
+     {
+      "ORCID": "https://orcid.org/0000-0002-5690-6069",
+      "authenticated-orcid": false,
+      "given": "Adailton",
+      "family": "Aragão",
+      "sequence": "additional",
+      "affiliation": [],
+      "role": [
+       {
+        "role": "author",
+        "vocabulary": "crossref"
+       }
+      ]
+     }
+    ],
+    "container-title": [
+     "CAOS – Revista Eletrônica de Ciências Sociais"
+    ],
+    "score": 17.731995,
+    "issued": {
+     "date-parts": [
+      [
+       2020,
+       12,
+       10
+      ]
+     ]
+    },
+    "URL": "https://doi.org/10.46906/caos.n25.56556.p6-9"
+   },
+   {
+    "issue": "26",
+    "DOI": "10.46906/caos.n26.59562.p7-11",
+    "type": "journal-article",
+    "page": "7-11",
+    "is-referenced-by-count": 0,
+    "title": [
+     "EDITORIAL"
+    ],
+    "volume": "1",
+    "author": [
+     {
+      "ORCID": "https://orcid.org/0000-0003-4022-7165",
+      "authenticated-orcid": false,
+      "given": "Giovanni",
+      "family": "Boaes",
+      "sequence": "first",
+      "affiliation": [],
+      "role": [
+       {
+        "role": "author",
+        "vocabulary": "crossref"
+       }
+      ]
+     },
+     {
+      "ORCID": "https://orcid.org/0000-0002-5690-6069",
+      "authenticated-orcid": false,
+      "given": "Adailton",
+      "family": "Aragão",
+      "sequence": "additional",
+      "affiliation": [],
+      "role": [
+       {
+        "role": "author",
+        "vocabulary": "crossref"
+       }
+      ]
+     }
+    ],
+    "container-title": [
+     "CAOS – Revista Eletrônica de Ciências Sociais"
+    ],
+    "score": 17.695332,
+    "issued": {
+     "date-parts": [
+      [
+       2021,
+       6,
+       12
+      ]
+     ]
+    },
+    "URL": "https://doi.org/10.46906/caos.n26.59562.p7-11"
+   }
+  ],
+  "items-per-page": 100,
+  "query": {
+   "start-index": 0,
+   "search-terms": "caos double pendulum"
+  }
+ }
+}
