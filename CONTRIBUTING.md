@@ -21,7 +21,9 @@ pnpm install
 pnpm dev            # the web app, with live reload
 pnpm typecheck
 pnpm test           # core and web unit tests
-pnpm test:scripts   # tests for the build checker in scripts/
+pnpm test:scripts   # tests for the scripts in scripts/ (single-file check, version tools)
+pnpm version:check  # the version in package.json and CITATION.cff agree
+pnpm version:set 0.2.0   # change the version (the only place to change it)
 pnpm build          # builds apps/web/dist: index.html (one file) and config.js
 pnpm check:dist     # fails if index.html needs any file other than config.js
 ```
@@ -37,7 +39,7 @@ packages/core/   providers, query parsing, BM25 relevance, labels, scoring, merg
 apps/web/        the React app and its plain CSS. Logic that is not about drawing lives in plain
                  modules with tests (pipeline.ts, searchState.ts, queryText.ts, savedStore.ts, ...).
 docs/            methodology.md (how everything is worked out) and adding-a-source.md.
-scripts/         the single-file build checker.
+scripts/         the single-file build checker and the version tools.
 ```
 
 ## Rules for code
@@ -62,9 +64,9 @@ See [docs/adding-a-source.md](docs/adding-a-source.md). The short version: check
 
 ## Making a release
 
-1. Change `version` in `apps/web/package.json` (the release workflow requires the tag to match it) and in `CITATION.cff`. Commit on `dev`, review, and merge to `main`.
+1. Set the new version in **one place**, the `version` line of the root `package.json`, with `pnpm version:set 0.2.0` (it also updates `CITATION.cff`, the one file that repeats it). The footer ("v0.2.0"), the search protocol and the release zip name all read it from there; the other `package.json` files carry no version on purpose. `pnpm version:check` (also run by CI) fails if anything disagrees. Commit on `dev`, review, and merge to `main`.
 2. Tag the commit on `main`: `git tag v0.2.0 && git push origin v0.2.0`.
-3. The `Release` workflow typechecks, tests and builds, checks that `index.html` is a single file, and attaches `sourcly-0.2.0.zip` (the site, `config.js`, a short README and the licence) to a GitHub Release. The footer's "Download" link points at `releases/latest`.
+3. The `Release` workflow typechecks, tests and builds, checks that `index.html` is a single file, checks that the tag equals the version, and attaches `sourcly-0.2.0.zip` (the site, `config.js`, a short README and the licence) to a GitHub Release. The footer's "Download" link points at `releases/latest`.
 
 ## Licence
 

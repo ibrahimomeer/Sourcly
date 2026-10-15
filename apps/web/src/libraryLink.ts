@@ -1,6 +1,6 @@
 import { doiUrl, type Result } from "@sourcly/core";
 
-// "Open via UBC Library" links are  prefix + encoded address  (config.libraryProxyPrefix).
+// "Access with UBC Library" links are  prefix + encoded address  (config.libraryProxyPrefix).
 //
 // The address is percent-encoded as one value, the way any web address is passed
 // inside a link's query string. UBC Library's OpenAthens redirector accepts it for
@@ -31,7 +31,7 @@ export function libraryTarget(result: Pick<Result, "doi" | "url">): string | nul
 }
 
 /**
- * The "Open via UBC Library" link, or null when the prefix is empty (the button
+ * The "Access with UBC Library" link, or null when the prefix is empty (the button
  * is then hidden) or the result has no address to open.
  */
 export function libraryUrl(prefix: string, result: Pick<Result, "doi" | "url">): string | null {

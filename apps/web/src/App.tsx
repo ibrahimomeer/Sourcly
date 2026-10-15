@@ -19,6 +19,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { browserStorage, loadApiKey, saveApiKey } from "./apiKey";
 import type { SourclyConfig } from "./config";
 import { Footer } from "./Footer";
+import { CitationsPanel } from "./CitationsPanel";
 import { CounterPanel } from "./CounterPanel";
 import { Header } from "./Header";
 import { rankResults, relatedFor, scoringContext } from "./pipeline";
@@ -62,6 +63,9 @@ export function App({ config }: { config: SourclyConfig }) {
   const [counterRecord, setCounterRecord] = useState<CounterRecord | null>(null);
   // The counterargument section starts as a small bar and opens when the person asks for it.
   const [counterOpen, setCounterOpen] = useState(false);
+  // The three panels under the search box, each opened by a button in the toolbar.
+  const [openPanels, setOpenPanels] = useState({ settings: false, saved: false, citations: false });
+  const togglePanel = (name: keyof typeof openPanels) => setOpenPanels((current) => ({ ...current, [name]: !current[name] }));
 
   // This visit's memory of each source's answers. In memory only, gone when the page closes.
   const cache = useRef(createSearchCache());
@@ -156,7 +160,7 @@ export function App({ config }: { config: SourclyConfig }) {
 
   return (
     <SavedProvider value={savedApi}>
-    <div className="page">
+    <div className={counterOpen && state.phase !== "idle" ? "page page-wide" : "page"}>
       <Header config={config} />
       <main>
         <div className="top">
@@ -169,7 +173,38 @@ export function App({ config }: { config: SourclyConfig }) {
             <p className="warning">No source is selected. Open Settings and choose at least one to search.</p>
           )}
 
+          <div className="toolbar" role="group" aria-label="Settings, saved list and citations">
+            <button
+              type="button"
+              className="settings-toggle"
+              aria-expanded={openPanels.settings}
+              aria-controls="settings-panel"
+              onClick={() => togglePanel("settings")}
+            >
+              Settings
+            </button>
+            <button
+              type="button"
+              className="settings-toggle"
+              aria-expanded={openPanels.saved}
+              aria-controls="saved-panel"
+              onClick={() => togglePanel("saved")}
+            >
+              Saved list ({saved.length})
+            </button>
+            <button
+              type="button"
+              className="settings-toggle"
+              aria-expanded={openPanels.citations}
+              aria-controls="citations-panel"
+              onClick={() => togglePanel("citations")}
+            >
+              In-text citations
+            </button>
+          </div>
+
           <SettingsPanel
+            open={openPanels.settings}
             scoring={scoring}
             onScoringChange={setScoring}
             filters={filters}
@@ -189,7 +224,9 @@ export function App({ config }: { config: SourclyConfig }) {
             onClear={() => setSaved([])}
             isStored={savedIsStored}
             libraryPrefix={config.libraryProxyPrefix}
+            open={openPanels.saved}
           />
+          <CitationsPanel items={saved} open={openPanels.citations} />
         </div>
 
         {/* Once a search has been made the counterargument section is a small bar above the results. Opened,

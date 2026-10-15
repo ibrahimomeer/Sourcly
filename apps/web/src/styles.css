@@ -179,7 +179,9 @@ button:disabled {
 }
 
 .button {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   padding: 0.3rem 0.8rem;
   border: 1px solid var(--border-strong);
   text-decoration: none;
@@ -197,9 +199,16 @@ button:disabled {
   font-weight: 600;
 }
 
-/* Settings */
+/* The toolbar of panel buttons under the search box, and the panels they open */
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
 .settings {
-  margin-bottom: 1.5rem;
+  margin: 0;
 }
 
 .settings-toggle[aria-expanded="true"] {
@@ -208,7 +217,7 @@ button:disabled {
 }
 
 .settings-panel {
-  margin-top: 0.75rem;
+  margin: 0 0 1rem;
   padding: 0 1rem 1rem;
   border: 1px solid var(--border);
 }
@@ -482,8 +491,21 @@ fieldset > p:first-of-type {
 .actions {
   display: flex;
   flex-wrap: wrap;
+  align-items: stretch;
   gap: 0.5rem;
   margin-top: 0.75rem;
+}
+
+/* Links and buttons in one row look the same: same size, text centred both ways. */
+.actions > .button,
+.actions > button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.3rem 0.8rem;
+  font-size: 0.875rem;
+  line-height: 1.4;
+  text-align: center;
 }
 
 .note {
@@ -650,11 +672,13 @@ code {
 /* Layout. After a search the counterarguments section is a small bar above the results. Opened, it
    moves into a second column on wide screens, and stays above the results on narrow ones. */
 
-.page {
+/* The page is one centred column. Only while the counterargument section is open does it widen,
+   so the two columns have room. */
+.page-wide {
   max-width: 1280px;
 }
 
-.top {
+.page-wide .top {
   max-width: 900px;
 }
 
@@ -662,14 +686,9 @@ code {
   min-width: 0;
 }
 
-.columns:not(.columns-two) {
-  max-width: 900px;
-}
-
 .columns-two {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  max-width: 900px;
 }
 
 .columns-two > .column + .column {
@@ -682,7 +701,6 @@ code {
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     gap: 2rem;
     align-items: start;
-    max-width: none;
   }
 
   .columns-two.counter-open > .column + .column {
@@ -831,8 +849,9 @@ mark {
 
 /* Saved list and exports */
 
-.saved {
-  margin-bottom: 1.5rem;
+.saved,
+.citations {
+  margin: 0;
 }
 
 .saved-list {
@@ -869,4 +888,49 @@ mark {
   align-items: center;
   gap: 0.5rem 0.75rem;
   margin: 0 0 1rem;
+}
+
+/* In-text citations */
+
+.citation-list {
+  margin: 0 0 1rem;
+  padding: 0;
+  list-style: none;
+}
+
+.citation-list > li {
+  margin: 0 0 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.citation-source {
+  margin: 0 0 0.35rem;
+  font-size: 0.8rem;
+  color: var(--muted);
+  overflow-wrap: anywhere;
+}
+
+.citation-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem 0.75rem;
+  margin: 0.25rem 0;
+}
+
+.citation-kind {
+  flex: 0 0 7.5rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.citation {
+  flex: 1 1 12rem;
+  overflow-wrap: anywhere;
+}
+
+.citation-row button {
+  padding: 0.2rem 0.7rem;
+  font-size: 0.85rem;
 }

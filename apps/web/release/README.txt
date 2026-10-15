@@ -23,7 +23,7 @@ Changing the name, the library link or the footer
 
 Everything you might want to change is in config.js, a plain text file you can open in any text
 editor: the site name, the author name shown in the footer, the repository and download links,
-the library sign-in prefix for the "Open via your library" button (empty hides it), and an
+the library sign-in prefix for the "Access with your library" button (empty hides it), and an
 optional contact email for sources that ask for one. Save the file and reload the page. You do
 not need to rebuild anything.
 

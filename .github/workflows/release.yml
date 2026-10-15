@@ -32,15 +32,10 @@ jobs:
       # The zip is useful only if index.html really is one file (plus config.js).
       - run: pnpm check:dist
 
+      # The version is written once, in the root package.json. The tag must be the same, and
+      # CITATION.cff must agree.
       - name: The tag must match the app version
-        run: |
-          tag_version="${GITHUB_REF_NAME#v}"
-          app_version="$(jq -r .version apps/web/package.json)"
-          if [ "$tag_version" != "$app_version" ]; then
-            echo "Tag $GITHUB_REF_NAME does not match the version $app_version in apps/web/package.json."
-            echo "Change the version, commit, and tag again."
-            exit 1
-          fi
+        run: node scripts/version.mjs check "$GITHUB_REF_NAME"
 
       - name: Make the zip
         run: |

@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   apaChecks,
+  apaInlineHtml,
   apaText,
   buildReferenceList,
   formatApa,
@@ -482,5 +483,174 @@ describe("journalCase", () => {
     expect(text(lower)).toContain(" Brain Communications, 8(4), Article e1.");
     const preprint = makeResult({ authors: [person("Smith", "Jo")], year: 2024, title: "A title", venue: "medRxiv", type: "preprint", doi: "10.1/x" });
     expect(text(preprint)).toContain(" medRxiv. https");
+  });
+});
+
+describe("in-text citations", () => {
+  const work = (title: string, authors: Author[], year: number | null, overrides: Partial<Result> = {}) =>
+    makeResult({
+      id: `10.1/${title}`.replace(/\s/g, "-"),
+      doi: `10.1/${title}`.replace(/\s/g, "-"),
+      title,
+      authors,
+      year,
+      volume: null,
+      issue: null,
+      pages: null,
+      ...overrides,
+    });
+  /** [parenthetical, narrative] for each work, in list order, keyed by title. */
+  const cites = (results: Result[]) =>
+    Object.fromEntries(
+      buildReferenceList(results).map((entry) => [
+        entry.result.title,
+        [apaText(entry.citation.parenthetical), apaText(entry.citation.narrative)],
+      ]),
+    );
+  const many = (family: string[]): Author[] => family.map((name) => person(name, "Alex"));
+
+  it("cites one author as (Stickgold, 2005), and as Stickgold (2005) in a sentence", () => {
+    expect(cites([work("A", [person("Stickgold", "Robert")], 2005)])).toEqual({ A: ["(Stickgold, 2005)", "Stickgold (2005)"] });
+  });
+
+  it("cites two authors with & in brackets and 'and' in a sentence", () => {
+    expect(cites([work("A", many(["Stickgold", "Walker"]), 2005)])).toEqual({
+      A: ["(Stickgold & Walker, 2005)", "Stickgold and Walker (2005)"],
+    });
+  });
+
+  it("cites three or more authors, at every citation, as the first author and et al.", () => {
+    expect(cites([work("A", many(["Smith", "Jones", "Lee"]), 2020)])).toEqual({ A: ["(Smith et al., 2020)", "Smith et al. (2020)"] });
+    expect(cites([work("B", many(Array.from({ length: 25 }, (_, i) => `Name${i}`)), 2020)]).B).toEqual([
+      "(Name0 et al., 2020)",
+      "Name0 et al. (2020)",
+    ]);
+  });
+
+  it("writes n.d. when there is no year", () => {
+    expect(cites([work("A", many(["Smith"]), null)])).toEqual({ A: ["(Smith, n.d.)", "Smith (n.d.)"] });
+  });
+
+  it("uses a group author's name as it is", () => {
+    expect(cites([work("A", [{ name: "World Health Organization" }], 2020)])).toEqual({
+      A: ["(World Health Organization, 2020)", "World Health Organization (2020)"],
+    });
+  });
+
+  it("adds the letters the reference list uses: 2020a, 2020b, and n.d.-a", () => {
+    expect(cites([work("Zebra", many(["Smith"]), 2020), work("Apple", many(["Smith"]), 2020), work("Old", many(["Smith"]), 2019)])).toEqual({
+      Old: ["(Smith, 2019)", "Smith (2019)"],
+      Apple: ["(Smith, 2020a)", "Smith (2020a)"],
+      Zebra: ["(Smith, 2020b)", "Smith (2020b)"],
+    });
+    expect(cites([work("B", many(["Smith"]), null), work("A", many(["Smith"]), null)])).toEqual({
+      A: ["(Smith, n.d.-a)", "Smith (n.d.-a)"],
+      B: ["(Smith, n.d.-b)", "Smith (n.d.-b)"],
+    });
+  });
+
+  it("gives the first author's initials when two first authors share a surname but not initials", () => {
+    const out = cites([
+      work("A", [person("Smith", "Jo"), person("Lee", "Ann")], 2020),
+      work("B", [person("Smith", "Kim")], 2019),
+      work("C", [person("Brown", "Cy")], 2020),
+    ]);
+    expect(out.A).toEqual(["(J. Smith & Lee, 2020)", "J. Smith and Lee (2020)"]);
+    expect(out.B).toEqual(["(K. Smith, 2019)", "K. Smith (2019)"]);
+    expect(out.C).toEqual(["(Brown, 2020)", "Brown (2020)"]);
+  });
+
+  it("does not add initials when the same surname has the same initials (the standard form is used)", () => {
+    const out = cites([work("A", [person("Smith", "Jo")], 2019), work("B", [person("Smith", "Jo")], 2021)]);
+    expect(out.A?.[0]).toBe("(Smith, 2019)");
+    expect(out.B?.[0]).toBe("(Smith, 2021)");
+  });
+
+  it("names enough authors to tell apart works that would both shorten to 'Smith et al., 2020'", () => {
+    const out = cites([
+      work("A", many(["Smith", "Jones", "Lee", "Kim"]), 2020),
+      work("B", many(["Smith", "Jones", "Park", "Cho"]), 2020),
+      work("C", many(["Smith", "Wu", "Lee"]), 2020),
+    ]);
+    expect(out.A).toEqual(["(Smith, Jones, Lee, et al., 2020)", "Smith, Jones, Lee, et al. (2020)"]);
+    expect(out.B).toEqual(["(Smith, Jones, Park, et al., 2020)", "Smith, Jones, Park, et al. (2020)"]);
+    expect(out.C?.[0]).toBe("(Smith, Wu, et al., 2020)");
+  });
+
+  it("names two authors when that is enough, and leaves works from different years alone", () => {
+    const out = cites([
+      work("A", many(["Smith", "Jones", "Lee"]), 2020),
+      work("B", many(["Smith", "Wu", "Lee"]), 2020),
+      work("C", many(["Smith", "Kim", "Lee"]), 2019),
+    ]);
+    expect(out.A?.[0]).toBe("(Smith, Jones, et al., 2020)");
+    expect(out.B?.[0]).toBe("(Smith, Wu, et al., 2020)");
+    expect(out.C?.[0]).toBe("(Smith et al., 2019)");
+  });
+
+  it("lets works with the same authors and year be told apart by their letters, not by extra names", () => {
+    const out = cites([work("Apple", many(["Smith", "Jones", "Lee"]), 2020), work("Zebra", many(["Smith", "Jones", "Lee"]), 2020)]);
+    expect(out.Apple?.[0]).toBe("(Smith et al., 2020a)");
+    expect(out.Zebra?.[0]).toBe("(Smith et al., 2020b)");
+  });
+
+  it("uses the title when there is no author: in quotation marks for an article, with the comma inside", () => {
+    const out = cites([work("Sleep and memory consolidation", [], 2020)]);
+    expect(out["Sleep and memory consolidation"]).toEqual(["(“Sleep and Memory Consolidation,” 2020)", "“Sleep and Memory Consolidation” (2020)"]);
+  });
+
+  it("shortens a long title to what comes before a colon, and to six words, never ending on a small word", () => {
+    expect(cites([work("The impact of climate change on global biodiversity: a comprehensive analysis", [], 2023)])[
+      "The impact of climate change on global biodiversity: a comprehensive analysis"
+    ]?.[0]).toBe("(“The Impact of Climate Change,” 2023)");
+    expect(cites([work("Sleep matters: a review", [], 2023)])["Sleep matters: a review"]?.[0]).toBe("(“Sleep Matters,” 2023)");
+  });
+
+  it("keeps a question mark inside the quotation marks with no comma after it", () => {
+    expect(cites([work("Why do we sleep?", [], 2017)])["Why do we sleep?"]?.[0]).toBe("(“Why Do We Sleep?” 2017)");
+  });
+
+  it("keeps capitals that are already inside a word, and puts small words in lower case", () => {
+    expect(cites([work("mRNA vaccines for COVID-19 in the clinic", [], 2021)])["mRNA vaccines for COVID-19 in the clinic"]?.[0]).toBe(
+      "(“mRNA Vaccines for COVID-19,” 2021)",
+    );
+  });
+
+  it("uses an italic title for a book or report with no author, and no quotation marks", () => {
+    const [entry] = buildReferenceList([work("Why we sleep", [], 2017, { type: "book", venue: "Scribner" })]);
+    expect(apaText(entry?.citation.parenthetical ?? [])).toBe("(Why We Sleep, 2017)");
+    expect(apaText(entry?.citation.narrative ?? [])).toBe("Why We Sleep (2017)");
+    expect(entry?.citation.parenthetical.filter((p) => p.italic).map((p) => p.text)).toEqual(["Why We Sleep"]);
+    expect(apaInlineHtml(entry?.citation.parenthetical ?? [])).toBe("(<i>Why We Sleep</i>, 2017)");
+  });
+
+  it("cites a Wikipedia page by its title, with n.d.", () => {
+    const page = work("Sleep", [], null, {
+      venue: "Wikipedia",
+      type: "reference-entry",
+      doi: null,
+      hits: [{ provider: "wikipedia", id: "1", rank: 1, listSize: 1, score: null }],
+    });
+    expect(cites([page]).Sleep).toEqual(["(“Sleep,” n.d.)", "“Sleep” (n.d.)"]);
+  });
+
+  it("escapes text in the inline HTML", () => {
+    const [entry] = buildReferenceList([work("A", [{ name: "Smith & Sons Group" }], 2020)]);
+    expect(apaInlineHtml(entry?.citation.parenthetical ?? [])).toBe("(Smith &amp; Sons Group, 2020)");
+  });
+
+  it("matches the year letters in the reference list", () => {
+    const list = buildReferenceList([work("Zebra", many(["Smith"]), 2020), work("Apple", many(["Smith"]), 2020)]);
+    for (const entry of list) {
+      const letter = entry.text.match(/\((\d{4}[a-z])\)/)?.[1];
+      expect(apaText(entry.citation.parenthetical)).toContain(letter);
+    }
+  });
+
+  it("does not change the results it is given", () => {
+    const input = [work("A", many(["Smith", "Jones", "Lee"]), 2020), work("B", many(["Smith", "Wu", "Lee"]), 2020)];
+    const before = JSON.stringify(input);
+    buildReferenceList(input);
+    expect(JSON.stringify(input)).toBe(before);
   });
 });

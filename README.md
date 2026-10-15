@@ -23,10 +23,11 @@ Labels and rankings are heuristics based on metadata. Verify sources before citi
 3. Open "Why this rank?" on any result to see how each factor contributed: relevance (BM25 over title, abstract and subject terms), citations, recency, peer review, open access, provider agreement and study type. "Related terms" under the results suggests topics and MeSH headings from the top results; clicking one adds it to the search box, and nothing is searched until you press Search.
 4. Press "Open" on the small "Counterarguments & limitations" bar above the results (it opens beside them on a wide screen), then "Search for counterarguments" to run a second search for sources that discuss limitations, criticism or corrections. Edit its terms, or type your own opposing search. Matched words are highlighted, and reviews, meta-analyses, retractions and corrections can be listed on their own. It is keyword-based and cannot tell whether a source actually disagrees: read before citing.
 5. Change sources, filters or weights in Settings. Results re-rank instantly without re-fetching. If a label looks wrong, change it on the card.
-6. Press "Save to list" on the sources you want to keep. Open "Saved list" to see them as APA 7 references (each with a small "Open via UBC Library" link), then copy them (italics are kept when you paste into Word or Google Docs) or download them as a text file. The list is kept in your browser only. Metadata can be incomplete, so each reference says what to check.
-7. Press "Download search protocol (JSON)" to record the query, what each source received, the sources, filters, weights, date and how each source answered, so the search can be written up and repeated. It contains no API key.
+6. Press "Save to list" on the sources you want to keep. Open "Saved list" to see them as APA 7 references (each with a small "Access with UBC Library" link), then copy them (italics are kept when you paste into Word or Google Docs) or download them as a text file. The list is kept in your browser only. Metadata can be incomplete, so each reference says what to check.
+7. Open "In-text citations" to copy the APA 7 in-text citation for each saved source, in brackets or in a sentence, such as `(Stickgold, 2005)` and `Stickgold (2005)`. They match your reference list.
+8. Press "Download search protocol (JSON)" to record the query, what each source received, the sources, filters, weights, date and how each source answered, so the search can be written up and repeated. It contains no API key.
 
-Each result can offer an "Open access PDF" button (when a free PDF is known), an "Open via UBC Library" button (on every result with a DOI or link, if `libraryProxyPrefix` is set in `config.js`), and a DOI button. Open access does not affect the ranking by default, so results are never pushed down for being behind a paywall.
+Each result can offer an "Open access PDF" button (when a free PDF is known), an "Access with UBC Library" button (on every result with a DOI or link, if `libraryProxyPrefix` is set in `config.js`), and a DOI button. Open access does not affect the ranking by default, so results are never pushed down for being behind a paywall.
 
 "Search elsewhere" links under the search box open the same query in Google Scholar, Google, DuckDuckGo and UBC Library's search.
 
@@ -43,7 +44,7 @@ Four ways to run Sourcly. All of them work the same way: your searches go straig
 3. **Zip with a local server.** Unzip, then run `npx serve` in the folder and open the address it prints. Some people prefer this to opening a file.
 4. **Development setup.** See below.
 
-Everything you might want to change is in one plain file, `config.js`, which sits next to `index.html` and is not bundled: the site name, the name in the footer, the repository and download links, the library sign-in prefix for the "Open via UBC Library" button (empty hides it), and an optional contact email. Forks and downloaders edit only that file to rebrand, with no rebuild.
+Everything you might want to change is in one plain file, `config.js`, which sits next to `index.html` and is not bundled: the site name, the name in the footer, the repository and download links, the library sign-in prefix for the "Access with UBC Library" button (empty hides it), and an optional contact email. Forks and downloaders edit only that file to rebrand, with no rebuild.
 
 Checked in Chrome from a downloaded folder (`file://`): all sources that allow browser requests answered, and the saved list, exports and counterarguments panel worked. Other browsers treat files differently and were not checked.
 
@@ -60,9 +61,10 @@ pnpm install
 pnpm dev            # start the web app
 pnpm typecheck
 pnpm test
-pnpm test:scripts   # tests for the build checker
+pnpm test:scripts   # tests for the build checker and the version tools
 pnpm build          # apps/web/dist: index.html (one file) and config.js
 pnpm check:dist     # fails if index.html needs any file other than config.js
+pnpm version:set 0.2.0   # change the version: the one place it is written is package.json
 ```
 
 [CONTRIBUTING.md](CONTRIBUTING.md) explains how to work on the code, and [docs/adding-a-source.md](docs/adding-a-source.md) how to add a data source.

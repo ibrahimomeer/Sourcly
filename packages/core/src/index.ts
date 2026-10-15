@@ -15,6 +15,7 @@ export {
 } from "./query";
 export {
   apaChecks,
+  apaInlineHtml,
   apaText,
   buildReferenceList,
   formatApa,
@@ -23,6 +24,7 @@ export {
   referenceListHtml,
   referenceListText,
   splitName,
+  type ApaCitation,
   type ApaEntry,
   type ApaOptions,
   type ApaPart,
