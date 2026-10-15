@@ -11,7 +11,9 @@ import {
   markText,
   parseCounterTerm,
 } from "./counter";
-import { formatQuery, parseQuery, queryTerms, renderQuery } from "./query";
+import { hardBlocks, parseConcepts } from "./concepts";
+import { renderConcepts } from "./conceptquery";
+import { coverageSpec } from "./coverage";
 import { planQueries } from "./search";
 
 describe("the default list of terms", () => {
@@ -76,67 +78,54 @@ describe("parseCounterTerm", () => {
 });
 
 describe("counterQuery", () => {
-  const main = (text: string) => parseQuery(text);
+  const labelsOf = (query: ReturnType<typeof counterQuery>) => hardBlocks(query).map((block) => block.label);
+  const lexiconOf = (query: ReturnType<typeof counterQuery>) => query.blocks.find((block) => block.kind === "lexicon")?.variants.map((variant) => variant.text);
 
-  it("asks for the main query and at least one of the terms", () => {
-    const query = counterQuery(main("sleep memory"), ["limitation", "criticism"]);
-    expect(formatQuery(query)).toBe("sleep memory (limitation OR criticism)");
-    expect(query.original).toBe("sleep memory (limitation OR criticism)");
-    expect(query.droppedStopwords).toEqual([]);
+  it("asks for the main concepts and at least one of the terms", () => {
+    const query = counterQuery("sleep memory", ["limitation", "criticism"]);
+    expect(labelsOf(query)).toEqual(["sleep", "memory"]);
+    expect(lexiconOf(query)).toEqual(["limitation", "criticism"]);
+    expect(renderConcepts(query, "boolean").text).toBe("sleep AND memory AND (limitation OR criticism)");
   });
 
   it("puts a phrase in quotes", () => {
-    expect(counterQuery(main("sleep"), ["no evidence", "bias"]).original).toBe('sleep ("no evidence" OR bias)');
+    expect(renderConcepts(counterQuery("sleep", ["no evidence", "bias"]), "boolean").text).toBe('sleep AND ("no evidence" OR bias)');
   });
 
   it("does not wrap a single term in an OR", () => {
-    expect(counterQuery(main("sleep"), ["bias"]).original).toBe("sleep bias");
+    expect(renderConcepts(counterQuery("sleep", ["bias"]), "boolean").text).toBe("sleep AND bias");
   });
 
   it("keeps every part of the main query, including a phrase, an OR group and a NOT", () => {
-    const query = counterQuery(main('"memory consolidation" (sleep OR nap) NOT rats'), ["limitation", "bias"]);
-    expect(query.original).toBe('"memory consolidation" (sleep OR nap) NOT rats (limitation OR bias)');
-    // Written again from that text, it is the same query.
-    expect(formatQuery(parseQuery(query.original))).toBe(query.original);
-  });
-
-  it("narrows a main query that is itself an OR, rather than adding to one side of it", () => {
-    const query = counterQuery(main("sleep OR nap"), ["bias", "limitation"]);
-    expect(query.original).toBe("(sleep OR nap) (bias OR limitation)");
-    expect(formatQuery(parseQuery(query.original))).toBe(query.original);
+    const query = counterQuery('"memory consolidation" (sleep OR nap) NOT rats', ["limitation", "bias"]);
+    expect(renderConcepts(query, "boolean").text).toBe('"memory consolidation" AND (sleep OR nap) AND (limitation OR bias) NOT rats');
   });
 
   it("ignores terms that are not usable, and repeats", () => {
-    const query = counterQuery(main("sleep"), ["bias", "Bias", "the", "", "limitation"]);
-    expect(query.original).toBe("sleep (bias OR limitation)");
+    expect(lexiconOf(counterQuery("sleep", ["bias", "Bias", "the", "", "limitation"]))).toEqual(["bias", "limitation"]);
   });
 
   it("returns the main query unchanged when there is no usable term", () => {
-    const query = main("sleep memory");
+    const query = parseConcepts("sleep memory");
     expect(counterQuery(query, [])).toBe(query);
-    expect(counterQuery(query, ["the", " "])).toBe(query);
+    expect(counterQuery(query, ["the", " "])).toEqual(query);
   });
 
   it("does not change the main query it was given", () => {
-    const query = main("sleep memory");
+    const query = parseConcepts("sleep memory");
     const before = JSON.stringify(query);
     counterQuery(query, ["bias"]);
     expect(JSON.stringify(query)).toBe(before);
   });
 
-  it("counts the main words and the terms' words as the words asked for, but not NOT words", () => {
-    const query = counterQuery(main("sleep NOT rats"), ["bias", "no evidence"]);
-    expect(queryTerms(query)).toEqual(["sleep", "bias", "no", "evidence"]);
-  });
-
   it("is written in each source's syntax like any other query", () => {
-    const query = counterQuery(main("sleep memory"), ["limitation", "no evidence"]);
-    expect(renderQuery(query, "boolean").text).toBe('sleep AND memory AND (limitation OR "no evidence")');
+    const query = counterQuery("sleep memory", ["limitation", "no evidence"]);
+    expect(renderConcepts(query, "boolean").text).toBe('sleep AND memory AND (limitation OR "no evidence")');
     // A source that takes only words cannot say "any of these", so it is sent the main query alone.
-    expect(renderQuery(query, "plain").text).toBe("sleep memory");
-    expect(renderQuery(query, "plain").notes).toEqual([
+    expect(renderConcepts(query, "plain").text).toBe("sleep memory");
+    expect(renderConcepts(query, "plain").notes).toContain(
       "This source cannot ask for “any of these terms”, so it was sent only the rest of your search; its results that contain none of the terms rank lower",
-    ]);
+    );
     const planned = planQueries(
       [
         { id: "openalex", syntax: "boolean" },
@@ -148,23 +137,36 @@ describe("counterQuery", () => {
   });
 
   it("sends one term to every source as a required word, since 'any of one term' is that term", () => {
-    const query = counterQuery(main("sleep memory"), ["bias"]);
-    expect(renderQuery(query, "boolean").text).toBe("sleep AND memory AND bias");
-    expect(renderQuery(query, "plain")).toEqual({ text: "sleep memory bias", notes: [] });
-  });
-
-  it("keeps the main query's own OR, NOT and phrase notes for sources that cannot read them", () => {
-    const query = counterQuery(main('"memory consolidation" (sleep OR nap) NOT rats'), ["limitation", "bias"]);
-    const plain = renderQuery(query, "plain");
-    expect(plain.text).toBe("memory consolidation sleep nap");
-    expect(plain.notes).toHaveLength(4);
+    const query = counterQuery("sleep memory", ["bias"]);
+    expect(renderConcepts(query, "boolean").text).toBe("sleep AND memory AND bias");
+    expect(renderConcepts(query, "plain").text).toBe("sleep memory bias");
   });
 
   it("with the default terms writes one query every Boolean source can read", () => {
-    const text = renderQuery(counterQuery(main("sleep memory"), DEFAULT_COUNTER_TERMS), "boolean").text;
+    const text = renderConcepts(counterQuery("sleep memory", DEFAULT_COUNTER_TERMS), "boolean").text;
     expect(text).toBe(
       'sleep AND memory AND (limitation OR criticism OR challenge OR fail OR failure OR bias OR reproducibility OR replication OR controversy OR "no evidence" OR "negative results" OR retraction OR erratum OR corrigendum)',
     );
+  });
+
+  it("does not count the terms as concepts of the search", () => {
+    expect(coverageSpec(counterQuery("sleep NOT rats", ["bias", "no evidence"])).blocks.map((block) => block.label)).toEqual(["sleep"]);
+  });
+});
+
+describe("markText with places that are already known", () => {
+  it("uses the given places as they are, and lets the counterargument terms win a place only where nothing else is", () => {
+    const text = "Odour of limitations";
+    const segments = markText(text, [
+      { name: "query", terms: [], spans: [{ start: 0, end: 5, term: "odour" }] },
+      { name: "counter", terms: ["limitation"] },
+    ]);
+    expect(segments.map((s) => [s.text, s.group])).toEqual([
+      ["Odour", "query"],
+      [" of ", null],
+      ["limitations", "counter"],
+    ]);
+    expect(segments.map((s) => s.text).join("")).toBe(text);
   });
 });
 
@@ -197,13 +199,9 @@ describe("findTerms", () => {
     ]);
   });
 
-  it("matches whole words, with -s, -es, -ing and -ed folded from 6 letters up, never part of a longer word", () => {
-    // "biased" is "bias" with -ed taken off and "failing" is "fail" with -ing taken off; "unfailing" is a different word.
-    expect(found("biased, failing, unfailing, bias-free")).toEqual([
-      ["biased", "bias"],
-      ["failing", "fail"],
-      ["bias", "bias"],
-    ]);
+  it("matches whole words, with only a plural -s or -es folded, never another ending and never part of a longer word", () => {
+    // There is no stemming: "biased" and "failing" are other words than "bias" and "fail". List them as terms if they matter.
+    expect(found("biased, failing, unfailing, bias-free")).toEqual([["bias", "bias"]]);
     expect(found("unfailing biasfree")).toEqual([]);
   });
 

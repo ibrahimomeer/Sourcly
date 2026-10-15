@@ -7,10 +7,11 @@ import {
   coverageSpec,
   mergeResults,
   scoreResults,
-  relatedTerms,
+  suggestedTerms,
+  type ConceptQuery,
   type LabelOverride,
   type LayoutSettings,
-  type RelatedTerm,
+  type SuggestedTerm,
   type Result,
   type ResultFilters,
   type ScoredResult,
@@ -29,7 +30,7 @@ export interface ViewSettings {
 }
 
 export interface RankedView {
-  /** The main list, in order: results that contain every term, and, while there are few, those that lack one. */
+  /** The main list, in order: results that match every concept, and, while there are few, those that lack one. */
   shown: ScoredResult[];
   /** Results hidden by the user's filters (never by anything else). */
   hidden: ScoredResult[];
@@ -103,40 +104,25 @@ export function scoringContext(
     queryTerms: search.terms,
     answeredSources: search.statuses.filter((status) => status.state === "ok").length,
     ...(signalTerms === undefined ? {} : { signalTerms }),
-    ...(search.parsed.exact === true ? { exact: true } : {}),
-    coverage: coverageSpec(search.parsed),
+    ...(search.concepts.exact ? { exact: true } : {}),
+    coverage: coverageSpec(search.concepts),
   };
 }
 
-/** How many merged results contain every term of the search, wherever the filters and sections put them. */
+/** How many merged results match every concept of the search, wherever the filters and sections put them. */
 export function fullMatchCount(ranked: RankedView): number {
   return allResults(ranked).filter((item) => item.tier === 1).length;
 }
 
-/** Fewer merged results than FEW_FULL_MATCHES contain every term: the page says so, and runs the expanded pass. */
+/** Fewer merged results than FEW_FULL_MATCHES match every concept: the page says so, and runs the fallback passes. */
 export function hasFewFullMatches(ranked: RankedView): boolean {
   return fullMatchCount(ranked) < FEW_FULL_MATCHES;
 }
 
-/** For each term of the search (its label, lowercase), how many merged results contain it. Filters do not change it. */
-export function termResultCounts(ranked: RankedView): Map<string, number> {
-  const counts = new Map<string, number>();
-  for (const item of allResults(ranked)) {
-    for (const unit of item.coverage?.units ?? []) {
-      const label = unit.label.toLowerCase();
-      counts.set(label, (counts.get(label) ?? 0) + (unit.matched ? 1 : 0));
-    }
-  }
-  return counts;
-}
-
-/** How many of the best-ranked results the related terms are taken from. */
-export const RELATED_FROM_TOP = 20;
-
-/** Related terms from the top results that are shown, in the order the list shows them. */
-export function relatedFor(ranked: RankedView, terms: readonly string[]): RelatedTerm[] {
-  return relatedTerms(
-    ranked.shown.slice(0, RELATED_FROM_TOP).map((scored) => scored.result),
-    terms,
+/** Suggested terms come from the best results of the main list, in the order the list shows them (see suggested.ts). */
+export function suggestedFor(ranked: RankedView, concepts: ConceptQuery): SuggestedTerm[] {
+  return suggestedTerms(
+    ranked.shown.map((scored) => scored.result),
+    concepts,
   );
 }

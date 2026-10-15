@@ -1,4 +1,4 @@
-import { counterQuery, parseQuery, planQueries, type ProviderId, type ProviderStatus, type ProviderUpdate } from "@sourcly/core";
+import { counterQuery, parseConcepts, planQueries, type ProviderId, type ProviderStatus, type ProviderUpdate } from "@sourcly/core";
 import { makeResult } from "@sourcly/core/testing";
 import { describe, expect, it } from "vitest";
 import { idleSearch, isSearching, orderedStatuses, searchReducer, type ActiveSearch, type SearchState } from "./searchState";
@@ -10,12 +10,12 @@ const done = (provider: ProviderId, ids: string[] = []): ProviderUpdate => ({
 });
 
 const startAction = (text: string, order: ProviderId[], skipped: ProviderStatus[] = [], id = 1) => {
-  const parsed = parseQuery(text);
+  const concepts = parseConcepts(text);
   return {
     type: "start" as const,
     id,
-    parsed,
-    sent: planQueries(order.map((provider) => ({ id: provider, syntax: "boolean" as const })), parsed),
+    concepts,
+    sent: planQueries(order.map((provider) => ({ id: provider, syntax: "boolean" as const })), concepts),
     order,
     skipped,
   };
@@ -33,7 +33,7 @@ describe("searchReducer", () => {
       phase: "searching",
       id: 1,
       query: "sleep",
-      parsed: parseQuery("sleep"),
+      concepts: parseConcepts("sleep"),
       terms: ["sleep"],
       sent: [
         { provider: "openalex", text: "sleep", notes: [] },
@@ -44,7 +44,7 @@ describe("searchReducer", () => {
       statuses: [],
       pending: ["openalex", "crossref"],
       searchedAt: null,
-      expansion: null,
+      fallback: null,
     });
   });
 
@@ -115,34 +115,34 @@ describe("searchReducer: the query", () => {
     return state;
   };
 
-  it("keeps the query as tidy text, the words it asks for, and what was typed", () => {
+  it("keeps what was typed, the concepts it was read as, and the concepts the search asks for", () => {
     const state = begin("what is the effect of sleep on memory?");
-    expect(state.query).toBe("effect sleep memory");
-    expect(state.terms).toEqual(["effect", "sleep", "memory"]);
-    expect(state.parsed.original).toBe("what is the effect of sleep on memory?");
-    expect(state.parsed.droppedStopwords).toEqual(["what", "is", "the", "of", "on"]);
+    expect(state.query).toBe("what is the effect of sleep on memory?");
+    expect(state.terms).toEqual(["sleep", "memory"]);
+    expect(state.concepts.original).toBe("what is the effect of sleep on memory?");
+    expect(state.concepts.stopwords).toEqual(["what", "is", "the", "of", "on"]);
+    expect(state.concepts.soft.map((term) => term.text)).toEqual(["effect"]);
   });
 
-  it("keeps the words to leave out out of the words it asks for", () => {
+  it("keeps the words to leave out out of the concepts it asks for", () => {
     const state = begin('"memory consolidation" sleep NOT rats');
     expect(state.query).toBe('"memory consolidation" sleep NOT rats');
-    expect(state.terms).toEqual(["memory", "consolidation", "sleep"]);
+    expect(state.terms).toEqual(["memory consolidation", "sleep"]);
   });
 
-  it("does not count the counterargument terms among the words the search is about", () => {
-    const main = parseQuery("sleep memory");
-    const query = counterQuery(main, ["limitation", "bias"]);
+  it("does not count the counterargument terms among the concepts the search is about", () => {
+    const query = counterQuery("sleep memory", ["limitation", "bias"]);
     const state = searchReducer(idleSearch, {
       type: "start",
       id: 1,
-      parsed: query,
+      concepts: query,
       sent: planQueries([{ id: "openalex", syntax: "boolean" }], query),
       order: ["openalex"],
       skipped: [],
     });
     if (state.phase === "idle") throw new Error("expected an active search");
     expect(state.terms).toEqual(["sleep", "memory"]);
-    expect(state.query).toBe("sleep memory (limitation OR bias)");
+    expect(state.query).toBe("sleep memory");
   });
 
   it("keeps what each source was sent", () => {
@@ -181,7 +181,7 @@ describe("orderedStatuses", () => {
   });
 });
 
-describe("searchReducer: the expanded second pass", () => {
+describe("searchReducer: the fallback passes", () => {
   const finished = (): ActiveSearch => {
     let state: SearchState = started(["openalex", "crossref"]);
     for (const provider of ["openalex", "crossref"] as const) state = searchReducer(state, { type: "provider-done", id: 1, update: done(provider, [`10.1/${provider}`]) });
@@ -189,63 +189,79 @@ describe("searchReducer: the expanded second pass", () => {
     if (state.phase === "idle") throw new Error("expected an active search");
     return state;
   };
-  const sent = [{ provider: "openalex" as const, text: "sleep memory", notes: [] }];
-  const expanding = () => {
-    const state = searchReducer(finished(), { type: "expand-start", id: 1, sent, order: ["openalex"] });
+  const sent = [{ provider: "openalex" as const, text: "sleep", notes: [] }];
+  const running = () => {
+    let state = searchReducer(finished(), { type: "fallback-start", id: 1 });
+    state = searchReducer(state, { type: "fallback-pass-start", id: 1, dropped: "memory", sent, order: ["openalex"] });
     if (state.phase === "idle") throw new Error("expected an active search");
     return state;
   };
 
   it("starts only after the strict pass is done, and only once", () => {
     const mid = started();
-    expect(searchReducer(mid, { type: "expand-start", id: 1, sent, order: ["openalex"] })).toBe(mid);
-    const again = expanding();
-    expect(searchReducer(again, { type: "expand-start", id: 1, sent, order: ["openalex"] })).toBe(again);
+    expect(searchReducer(mid, { type: "fallback-start", id: 1 })).toBe(mid);
+    const first = searchReducer(finished(), { type: "fallback-start", id: 1 });
+    expect(searchReducer(first, { type: "fallback-start", id: 1 })).toBe(first);
   });
 
-  it("keeps its queries and answers apart from the strict pass's", () => {
-    const state = expanding();
-    expect(state.expansion).toEqual({ phase: "searching", sent, order: ["openalex"], statuses: [], pending: ["openalex"] });
+  it("keeps the concept counts and every pass's queries and answers apart from the strict pass's", () => {
+    let state = searchReducer(finished(), { type: "fallback-start", id: 1 });
+    state = searchReducer(state, { type: "fallback-counts", id: 1, counts: [{ concept: "sleep", works: 1000 }] });
+    state = searchReducer(state, { type: "fallback-pass-start", id: 1, dropped: "memory", sent, order: ["openalex"] });
+    if (state.phase === "idle") throw new Error("expected an active search");
+    expect(state.fallback).toEqual({
+      phase: "searching",
+      counts: [{ concept: "sleep", works: 1000 }],
+      passes: [{ dropped: "memory", sent, order: ["openalex"], statuses: [], pending: ["openalex"] }],
+    });
     expect(state.statuses).toHaveLength(2);
     expect(state.sent).toHaveLength(2);
   });
 
-  it("adds its results to the search, and its status to its own list", () => {
-    const next = searchReducer(expanding(), { type: "expand-provider-done", id: 1, update: done("openalex", ["10.1/extra"]) });
+  it("adds a pass's results to the search, and its status to that pass's own list", () => {
+    const next = searchReducer(running(), { type: "fallback-provider-done", id: 1, update: done("openalex", ["10.1/extra"]) });
     if (next.phase === "idle") throw new Error("expected an active search");
     expect(next.results.map((r) => r.id)).toEqual(["10.1/openalex", "10.1/crossref", "10.1/extra"]);
-    expect(next.expansion?.statuses).toEqual([{ provider: "openalex", state: "ok", count: 1 }]);
-    expect(next.expansion?.pending).toEqual([]);
+    expect(next.fallback?.passes[0]?.statuses).toEqual([{ provider: "openalex", state: "ok", count: 1 }]);
+    expect(next.fallback?.passes[0]?.pending).toEqual([]);
     expect(next.statuses).toHaveLength(2);
   });
 
-  it("ignores an answer from a provider it did not ask, and one it already has", () => {
-    const state = expanding();
-    expect(searchReducer(state, { type: "expand-provider-done", id: 1, update: done("crossref", ["10.1/x"]) })).toBe(state);
-    const once = searchReducer(state, { type: "expand-provider-done", id: 1, update: done("openalex", ["10.1/a"]) });
-    expect(searchReducer(once, { type: "expand-provider-done", id: 1, update: done("openalex", ["10.1/b"]) })).toBe(once);
+  it("keeps a second pass apart from the first", () => {
+    let state = searchReducer(running(), { type: "fallback-provider-done", id: 1, update: done("openalex", ["10.1/a"]) });
+    state = searchReducer(state, { type: "fallback-pass-start", id: 1, dropped: "sleep", sent, order: ["openalex"] });
+    state = searchReducer(state, { type: "fallback-provider-done", id: 1, update: done("openalex", ["10.1/b"]) });
+    if (state.phase === "idle") throw new Error("expected an active search");
+    expect(state.fallback?.passes.map((pass) => [pass.dropped, pass.statuses.length])).toEqual([["memory", 1], ["sleep", 1]]);
+  });
+
+  it("ignores an answer from a provider the pass did not ask, and one it already has", () => {
+    const state = running();
+    expect(searchReducer(state, { type: "fallback-provider-done", id: 1, update: done("crossref", ["10.1/x"]) })).toBe(state);
+    const once = searchReducer(state, { type: "fallback-provider-done", id: 1, update: done("openalex", ["10.1/a"]) });
+    expect(searchReducer(once, { type: "fallback-provider-done", id: 1, update: done("openalex", ["10.1/b"]) })).toBe(once);
   });
 
   it("finishes, and is searching until it does", () => {
-    const state = expanding();
+    const state = running();
     expect(isSearching(state)).toBe(true);
-    const done2 = searchReducer(searchReducer(state, { type: "expand-provider-done", id: 1, update: done("openalex") }), { type: "expand-finish", id: 1 });
-    expect(isSearching(done2)).toBe(false);
-    if (done2.phase === "idle") throw new Error("expected an active search");
-    expect(done2.expansion?.phase).toBe("done");
+    const after = searchReducer(searchReducer(state, { type: "fallback-provider-done", id: 1, update: done("openalex") }), { type: "fallback-finish", id: 1 });
+    expect(isSearching(after)).toBe(false);
+    if (after.phase === "idle") throw new Error("expected an active search");
+    expect(after.fallback?.phase).toBe("done");
   });
 
-  it("is not searching when the strict pass is done and no second pass was started", () => {
+  it("is not searching when the strict pass is done and no fallback pass was started", () => {
     expect(isSearching(finished())).toBe(false);
     expect(isSearching(started())).toBe(true);
     expect(isSearching(idleSearch)).toBe(false);
   });
 
   it("is dropped with the search: a newer search or a reset makes late answers do nothing", () => {
-    const state = expanding();
+    const state = running();
     const newer = searchReducer(state, startAction("other", ["openalex"], [], 2));
-    expect(searchReducer(newer, { type: "expand-provider-done", id: 1, update: done("openalex", ["10.1/late"]) })).toBe(newer);
+    expect(searchReducer(newer, { type: "fallback-provider-done", id: 1, update: done("openalex", ["10.1/late"]) })).toBe(newer);
     const reset = searchReducer(state, { type: "reset" });
-    expect(searchReducer(reset, { type: "expand-finish", id: 1 })).toBe(reset);
+    expect(searchReducer(reset, { type: "fallback-finish", id: 1 })).toBe(reset);
   });
 });

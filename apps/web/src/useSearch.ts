@@ -1,9 +1,10 @@
 import {
-  expandable,
-  planExpandedQueries,
   planQueries,
+  runFallback,
   searchProviders,
-  type ParsedQuery,
+  hardBlocks,
+  type Counter,
+  type ConceptQuery,
   type Provider,
   type ProviderStatus,
   type SearchCache,
@@ -18,6 +19,8 @@ export interface SearchRequestOptions {
   cache: SearchCache;
   /** Sources that cannot be asked; reported in the status list. */
   skipped: ProviderStatus[];
+  /** Asks how many works a concept matches, to judge how specific it is. Only for the fallback passes. */
+  count?: Counter;
 }
 
 /**
@@ -27,32 +30,36 @@ export interface SearchRequestOptions {
  */
 export function useSearch(): {
   state: SearchState;
-  search: (query: ParsedQuery, providers: readonly Provider[], options: SearchRequestOptions) => void;
-  /** Runs the expanded second pass of the search on the page, once. It adds results to it; it does not start a new search. */
-  expand: (providers: readonly Provider[], options: SearchRequestOptions) => void;
+  search: (query: ConceptQuery, providers: readonly Provider[], options: SearchRequestOptions) => void;
+  /** Runs the fallback passes of the search on the page, once. They add results to it; they do not start a new search. */
+  fallback: (providers: readonly Provider[], options: SearchRequestOptions) => void;
   /** Cancels any search in progress and forgets its results. */
   reset: () => void;
 } {
   const [state, dispatch] = useReducer(searchReducer, idleSearch);
   const current = useRef<AbortController | null>(null);
   const counter = useRef(0);
-  // The query of the search on the page, for its expanded pass.
-  const latest = useRef<ParsedQuery | null>(null);
+  // The search on the page, for its fallback passes: its concepts and what the strict pass found.
+  const latest = useRef<{ query: ConceptQuery; id: number } | null>(null);
+  const stateRef = useRef<SearchState>(state);
+  stateRef.current = state;
+  // Answers to "how many works match this concept", kept for the visit.
+  const counts = useRef(new Map<string, number | null>());
 
   useEffect(() => () => current.current?.abort(), []);
 
-  const search = useCallback((query: ParsedQuery, providers: readonly Provider[], options: SearchRequestOptions) => {
+  const search = useCallback((query: ConceptQuery, providers: readonly Provider[], options: SearchRequestOptions) => {
     current.current?.abort();
     const controller = new AbortController();
     current.current = controller;
     counter.current += 1;
     const id = counter.current;
-    latest.current = query;
+    latest.current = { query, id };
 
     dispatch({
       type: "start",
       id,
-      parsed: query,
+      concepts: query,
       sent: planQueries(providers, query),
       order: providers.map((provider) => provider.id),
       skipped: options.skipped,
@@ -69,32 +76,52 @@ export function useSearch(): {
     });
   }, []);
 
-  const expand = useCallback((providers: readonly Provider[], options: SearchRequestOptions) => {
-    const query = latest.current;
-    const asked = expandable(providers);
-    if (query === null || asked.length === 0) return;
+  const fallback = useCallback((providers: readonly Provider[], options: SearchRequestOptions) => {
+    const started = latest.current;
+    const now = stateRef.current;
+    if (started === null || now.phase !== "done" || now.id !== started.id || now.fallback !== null) return;
+    if (hardBlocks(started.query).length < 2) return;
     const controller = new AbortController();
     current.current = controller;
-    const id = counter.current;
-    dispatch({ type: "expand-start", id, sent: planExpandedQueries(asked, query), order: asked.map((provider) => provider.id) });
-    void searchProviders(asked, query, {
-      limit: options.limit,
-      signal: controller.signal,
-      cache: options.cache,
-      expanded: true,
-      onProviderDone: (update) => {
-        if (!controller.signal.aborted) dispatch({ type: "expand-provider-done", id, update });
+    const { id, query } = started;
+    dispatch({ type: "fallback-start", id });
+    void runFallback(
+      providers,
+      query,
+      {
+        limit: options.limit,
+        signal: controller.signal,
+        cache: options.cache,
+        count: options.count ?? (async () => null),
+        memory: counts.current,
+        have: now.results,
       },
-    }).then(() => {
-      if (!controller.signal.aborted) dispatch({ type: "expand-finish", id });
+      {
+        onCounts: (found) => {
+          if (controller.signal.aborted) return;
+          const byBlock = hardBlocks(query)
+            .filter((block) => found.has(block.id))
+            .map((block) => ({ concept: block.label, works: found.get(block.id) as number }));
+          dispatch({ type: "fallback-counts", id, counts: byBlock });
+        },
+        onPassStart: (pass, sent) => {
+          if (!controller.signal.aborted) dispatch({ type: "fallback-pass-start", id, dropped: pass.dropped, sent, order: providers.map((provider) => provider.id) });
+        },
+        onProviderDone: (update) => {
+          if (!controller.signal.aborted) dispatch({ type: "fallback-provider-done", id, update });
+        },
+      },
+    ).then(() => {
+      if (!controller.signal.aborted) dispatch({ type: "fallback-finish", id });
     });
   }, []);
 
   const reset = useCallback(() => {
     current.current?.abort();
     current.current = null;
+    latest.current = null;
     dispatch({ type: "reset" });
   }, []);
 
-  return { state, search, expand, reset };
+  return { state, search, fallback, reset };
 }

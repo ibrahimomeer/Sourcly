@@ -2,7 +2,7 @@ import {
   DEFAULT_COUNTER_TERMS,
   counterQuery,
   type LabelOverride,
-  type ParsedQuery,
+  type ConceptQuery,
   type Provider,
   type ProviderStatus,
   type SearchCache,
@@ -40,6 +40,8 @@ export function CounterPanel({
   mainSearch,
   makeProviders,
   perSource,
+  exact,
+  synonyms,
   cache,
   skipped,
   view,
@@ -56,6 +58,9 @@ export function CounterPanel({
   mainSearch: ActiveSearch;
   makeProviders: () => Provider[];
   perSource: number;
+  /** The settings the main search is read with; the counterargument search's own text is read the same way. */
+  exact: boolean;
+  synonyms: boolean;
   cache: SearchCache;
   skipped: ProviderStatus[];
   view: ViewSettings;
@@ -113,26 +118,26 @@ export function CounterPanel({
 
   function runSearch(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    let parsed: ParsedQuery;
+    let concepts: ConceptQuery;
     if (mode === "lexicon") {
       if (terms.length === 0) return;
-      parsed = counterQuery(mainSearch.parsed, terms);
+      concepts = counterQuery(mainSearch.concepts, terms);
     } else {
-      const prepared = prepareSearch(ownText);
+      const prepared = prepareSearch(ownText, { exact, synonyms });
       if (!prepared.usable) {
-        setOwnProblem(explainUnusable(prepared.parsed));
+        setOwnProblem(explainUnusable(prepared.concepts));
         return;
       }
       setOwnProblem(null);
-      // The text in the box is left as typed; the common words not used are listed under the results.
-      parsed = prepared.parsed;
+      // The text in the box is left as typed; how it was read is listed under “How we searched”.
+      concepts = prepared.concepts;
     }
     const providers = makeProviders();
     if (providers.length === 0) return;
     setPage(1);
     setPanelView("all");
     setSearched({ terms: [...terms], lexicon: mode === "lexicon" });
-    search(parsed, providers, { limit: perSource, cache, skipped });
+    search(concepts, providers, { limit: perSource, cache, skipped });
   }
 
   const canSearch = mode === "lexicon" ? terms.length > 0 : ownText.trim() !== "";

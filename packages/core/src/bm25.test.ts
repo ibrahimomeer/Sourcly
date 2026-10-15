@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { BM25_B, BM25_K1, scoreBm25 } from "./bm25";
+import { BM25_B, BM25_K1, scoreBm25, scoreBm25FromCounts } from "./bm25";
 
 describe("scoreBm25: the formula", () => {
   it("uses the standard parameters", () => {
@@ -106,5 +106,29 @@ describe("scoreBm25: details and edge cases", () => {
     const docs = [["sleep", "memory"], ["sleep", "memory", ...Array.from({ length: 40 }, () => "filler")]];
     const noLength = scoreBm25(docs, ["sleep"], { b: 0 });
     expect(noLength.scores[0]).toBeCloseTo(noLength.scores[1] ?? 0, 12);
+  });
+});
+
+describe("scoreBm25FromCounts: term weights", () => {
+  const counts = [new Map([["odor", 1], ["soft:using", 1]]), new Map([["other", 1]])];
+  const lengths = [2, 1];
+
+  it("counts a term 1.0 when it has no weight listed", () => {
+    const plain = scoreBm25FromCounts(counts, lengths, ["odor"]);
+    const weighted = scoreBm25FromCounts(counts, lengths, ["odor"], { weights: new Map() });
+    expect(weighted.scores[0]).toBe(plain.scores[0]);
+  });
+
+  it("multiplies a term's contribution by its weight: a generic word counts 0.3 against 1.0", () => {
+    const full = scoreBm25FromCounts(counts, lengths, ["soft:using"]).scores[0] ?? 0;
+    const soft = scoreBm25FromCounts(counts, lengths, ["soft:using"], { weights: new Map([["soft:using", 0.3]]) }).scores[0] ?? 0;
+    expect(soft).toBeCloseTo(full * 0.3, 12);
+  });
+
+  it("adds the weighted contributions of several terms", () => {
+    const both = scoreBm25FromCounts(counts, lengths, ["odor", "soft:using"], { weights: new Map([["soft:using", 0.3]]) });
+    const odor = scoreBm25FromCounts(counts, lengths, ["odor"]).scores[0] ?? 0;
+    const using = scoreBm25FromCounts(counts, lengths, ["soft:using"]).scores[0] ?? 0;
+    expect(both.scores[0]).toBeCloseTo(odor + using * 0.3, 12);
   });
 });

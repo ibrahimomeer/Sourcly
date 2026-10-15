@@ -49,7 +49,7 @@ export function scoreBm25FromCounts(
   counts: readonly ReadonlyMap<string, number>[],
   lengths: readonly number[],
   terms: readonly string[],
-  options: { k1?: number; b?: number } = {},
+  options: { k1?: number; b?: number; /** How much each term counts: 1 when not listed. */ weights?: ReadonlyMap<string, number> } = {},
 ): Bm25Scores {
   const k1 = options.k1 ?? BM25_K1;
   const b = options.b ?? BM25_B;
@@ -72,7 +72,7 @@ export function scoreBm25FromCounts(
     for (const term of unique) {
       const tf = found.get(term) ?? 0;
       if (tf === 0) continue;
-      const contribution = ((idf.get(term) ?? 0) * tf * (k1 + 1)) / (tf + k1 * lengthFactor);
+      const contribution = (options.weights?.get(term) ?? 1) * (((idf.get(term) ?? 0) * tf * (k1 + 1)) / (tf + k1 * lengthFactor));
       matched.push({ term, count: tf, contribution });
     }
     matched.sort((x, y) => y.contribution - x.contribution || (x.term < y.term ? -1 : 1));

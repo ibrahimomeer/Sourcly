@@ -5,7 +5,7 @@ import {
   defaultLayoutSettings,
   defaultScoringSettings,
   FACTOR_IDS,
-  parseQuery,
+  parseConcepts,
   planQueries,
   type ProviderId,
   type Result,
@@ -19,10 +19,8 @@ import {
   fullMatchCount,
   hasFewFullMatches,
   rankResults,
-  RELATED_FROM_TOP,
-  relatedFor,
   scoringContext,
-  termResultCounts,
+  suggestedFor,
   type ViewSettings,
 } from "./pipeline";
 import { idleSearch, searchReducer, type ActiveSearch } from "./searchState";
@@ -231,12 +229,12 @@ describe("scoringContext", () => {
   ];
 
   function searching(text: string): ActiveSearch {
-    const parsed = parseQuery(text);
+    const concepts = parseConcepts(text);
     const state = searchReducer(idleSearch, {
       type: "start",
       id: 1,
-      parsed,
-      sent: planQueries(providers, parsed),
+      concepts,
+      sent: planQueries(providers, concepts),
       order: providers.map((p) => p.id),
       skipped: [{ provider: "arxiv", state: "skipped", message: "no CORS" }],
     });
@@ -246,8 +244,8 @@ describe("scoringContext", () => {
 
   it("takes the query's words from the search and the year it is given", () => {
     const context = scoringContext(searching('"memory consolidation" sleep NOT rats'), 2026);
-    expect(context).toMatchObject({ referenceYear: 2026, queryTerms: ["memory", "consolidation", "sleep"], answeredSources: 0 });
-    expect(context.coverage?.units.map((unit) => unit.label)).toEqual(['"memory consolidation"', "sleep"]);
+    expect(context).toMatchObject({ referenceYear: 2026, queryTerms: ["memory consolidation", "sleep"], answeredSources: 0 });
+    expect(context.coverage?.blocks.map((block) => block.label)).toEqual(["memory consolidation", "sleep"]);
   });
 
   it("passes the counterargument terms on only when it is given them", () => {
@@ -257,8 +255,8 @@ describe("scoringContext", () => {
 
   it("tells ranking when the search was sent exactly as typed, and only then", () => {
     const exact = (() => {
-      const parsed = parseQuery("what is chaos", { exact: true });
-      const state = searchReducer(idleSearch, { type: "start", id: 1, parsed, sent: planQueries(providers, parsed), order: ["openalex"], skipped: [] });
+      const concepts = parseConcepts("what is chaos", { exact: true });
+      const state = searchReducer(idleSearch, { type: "start", id: 1, concepts, sent: planQueries(providers, concepts), order: ["openalex"], skipped: [] });
       if (state.phase === "idle") throw new Error("expected an active search");
       return state;
     })();
@@ -281,41 +279,41 @@ describe("scoringContext", () => {
   });
 });
 
-describe("relatedFor", () => {
-  const topic = (term: string): Subject => ({ term, kind: "topic", provider: "openalex" });
-  const withTopics = (id: string, ...subjects: Subject[]) => makeResult({ id, doi: id, subjects });
+describe("suggestedFor", () => {
+  const keyword = (term: string): Subject => ({ term, kind: "keyword", provider: "pubmed" });
+  const withKeywords = (id: string, ...subjects: Subject[]) => makeResult({ id, doi: id, subjects });
+  const emptyView = (shown: Result[]) => ({ shown: shown.map((result) => ({ result }) as never), hidden: [], partial: [], otherLanguages: [], otherTypes: [] });
 
-  it("suggests terms from the top results only", () => {
-    const top = Array.from({ length: RELATED_FROM_TOP }, (_, i) => withTopics(`10.1/top${i}`, topic("Common Topic")));
-    const beyond = withTopics("10.1/beyond", topic("Only Far Down"));
-    const ranked = { shown: [...top, beyond].map((result) => ({ result }) as never), hidden: [], partial: [], otherLanguages: [], otherTypes: [] };
-    const terms = relatedFor(ranked, []).map((t) => t.term);
-    expect(terms).toEqual(["Common Topic"]);
+  it("suggests terms that at least three of the main list's best results share", () => {
+    const shown = Array.from({ length: 4 }, (_, i) => withKeywords(`10.1/top${i}`, keyword("Dreaming"), keyword("Hippocampus"), keyword("Amygdala")));
+    const found = suggestedFor(emptyView([...shown, withKeywords("10.1/once", keyword("Only Once"))]), parseConcepts("sleep memory"));
+    expect(found.map((t) => t.term)).toEqual(["Amygdala", "Dreaming", "Hippocampus"]);
+    expect(found.every((t) => t.count === 4)).toBe(true);
   });
 
-  it("leaves out terms made only of words already in the query", () => {
-    const ranked = {
-      shown: [withTopics("10.1/a", topic("Sleep"), topic("Dreaming"))].map((result) => ({ result }) as never),
-      hidden: [],
-      partial: [],
-      otherLanguages: [],
-      otherTypes: [],
-    };
-    expect(relatedFor(ranked, ["sleep"]).map((t) => t.term)).toEqual(["Dreaming"]);
+  it("suggests nothing when fewer than three terms qualify, and nothing the search already says", () => {
+    const shown = Array.from({ length: 4 }, (_, i) => withKeywords(`10.1/top${i}`, keyword("Sleep"), keyword("Dreaming")));
+    expect(suggestedFor(emptyView(shown), parseConcepts("sleep memory"))).toEqual([]);
+  });
+
+  it("reads only the main list: partial matches and the other sections give no suggestions", () => {
+    const shown = Array.from({ length: 4 }, (_, i) => withKeywords(`10.1/p${i}`, keyword("Dreaming"), keyword("Hippocampus"), keyword("Amygdala")));
+    const view = { shown: [], hidden: [], partial: shown.map((result) => ({ result }) as never), otherLanguages: [], otherTypes: [] };
+    expect(suggestedFor(view, parseConcepts("sleep memory"))).toEqual([]);
   });
 });
 
 describe("rankResults: sections", () => {
-  const spec = coverageSpec(parseQuery("chaos double pendulum"));
-  const withCoverage = (): ScoringContext => ({ referenceYear: YEAR, queryTerms: ["chaos", "double", "pendulum"], answeredSources: 1, coverage: spec });
+  const spec = coverageSpec(parseConcepts("chaos damping pendulum"));
+  const withCoverage = (): ScoringContext => ({ referenceYear: YEAR, queryTerms: ["chaos", "damping", "pendulum"], answeredSources: 1, coverage: spec });
   const pile = (): Result[] => [
     makeResult({ id: "10.1/slag", doi: "10.1/slag", title: "Chaos in steel slag asphalt", citationCount: 900, year: 2026 }),
-    makeResult({ id: "10.1/two", doi: "10.1/two", title: "A double pendulum", citationCount: 100, year: 2026 }),
-    makeResult({ id: "10.1/all", doi: "10.1/all", title: "Chaos in a double pendulum", citationCount: 0, year: 1990 }),
-    makeResult({ id: "10.1/all2", doi: "10.1/all2", title: "Double pendulum chaos", citationCount: 0, year: 1991 }),
+    makeResult({ id: "10.1/two", doi: "10.1/two", title: "Damping of a pendulum", citationCount: 100, year: 2026 }),
+    makeResult({ id: "10.1/all", doi: "10.1/all", title: "Chaos, damping and a pendulum", citationCount: 0, year: 1990 }),
+    makeResult({ id: "10.1/all2", doi: "10.1/all2", title: "Pendulum damping chaos", citationCount: 0, year: 1991 }),
   ];
 
-  it("puts results that contain every word in the main list, and, while they are few, those that lack one, after them", () => {
+  it("puts results that match every concept in the main list, and, while they are few, those that lack one concept, after them", () => {
     const { shown, partial, hidden } = rankResults(pile(), view(), withCoverage());
     // Same tier and the same phrase score, so the newer paper comes first.
     expect(ids(shown)).toEqual(["10.1/all2", "10.1/all", "10.1/two"]);
@@ -324,7 +322,7 @@ describe("rankResults: sections", () => {
     expect(allResults({ shown, partial, hidden, otherLanguages: [], otherTypes: [] })).toHaveLength(4);
   });
 
-  it("keeps a result that lacks two words out of the main list, labelled by what it matched", () => {
+  it("keeps a result that lacks two concepts out of the main list, labelled by what it matched", () => {
     const { partial } = rankResults(pile(), view(), withCoverage());
     expect(partial.map((p) => [p.result.id, p.coverage?.matchedCount, p.coverage?.total, p.tier])).toEqual([["10.1/slag", 1, 3, 3]]);
   });
@@ -356,16 +354,16 @@ describe("rankResults: sections", () => {
   });
 
   it("is told what the query asks for by scoringContext", () => {
-    const parsed = parseQuery("chaos double pendulum");
-    const state = searchReducer(idleSearch, { type: "start", id: 1, parsed, sent: planQueries([{ id: "openalex", syntax: "boolean" }], parsed), order: ["openalex"], skipped: [] });
+    const concepts = parseConcepts("chaos damping pendulum");
+    const state = searchReducer(idleSearch, { type: "start", id: 1, concepts, sent: planQueries([{ id: "openalex", syntax: "boolean" }], concepts), order: ["openalex"], skipped: [] });
     if (state.phase === "idle") throw new Error("expected an active search");
-    expect(scoringContext(state, 2026).coverage?.units.map((u) => u.label)).toEqual(["chaos", "double", "pendulum"]);
-    expect(scoringContext(state, 2026).coverage?.pairs.map((p) => p.text)).toEqual(["chaos double", "double pendulum"]);
+    expect(scoringContext(state, 2026).coverage?.blocks.map((b) => b.label)).toEqual(["chaos", "damping", "pendulum"]);
+    expect(scoringContext(state, 2026).coverage?.pairs.map((p) => p.text)).toEqual(["chaos damping", "damping pendulum"]);
   });
 });
 
 describe("rankResults: other languages and other types", () => {
-  const spec = coverageSpec(parseQuery("pendulum"));
+  const spec = coverageSpec(parseConcepts("pendulum"));
   const withCoverage = (): ScoringContext => ({ referenceYear: YEAR, queryTerms: ["pendulum"], answeredSources: 1, coverage: spec });
   const VIETNAMESE = "Thiết kế và tối ưu hóa bộ điều khiển sử dụng thuật toán di truyền để điều khiển cần cẩu trên cao";
   const pile = (): Result[] => [
@@ -399,8 +397,8 @@ describe("rankResults: other languages and other types", () => {
   });
 });
 
-describe("fullMatchCount, hasFewFullMatches and termResultCounts", () => {
-  const spec = coverageSpec(parseQuery("chaos pendulum"));
+describe("fullMatchCount and hasFewFullMatches", () => {
+  const spec = coverageSpec(parseConcepts("chaos pendulum"));
   const withCoverage = (): ScoringContext => ({ referenceYear: YEAR, queryTerms: ["chaos", "pendulum"], answeredSources: 1, coverage: spec });
   const results = (): Result[] => [
     makeResult({ id: "10.1/both", doi: "10.1/both", title: "Chaos in a pendulum", language: "en" }),
@@ -408,33 +406,29 @@ describe("fullMatchCount, hasFewFullMatches and termResultCounts", () => {
     makeResult({ id: "10.1/none", doi: "10.1/none", title: "Gardening", language: null }),
   ];
 
-  it("counts the results that contain every term, wherever the sections put them", () => {
+  it("counts the results that match every concept, wherever the sections put them", () => {
     expect(fullMatchCount(rankResults(results(), view(), withCoverage()))).toBe(1);
     const sectioned = rankResults(results(), view({ layout: { preferredLanguages: ["pt"], showNonArticleTypes: false } }), withCoverage());
     expect(sectioned.otherLanguages).toHaveLength(1);
     expect(fullMatchCount(sectioned)).toBe(1);
   });
 
-  it("counts results a filter hides, because the advice is about the words, not the filters", () => {
+  it("counts results a filter hides, because the advice is about the concepts, not the filters", () => {
     const filtered = view({ filters: { ...defaultFilters(), yearFrom: 3000 } });
     const ranked = rankResults(results(), filtered, withCoverage());
     expect(ranked.shown).toEqual([]);
     expect(fullMatchCount(ranked)).toBe(1);
   });
 
-  it("is few below ten and not few from ten", () => {
-    expect(FEW_FULL_MATCHES).toBe(10);
+  it("is few below fifteen and not few from fifteen", () => {
+    expect(FEW_FULL_MATCHES).toBe(15);
     const many = (count: number): Result[] =>
       Array.from({ length: count }, (_, i) => makeResult({ id: `10.1/m${i}`, doi: `10.1/m${i}`, title: `Chaos pendulum ${i}` }));
-    expect(hasFewFullMatches(rankResults(many(9), view(), withCoverage()))).toBe(true);
-    expect(hasFewFullMatches(rankResults(many(10), view(), withCoverage()))).toBe(false);
+    expect(hasFewFullMatches(rankResults(many(14), view(), withCoverage()))).toBe(true);
+    expect(hasFewFullMatches(rankResults(many(15), view(), withCoverage()))).toBe(false);
   });
 
   it("is few for no results at all", () => {
     expect(hasFewFullMatches(rankResults([], view(), withCoverage()))).toBe(true);
-  });
-
-  it("counts, for each term, the results that contain it", () => {
-    expect(Object.fromEntries(termResultCounts(rankResults(results(), view(), withCoverage())))).toEqual({ chaos: 1, pendulum: 2 });
   });
 });

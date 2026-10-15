@@ -8,7 +8,6 @@ import type {
   ScoringSettings,
 } from "@sourcly/core";
 import { allResults, type RankedView } from "./pipeline";
-import { droppedWords } from "./queryText";
 import { orderedStatuses, type ActiveSearch } from "./searchState";
 
 /** A finished counterargument search, as the protocol needs to know it. */
@@ -25,12 +24,11 @@ export interface CounterRecord {
 export function searchRecord(search: ActiveSearch, ranked: RankedView): ProtocolSearch {
   const merged = allResults(ranked).length;
   return {
-    typedQuery: search.parsed.original,
-    searchedQuery: search.query,
-    commonWordsRemoved: droppedWords(search.parsed),
+    typedQuery: search.concepts.original,
+    concepts: search.concepts,
     sentQueries: search.sent,
     statuses: orderedStatuses(search),
-    expandedPass: search.expansion === null ? null : { sentQueries: search.expansion.sent, statuses: search.expansion.statuses },
+    fallbackPasses: (search.fallback?.passes ?? []).map((pass) => ({ dropped: pass.dropped, sentQueries: pass.sent, statuses: pass.statuses })),
     counts: {
       fetched: search.results.length,
       merged,

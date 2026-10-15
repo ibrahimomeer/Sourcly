@@ -70,7 +70,7 @@ const OPERATORS = new Set(["AND", "OR", "NOT"]);
  * `covid AND 19`. Other punctuation splits a word, and apostrophes are simply removed
  * (memory's -> memorys, don't -> dont).
  */
-function splitWords(text: string): string[] {
+export function splitWords(text: string): string[] {
   return text
     .replace(/['’]/g, "")
     .replace(/[‐‑]/g, "-")

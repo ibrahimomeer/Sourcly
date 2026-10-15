@@ -1,5 +1,7 @@
 import type { SearchCache } from "./cache";
-import { isUsable, parseQuery, renderQuery, type ParsedQuery } from "./query";
+import { hardBlocks, isUsableConcepts, type ConceptQuery } from "./concepts";
+import { renderConcepts, toConcepts } from "./conceptquery";
+import type { ParsedQuery } from "./query";
 import {
   ProviderError,
   type Provider,
@@ -27,9 +29,9 @@ export interface SentQuery {
   notes: string[];
 }
 
-export interface SearchRunOptions extends Omit<SearchOptions, "expanded"> {
-  /** Run the expanded pass: only the providers that have one, each asked in its looser way. */
-  expanded?: boolean;
+export interface SearchRunOptions extends SearchOptions {
+  /** This is a fallback pass (a concept dropped): every hit of every result is marked as found by it. */
+  fallback?: boolean;
   /** Per-provider time limit in milliseconds. Defaults to DEFAULT_TIMEOUT_MS. */
   timeoutMs?: number;
   /** When given, successful answers are remembered and reused for the same query and limit. */
@@ -51,34 +53,27 @@ export interface SearchOutcome {
  */
 export function planQueries(
   providers: readonly Pick<Provider, "id" | "syntax" | "requestNotes">[],
-  query: string | ParsedQuery,
+  query: string | ParsedQuery | ConceptQuery,
 ): SentQuery[] {
-  const parsed = typeof query === "string" ? parseQuery(query) : query;
+  const concepts = toConcepts(query);
   return providers.map((provider) => {
-    const rendered = renderQuery(parsed, provider.syntax);
+    const rendered = renderConcepts(concepts, provider.syntax);
     return { provider: provider.id, text: rendered.text, notes: [...rendered.notes, ...(provider.requestNotes ?? [])] };
   });
 }
 
-/** The providers that take part in the expanded pass. */
-export function expandable<T extends Pick<Provider, "expandedSyntax">>(providers: readonly T[]): T[] {
-  return providers.filter((provider) => provider.expandedSyntax !== undefined);
-}
-
 /**
- * The query as written for the expanded pass: the same words, in the looser syntax each expanding provider has
- * (usually just the words). Only providers that take part are listed.
+ * The order in which a fallback pass drops concepts: the least specific first, judged by how many works each
+ * concept matches on its own (`counts`, by block id): the concept with the most matches narrows the search least,
+ * so dropping it widens the search least harmfully. A concept with no count is tried last. Needs two or more concepts.
  */
-export function planExpandedQueries(
-  providers: readonly Pick<Provider, "id" | "expandedSyntax" | "expandedRequestNotes">[],
-  query: string | ParsedQuery,
-): SentQuery[] {
-  const parsed = typeof query === "string" ? parseQuery(query) : query;
-  return providers.flatMap((provider) => {
-    if (provider.expandedSyntax === undefined) return [];
-    const rendered = renderQuery(parsed, provider.expandedSyntax);
-    return [{ provider: provider.id, text: rendered.text, notes: [...rendered.notes, ...(provider.expandedRequestNotes ?? [])] }];
-  });
+export function fallbackOrder(query: ConceptQuery, counts: ReadonlyMap<string, number>): string[] {
+  const hard = hardBlocks(query);
+  if (hard.length < 2) return [];
+  return hard
+    .map((block, index) => ({ id: block.id, count: counts.get(block.id) ?? -1, index }))
+    .sort((a, b) => b.count - a.count || a.index - b.index)
+    .map((entry) => entry.id);
 }
 
 /**
@@ -91,7 +86,6 @@ async function askWithTimeout(
   limit: number,
   signal: AbortSignal | undefined,
   timeoutMs: number,
-  expanded = false,
 ): Promise<Result[]> {
   const controller = new AbortController();
   const cancel = () => controller.abort();
@@ -107,7 +101,7 @@ async function askWithTimeout(
   });
 
   try {
-    return await Promise.race([provider.search(query, { limit, signal: controller.signal, ...(expanded ? { expanded: true } : {}) }), timeout]);
+    return await Promise.race([provider.search(query, { limit, signal: controller.signal }), timeout]);
   } finally {
     clearTimeout(timer);
     signal?.removeEventListener("abort", cancel);
@@ -119,18 +113,18 @@ async function askWithTimeout(
  * rate limited or timing out never affects the others: it just gets a status. Each provider's
  * answer is also reported through `onProviderDone` as soon as it arrives.
  *
- * `query` may be the text a person typed or an already parsed query. A query with nothing
+ * `query` may be the text a person typed, a parsed query or the concept blocks. A query with nothing
  * searchable in it (only common words, say) asks no provider anything.
  */
 export async function searchProviders(
   providers: readonly Provider[],
-  query: string | ParsedQuery,
+  query: string | ParsedQuery | ConceptQuery,
   options: SearchRunOptions,
 ): Promise<SearchOutcome> {
-  const parsed = typeof query === "string" ? parseQuery(query.trim()) : query;
-  if (!isUsable(parsed)) return { results: [], statuses: [] };
-  const { limit, signal, cache, onProviderDone, timeoutMs = DEFAULT_TIMEOUT_MS, expanded = false } = options;
-  const asked = expanded ? expandable(providers) : providers;
+  const concepts = toConcepts(query);
+  if (!isUsableConcepts(concepts)) return { results: [], statuses: [] };
+  const { limit, signal, cache, onProviderDone, timeoutMs = DEFAULT_TIMEOUT_MS, fallback = false } = options;
+  const asked = providers;
 
   const notify = (update: ProviderUpdate) => {
     try {
@@ -142,9 +136,8 @@ export async function searchProviders(
 
   const answers = await Promise.all(
     asked.map(async (provider): Promise<ProviderUpdate> => {
-      const sent = renderQuery(parsed, expanded ? (provider.expandedSyntax ?? provider.syntax) : provider.syntax).text;
-      // The expanded pass remembers its answers apart from the strict one, even when the text happens to be the same.
-      const memory = expanded ? `\u0001${sent}` : sent;
+      const sent = renderConcepts(concepts, provider.syntax).text;
+      const memory = sent;
       if (sent === "") {
         const update: ProviderUpdate = {
           provider: provider.id,
@@ -168,8 +161,8 @@ export async function searchProviders(
 
       let update: ProviderUpdate;
       try {
-        const found = await askWithTimeout(provider, sent, limit, signal, timeoutMs, expanded);
-        const results = expanded ? found.map((result) => ({ ...result, hits: result.hits.map((hit) => ({ ...hit, expanded: true as const })) })) : found;
+        const found = await askWithTimeout(provider, sent, limit, signal, timeoutMs);
+        const results = fallback ? found.map((result) => ({ ...result, hits: result.hits.map((hit) => ({ ...hit, fallback: true as const })) })) : found;
         cache?.set(provider.id, memory, limit, results);
         update = { provider: provider.id, status: { provider: provider.id, state: "ok", count: results.length }, results };
       } catch (error) {

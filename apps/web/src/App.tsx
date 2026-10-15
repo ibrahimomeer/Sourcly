@@ -8,12 +8,10 @@ import {
   defaultLayoutSettings,
   defaultScoringSettings,
   describeInput,
-  expandable,
-  formatQuery,
+  createOpenAlexCounter,
+  hardBlocks,
   isSaved,
-  isUsable,
   parseInput,
-  parseQuery,
   protocolJson,
   removeSaved,
   suggestTypos,
@@ -24,6 +22,7 @@ import {
   type ProviderId,
   type ResultFilters,
   type ScoringSettings,
+  type Counter,
 } from "@sourcly/core";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { browserStorage, loadApiKey, saveApiKey } from "./apiKey";
@@ -32,13 +31,11 @@ import { Footer } from "./Footer";
 import { CitationsPanel } from "./CitationsPanel";
 import { CounterPanel } from "./CounterPanel";
 import { Header } from "./Header";
-import { allResults, hasFewFullMatches, rankResults, relatedFor, scoringContext } from "./pipeline";
+import { allResults, hasFewFullMatches, rankResults, scoringContext, suggestedFor } from "./pipeline";
 import { ClosestMatch, LookupPanel } from "./LookupPanel";
 import { ProtocolExport } from "./ProtocolExport";
 import { protocolInputFrom, type CounterRecord } from "./protocolRecord";
 import { createProviders, DEFAULT_PROVIDERS, skippedStatuses } from "./providers";
-import { QueryChips } from "./QueryChips";
-import { queryChipsModel } from "./chipsModel";
 import { addTermToQuery, explainUnusable, prepareSearch } from "./queryText";
 import { Results } from "./Results";
 import { SavedProvider, type SavedApi } from "./SavedContext";
@@ -47,7 +44,9 @@ import { loadSavedList, persistSavedList } from "./savedStore";
 import { SearchBox } from "./SearchBox";
 import { DEFAULT_PER_SOURCE, toggleInList, withOverride } from "./settings";
 import { SettingsPanel } from "./SettingsPanel";
+import { SuggestedTerms } from "./SuggestedTerms";
 import { useLookup, useTitleMatch, type LookupTarget } from "./useLookup";
+import { isSearching } from "./searchState";
 import { useSearch } from "./useSearch";
 import { APP_VERSION } from "./version";
 
@@ -63,10 +62,9 @@ export function App({ config }: { config: SourclyConfig }) {
   const [page, setPage] = useState(1);
   const [queryText, setQueryText] = useState("");
   const [queryProblem, setQueryProblem] = useState<string | null>(null);
-  // How the text is read. The text itself is never changed by any of this.
-  const [ignoreCommon, setIgnoreCommon] = useState(true);
-  const [restored, setRestored] = useState<ReadonlySet<string>>(() => new Set());
-  const [leftOut, setLeftOut] = useState<ReadonlySet<string>>(() => new Set());
+  // How the text is read (Settings). The text itself is never changed by any of this.
+  const [exact, setExact] = useState(false);
+  const [synonyms, setSynonyms] = useState(true);
 
   const [storage] = useState(browserStorage);
   const [apiKey, setApiKey] = useState(() => loadApiKey(storage));
@@ -88,7 +86,7 @@ export function App({ config }: { config: SourclyConfig }) {
 
   // This visit's memory of each source's answers. In memory only, gone when the page closes.
   const cache = useRef(createSearchCache());
-  const { state, search, expand, reset } = useSearch();
+  const { state, search, fallback, reset } = useSearch();
   const lookupContext = { contactEmail: config.contactEmail, openAlexApiKey: apiKey };
   const lookup = useLookup(lookupContext);
   const titleMatch = useTitleMatch(lookupContext);
@@ -104,9 +102,9 @@ export function App({ config }: { config: SourclyConfig }) {
     [state, viewSettings],
   );
 
-  // Suggested from the top results only; a suggestion never changes the query by itself.
-  const related = useMemo(
-    () => (state.phase === "idle" || ranked === null ? [] : relatedFor(ranked, state.terms)),
+  // Suggested from the best results only; a suggestion never changes the query by itself.
+  const suggested = useMemo(
+    () => (state.phase === "idle" || ranked === null || isSearching(state) ? [] : suggestedFor(ranked, state.concepts)),
     [state, ranked],
   );
 
@@ -118,30 +116,31 @@ export function App({ config }: { config: SourclyConfig }) {
 
   // "Did you mean ...?", worked out only from the results that came back, and only a link.
   const suggestion = useMemo(
-    () => (state.phase === "idle" || ranked === null ? null : suggestTypos(state.parsed, allResults(ranked).map((scored) => scored.result))),
+    () => (state.phase === "idle" || ranked === null ? null : suggestTypos(state.concepts, allResults(ranked).map((scored) => scored.result))),
     [state, ranked],
   );
 
-  // When the strict first pass is done and fewer than 10 results contain every word, the expanded second pass runs by itself, once.
+  // When the strict first pass is done and fewer than 15 results match every concept, the fallback passes run by themselves, once.
   const providersRef = useRef<() => ReturnType<typeof createProviders>>(() => []);
+  const countRef = useRef<() => Counter | undefined>(() => undefined);
   useEffect(() => {
-    if (state.phase !== "done" || state.expansion !== null || ranked === null || state.parsed.exact === true) return;
-    if (!hasFewFullMatches(ranked)) return;
+    if (state.phase !== "done" || state.fallback !== null || ranked === null || state.concepts.exact) return;
+    if (hardBlocks(state.concepts).length < 2 || !hasFewFullMatches(ranked)) return;
     const providers = providersRef.current();
-    if (expandable(providers).length === 0) return;
-    expand(providers, { limit: perSource, cache: cache.current, skipped: [] });
-  }, [state, ranked, expand, perSource]);
+    if (providers.length === 0) return;
+    const count = countRef.current();
+    fallback(providers, { limit: perSource, cache: cache.current, skipped: [], ...(count === undefined ? {} : { count }) });
+  }, [state, ranked, fallback, perSource]);
 
   const makeProviders = () =>
     createProviders(enabledProviders, { openAlexApiKey: apiKey, contactEmail: config.contactEmail });
   providersRef.current = makeProviders;
+  // Concepts are counted in OpenAlex only when the person has it switched on.
+  countRef.current = () => (enabledProviders.includes("openalex") ? createOpenAlexCounter({ apiKey }) : undefined);
 
-  // Changing the text starts the reading afresh: restored and left-out words belong to the text they were chosen for.
   function changeQueryText(next: string) {
     setQueryText(next);
     setAsKeywords(false);
-    setRestored(new Set());
-    setLeftOut(new Set());
   }
 
   // What the text looks like: keywords, or a DOI, a link, an ID or a title. The text itself is never changed.
@@ -149,44 +148,28 @@ export function App({ config }: { config: SourclyConfig }) {
   const lookupTarget: LookupTarget | null =
     asKeywords || detected.kind === "keywords" || detected.kind === "title" ? null : detected;
 
-  const interpretation = useMemo(
-    () => parseQuery(queryText.trim(), { ignoreCommon, restored, excluded: leftOut }),
-    [queryText, ignoreCommon, restored, leftOut],
-  );
-  const chipsModel = useMemo(
-    () => queryChipsModel(interpretation, isUsable(interpretation) ? formatQuery(interpretation) : ""),
-    [interpretation],
-  );
-  // The terms were changed after the last search of this same text, so the results are for the earlier terms.
-  const needsSearch =
-    state.phase !== "idle" &&
-    state.parsed.exact !== true &&
-    state.parsed.original === interpretation.original &&
-    formatQuery(state.parsed) !== formatQuery(interpretation);
-
-  function handleSearch(text: string, exact: boolean) {
+  function handleSearch(text: string) {
     // A DOI, a link or an ID names one work: look it up instead of searching for its characters.
-    if (lookupTarget !== null && !exact) {
+    if (lookupTarget !== null) {
       setQueryProblem(null);
       reset();
       titleMatch.clear();
       lookup.run(lookupTarget, text);
       return;
     }
-    runSearch(text, exact ? { exact: true } : { ignoreCommon, restored, excluded: leftOut });
+    runSearch(text);
   }
 
   // The person chose the suggestion: it replaces the text, and the words are read afresh.
   function handleUseSuggestion(text: string) {
-    const exact = state.phase !== "idle" && state.parsed.exact === true;
     changeQueryText(text);
-    runSearch(text, exact ? { exact: true } : { ignoreCommon });
+    runSearch(text);
   }
 
-  function runSearch(text: string, options: Parameters<typeof prepareSearch>[1]) {
-    const prepared = prepareSearch(text, options);
+  function runSearch(text: string) {
+    const prepared = prepareSearch(text, { exact, synonyms });
     if (!prepared.usable) {
-      setQueryProblem(explainUnusable(prepared.parsed));
+      setQueryProblem(explainUnusable(prepared.concepts));
       return;
     }
     setQueryProblem(null);
@@ -195,14 +178,14 @@ export function App({ config }: { config: SourclyConfig }) {
     // The text in the box is left exactly as typed.
     setPage(1);
     lookup.clear();
-    search(prepared.parsed, providers, { limit: perSource, cache: cache.current, skipped: skippedStatuses() });
+    search(prepared.concepts, providers, { limit: perSource, cache: cache.current, skipped: skippedStatuses() });
     // A long title also gets its closest match, shown above the results.
     const title = parseInput(text);
     if (title.kind === "title" && !asKeywords) titleMatch.run(title.title);
     else titleMatch.clear();
   }
 
-  function handleAddRelatedTerm(term: string) {
+  function handleAddSuggestedTerm(term: string) {
     changeQueryText(addTermToQuery(queryText, term));
     document.getElementById("query")?.focus();
   }
@@ -263,13 +246,7 @@ export function App({ config }: { config: SourclyConfig }) {
       <Header config={config} />
       <main>
         <div className="top">
-          <SearchBox
-            value={queryText}
-            onChange={changeQueryText}
-            onSearch={handleSearch}
-            ignoreCommon={ignoreCommon}
-            onIgnoreCommonChange={setIgnoreCommon}
-          >
+          <SearchBox value={queryText} onChange={changeQueryText} onSearch={handleSearch}>
             {queryText.trim() !== "" && detected.kind !== "keywords" && (
               <p className="detected" role="status">
                 {lookupTarget !== null ? (
@@ -296,21 +273,7 @@ export function App({ config }: { config: SourclyConfig }) {
                 )}
               </p>
             )}
-            {queryText.trim() !== "" && lookupTarget === null && (
-              <QueryChips
-                model={chipsModel}
-                onExclude={(key) => setLeftOut((current) => new Set(current).add(key))}
-                onRestoreCommon={(word) => setRestored((current) => new Set(current).add(word))}
-                onRestoreLeftOut={(key) =>
-                  setLeftOut((current) => {
-                    const next = new Set(current);
-                    next.delete(key);
-                    return next;
-                  })
-                }
-                needsSearch={needsSearch}
-              />
-            )}
+            {lookupTarget === null && <SuggestedTerms terms={suggested} onAdd={handleAddSuggestedTerm} />}
           </SearchBox>
           {queryProblem !== null && <p className="warning">{queryProblem}</p>}
           <p className="notice">
@@ -363,6 +326,10 @@ export function App({ config }: { config: SourclyConfig }) {
             onToggleProvider={(id) => setEnabledProviders((current) => toggleInList(current, id))}
             perSource={perSource}
             onPerSourceChange={setPerSource}
+            exact={exact}
+            onExactChange={setExact}
+            synonyms={synonyms}
+            onSynonymsChange={setSynonyms}
             onClearCache={() => cache.current.clear()}
             apiKey={apiKey}
             onApiKeyChange={handleApiKeyChange}
@@ -415,8 +382,6 @@ export function App({ config }: { config: SourclyConfig }) {
                 librarySearchUrl={config.librarySearchUrl}
                 onOverrideChange={handleOverrideChange}
                 onClearFilters={() => setFilters(defaultFilters())}
-                related={related}
-                onAddRelatedTerm={handleAddRelatedTerm}
                 exportSlot={<ProtocolExport build={buildProtocolText} />}
                 suggestion={suggestion}
                 onUseSuggestion={handleUseSuggestion}
@@ -428,6 +393,8 @@ export function App({ config }: { config: SourclyConfig }) {
                   mainSearch={state}
                   makeProviders={makeProviders}
                   perSource={perSource}
+                  exact={exact}
+                  synonyms={synonyms}
                   cache={cache.current}
                   skipped={skippedStatuses()}
                   view={viewSettings}

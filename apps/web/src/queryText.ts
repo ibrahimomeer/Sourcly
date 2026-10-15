@@ -1,38 +1,30 @@
-import { isUsable, parseQuery, queryTerms, type ParseOptions, type ParsedQuery } from "@sourcly/core";
+import { hardBlocks, isUsableConcepts, parseConcepts, parseQuery, type ConceptOptions, type ConceptQuery } from "@sourcly/core";
 
 export interface PreparedSearch {
-  parsed: ParsedQuery;
+  concepts: ConceptQuery;
   /** Whether there is anything to search for. */
   usable: boolean;
 }
 
 /**
- * Reads the text of the search box. The text itself is never changed: a question such as "what is
- * the effect of sleep on memory?" is read as keywords by leaving out common words (a fixed list, no
- * guessing), and the words left out are shown to the person, who can restore any of them.
+ * Reads the text of the search box as concepts. The text itself is never changed: a question such as "how do
+ * vaccines train the immune system?" is read as concepts by leaving out common words and generic verbs (fixed lists,
+ * no guessing); the reading is shown, collapsed, under “How we searched”.
  */
-export function prepareSearch(text: string, options: ParseOptions = {}): PreparedSearch {
-  const parsed = parseQuery(text.trim(), options);
-  return { parsed, usable: isUsable(parsed) };
+export function prepareSearch(text: string, options: ConceptOptions = {}): PreparedSearch {
+  const concepts = parseConcepts(text.trim(), options);
+  return { concepts, usable: isUsableConcepts(concepts) };
 }
 
 /** Why a query cannot be searched, in plain words. */
-export function explainUnusable(parsed: ParsedQuery): string {
-  if (parsed.droppedStopwords.length > 0 && parsed.root === null) {
-    return `Everything in “${parsed.original}” is a common word that searches leave out (${[...new Set(parsed.droppedStopwords)].join(", ")}). Click one of the dashed words below to use it, turn off “Ignore common words”, or add a more specific word.`;
+export function explainUnusable(concepts: ConceptQuery): string {
+  if (hardBlocks(concepts).length === 0 && concepts.stopwords.length > 0) {
+    return `Everything in “${concepts.original}” is a common word that searches leave out (${[...new Set(concepts.stopwords)].join(", ")}). Add a more specific word, or turn on “Search exactly as typed” in Settings.`;
   }
-  if (parsed.root === null && (parsed.excludedTerms?.length ?? 0) > 0) {
-    return "Every term has been left out. Click a dashed word below to use it again.";
-  }
-  if (parsed.root !== null && queryTerms(parsed).length === 0) {
+  if (concepts.blocks.length === 0 && concepts.exclusions.length > 0) {
     return "A search needs at least one word to look for, not only words to leave out.";
   }
   return "Type some words to search for.";
-}
-
-/** "Common words" as a short list for display: each once, in the order they appeared. */
-export function droppedWords(parsed: ParsedQuery): string[] {
-  return [...new Set(parsed.droppedStopwords)];
 }
 
 const escapeRegExp = (text: string) => text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");

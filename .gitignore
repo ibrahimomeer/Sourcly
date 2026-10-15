@@ -9,3 +9,4 @@ coverage/
 
 # The eval script keeps live answers here so repeated runs do not use up free allowances.
 apps/web/eval/.cache/
+apps/web/eval/output/

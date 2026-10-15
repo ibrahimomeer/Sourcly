@@ -3,6 +3,7 @@ import {
   FACTOR_LABELS,
   PEER_REVIEW_STATUSES,
   SOURCE_LEVELS,
+  SOFT_TERMS,
   STOPWORDS,
   UNKNOWN_LANGUAGE,
   defaultFilters,
@@ -26,11 +27,11 @@ const OPENALEX_KEY_URL = "https://openalex.org/settings/api";
 
 const FACTOR_HELP: Record<FactorId, string> = {
   relevance:
-    "BM25, a standard word-matching formula, over each result's title, abstract and subject terms, worked out on all the results fetched. Rarer words count for more. The best match scores 1.",
+    "BM25, a standard word-matching formula, over each result's title, abstract and author keywords, worked out on all the results fetched. Each concept of your search counts 1.0, a generic word such as “using” counts 0.3. Rarer concepts count for more. The best match scores 1.",
   termCoverage:
-    "How many of your search's words and phrases the result contains, and where: a term in the title counts 1, in the author keywords 0.8, only in the abstract 0.6. Averaged over your terms. Topic tags and the journal name are not read.",
+    "How many of your search's concepts the result matches, and where: a concept in the title counts 1, in the author keywords 0.8, only in the abstract 0.6. Averaged over your concepts. Topic tags and the journal name are not read.",
   phraseMatch:
-    "Words that are next to each other in your search, found next to each other in the same order: in the title counts 1, in the abstract 0.7. Neutral (0.5) when your search has no two such words.",
+    "Concepts that are next to each other in your search, found next to each other in the same order: in the title counts 1, in the abstract 0.7. Neutral (0.5) when your search has no two such concepts.",
   citations: "Citations per year since publication, compared with the other results.",
   recency: "Newer publications score higher. The score halves every “half-life”.",
   peerReview: "Likely peer-reviewed scores 1, unknown 0.5, not peer-reviewed 0.",
@@ -52,6 +53,12 @@ export interface SettingsPanelProps {
   languageOptions: readonly LanguageCount[];
   enabledProviders: readonly ProviderId[];
   onToggleProvider: (id: ProviderId) => void;
+  /** "Search exactly as typed": no word removed, no alternatives added, the text sent as it is. */
+  exact: boolean;
+  onExactChange: (exact: boolean) => void;
+  /** "Expand with curated synonyms". */
+  synonyms: boolean;
+  onSynonymsChange: (synonyms: boolean) => void;
   /** How many results each source is asked for. */
   perSource: number;
   onPerSourceChange: (count: number) => void;
@@ -70,6 +77,7 @@ export function SettingsPanel(props: SettingsPanelProps) {
     <div className="settings">
       {/* Hidden, not removed, so what you typed survives closing the panel. */}
       <div id="settings-panel" className="settings-panel" hidden={!props.open}>
+        <SearchSection {...props} />
         <SourcesSection {...props} />
         <RankingSection {...props} />
         <LayoutSection {...props} />
@@ -78,6 +86,38 @@ export function SettingsPanel(props: SettingsPanelProps) {
         <ApiKeySection {...props} />
       </div>
     </div>
+  );
+}
+
+function SearchSection({ exact, onExactChange, synonyms, onSynonymsChange }: SettingsPanelProps) {
+  return (
+    <fieldset>
+      <legend>How the search is read</legend>
+      <p className="muted">
+        Your text is read as concepts: common words and generic words (“understand”, “using”, “novel”) are not required, and
+        every other word or quoted phrase must match. “How we searched”, under the results heading, shows exactly how.
+      </p>
+      <label className="check">
+        <input type="checkbox" checked={exact} onChange={(event) => onExactChange(event.target.checked)} />
+        <span>
+          <strong>Search exactly as typed</strong>{" "}
+          <span className="muted">
+            No common word is removed, no generic word is set aside, no alternative is added and no operator is written for
+            you: your text is sent to every source as it is. Applies to your next search.
+          </span>
+        </span>
+      </label>
+      <label className="check">
+        <input type="checkbox" checked={synonyms && !exact} disabled={exact} onChange={(event) => onSynonymsChange(event.target.checked)} />
+        <span>
+          <strong>Expand with curated synonyms</strong>{" "}
+          <span className="muted">
+            A concept also matches its spelling variants, abbreviations and a few close synonyms from a short, hand-checked
+            list (for example AI also matches “machine learning”). Quoted phrases are never expanded.
+          </span>
+        </span>
+      </label>
+    </fieldset>
   );
 }
 
@@ -143,8 +183,8 @@ function RankingSection({ scoring, onScoringChange }: SettingsPanelProps) {
       <legend>Ranking weights</legend>
       <p className="muted">
         Results re-rank instantly, without searching again. Score = sum of (weight × factor) ÷ sum of weights, over the
-        factors that are on. The score is used after two things that always come first: how many of your words a result
-        contains, and whether they appear next to each other.
+        factors that are on. The score is used after two things that always come first: how many of your concepts a result
+        matches, and whether neighbouring concepts appear next to each other.
       </p>
 
       {FACTOR_IDS.map((id) => {
@@ -227,9 +267,9 @@ function LayoutSection({ layout, onLayoutChange, languageOptions }: SettingsPane
     <fieldset>
       <legend>Results layout</legend>
       <p className="muted">
-        Nothing is ever deleted. The main list holds results that contain every word of your search (and, while there are
-        fewer than 10 of those, results that lack one word). Everything else is kept in collapsed sections below it, each
-        with a count.
+        Nothing is ever deleted. The main list holds results that match every concept of your search (and, while there are
+        fewer than 15 of those, results that lack one concept, labelled “Matches N of M concepts”). Everything else is kept
+        in collapsed sections below it, each with a count.
       </p>
       <div className="check-group" role="group" aria-label="Preferred languages">
         <span className="group-label">Preferred languages (none ticked = any)</span>
@@ -342,20 +382,26 @@ function FiltersSection({ filters, onFiltersChange }: SettingsPanelProps) {
 }
 
 const COMMON_WORDS = [...STOPWORDS].sort();
+const GENERIC_WORDS = [...SOFT_TERMS].sort();
 
 function CommonWordsSection() {
   return (
     <fieldset>
-      <legend>Common words</legend>
+      <legend>Common and generic words</legend>
       <p className="muted">
-        While “Ignore common words” (next to the search box) is on, these {COMMON_WORDS.length} words are not used in a
-        search, and each one that is left out is shown under the box, where one click puts it back. Words inside quotes are
-        always kept, and so is a word in capitals such as <code>CAN</code> or <code>US</code>. The list is fixed: nothing is
-        learned or guessed.
+        Two fixed lists decide which words of a search are not required. <strong>Common words</strong> ({COMMON_WORDS.length}{" "}
+        words, such as “what”, “is” and “the”) are never searched. <strong>Generic words</strong> ({GENERIC_WORDS.length}{" "}
+        words, such as “understand”, “using” and “novel”) are not required either, and only give a small ranking boost
+        when a result has them. Words inside quotes are always kept, and so is a word in capitals such as <code>CAN</code> or{" "}
+        <code>US</code>. The lists are fixed: nothing is learned or guessed. “Search exactly as typed” turns both off.
       </p>
       <details className="panel">
-        <summary>Show the list ({COMMON_WORDS.length} words)</summary>
+        <summary>Show the common words ({COMMON_WORDS.length})</summary>
         <p className="word-list">{COMMON_WORDS.join(" ")}</p>
+      </details>
+      <details className="panel">
+        <summary>Show the generic words ({GENERIC_WORDS.length})</summary>
+        <p className="word-list">{GENERIC_WORDS.join(" ")}</p>
       </details>
     </fieldset>
   );

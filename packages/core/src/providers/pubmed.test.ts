@@ -166,11 +166,11 @@ describe("PubMed subjects and syntax", () => {
     }
   });
 
-  it("understands Boolean queries and looks every word up in PubMed's text words, and says so", () => {
+  it("understands Boolean queries and looks every word up in PubMed's title and abstract, and says so", () => {
     const provider = createPubmedProvider();
     expect(provider.syntax).toBe("pubmed");
-    expect(provider.expandedSyntax).toBe("plain");
-    expect(provider.requestNotes?.join(" ")).toMatch(/text words.*synonyms and word forms is switched off/);
+    expect(provider).not.toHaveProperty("expandedSyntax");
+    expect(provider.requestNotes?.join(" ")).toMatch(/title and abstract only \(\[tiab\]\).*synonyms and word forms is switched off/);
   });
 });
 describe("PubMed: volume, issue and pages", () => {

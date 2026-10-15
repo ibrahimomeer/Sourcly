@@ -1,4 +1,5 @@
 import { BM25_B, BM25_K1 } from "./bm25";
+import { hardBlocks, type ConceptQuery } from "./concepts";
 import type { ResultFilters } from "./filters";
 import { FACTOR_IDS, FACTOR_LABELS, type FactorId, type ScoringSettings } from "./scoring";
 import type { SentQuery } from "./search";
@@ -15,22 +16,21 @@ export const PROTOCOL_SCHEMA_VERSION = 1;
 export interface ProtocolSearch {
   /** What was typed, exactly. */
   typedQuery: string;
-  /** What was searched for after common words were removed. */
-  searchedQuery: string;
-  commonWordsRemoved: string[];
+  /** How the typed text was read: the concepts, the words left out, the settings that changed the reading. */
+  concepts: ConceptQuery;
   /** The text each source received, and what it could not apply. */
   sentQueries: SentQuery[];
   /** How each source answered. */
   statuses: ProviderStatus[];
-  /** The expanded second pass, when it ran: what each source asked in it received, and how each answered. */
-  expandedPass: { sentQueries: SentQuery[]; statuses: ProviderStatus[] } | null;
+  /** The fallback passes that ran (a concept dropped at a time, when the first search found few), each with what was sent. */
+  fallbackPasses: { dropped: string; sentQueries: SentQuery[]; statuses: ProviderStatus[] }[];
   counts: {
     /** Records returned by all sources together, before duplicates were merged. */
     fetched: number;
     /** Distinct works after merging duplicates. */
     merged: number;
     shown: number;
-    /** Results kept apart as partial matches (they lack some of the query's terms). */
+    /** Results kept apart as partial matches (they lack some of the query's concepts). */
     partialMatches: number;
     /** Results kept apart because they are in a language that is not preferred. */
     otherLanguages: number;
@@ -57,19 +57,40 @@ export interface ProtocolInput {
   saved: readonly { title: string; doi: string | null; url: string | null }[];
 }
 
+const copyQueries = (queries: readonly SentQuery[]) =>
+  queries.map(({ provider, text, notes }) => ({ source: provider, query: text, notes: [...notes] }));
+
+/** How the search was read, by concept: only the fields below are written, whatever the input carries. */
+function copyConcepts(query: ConceptQuery) {
+  return {
+    exactlyAsTyped: query.exact,
+    curatedSynonyms: query.expanded,
+    concepts: hardBlocks(query).map((block) => ({
+      concept: block.label,
+      quoted: block.quoted,
+      variants: block.variants.map((variant) => ({
+        text: variant.text,
+        from: variant.origin === "thesaurus" ? "curated thesaurus" : "typed",
+        ...(variant.entryType === undefined ? {} : { entryType: variant.entryType }),
+        ...(variant.note === undefined ? {} : { note: variant.note }),
+      })),
+    })),
+    softTerms: query.soft.map((term) => term.text),
+    commonWordsLeftOut: [...query.stopwords],
+    excluded: query.exclusions.map((variant) => variant.text),
+  };
+}
+
 const copySearch = (search: ProtocolSearch) => ({
   typedQuery: search.typedQuery,
-  searchedQuery: search.searchedQuery,
-  commonWordsRemoved: [...search.commonWordsRemoved],
-  sentQueries: search.sentQueries.map(({ provider, text, notes }) => ({ source: provider, query: text, notes: [...notes] })),
+  reading: copyConcepts(search.concepts),
+  sentQueries: copyQueries(search.sentQueries),
   statuses: search.statuses.map((status) => ({ ...status })),
-  expandedPass:
-    search.expandedPass === null
-      ? null
-      : {
-          sentQueries: search.expandedPass.sentQueries.map(({ provider, text, notes }) => ({ source: provider, query: text, notes: [...notes] })),
-          statuses: search.expandedPass.statuses.map((status) => ({ ...status })),
-        },
+  fallbackPasses: search.fallbackPasses.map((pass) => ({
+    droppedConcept: pass.dropped,
+    sentQueries: copyQueries(pass.sentQueries),
+    statuses: pass.statuses.map((status) => ({ ...status })),
+  })),
   counts: { ...search.counts },
 });
 
@@ -103,7 +124,7 @@ export function buildProtocol(input: ProtocolInput) {
     },
     ranking: {
       formula: "score = sum(weight * factor) / sum(weight), over the factors that are on; every factor is 0 to 1",
-      relevance: `BM25 (k1 = ${BM25_K1}, b = ${BM25_B}) over title, abstract and subject terms of the merged results`,
+      relevance: `BM25 (k1 = ${BM25_K1}, b = ${BM25_B}) over title, abstract and author keywords of the merged results; concepts weigh 1.0, soft terms 0.3`,
       referenceYear: input.referenceYear,
       // How term coverage decides the order: "all" (all terms first, partial matches apart), "coverage" or "ignore".
       layout: {

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { duplicateKey, familyName, mergeResults, normalizeTitle, versionlessDoi } from "./dedupe";
+import { duplicateKey, familyName, mergeResults, normalizeTitle, uniqueProviderHits, versionlessDoi } from "./dedupe";
 import { parseCrossrefWork } from "./providers/crossref";
 import { parseDataCiteRecord } from "./providers/datacite";
 import { parseEuropePmcRecord } from "./providers/europepmc";
@@ -11,7 +11,7 @@ import europepmc from "./providers/__fixtures__/europepmc.json";
 import openalex from "./providers/__fixtures__/openalex-works.json";
 import zenodo from "./providers/__fixtures__/zenodo.json";
 import { makeResult } from "./testing/make-result";
-import type { ProviderId, Result } from "./types";
+import type { ProviderHit, ProviderId, Result } from "./types";
 
 const hit = (provider: ProviderId, rank = 1, listSize = 10) => [{ provider, id: `${provider}-${rank}`, rank, listSize, score: null }];
 const result = (provider: ProviderId, overrides: Partial<Result> = {}) =>
@@ -230,5 +230,39 @@ describe("merging volume, issue and pages", () => {
     const openalex = result("openalex", { id: doi, doi, volume: "12", issue: "3", pages: null });
     const [merged] = mergeResults([crossref, openalex]);
     expect(merged).toMatchObject({ volume: "12", issue: "3", pages: "1-2" });
+  });
+});
+
+describe("uniqueProviderHits: one “Found by” badge per source", () => {
+  const hit = (provider: ProviderId, rank: number, extra: Partial<ProviderHit> = {}): ProviderHit => ({ provider, id: `${provider}${rank}`, rank, listSize: 100, score: null, ...extra });
+
+  it("lists a source once, even when it found the work in the strict search and again in a fallback pass", () => {
+    const hits = [hit("pubmed", 7), hit("openalex", 3), hit("pubmed", 2, { fallback: true })];
+    expect(uniqueProviderHits(hits).map((h) => h.provider)).toEqual(["pubmed", "openalex"]);
+  });
+
+  it("keeps the best rank of that source, and the order in which the sources first appeared", () => {
+    const hits = [hit("crossref", 9), hit("openalex", 5), hit("crossref", 4), hit("openalex", 8), hit("europepmc", 1)];
+    expect(uniqueProviderHits(hits).map((h) => [h.provider, h.rank])).toEqual([
+      ["crossref", 4],
+      ["openalex", 5],
+      ["europepmc", 1],
+    ]);
+  });
+
+  it("changes nothing when every source is there once, and does not change its input", () => {
+    const hits = [hit("openalex", 1), hit("pubmed", 2)];
+    const before = JSON.stringify(hits);
+    expect(uniqueProviderHits(hits)).toEqual(hits);
+    expect(JSON.stringify(hits)).toBe(before);
+    expect(uniqueProviderHits([])).toEqual([]);
+  });
+
+  it("works on a merged result: the merge keeps every hit, the badges show each source once", () => {
+    const a = makeResult({ id: "10.1/a", doi: "10.1/a", hits: [hit("pubmed", 6)] });
+    const b = makeResult({ id: "10.1/a", doi: "10.1/a", hits: [hit("pubmed", 2, { fallback: true })] });
+    const [merged] = mergeResults([a, b]);
+    expect(merged?.hits).toHaveLength(2);
+    expect(uniqueProviderHits(merged?.hits ?? [])).toHaveLength(1);
   });
 });

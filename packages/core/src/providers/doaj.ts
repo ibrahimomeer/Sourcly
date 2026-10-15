@@ -97,7 +97,6 @@ export function createDoajProvider(options: DoajOptions = {}): Provider {
     id: "doaj",
     name: "DOAJ",
     syntax: "boolean",
-    expandedSyntax: "plain",
 
     async search(query: string, { limit, signal }: SearchOptions): Promise<Result[]> {
       const text = query.trim();

@@ -21,8 +21,8 @@ export interface ProviderOption {
 
 /** The sources the user can switch on and off, in the order they are listed. */
 export const PROVIDER_OPTIONS: readonly ProviderOption[] = [
-  { id: "openalex", name: "OpenAlex", description: "A large open index of scholarly works in every field. The backbone of the search." },
-  { id: "crossref", name: "Crossref", description: "DOIs registered by publishers. Strong on metadata, light on abstracts; its matching is loose, so at most 25 journal articles, conference papers, preprints and books are asked for." },
+  { id: "openalex", name: "OpenAlex", description: "A large open index of scholarly works in every field. The backbone of the search: at 100 results per source it is asked for two pages, up to 200 works." },
+  { id: "crossref", name: "Crossref", description: "DOIs registered by publishers. Strong on metadata, light on abstracts; its matching is loose, so it is only a supplement: at most 20 journal articles, conference papers, preprints and books are asked for." },
   { id: "pubmed", name: "PubMed", description: "Biomedical and life-science literature from the U.S. National Library of Medicine." },
   { id: "europepmc", name: "Europe PMC", description: "Life-science articles and preprints, with citation counts and free full-text links." },
   { id: "doaj", name: "DOAJ", description: "Journals that are fully open access." },

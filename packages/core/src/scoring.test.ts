@@ -513,7 +513,8 @@ describe("scoreResults: term coverage comes first", () => {
   const withSpec = (text: string, changes: Partial<ScoringContext> = {}) =>
     ctx({ queryTerms: ["chaos", "double", "pendulum"], coverage: query(text), ...changes });
 
-  // A is the weakest by every other factor, but is the only one with all three words.
+  // "chaos double pendulum" has two concepts: chaos, and the phrase "double pendulum". "all" is the weakest by every
+  // other factor, but is the only one that matches both.
   const items = () => [
     item({ id: "10.1/slag", title: "Chaos in steel slag asphalt", citationCount: 900, year: 2026 }),
     item({ id: "10.1/caos", title: "CAOS editorial", citationCount: 500, year: 2026 }),
@@ -522,16 +523,34 @@ describe("scoreResults: term coverage comes first", () => {
   ];
   const ids = (scored: ReturnType<typeof scoreResults>) => scored.map((s) => s.result.id);
 
-  it("puts results with every term first, then most, then few, whatever their score", () => {
+  it("puts the result that matches every concept first, whatever its score, then the others", () => {
     const scored = scoreResults(items(), defaultScoringSettings(), withSpec("chaos double pendulum"));
-    expect(ids(scored)).toEqual(["10.1/all", "10.1/two", "10.1/slag", "10.1/caos"]);
-    expect(scored.map((s) => s.tier)).toEqual([1, 2, 3, 3]);
+    expect(ids(scored)).toEqual(["10.1/all", "10.1/slag", "10.1/two", "10.1/caos"]);
+    expect(scored.map((s) => s.tier)).toEqual([1, 3, 3, 3]);
+  });
+
+  it("puts a result that matches most of the concepts before one that matches few", () => {
+    const three = [
+      item({ id: "10.1/few", title: "Chaos", citationCount: 900, year: 2026 }),
+      item({ id: "10.1/most", title: "Chaos in a double pendulum", citationCount: 0, year: 1990 }),
+    ];
+    const scored = scoreResults(three, defaultScoringSettings(), ctx({ queryTerms: ["chaos", "pendulum", "motion"], coverage: query("chaos pendulum motion") }));
+    expect(scored.map((s) => [s.result.id, s.tier])).toEqual([["10.1/most", 2], ["10.1/few", 3]]);
+  });
+
+  it("orders inside a tier by how many concepts were matched, before anything else", () => {
+    const set = [
+      item({ id: "10.1/none", title: "Gardening in steel slag", citationCount: 9000, year: 2026 }),
+      item({ id: "10.1/one", title: "A pendulum", citationCount: 0, year: 1990 }),
+    ];
+    const scored = scoreResults(set, defaultScoringSettings(), withSpec("chaos pendulum motion"));
+    expect(scored.map((s) => [s.result.id, s.tier, s.coverage?.matchedCount])).toEqual([["10.1/one", 3, 1], ["10.1/none", 3, 0]]);
   });
 
   it("orders inside a tier by the weighted score", () => {
     const scored = scoreResults(items(), defaultScoringSettings(), withSpec("chaos double pendulum"));
-    // slag (1 of 3 terms, many citations) beats caos (0 of 3, fewer citations): both are tier 3.
-    expect(ids(scored).slice(2)).toEqual(["10.1/slag", "10.1/caos"]);
+    // slag (1 of 2 concepts, 900 citations) beats two (1 of 2, 100 citations) beats caos (0 of 2): all three are tier 3.
+    expect(ids(scored).slice(1)).toEqual(["10.1/slag", "10.1/two", "10.1/caos"]);
   });
 
   it("keeps the same order whatever order the words were typed in", () => {
@@ -549,15 +568,18 @@ describe("scoreResults: term coverage comes first", () => {
   });
 
   it("orders by phrase match inside a tier, before the score", () => {
-    const adjacent = makeResult({ id: "10.1/adjacent", doi: "10.1/adjacent", title: "The double pendulum", year: 1990, citationCount: 0 });
-    const apart = makeResult({ id: "10.1/apart", doi: "10.1/apart", title: "Pendulum and a double", year: 2026, citationCount: 5000 });
+    const adjacent = makeResult({ id: "10.1/adjacent", doi: "10.1/adjacent", title: "Chaos pendulum", year: 1990, citationCount: 0 });
+    const apart = makeResult({ id: "10.1/apart", doi: "10.1/apart", title: "Pendulum and a chaos", year: 2026, citationCount: 5000 });
+    // The phrase factor is switched off so that the score alone would put the newer, much more cited one first.
+    const settings = defaultScoringSettings();
+    settings.factors.phraseMatch.enabled = false;
     const scored = scoreResults(
       [adjacent, apart].map((result) => ({ result, labels: classify(result) })),
-      defaultScoringSettings(),
-      withSpec("double pendulum"),
+      settings,
+      withSpec("chaos pendulum"),
     );
     expect(scored.map((s) => s.tier)).toEqual([1, 1]);
-    // The newer, much more cited one scores higher, but the words are not next to each other in it.
+    // The newer, much more cited one scores higher, but the concepts are not next to each other in it.
     expect(scored.find((s) => s.result.id === "10.1/apart")!.score).toBeGreaterThan(scored.find((s) => s.result.id === "10.1/adjacent")!.score);
     expect(ids(scored)).toEqual(["10.1/adjacent", "10.1/apart"]);
   });

@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import { ProviderError } from "../types";
 import {
+  createOpenAlexCounter,
   createOpenAlexProvider,
   mapOpenAlexType,
   parseOpenAlexWork,
@@ -310,23 +311,21 @@ describe("createOpenAlexProvider", () => {
     expect(init).toEqual({ signal: controller.signal });
   });
 
-  it("uses the scoped title-and-abstract search for the strict pass and the default relevance search for the expanded pass", async () => {
+  it("uses the scoped title-and-abstract search, and sends a Boolean query as it is", async () => {
     const fetchMock = vi.fn<typeof fetch>(() => jsonResponse({ results: [] }));
     const provider = createOpenAlexProvider({ fetch: fetchMock });
-    await provider.search("sleep memory", { limit: 5 });
-    await provider.search("sleep memory", { limit: 5, expanded: true });
-    const [strict, expanded] = fetchMock.mock.calls.map((call) => new URL(String(call[0])));
-    expect(strict?.searchParams.get("search.title_and_abstract")).toBe("sleep memory");
-    expect(strict?.searchParams.has("search")).toBe(false);
-    expect(expanded?.searchParams.get("search")).toBe("sleep memory");
-    expect(expanded?.searchParams.has("search.title_and_abstract")).toBe(false);
-    expect(provider.expandedSyntax).toBe("plain");
-    expect(provider.expandedRequestNotes?.join(" ")).toMatch(/default relevance search/);
+    const boolean = '(AI OR "machine learning") AND (odor OR odour OR olfaction)';
+    await provider.search(boolean, { limit: 5 });
+    const url = new URL(String(fetchMock.mock.calls[0]?.[0]));
+    expect(url.searchParams.get("search.title_and_abstract")).toBe(boolean);
+    expect(url.searchParams.has("search")).toBe(false);
+    expect(provider.syntax).toBe("boolean");
+    expect(provider).not.toHaveProperty("expandedSyntax");
   });
 
   it.each([
-    [500, "100"],
-    [100, "100"],
+    [50, "50"],
+    [99, "99"],
     [12.7, "12"],
     [0, "1"],
     [-5, "1"],
@@ -335,6 +334,29 @@ describe("createOpenAlexProvider", () => {
     await createOpenAlexProvider({ fetch: fetchMock }).search("q", { limit });
     const url = new URL(String(fetchMock.mock.calls[0]?.[0]));
     expect(url.searchParams.get("per_page")).toBe(expected);
+  });
+
+  it("asks for two pages of 100 when a full page is asked for, one after the other, and numbers the ranks across both", async () => {
+    const page = (offset: number) => ({ results: Array.from({ length: 100 }, (_, i) => ({ id: `https://openalex.org/W${offset + i + 1}`, title: `Work ${offset + i + 1}`, doi: `https://doi.org/10.1/w${offset + i + 1}` })) });
+    const fetchMock = vi.fn<typeof fetch>((input) => jsonResponse(new URL(String(input)).searchParams.get("page") === "2" ? page(100) : page(0)));
+    const results = await createOpenAlexProvider({ fetch: fetchMock }).search("sleep", { limit: 100 });
+    const urls = fetchMock.mock.calls.map((call) => new URL(String(call[0])));
+    expect(urls.map((url) => [url.searchParams.get("per_page"), url.searchParams.get("page")])).toEqual([
+      ["100", null],
+      ["100", "2"],
+    ]);
+    expect(results).toHaveLength(200);
+    expect(results.map((result) => result.hits[0]?.rank).slice(98, 102)).toEqual([99, 100, 101, 102]);
+    expect(results.every((result) => result.hits[0]?.listSize === 200)).toBe(true);
+  });
+
+  it("does not ask for a second page when the first is not full, or when fewer than a full page is asked for", async () => {
+    const short = vi.fn<typeof fetch>(() => jsonResponse({ results: [{ id: "https://openalex.org/W1", title: "Only work" }] }));
+    await createOpenAlexProvider({ fetch: short }).search("sleep", { limit: 100 });
+    expect(short).toHaveBeenCalledTimes(1);
+    const small = vi.fn<typeof fetch>(() => jsonResponse({ results: [] }));
+    await createOpenAlexProvider({ fetch: small }).search("sleep", { limit: 50 });
+    expect(small).toHaveBeenCalledTimes(1);
   });
 
   it("returns results in provider order with their rank and list size", async () => {
@@ -367,6 +389,45 @@ describe("createOpenAlexProvider", () => {
     expect(error).toBeInstanceOf(ProviderError);
     expect(error).toMatchObject({ kind: "rate-limited", httpStatus: 429 });
     expect((error as ProviderError).message).toContain("retry after 12 s");
+  });
+
+  it("waits out a short Retry-After (the one-request-per-second limit on broad boolean queries) and asks again", async () => {
+    const limited = () => Response.json({ error: "Rate limit exceeded", reason: "broad_boolean_query", retryAfter: 1 }, { status: 429, headers: { "Retry-After": "1" } });
+    const answers = [limited(), Response.json({ results: [fixtures.search.results[0]] })];
+    const fetchMock = vi.fn<typeof fetch>(() => Promise.resolve(answers.shift() as Response));
+    const sleep = vi.fn(() => Promise.resolve());
+    const results = await createOpenAlexProvider({ fetch: fetchMock, sleep }).search("(a OR b) AND (c OR d)", { limit: 10 });
+    expect(results).toHaveLength(1);
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    expect(sleep).toHaveBeenCalledTimes(1);
+    expect(sleep).toHaveBeenCalledWith(1100, undefined);
+  });
+
+  it("waits at most twice, and does not wait at all for a long Retry-After or none", async () => {
+    const sleep = vi.fn(() => Promise.resolve());
+    const always = (headers?: Record<string, string>) => vi.fn<typeof fetch>(() => Promise.resolve(Response.json({}, { status: 429, ...(headers === undefined ? {} : { headers }) })));
+
+    const short = always({ "Retry-After": "1" });
+    await expect(createOpenAlexProvider({ fetch: short, sleep }).search("q", { limit: 10 })).rejects.toMatchObject({ kind: "rate-limited" });
+    expect(short).toHaveBeenCalledTimes(3);
+    expect(sleep).toHaveBeenCalledTimes(2);
+
+    sleep.mockClear();
+    for (const headers of [{ "Retry-After": "3600" }, undefined]) {
+      const once = always(headers);
+      await expect(createOpenAlexProvider({ fetch: once, sleep }).search("q", { limit: 10 })).rejects.toMatchObject({ kind: "rate-limited" });
+      expect(once).toHaveBeenCalledTimes(1);
+    }
+    expect(sleep).not.toHaveBeenCalled();
+  });
+
+  it("stops waiting when the search is cancelled", async () => {
+    const controller = new AbortController();
+    const fetchMock = vi.fn<typeof fetch>(() => Promise.resolve(Response.json({}, { status: 429, headers: { "Retry-After": "1" } })));
+    const search = createOpenAlexProvider({ fetch: fetchMock }).search("q", { limit: 10, signal: controller.signal });
+    setTimeout(() => controller.abort(), 20);
+    await expect(search).rejects.toMatchObject({ kind: "failed", message: "Search was cancelled" });
+    expect(fetchMock).toHaveBeenCalledTimes(1);
   });
 
   it("reports other HTTP errors as failed", async () => {
@@ -509,5 +570,45 @@ describe("OpenAlex: markup in titles", () => {
     const work = { ...fixtures.search.results[0], title: "Sleep in <i>Drosophila</i> and &lt;i&gt;Candida&lt;/i&gt;" };
     const result = parseOpenAlexWork(work, 1, 1);
     expect(result?.title).toBe("Sleep in Drosophila and Candida");
+  });
+});
+
+describe("createOpenAlexCounter", () => {
+  const jsonResponse = (body: unknown, init?: ResponseInit) => Promise.resolve(Response.json(body, init));
+
+  it("asks for one work and reads the total from meta.count", async () => {
+    const fetchMock = vi.fn<typeof fetch>(() => jsonResponse({ meta: { count: 123456 }, results: [{ id: "https://openalex.org/W1" }] }));
+    const count = await createOpenAlexCounter({ fetch: fetchMock })('"machine learning" OR ML');
+    expect(count).toBe(123456);
+    const url = new URL(String(fetchMock.mock.calls[0]?.[0]));
+    expect(url.searchParams.get("search.title_and_abstract")).toBe('"machine learning" OR ML');
+    expect(url.searchParams.get("per_page")).toBe("1");
+    expect(url.searchParams.get("select")).toBe("id");
+  });
+
+  it("sends the key only to OpenAlex, and only when there is one", async () => {
+    const fetchMock = vi.fn<typeof fetch>(() => jsonResponse({ meta: { count: 1 } }));
+    await createOpenAlexCounter({ fetch: fetchMock })("q");
+    await createOpenAlexCounter({ fetch: fetchMock, apiKey: " k3y " })("q");
+    const [without, withKey] = fetchMock.mock.calls.map((call) => new URL(String(call[0])));
+    expect(without?.searchParams.has("api_key")).toBe(false);
+    expect(withKey?.searchParams.get("api_key")).toBe("k3y");
+  });
+
+  it("waits out a short Retry-After once before it counts", async () => {
+    const answers = [Response.json({}, { status: 429, headers: { "Retry-After": "1" } }), Response.json({ meta: { count: 77 } })];
+    const fetchMock = vi.fn<typeof fetch>(() => Promise.resolve(answers.shift() as Response));
+    const sleep = vi.fn(() => Promise.resolve());
+    expect(await createOpenAlexCounter({ fetch: fetchMock, sleep })("q")).toBe(77);
+    expect(sleep).toHaveBeenCalledWith(1100, undefined);
+  });
+
+  it("answers null, and never throws, when OpenAlex does not answer or the text is blank", async () => {
+    expect(await createOpenAlexCounter({ fetch: () => jsonResponse({}, { status: 429 }) })("q")).toBeNull();
+    expect(await createOpenAlexCounter({ fetch: () => Promise.reject(new Error("offline")) })("q")).toBeNull();
+    expect(await createOpenAlexCounter({ fetch: () => jsonResponse({ nothing: true }) })("q")).toBeNull();
+    const fetchMock = vi.fn<typeof fetch>();
+    expect(await createOpenAlexCounter({ fetch: fetchMock })("   ")).toBeNull();
+    expect(fetchMock).not.toHaveBeenCalled();
   });
 });

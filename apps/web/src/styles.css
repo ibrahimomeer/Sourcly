@@ -608,10 +608,23 @@ code {
   font-size: 0.875rem;
 }
 
-.query-note > p {
-  margin: 0 0 0.5rem;
-  padding-left: 0.6rem;
-  border-left: 3px solid var(--border-strong);
+.query-note > p,
+.query-note .fallback-note > p {
+  margin: 0.5rem 0;
+}
+
+.query-note .concepts {
+  margin: 0.4rem 0;
+  padding-left: 1.25rem;
+}
+
+.query-note .concepts li {
+  margin: 0.2rem 0;
+}
+
+.query-note h4 {
+  margin: 0.75rem 0 0.25rem;
+  font-size: 0.9rem;
 }
 
 .sent-queries {
@@ -633,20 +646,31 @@ code {
   color: var(--muted);
 }
 
-/* Related terms */
+/* Suggested terms: one collapsed line under the search box */
 
-.related {
-  margin: 0 0 1rem;
-}
-
-.related h2 {
-  margin: 0 0 0.25rem;
-  font-size: 1rem;
-}
-
-.related > p {
-  margin: 0 0 0.5rem;
+.suggested-terms {
+  margin: 0.5rem 0 0;
   font-size: 0.875rem;
+}
+
+.suggested-terms > p {
+  margin: 0.4rem 0;
+}
+
+/* Where each concept matched, in "Why this rank?" */
+
+.match-snippets ul {
+  margin: 0.25rem 0;
+  padding-left: 1.25rem;
+}
+
+.match-snippets li {
+  margin: 0.3rem 0;
+}
+
+.snippet {
+  font-style: italic;
+  overflow-wrap: anywhere;
 }
 
 .chips {
@@ -933,55 +957,6 @@ mark {
 .citation-row button {
   padding: 0.2rem 0.7rem;
   font-size: 0.85rem;
-}
-
-/* How the search text is read: chips under the search box */
-
-.search-options {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.5rem 1.25rem;
-  margin: 0.5rem 0 0;
-  font-size: 0.875rem;
-}
-
-.small-button {
-  padding: 0.25rem 0.75rem;
-  font-size: 0.875rem;
-}
-
-.query-chips {
-  margin: 0.5rem 0 0;
-  font-size: 0.875rem;
-}
-
-.chips-line {
-  margin: 0.35rem 0 0;
-  line-height: 2.1;
-}
-
-.chips-label {
-  font-weight: 600;
-}
-
-.query-chips .chip {
-  padding: 0.1rem 0.6rem;
-  font-size: 0.875rem;
-}
-
-.chip-dashed {
-  border-style: dashed;
-  color: var(--muted);
-}
-
-.chip-op {
-  font-size: 0.8rem;
-  font-weight: 700;
-}
-
-.chips-note {
-  margin: 0.35rem 0 0;
 }
 
 .word-list {

@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { classify } from "./classify";
 import { coverageSpec } from "./coverage";
-import { parseQuery } from "./query";
+import { parseConcepts } from "./concepts";
 import { FEW_FULL_MATCHES, arrangeResults, defaultLayoutSettings, isArticleLike, matchCountLabel, sectionOf, type LayoutSettings } from "./sections";
 import { scoreResults, defaultScoringSettings } from "./scoring";
 import { makeResult } from "./testing/make-result";
@@ -20,7 +20,7 @@ const result = (title: string, changes: Partial<Result> = {}): Result => {
 
 /** Ranks results for a query the way the page does, then arranges them. */
 function arrange(results: Result[], text: string, layout: LayoutSettings = defaultLayoutSettings()) {
-  const parsed = parseQuery(text);
+  const parsed = parseConcepts(text);
   const ranked = scoreResults(
     results.map((r) => ({ result: r, labels: classify(r) })),
     defaultScoringSettings(),
@@ -31,33 +31,37 @@ function arrange(results: Result[], text: string, layout: LayoutSettings = defau
 const titles = (items: { result: Result }[]) => items.map((item) => item.result.title);
 
 describe("the main list", () => {
-  it("holds the results that contain every word", () => {
-    const layout = arrange([result("Chaos in a double pendulum"), result("A double pendulum"), result("Gardening")], "chaos double pendulum");
-    expect(titles(layout.main)).toEqual(["Chaos in a double pendulum", "A double pendulum"]);
+  it("widens with near matches while fewer than 15 results match every concept", () => {
+    expect(FEW_FULL_MATCHES).toBe(15);
   });
 
-  it("adds results that lack one word, after the full matches, while fewer than 10 contain every word", () => {
-    const layout = arrange([result("A double pendulum"), result("Chaos in a double pendulum"), result("Gardening"), result("Pendulum clocks")], "chaos double pendulum");
-    expect(titles(layout.main)).toEqual(["Chaos in a double pendulum", "A double pendulum"]);
+  it("holds the results that match every concept", () => {
+    const layout = arrange([result("Chaos, damping and a pendulum"), result("Damping of a pendulum"), result("Gardening")], "chaos damping pendulum");
+    expect(titles(layout.main)).toEqual(["Chaos, damping and a pendulum", "Damping of a pendulum"]);
+  });
+
+  it("adds results that lack one concept, after the full matches, while fewer than 15 match every concept", () => {
+    const layout = arrange([result("Damping of a pendulum"), result("Chaos, damping and a pendulum"), result("Gardening"), result("Pendulum clocks")], "chaos damping pendulum");
+    expect(titles(layout.main)).toEqual(["Chaos, damping and a pendulum", "Damping of a pendulum"]);
     expect(titles(layout.partial)).toEqual(["Pendulum clocks", "Gardening"]);
   });
 
-  it("does not add them once 10 results contain every word", () => {
-    const full = Array.from({ length: FEW_FULL_MATCHES }, (_, i) => result(`Chaos in a double pendulum ${i}`));
-    const layout = arrange([...full, result("A double pendulum")], "chaos double pendulum");
+  it("does not add them once 15 results match every concept", () => {
+    const full = Array.from({ length: FEW_FULL_MATCHES }, (_, i) => result(`Chaos, damping and a pendulum ${i}`));
+    const layout = arrange([...full, result("Damping of a pendulum")], "chaos damping pendulum");
     expect(layout.main).toHaveLength(FEW_FULL_MATCHES);
-    expect(titles(layout.partial)).toEqual(["A double pendulum"]);
+    expect(titles(layout.partial)).toEqual(["Damping of a pendulum"]);
   });
 
-  it("adds them with 9 full matches, because 9 is fewer than 10", () => {
-    const full = Array.from({ length: FEW_FULL_MATCHES - 1 }, (_, i) => result(`Chaos in a double pendulum ${i}`));
-    const layout = arrange([...full, result("A double pendulum")], "chaos double pendulum");
+  it("adds them with 14 full matches, because 14 is fewer than 15", () => {
+    const full = Array.from({ length: FEW_FULL_MATCHES - 1 }, (_, i) => result(`Chaos, damping and a pendulum ${i}`));
+    const layout = arrange([...full, result("Damping of a pendulum")], "chaos damping pendulum");
     expect(layout.main).toHaveLength(FEW_FULL_MATCHES);
   });
 
-  it("never adds a result that lacks two words: those are partial matches", () => {
-    const layout = arrange([result("Chaos in a double pendulum"), result("Pendulum clocks"), result("Chaos")], "chaos double pendulum");
-    expect(titles(layout.main)).toEqual(["Chaos in a double pendulum"]);
+  it("never adds a result that lacks two concepts: those are partial matches", () => {
+    const layout = arrange([result("Chaos, damping and a pendulum"), result("Pendulum clocks"), result("Chaos")], "chaos damping pendulum");
+    expect(titles(layout.main)).toEqual(["Chaos, damping and a pendulum"]);
     expect(titles(layout.partial).sort()).toEqual(["Chaos", "Pendulum clocks"]);
   });
 
@@ -67,10 +71,10 @@ describe("the main list", () => {
     expect(titles(layout.partial)).toEqual(["Gardening"]);
   });
 
-  it("labels the near matches “Matches N of M words” and no one else", () => {
-    const layout = arrange([result("Chaos in a double pendulum"), result("A double pendulum")], "chaos double pendulum");
+  it("labels the near matches “Matches N of M concepts” and no one else", () => {
+    const layout = arrange([result("Chaos, damping and a pendulum"), result("Damping of a pendulum")], "chaos damping pendulum");
     expect(matchCountLabel(layout.main[0]!)).toBeNull();
-    expect(matchCountLabel(layout.main[1]!)).toBe("Matches 2 of 3 words");
+    expect(matchCountLabel(layout.main[1]!)).toBe("Matches 2 of 3 concepts");
   });
 
   it("keeps the order it was given inside every section", () => {
@@ -83,14 +87,14 @@ describe("the main list", () => {
 describe("nothing is deleted", () => {
   it("puts every result in exactly one place", () => {
     const results = [
-      result("Chaos in a double pendulum"),
-      result("A double pendulum"),
+      result("Chaos, damping and a pendulum"),
+      result("Damping of a pendulum"),
       result("Gardening"),
       result("A dataset", { type: "dataset" }),
       result(VIETNAMESE),
       result(`Pendulum ${SPANISH}`),
     ];
-    const layout = arrange(results, "chaos double pendulum");
+    const layout = arrange(results, "chaos damping pendulum");
     const all = [...layout.main, ...layout.partial, ...layout.otherLanguages, ...layout.otherTypes];
     expect(all).toHaveLength(results.length);
     expect(new Set(all.map((item) => item.result.id)).size).toBe(results.length);
@@ -174,8 +178,8 @@ describe("datasets, presentations and other types", () => {
 
   it("does not count them when working out whether fewer than 10 results contain every word", () => {
     const datasets = Array.from({ length: FEW_FULL_MATCHES }, (_, i) => result(`Chaos double pendulum data ${i}`, { type: "dataset" }));
-    const layout = arrange([...datasets, result("Chaos in a double pendulum"), result("A double pendulum")], "chaos double pendulum");
-    expect(titles(layout.main)).toEqual(["Chaos in a double pendulum", "A double pendulum"]);
+    const layout = arrange([...datasets, result("Chaos, damping and a pendulum"), result("Damping of a pendulum")], "chaos damping pendulum");
+    expect(titles(layout.main)).toEqual(["Chaos, damping and a pendulum", "Damping of a pendulum"]);
   });
 });
 

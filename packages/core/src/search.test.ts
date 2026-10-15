@@ -1,7 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { createSearchCache } from "./cache";
 import { parseQuery } from "./query";
-import { DEFAULT_TIMEOUT_MS, expandable, planExpandedQueries, planQueries, searchProviders, type ProviderUpdate } from "./search";
+import { parseConcepts } from "./concepts";
+import { DEFAULT_TIMEOUT_MS, fallbackOrder, planQueries, searchProviders, type ProviderUpdate } from "./search";
 import { makeResult } from "./testing/make-result";
 import { ProviderError, type Provider, type ProviderId, type Result } from "./types";
 
@@ -347,17 +348,17 @@ describe("planQueries", () => {
   it("adds what a provider's own request does to the notes, after what it could not apply", () => {
     const scoped = { id: "openalex" as const, syntax: "boolean" as const, requestNotes: ["Looks in titles and abstracts only, not in the full text"] };
     const limited = { id: "crossref" as const, syntax: "plain" as const, requestNotes: ["At most 50 results are asked for"] };
-    const [first, second] = planQueries([scoped, limited], "sleep OR nap");
+    const [first, second] = planQueries([scoped, limited], "How AI understand odor");
     expect(first?.notes).toEqual(["Looks in titles and abstracts only, not in the full text"]);
     expect(second?.notes).toEqual([
-      "This source cannot match “either word”, so it searches for all of the words together",
+      "This source cannot ask for alternatives (“either word”), so it was sent only the words you typed for each concept; results are checked here against every variant",
       "At most 50 results are asked for",
     ]);
   });
 
   it("keeps the request notes when the search is sent exactly as typed", () => {
     const scoped = { id: "openalex" as const, syntax: "boolean" as const, requestNotes: ["Looks in titles and abstracts only, not in the full text"] };
-    const [only] = planQueries([scoped], parseQuery("what is chaos", { exact: true }));
+    const [only] = planQueries([scoped], parseConcepts("what is chaos", { exact: true }));
     expect(only).toEqual({
       provider: "openalex",
       text: "what is chaos",
@@ -374,8 +375,8 @@ describe("planQueries", () => {
       "chaos double pendulum",
     );
     expect(planned.map((p) => p.text)).toEqual([
-      "chaos[tw] AND double[tw] AND pendulum[tw]",
-      "TITLE_ABS:chaos AND TITLE_ABS:double AND TITLE_ABS:pendulum",
+      '(chaos[tiab] OR chaotic[tiab]) AND "double pendulum"[tiab]',
+      '(TITLE_ABS:chaos OR TITLE_ABS:chaotic) AND TITLE_ABS:"double pendulum"',
     ]);
   });
 });
@@ -431,68 +432,49 @@ describe("searchProviders: what is sent", () => {
   });
 });
 
-describe("the expanded pass", () => {
-  const strictOnly = { id: "crossref" as const, name: "Crossref", syntax: "plain" as const };
-  const expanding = (search: (query: string, options: { limit: number; expanded?: boolean }) => Promise<Result[]>): Provider => ({
-    id: "openalex",
-    name: "OpenAlex",
-    syntax: "boolean",
-    expandedSyntax: "plain",
-    expandedRequestNotes: ["The default relevance search"],
-    search,
-  });
+describe("the fallback pass", () => {
+  const found = () => [makeResult({ id: "10.1/a", hits: [{ provider: "openalex", id: "W1", rank: 1, listSize: 1, score: null }] })];
+  const openalex = (search: Provider["search"] = async () => found()): Provider => ({ id: "openalex", name: "OpenAlex", syntax: "boolean", search });
 
-  it("is planned only for the providers that have a looser way, with the words and without AND", () => {
-    const planned = planExpandedQueries([{ id: "openalex", expandedSyntax: "plain", expandedRequestNotes: ["a looser note"] }, strictOnly], "chaos double pendulum");
-    expect(planned).toEqual([{ provider: "openalex", text: "chaos double pendulum", notes: ["a looser note"] }]);
-  });
-
-  it("says what a plain pass leaves out, the same way the strict one does", () => {
-    const [only] = planExpandedQueries([{ id: "openalex", expandedSyntax: "plain" }], '"double pendulum" chaos NOT rats');
-    expect(only?.text).toBe("double pendulum chaos");
-    expect(only?.notes.length).toBeGreaterThan(0);
-  });
-
-  it("lists the providers that take part", () => {
-    const both = [expanding(async () => []), { ...strictOnly, search: async () => [] } as Provider];
-    expect(expandable(both).map((p) => p.id)).toEqual(["openalex"]);
-  });
-
-  it("asks only those providers, in their looser syntax, with expanded set, and marks every hit as expanded", async () => {
-    const asked: { query: string; expanded: boolean | undefined }[] = [];
-    const openalex = expanding(async (query, options) => {
-      asked.push({ query, expanded: options.expanded });
-      return [makeResult({ id: "10.1/a", hits: [{ provider: "openalex", id: "W1", rank: 1, listSize: 1, score: null }] })];
-    });
-    const crossref: Provider = { ...strictOnly, search: vi.fn(async () => [] as Result[]) };
-    const outcome = await searchProviders([openalex, crossref], "chaos double pendulum", { limit: 5, expanded: true });
-    expect(asked).toEqual([{ query: "chaos double pendulum", expanded: true }]);
-    expect(crossref.search).not.toHaveBeenCalled();
-    expect(outcome.statuses).toHaveLength(1);
-    expect(outcome.results[0]?.hits).toEqual([{ provider: "openalex", id: "W1", rank: 1, listSize: 1, score: null, expanded: true }]);
+  it("marks every hit of every result as found by a fallback pass, when it is one", async () => {
+    const outcome = await searchProviders([openalex()], "chaos pendulum", { limit: 5, fallback: true });
+    expect(outcome.results[0]?.hits).toEqual([{ provider: "openalex", id: "W1", rank: 1, listSize: 1, score: null, fallback: true }]);
   });
 
   it("does not mark the results of the strict pass", async () => {
-    const openalex = expanding(async () => [makeResult({ id: "10.1/a", hits: [{ provider: "openalex", id: "W1", rank: 1, listSize: 1, score: null }] })]);
-    const outcome = await searchProviders([openalex], "sleep", { limit: 5 });
-    expect(outcome.results[0]?.hits[0]).not.toHaveProperty("expanded");
+    const outcome = await searchProviders([openalex()], "chaos pendulum", { limit: 5 });
+    expect(outcome.results[0]?.hits[0]).not.toHaveProperty("fallback");
   });
 
-  it("remembers the expanded answer apart from the strict one, even for the same text", async () => {
-    const cache = createSearchCache();
-    const calls: (boolean | undefined)[] = [];
-    const openalex = expanding(async (_query, options) => {
-      calls.push(options.expanded);
-      return [];
-    });
-    await searchProviders([openalex], "sleep", { limit: 5, cache });
-    await searchProviders([openalex], "sleep", { limit: 5, cache, expanded: true });
-    await searchProviders([openalex], "sleep", { limit: 5, cache, expanded: true });
-    expect(calls).toEqual([undefined, true]);
+  it("asks every provider the query it is given, which is how a pass without one concept is sent", async () => {
+    const search = vi.fn(async (_query: string, _options: unknown) => [] as Result[]);
+    await searchProviders([openalex(search)], parseConcepts("chaos pendulum motion"), { limit: 5 });
+    await searchProviders([openalex(search)], parseConcepts("chaos pendulum"), { limit: 5, fallback: true });
+    expect(search.mock.calls.map((call) => call[0])).toEqual(["(chaos OR chaotic) AND pendulum AND motion", "(chaos OR chaotic) AND pendulum"]);
+  });
+});
+
+describe("fallbackOrder: which concept to drop first", () => {
+  const query = parseConcepts("machine learning odor prediction");
+  const counts = (entries: Record<string, number>) => new Map(Object.entries(entries));
+
+  it("drops the concept that matches the most works first: it narrows the search least", () => {
+    expect(fallbackOrder(query, counts({ b1: 900_000, b2: 40_000, b3: 3_000_000 }))).toEqual(["b3", "b1", "b2"]);
   });
 
-  it("asks nothing when no provider has an expanded pass", async () => {
-    const outcome = await searchProviders([{ ...strictOnly, search: async () => [] }], "sleep", { limit: 5, expanded: true });
-    expect(outcome).toEqual({ results: [], statuses: [] });
+  it("keeps the order typed when counts are equal, and tries a concept with no count last", () => {
+    expect(fallbackOrder(query, counts({ b1: 10, b2: 10, b3: 10 }))).toEqual(["b1", "b2", "b3"]);
+    expect(fallbackOrder(query, counts({ b2: 5 }))).toEqual(["b2", "b1", "b3"]);
+    expect(fallbackOrder(query, counts({}))).toEqual(["b1", "b2", "b3"]);
+  });
+
+  it("has nothing to drop in a search of one concept", () => {
+    expect(fallbackOrder(parseConcepts("odor"), counts({ b1: 5 }))).toEqual([]);
+  });
+
+  it("does not change its input", () => {
+    const given = counts({ b1: 1, b2: 2, b3: 3 });
+    fallbackOrder(query, given);
+    expect([...given]).toEqual([["b1", 1], ["b2", 2], ["b3", 3]]);
   });
 });

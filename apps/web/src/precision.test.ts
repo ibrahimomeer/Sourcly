@@ -5,17 +5,16 @@ import {
   defaultFilters,
   defaultLayoutSettings,
   defaultScoringSettings,
+  hardBlocks,
   measureCoverage,
-  parseQuery,
+  parseConcepts,
   planQueries,
-  queryTerms,
-  renderQuery,
+  renderConcepts,
   type ProviderId,
   type Result,
 } from "@sourcly/core";
 import { makeResult } from "@sourcly/core/testing";
 import { describe, expect, it } from "vitest";
-import { queryChipsModel } from "./chipsModel";
 import { allResults, rankResults, scoringContext, type RankedView } from "./pipeline";
 import { prepareSearch } from "./queryText";
 import { idleSearch, searchReducer } from "./searchState";
@@ -52,12 +51,12 @@ const providers: { id: ProviderId; syntax: "boolean" | "plain" }[] = [
 
 /** The recorded pool, ranked for a search typed as `text`, the way the page does it. */
 function rankFor(pool: readonly Result[], text: string): RankedView {
-  const parsed = parseQuery(text);
+  const concepts = parseConcepts(text);
   const state = searchReducer(idleSearch, {
     type: "start",
     id: 1,
-    parsed,
-    sent: planQueries(providers, parsed),
+    concepts,
+    sent: planQueries(providers, concepts),
     order: providers.map((p) => p.id),
     skipped: [],
   });
@@ -69,9 +68,9 @@ const titleOf = (scored: { result: Result }) => scored.result.title;
 const everyone = (ranked: RankedView) => [...ranked.shown, ...ranked.partial];
 const everything = (ranked: RankedView) => allResults(ranked);
 
-/** Whether a ranked result contains the word as a term of the search, by the coverage that ranking worked out. */
-const contains = (scored: RankedView["shown"][number], term: string) =>
-  scored.coverage?.units.some((unit) => unit.label.toLowerCase() === term && unit.matched) === true;
+/** Whether a ranked result matches the concept of the search, by the coverage that ranking worked out. */
+const contains = (scored: RankedView["shown"][number], concept: string) =>
+  scored.coverage?.units.some((unit) => unit.label.toLowerCase() === concept && unit.matched) === true;
 
 // ---- The three results that were reported, by what they are.
 
@@ -101,29 +100,30 @@ describe("the recorded answers", () => {
   });
 });
 
-describe("“caos double pendulum”: results that lack “pendulum” never outrank results that have “double pendulum”", () => {
-  const adjacent = (r: RankedView["shown"][number]) => r.coverage?.pairs.find((pair) => pair.text === "double pendulum")?.found != null;
+describe("“caos double pendulum”: results that match no concept never outrank results that match “double pendulum”", () => {
+  // “caos double pendulum” has two concepts: caos, and the phrase “double pendulum” (with its curated alternative).
+  const phrase = (r: RankedView["shown"][number]) => contains(r, "double pendulum");
 
   it("holds in the main list and the partial matches read in order", async () => {
     const pool = await recorded();
     const order = everyone(rankFor(pool, "caos double pendulum"));
     expect(order.length).toBeGreaterThan(30);
 
-    const without = order.map((r, index) => ({ r, index })).filter(({ r }) => !contains(r, "pendulum"));
-    const withBoth = order.map((r, index) => ({ r, index })).filter(({ r }) => contains(r, "double") && contains(r, "pendulum"));
-    expect(without.length).toBeGreaterThan(3);
-    expect(withBoth.length).toBeGreaterThan(10);
-    expect(Math.max(...withBoth.map(({ index }) => index))).toBeLessThan(Math.min(...without.map(({ index }) => index)));
+    const none = order.map((r, index) => ({ r, index })).filter(({ r }) => r.coverage?.matchedCount === 0);
+    const withPhrase = order.map((r, index) => ({ r, index })).filter(({ r }) => phrase(r));
+    expect(none.length).toBeGreaterThan(3);
+    expect(withPhrase.length).toBeGreaterThan(10);
+    expect(Math.max(...withPhrase.map(({ index }) => index))).toBeLessThan(Math.min(...none.map(({ index }) => index)));
   });
 
-  it("fails when the order ignores how many words a result contains", async () => {
-    // The same results ordered by score alone: the check above would not hold.
+  it("is not an accident of the data: ordered by citations alone, the same results break the check", async () => {
+    // A control. The order is only right because of how many concepts each result matches.
     const pool = await recorded();
     const ranked = rankFor(pool, "caos double pendulum");
-    const byScore = [...ranked.shown, ...ranked.partial].sort((a, b) => b.score - a.score);
-    const lastBoth = Math.max(...byScore.map((r, i) => (contains(r, "double") && contains(r, "pendulum") ? i : -1)));
-    const firstWithout = Math.min(...byScore.map((r, i) => (!contains(r, "pendulum") ? i : Number.MAX_SAFE_INTEGER)));
-    expect(lastBoth).toBeGreaterThan(firstWithout);
+    const byCitations = [...ranked.shown, ...ranked.partial].sort((a, b) => (b.result.citationCount ?? 0) - (a.result.citationCount ?? 0));
+    const lastPhrase = Math.max(...byCitations.map((r, i) => (phrase(r) ? i : -1)));
+    const firstNone = Math.min(...byCitations.map((r, i) => (r.coverage?.matchedCount === 0 ? i : Number.MAX_SAFE_INTEGER)));
+    expect(lastPhrase).toBeGreaterThan(firstNone);
   });
 
   it("puts the Spanish paper in Other languages and the CAOS editorials in Partial matches, and deletes none of them", async () => {
@@ -135,7 +135,7 @@ describe("“caos double pendulum”: results that lack “pendulum” never out
     expect(ranked.hidden).toEqual([]);
   });
 
-  it("lists in the main list only results that lack at most one word, and says what each partial match has", async () => {
+  it("lists in the main list only results that lack at most one concept, and says what each partial match has", async () => {
     const pool = await recorded();
     const ranked = rankFor(pool, "caos double pendulum");
     for (const scored of ranked.shown) expect(scored.coverage?.matchedCount).toBeGreaterThanOrEqual((scored.coverage?.total ?? 0) - 1);
@@ -145,7 +145,7 @@ describe("“caos double pendulum”: results that lack “pendulum” never out
     }
   });
 
-  it("ranks the three reported results below every result that contains every word", async () => {
+  it("ranks the three reported results below every result that matches every concept", async () => {
     const pool = await recorded();
     // The main list and the sections, one after the other: the main list comes first and its full matches come first in it.
     const ranked = rankFor(pool, "caos double pendulum");
@@ -156,14 +156,14 @@ describe("“caos double pendulum”: results that lack “pendulum” never out
     for (const { i } of reported) expect(i).toBeGreaterThan(lastFull);
   });
 
-  it("ranks the steel slag paper below every result that has the words “double pendulum” next to each other", async () => {
+  it("ranks the steel slag paper below every result that has the phrase “double pendulum”", async () => {
     const pool = await recorded();
     const order = everyone(rankFor(pool, "caos double pendulum"));
     const slag = order.findIndex((r) => SLAG.test(titleOf(r)));
-    const lastAdjacent = Math.max(...order.map((r, i) => (adjacent(r) ? i : -1)));
+    const lastPhrase = Math.max(...order.map((r, i) => (phrase(r) ? i : -1)));
     expect(slag).toBeGreaterThan(-1);
-    expect(lastAdjacent).toBeGreaterThan(-1);
-    expect(slag).toBeGreaterThan(lastAdjacent);
+    expect(lastPhrase).toBeGreaterThan(-1);
+    expect(slag).toBeGreaterThan(lastPhrase);
   });
 
   it("matches the Spanish paper and the CAOS editorials on “caos” alone, or on nothing, so they are in the lowest tier", async () => {
@@ -183,11 +183,11 @@ describe("“caos double pendulum”: results that lack “pendulum” never out
     expect(editorials.some((e) => e.coverage?.matchedCount === 0)).toBe(true);
   });
 
-  it("no longer matches “caos” in the steel slag paper: its abstract says “CaO” (calcium oxide), and “caos” is not “cao”", async () => {
+  it("does not match “caos” in the steel slag paper: its abstract says “CaO” (calcium oxide), and “caos” is not “cao”", async () => {
     const pool = await recorded();
     const ranked = rankFor(pool, "caos double pendulum");
     const slag = everything(ranked).find((r) => SLAG.test(titleOf(r)));
-    expect(slag?.coverage?.units.map((u) => [u.label, u.matched])).toEqual([["caos", false], ["double", false], ["pendulum", true]]);
+    expect(slag?.coverage?.units.map((u) => [u.label, u.matched])).toEqual([["caos", false], ["double pendulum", false]]);
     expect(slag?.tier).toBe(3);
     // It is kept apart in Partial matches, not deleted, and the card says what it matched.
     expect(ranked.partial.some((r) => SLAG.test(titleOf(r)))).toBe(true);
@@ -215,18 +215,15 @@ describe("the same words in another order, or with a phrase, give the same top s
     expect(tops[2]).toEqual(tops[0]);
   });
 
-  it("makes the quoted phrase the stricter search: its main list is part of the other, and the difference lacks the adjacent words", async () => {
+  it("treats a quoted phrase and the same words typed plainly alike: “double pendulum” has no alternative to add, and a “compound pendulum” is another system", async () => {
     const pool = await recorded();
     const loose = rankFor(pool, typed[0] as string);
     const quoted = rankFor(pool, typed[2] as string);
-    const looseIds = new Set(loose.shown.map((r) => r.result.id));
-    expect(quoted.shown.every((r) => looseIds.has(r.result.id))).toBe(true);
-
-    const quotedIds = new Set(quoted.shown.map((r) => r.result.id));
-    const dropped = loose.shown.filter((r) => !quotedIds.has(r.result.id));
-    for (const scored of dropped) {
-      // "double pendulum" is in the text, but not as adjacent words in the title or abstract.
-      expect(scored.coverage?.pairs.find((pair) => pair.text === "double pendulum")?.found).toBeNull();
+    expect(ids(quoted.shown)).toEqual(ids(loose.shown));
+    // A compound (physical) pendulum is not a double pendulum, so it is not given as a variant: where the concept matched, it is by the phrase itself.
+    for (const scored of loose.shown) {
+      const unit = scored.coverage?.units.find((u) => u.label === "double pendulum");
+      if (unit?.matched === true) expect(unit.found).toEqual(["double pendulum"]);
     }
   });
 });
@@ -234,74 +231,62 @@ describe("the same words in another order, or with a phrase, give the same top s
 describe("“what is the best way to predict odor”", () => {
   const text = "what is the best way to predict odor";
 
-  it("shows the removed common words as ignored chips, in order, and keeps the others as terms", () => {
-    const parsed = prepareSearch(text).parsed;
-    const model = queryChipsModel(parsed, "best way predict odor");
-    expect(model.ignored).toEqual(["what", "is", "the", "to"]);
-    expect(queryTerms(parsed)).toEqual(["best", "way", "predict", "odor"]);
-    expect(model.questionNote).toBe("Question reduced to keywords: best way predict odor. You can edit or restore words above.");
+  it("leaves out the common words and sets the generic words aside; the others are the concepts", () => {
+    const concepts = prepareSearch(text).concepts;
+    expect(concepts.stopwords).toEqual(["what", "is", "the", "to"]);
+    expect(concepts.soft.map((term) => term.text)).toEqual(["best", "way"]);
+    expect(hardBlocks(concepts).map((block) => block.label)).toEqual(["predict", "odor"]);
   });
 
   it("never changes the text in the box", () => {
     const prepared = prepareSearch(text);
-    expect(prepared.parsed.original).toBe(text);
+    expect(prepared.concepts.original).toBe(text);
     expect("box" in prepared).toBe(false);
   });
 
-  it("restores a word as an ordinary term when it is clicked", () => {
-    const parsed = prepareSearch(text, { restored: new Set(["is"]) }).parsed;
-    expect(queryTerms(parsed)).toEqual(["is", "best", "way", "predict", "odor"]);
-    expect(queryChipsModel(parsed, "").ignored).toEqual(["what", "the", "to"]);
-    // Restoring one word restores no other.
-    expect(queryTerms(parsed)).not.toContain("what");
-  });
-
-  it("removes nothing when “Ignore common words” is off", () => {
-    const parsed = prepareSearch(text, { ignoreCommon: false }).parsed;
-    expect(queryTerms(parsed)).toEqual(["what", "is", "the", "best", "way", "to", "predict", "odor"]);
-    expect(queryChipsModel(parsed, "").ignored).toEqual([]);
-    expect(parsed.droppedStopwords).toEqual([]);
-  });
-
   it("sends the raw text, unchanged, to every source when searched exactly as typed", () => {
-    const parsed = prepareSearch(text, { exact: true }).parsed;
+    const concepts = prepareSearch(text, { exact: true }).concepts;
     for (const syntax of ["boolean", "boolean-flat", "pubmed", "europepmc", "plain", "plain-spaced"] as const) {
-      expect(renderQuery(parsed, syntax).text).toBe(text);
+      expect(renderConcepts(concepts, syntax).text).toBe(text);
     }
   });
 
-  it("sends the words that remain, joined by AND, to a source that reads Boolean searches", () => {
-    expect(renderQuery(prepareSearch(text).parsed, "boolean").text).toBe("best AND way AND predict AND odor");
+  it("sends the concepts, each with its alternatives, joined by AND, to a source that reads Boolean searches", () => {
+    expect(renderConcepts(prepareSearch(text).concepts, "boolean").text).toBe(
+      "(predict OR prediction OR predicting OR predictive OR predicted OR predictor) AND (odor OR odour OR odorant OR olfaction OR olfactory OR smell)",
+    );
   });
 });
 
 describe("all-capital words, quoted phrases and single words", () => {
-  it("keeps an all-capital word as a term, but drops the same word in lowercase", () => {
-    expect(queryTerms(parseQuery("CAN bus message"))).toEqual(["CAN", "bus", "message"]);
-    expect(queryTerms(parseQuery("can bus message"))).toEqual(["bus", "message"]);
-    expect(queryTerms(parseQuery("US IT policy"))).toEqual(["US", "IT", "policy"]);
-    expect(queryChipsModel(parseQuery("CAN bus"), "").ignored).toEqual([]);
+  const labels = (text: string) => hardBlocks(parseConcepts(text)).map((block) => block.label);
+
+  it("keeps an all-capital word as a concept, but drops the same word in lowercase", () => {
+    expect(labels("CAN bus message")).toEqual(["CAN", "bus", "message"]);
+    expect(labels("can bus message")).toEqual(["bus", "message"]);
+    expect(labels("US IT policy")).toEqual(["US", "IT", "policy"]);
+    expect(parseConcepts("CAN bus").stopwords).toEqual([]);
   });
 
   it("keeps every word inside quotes, common ones too, and writes the phrase out as it is", () => {
-    const parsed = parseQuery('"state of the art" and "to be or not to be"');
-    expect(parsed.droppedStopwords).toEqual(["and"]);
-    expect(renderQuery(parsed, "boolean").text).toBe('"state of the art" AND "to be or not to be"');
+    const concepts = parseConcepts('"state of the art" and "to be or not to be"');
+    expect(concepts.stopwords).toEqual(["and"]);
+    expect(renderConcepts(concepts, "boolean").text).toBe('"state of the art" AND "to be or not to be"');
   });
 
   it("matches a quoted phrase only as adjacent words, in that order", () => {
-    const spec = coverageSpec(parseQuery('"state of the art"'));
+    const spec = coverageSpec(parseConcepts('"state of the art"'));
     const adjacent = makeResult({ title: "The state of the art in odor prediction" });
     const scattered = makeResult({ title: "The art of the state: a history" });
     expect(measureCoverage(adjacent, spec).matchedCount).toBe(1);
     expect(measureCoverage(scattered, spec).matchedCount).toBe(0);
   });
 
-  it("still works for a single word: it is a term, it is sent as it is, and results are ranked by it", async () => {
-    const parsed = parseQuery("odor");
-    expect(queryTerms(parsed)).toEqual(["odor"]);
-    expect(renderQuery(parsed, "boolean").text).toBe("odor");
-    expect(renderQuery(parsed, "plain").text).toBe("odor");
+  it("still works for a single word: it is a concept, it is sent with its alternatives, and results are ranked by it", async () => {
+    const concepts = parseConcepts("odor");
+    expect(hardBlocks(concepts).map((block) => block.label)).toEqual(["odor"]);
+    expect(renderConcepts(concepts, "boolean").text).toBe("(odor OR odour OR odorant OR olfaction OR olfactory OR smell)");
+    expect(renderConcepts(concepts, "plain").text).toBe("odor");
     const pool = [
       makeResult({ id: "10.1/a", doi: "10.1/a", title: "Odor prediction from molecules" }),
       makeResult({ id: "10.1/b", doi: "10.1/b", title: "Gardening" }),
@@ -313,6 +298,6 @@ describe("all-capital words, quoted phrases and single words", () => {
 
   it("does not use a single common word as a search, and says what to do (the page shows the message)", () => {
     expect(prepareSearch("the").usable).toBe(false);
-    expect(prepareSearch("the", { ignoreCommon: false }).usable).toBe(true);
+    expect(prepareSearch("the", { exact: true }).usable).toBe(true);
   });
 });

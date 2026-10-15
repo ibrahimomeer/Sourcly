@@ -115,24 +115,9 @@ describe("normalizeWord: short words are left alone", () => {
   });
 });
 
-describe("normalizeWord: -ing and -ed", () => {
-  it.each([
-    ["sleeping", "sleep"],
-    ["learning", "learn"],
-    ["processing", "process"],
-    ["predicting", "predict"],
-    ["running", "run"],
-    ["learned", "learn"],
-    ["predicted", "predict"],
-    ["studied", "study"],
-    ["needed", "need"],
-    ["falling", "fall"],
-  ])("takes %s to %s", (word, expected) => {
-    expect(normalizeWord(word)).toBe(expected);
-  });
-
-  it.each([["string"], ["during"], ["making"], ["bring"], ["spring"], ["speed"], ["breed"], ["need"], ["sing"], ["wing"]])(
-    "leaves %s alone: too short, or too little would be left",
+describe("normalizeWord: no stemming", () => {
+  it.each([["sleeping"], ["learning"], ["processing"], ["predicting"], ["running"], ["learned"], ["predicted"], ["studied"], ["needed"], ["falling"]])(
+    "leaves %s exactly as it is: only a plural -s or -es is ever taken off",
     (word) => {
       expect(normalizeWord(word)).toBe(word);
     },
@@ -144,8 +129,12 @@ describe("normalizeWord: -ing and -ed", () => {
     expect(normalizeWord("organization")).toBe("organization");
   });
 
+  it("keeps predict and predicted apart, so the thesaurus (not a guess) decides which forms belong together", () => {
+    expect(tokenize("predicted")).not.toEqual(tokenize("predict"));
+  });
+
   it("applies the same steps to the query and to the text, so they always agree", () => {
-    expect(tokenize("sleeping memories")).toEqual(tokenize("sleep memory"));
+    expect(tokenize("sleeping memories")).toEqual(tokenize("sleeping memory"));
   });
 });
 
