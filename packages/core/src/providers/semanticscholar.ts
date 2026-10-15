@@ -116,6 +116,10 @@ export function parseSemanticScholarPaper(raw: unknown, rank: number, listSize: 
     year: asInteger(paper.year),
     venue,
     venueKind: kind === null ? null : sourced(kind, "semanticscholar", venueType !== undefined ? "publicationVenue.type" : "venue"),
+    // This source gives no volume, issue or pages.
+    volume: null,
+    issue: null,
+    pages: null,
     doi,
     url: doi !== null ? doiUrl(doi) : `https://www.semanticscholar.org/paper/${paperId}`,
     abstract: plainTextOrNull(asString(paper.abstract)),

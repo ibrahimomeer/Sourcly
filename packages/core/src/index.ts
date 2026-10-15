@@ -13,6 +13,44 @@ export {
   type QueryNode,
   type RenderedQuery,
 } from "./query";
+export {
+  apaChecks,
+  apaText,
+  buildReferenceList,
+  formatApa,
+  formatApaAuthors,
+  journalCase,
+  referenceListHtml,
+  referenceListText,
+  splitName,
+  type ApaEntry,
+  type ApaOptions,
+  type ApaPart,
+} from "./apa";
+export {
+  PROTOCOL_SCHEMA,
+  PROTOCOL_SCHEMA_VERSION,
+  buildProtocol,
+  protocolFileName,
+  protocolJson,
+  referencesFileName,
+  type ProtocolInput,
+  type ProtocolSearch,
+  type SearchProtocol,
+} from "./protocol";
+export {
+  MAX_SAVED,
+  SAVED_FORMAT_VERSION,
+  addSaved,
+  canSave,
+  isSaved,
+  parseSaved,
+  removeSaved,
+  savedResults,
+  serializeSaved,
+  toSavedResult,
+  type SavedItem,
+} from "./saved";
 export { CHECK_TAGS, isCheckTag } from "./checktags";
 export {
   CRITICISM_TERMS,

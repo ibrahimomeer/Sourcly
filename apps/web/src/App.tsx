@@ -1,26 +1,40 @@
 import {
+  addSaved,
+  buildProtocol,
+  canSave,
   createSearchCache,
   defaultFilters,
   defaultScoringSettings,
+  isSaved,
+  protocolJson,
+  removeSaved,
   type LabelOverride,
+  type Result,
+  type SavedItem,
   type ProviderId,
   type ResultFilters,
   type ScoringSettings,
 } from "@sourcly/core";
-import { useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { browserStorage, loadApiKey, saveApiKey } from "./apiKey";
 import type { SourclyConfig } from "./config";
 import { Footer } from "./Footer";
 import { CounterPanel } from "./CounterPanel";
 import { Header } from "./Header";
 import { rankResults, relatedFor, scoringContext } from "./pipeline";
+import { ProtocolExport } from "./ProtocolExport";
+import { protocolInputFrom, type CounterRecord } from "./protocolRecord";
 import { createProviders, DEFAULT_PROVIDERS, skippedStatuses } from "./providers";
 import { addTermToQuery, explainUnusable, prepareSearch } from "./queryText";
 import { Results } from "./Results";
+import { SavedProvider, type SavedApi } from "./SavedContext";
+import { SavedPanel } from "./SavedPanel";
+import { loadSavedList, persistSavedList } from "./savedStore";
 import { SearchBox } from "./SearchBox";
 import { DEFAULT_PER_SOURCE, toggleInList, withOverride } from "./settings";
 import { SettingsPanel } from "./SettingsPanel";
 import { useSearch } from "./useSearch";
+import { APP_VERSION } from "./version";
 
 const REFERENCE_YEAR = new Date().getFullYear();
 
@@ -37,6 +51,17 @@ export function App({ config }: { config: SourclyConfig }) {
   const [storage] = useState(browserStorage);
   const [apiKey, setApiKey] = useState(() => loadApiKey(storage));
   const [keyIsStored, setKeyIsStored] = useState(true);
+
+  // Sources the person saved to their list: kept in this browser's localStorage, and nowhere else.
+  const [saved, setSaved] = useState<SavedItem[]>(() => loadSavedList(storage));
+  const [savedIsStored, setSavedIsStored] = useState(true);
+  useEffect(() => {
+    setSavedIsStored(persistSavedList(storage, saved));
+  }, [storage, saved]);
+  // The counterargument search, once finished, for the search protocol.
+  const [counterRecord, setCounterRecord] = useState<CounterRecord | null>(null);
+  // The counterargument section starts as a small bar and opens when the person asks for it.
+  const [counterOpen, setCounterOpen] = useState(false);
 
   // This visit's memory of each source's answers. In memory only, gone when the page closes.
   const cache = useRef(createSearchCache());
@@ -85,6 +110,41 @@ export function App({ config }: { config: SourclyConfig }) {
     setKeyIsStored(saveApiKey(storage, key));
   }
 
+  const savedApi = useMemo<SavedApi>(
+    () => ({
+      isSaved: (id) => isSaved(saved, id),
+      toggle: (result: Result) =>
+        setSaved((current) =>
+          isSaved(current, result.id) ? removeSaved(current, result.id) : addSaved(current, result, new Date()),
+        ),
+      canSave: canSave(saved),
+    }),
+    [saved],
+  );
+
+  const handleRecord = useCallback((record: CounterRecord | null) => setCounterRecord(record), []);
+
+  // The search protocol for the search on the page, built only when its button is pressed.
+  function buildProtocolText(date: Date): string {
+    if (state.phase === "idle" || ranked === null) return "";
+    return protocolJson(
+      buildProtocol(
+        protocolInputFrom({
+          search: state,
+          ranked,
+          counter: counterRecord,
+          perSource,
+          filters,
+          scoring,
+          saved,
+          referenceYear: REFERENCE_YEAR,
+          appVersion: APP_VERSION,
+          date,
+        }),
+      ),
+    );
+  }
+
   function handleOverrideChange(resultId: string, change: LabelOverride) {
     setOverrides((current) => withOverride(current, resultId, change));
   }
@@ -95,6 +155,7 @@ export function App({ config }: { config: SourclyConfig }) {
   }
 
   return (
+    <SavedProvider value={savedApi}>
     <div className="page">
       <Header config={config} />
       <main>
@@ -122,10 +183,18 @@ export function App({ config }: { config: SourclyConfig }) {
             onApiKeyChange={handleApiKeyChange}
             keyIsStored={keyIsStored}
           />
+          <SavedPanel
+            items={saved}
+            onRemove={(id) => setSaved((current) => removeSaved(current, id))}
+            onClear={() => setSaved([])}
+            isStored={savedIsStored}
+            libraryPrefix={config.libraryProxyPrefix}
+          />
         </div>
 
-        {/* Two columns on wide screens once a search has been made; stacked on narrow ones. */}
-        <div className={state.phase === "idle" ? "columns" : "columns columns-two"}>
+        {/* Once a search has been made the counterargument section is a small bar above the results. Opened,
+            it moves into a second column on wide screens and stays above the results on narrow ones. */}
+        <div className={state.phase === "idle" ? "columns" : counterOpen ? "columns columns-two counter-open" : "columns columns-two"}>
           <div className="column">
             <Results
               state={state}
@@ -139,6 +208,7 @@ export function App({ config }: { config: SourclyConfig }) {
               onClearFilters={() => setFilters(defaultFilters())}
               related={related}
               onAddRelatedTerm={handleAddRelatedTerm}
+              exportSlot={<ProtocolExport build={buildProtocolText} />}
             />
           </div>
           {state.phase !== "idle" && (
@@ -155,6 +225,9 @@ export function App({ config }: { config: SourclyConfig }) {
                 libraryPrefix={config.libraryProxyPrefix}
                 onOverrideChange={handleOverrideChange}
                 onClearFilters={() => setFilters(defaultFilters())}
+                onRecord={handleRecord}
+                open={counterOpen}
+                onToggle={() => setCounterOpen((current) => !current)}
               />
             </div>
           )}
@@ -162,5 +235,6 @@ export function App({ config }: { config: SourclyConfig }) {
       </main>
       <Footer config={config} />
     </div>
+    </SavedProvider>
   );
 }

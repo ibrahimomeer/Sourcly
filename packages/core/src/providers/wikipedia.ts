@@ -30,6 +30,10 @@ export function parseWikipediaPage(raw: unknown, rank: number, listSize: number)
     year: null,
     venue: "Wikipedia",
     venueKind: sourced("other", "wikipedia", "(Wikipedia is an encyclopedia)"),
+    // This source gives no volume, issue or pages.
+    volume: null,
+    issue: null,
+    pages: null,
     doi: null,
     url,
     abstract: plainTextOrNull(asString(page.extract)),

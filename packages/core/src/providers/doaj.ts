@@ -4,10 +4,12 @@ import { plainTextOrNull, stripMarkup, toLanguageCode } from "../text";
 import type { Author, Provider, Result, SearchOptions } from "../types";
 import {
   authorFromParts,
+  biblioText,
   clampLimit,
   defaultFetch,
   doiOf,
   openAccess,
+  pageRange,
   parseYear,
   requestJson,
   sourced,
@@ -54,6 +56,10 @@ export function parseDoajArticle(raw: unknown, rank: number, listSize: number): 
     year: parseYear(bibjson.year),
     venue: asString(journal?.title),
     venueKind: asString(journal?.title) === null ? null : sourced("journal", "doaj", "bibjson.journal"),
+    // DOAJ calls the issue "number".
+    volume: biblioText(journal?.volume),
+    issue: biblioText(journal?.number),
+    pages: pageRange(bibjson.start_page, bibjson.end_page),
     doi,
     url: fulltextUrl ?? (doi !== null ? doiUrl(doi) : null),
     abstract: plainTextOrNull(asString(bibjson.abstract)),

@@ -1,4 +1,5 @@
 import type { LabelOverride, RelatedTerm } from "@sourcly/core";
+import type { ReactNode } from "react";
 import { pluralize } from "./format";
 import { Pagination } from "./Pagination";
 import { paginate } from "./paginate";
@@ -22,6 +23,7 @@ export function Results({
   onClearFilters,
   related,
   onAddRelatedTerm,
+  exportSlot,
 }: {
   state: SearchState;
   /** Null until a search has started. */
@@ -39,6 +41,8 @@ export function Results({
   /** Terms to suggest, from the top results. */
   related: readonly RelatedTerm[];
   onAddRelatedTerm: (term: string) => void;
+  /** Shown under "Search elsewhere": the search protocol download. */
+  exportSlot?: ReactNode;
 }) {
   if (state.phase === "idle" || ranked === null) {
     return (
@@ -63,6 +67,7 @@ export function Results({
       <ProviderStatuses search={state} />
       <QueryNote search={state} />
       <SearchElsewhere query={state.query} librarySearchUrl={librarySearchUrl} />
+      {exportSlot}
 
       {total === 0 && searching && <p>Searching for “{state.query}”…</p>}
 

@@ -128,6 +128,13 @@ export interface Result {
   year: number | null;
   venue: string | null;
   venueKind: Sourced<VenueKind> | null;
+  /**
+   * Where in the venue the work is, as the source wrote it, for citations. Null when the source
+   * gives none. `pages` is a range ("1272-1278"), a single page, or an article number ("e0173456").
+   */
+  volume: string | null;
+  issue: string | null;
+  pages: string | null;
   /** Bare, lowercase DOI (no URL prefix), or null. */
   doi: string | null;
   url: string | null;

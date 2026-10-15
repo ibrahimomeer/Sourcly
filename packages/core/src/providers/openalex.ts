@@ -1,6 +1,7 @@
 import { doiUrl, normalizeDoi } from "../doi";
 import { asArray, asBoolean, asHttpUrl, asInteger, asNumber, asRecord, asString } from "../json";
-import { subjectsFrom } from "./shared";
+import { stripMarkup } from "../text";
+import { biblioText, pageRange, subjectsFrom } from "./shared";
 import {
   ProviderError,
   type OaStatus,
@@ -43,6 +44,8 @@ const SELECT_FIELDS = [
   "is_retracted",
   "authorships",
   "primary_location",
+  // Volume, issue and pages, for citations.
+  "biblio",
   // Used only for its free PDF link. OpenAlex sets it to null when no open copy is known.
   "best_oa_location",
   // Descriptive terms, matched against the query for relevance and mined for related terms.
@@ -173,10 +176,13 @@ export function parseOpenAlexWork(raw: unknown, rank: number, listSize: number):
 
   return {
     id: doi ?? `openalex:${openAlexId}`,
-    title: asString(work.title) ?? "",
+    title: stripMarkup(asString(work.title)),
     authors: authorNames.map((name) => ({ name })),
     year: asInteger(work.publication_year),
-    venue: asString(source?.display_name),
+    venue: stripMarkup(asString(source?.display_name)) || null,
+    volume: biblioText(asRecord(work.biblio)?.volume),
+    issue: biblioText(asRecord(work.biblio)?.issue),
+    pages: pageRange(asRecord(work.biblio)?.first_page, asRecord(work.biblio)?.last_page),
     venueKind:
       sourceType === null
         ? null

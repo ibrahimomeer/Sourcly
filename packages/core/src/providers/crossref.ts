@@ -3,6 +3,7 @@ import { plainTextOrNull, stripMarkup } from "../text";
 import type { Author, Provider, Result, SearchOptions, VenueKind, WorkType } from "../types";
 import {
   authorFromParts,
+  biblioText,
   clampLimit,
   defaultFetch,
   doiOf,
@@ -33,6 +34,10 @@ const SELECT = [
   "author",
   "issued",
   "container-title",
+  "volume",
+  "issue",
+  "page",
+  "article-number",
   "type",
   "is-referenced-by-count",
   "abstract",
@@ -145,6 +150,10 @@ export function parseCrossrefWork(raw: unknown, rank: number, listSize: number):
     authors,
     year: parseYear(dateParts[0]),
     venue: stripMarkup(venue ?? (typeValue === "journal-article" ? null : publisher)) || null,
+    volume: biblioText(work.volume),
+    issue: biblioText(work.issue),
+    // The page range, or for journals that number articles instead, the article number.
+    pages: biblioText(work.page) ?? biblioText(work["article-number"]),
     venueKind: kind === undefined ? null : sourced(kind, "crossref", "type"),
     doi,
     url: asHttpUrl(work.URL) ?? doiUrl(doi),

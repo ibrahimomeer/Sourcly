@@ -1,0 +1,60 @@
+name: Release
+
+# Pushing a tag such as v0.2.0 builds the site and attaches sourcly-0.2.0.zip to a GitHub Release.
+# The footer's "Download" link points at releases/latest, so it always finds the newest one.
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      # Reads the pnpm version from "packageManager" in package.json.
+      - uses: pnpm/action-setup@v6
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm typecheck
+      - run: pnpm test
+      - run: pnpm test:scripts
+      - run: pnpm build
+
+      # The zip is useful only if index.html really is one file (plus config.js).
+      - run: pnpm check:dist
+
+      - name: The tag must match the app version
+        run: |
+          tag_version="${GITHUB_REF_NAME#v}"
+          app_version="$(jq -r .version apps/web/package.json)"
+          if [ "$tag_version" != "$app_version" ]; then
+            echo "Tag $GITHUB_REF_NAME does not match the version $app_version in apps/web/package.json."
+            echo "Change the version, commit, and tag again."
+            exit 1
+          fi
+
+      - name: Make the zip
+        run: |
+          folder="sourcly-${GITHUB_REF_NAME#v}"
+          mkdir "$folder"
+          cp apps/web/dist/index.html apps/web/dist/config.js "$folder/"
+          cp apps/web/release/README.txt LICENSE "$folder/"
+          zip -r "$folder.zip" "$folder"
+          unzip -l "$folder.zip"
+
+      - name: Publish the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          gh release create "$GITHUB_REF_NAME" "sourcly-$version.zip" \
+            --title "Sourcly $version" --generate-notes

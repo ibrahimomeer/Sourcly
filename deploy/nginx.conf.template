@@ -1,0 +1,19 @@
+# Serves the two files Sourcly builds: index.html and config.js. No application logic.
+server {
+  listen ${PORT};
+  listen [::]:${PORT};
+  server_name _;
+
+  root /usr/share/nginx/html;
+  index index.html;
+
+  # Never cached, so editing config.js or deploying a new version shows at once.
+  add_header Cache-Control "no-cache" always;
+  add_header X-Content-Type-Options "nosniff" always;
+  # Links to other sites do not tell them where you came from.
+  add_header Referrer-Policy "no-referrer" always;
+
+  location / {
+    try_files $uri $uri/ =404;
+  }
+}

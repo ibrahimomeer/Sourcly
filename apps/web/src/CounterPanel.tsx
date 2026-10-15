@@ -15,6 +15,7 @@ import { Pagination } from "./Pagination";
 import { paginate } from "./paginate";
 import { rankResults, scoringContext, type ViewSettings } from "./pipeline";
 import { ProviderStatuses } from "./ProviderStatuses";
+import type { CounterRecord } from "./protocolRecord";
 import { QueryNote } from "./QueryNote";
 import { explainUnusable, prepareSearch } from "./queryText";
 import { ResultCard } from "./ResultCard";
@@ -46,6 +47,9 @@ export function CounterPanel({
   libraryPrefix,
   onOverrideChange,
   onClearFilters,
+  onRecord,
+  open,
+  onToggle,
 }: {
   /** The main search this panel is about. */
   mainSearch: ActiveSearch;
@@ -59,6 +63,11 @@ export function CounterPanel({
   libraryPrefix: string;
   onOverrideChange: (resultId: string, change: LabelOverride) => void;
   onClearFilters: () => void;
+  /** Told about the finished counterargument search (or null when there is none), for the search protocol. */
+  onRecord: (record: CounterRecord | null) => void;
+  /** Whether the panel is open. Closed, it is a small bar: the heading, the notice and an Open button. */
+  open: boolean;
+  onToggle: () => void;
 }) {
   const { state, search, reset } = useSearch();
   const [terms, setTerms] = useState<string[]>(() => [...DEFAULT_COUNTER_TERMS]);
@@ -92,6 +101,15 @@ export function CounterPanel({
     [state, view, referenceYear, searched],
   );
 
+  // The protocol records a counterargument search only once it has finished.
+  useEffect(() => {
+    onRecord(
+      state.phase === "done" && ranked !== null && searched !== null
+        ? { search: state, ranked, mode: searched.lexicon ? "terms" : "own", terms: searched.terms }
+        : null,
+    );
+  }, [state, ranked, searched, onRecord]);
+
   function runSearch(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     let parsed: ParsedQuery;
@@ -118,101 +136,124 @@ export function CounterPanel({
 
   const canSearch = mode === "lexicon" ? terms.length > 0 : ownText.trim() !== "";
 
+  const found = ranked === null ? 0 : ranked.shown.length + ranked.hidden.length;
+
   return (
-    <section className="counter" aria-labelledby="counter-heading">
-      <h2 id="counter-heading">Counterarguments &amp; limitations</h2>
+    <section className={open ? "counter counter-open" : "counter"} aria-labelledby="counter-heading">
+      <div className="counter-head">
+        <h2 id="counter-heading">Counterarguments &amp; limitations</h2>
+        <button
+          type="button"
+          className="settings-toggle"
+          aria-expanded={open}
+          aria-controls="counter-body"
+          aria-label={open ? "Close counterarguments and limitations" : "Open counterarguments and limitations"}
+          onClick={onToggle}
+        >
+          {open ? "Close" : "Open"}
+        </button>
+      </div>
       <p className="counter-notice" role="note">
         {COUNTER_NOTICE}
       </p>
-      <p className="muted">
-        This runs a second search, so it sends another round of requests to the sources and only runs when you press the
-        button. Results are ranked and explained like the ones beside it, and the words that matched are marked in the
-        title and abstract. Reviews and meta-analyses, and retraction and correction notices, can be listed on their own
-        with the buttons above the results.
-      </p>
-
-      <form onSubmit={runSearch}>
-        <fieldset className="counter-mode">
-          <legend className="visually-hidden">What to search for</legend>
-          <label className="check">
-            <input type="radio" name="counter-mode" checked={mode === "lexicon"} onChange={() => setMode("lexicon")} />
-            <span>
-              Your search, narrowed to results that also mention <strong>any</strong> of the terms below
-            </span>
-          </label>
-          <label className="check">
-            <input type="radio" name="counter-mode" checked={mode === "own"} onChange={() => setMode("own")} />
-            <span>Only my own search, for example a claim that opposes yours</span>
-          </label>
-          {mode === "own" && (
-            <div className="field-row">
-              <label htmlFor="counter-own">Your own search</label>
-              <input
-                id="counter-own"
-                type="search"
-                value={ownText}
-                autoComplete="off"
-                placeholder="same rules as the main search box"
-                onChange={(event) => setOwnText(event.target.value)}
-              />
-            </div>
-          )}
-          {mode === "own" && (
-            <p className="muted own-hint">
-              Common words are removed here too, including “not” and “does”, so a sentence loses its meaning. Write the claim
-              as keywords (for example <code>hydroxychloroquine ineffective</code>), and use quotes for an exact phrase.
-            </p>
-          )}
-          {mode === "own" && ownProblem !== null && (
-            <p className="warning" role="alert">
-              {ownProblem}
-            </p>
-          )}
-        </fieldset>
-
-        <p className="terms-label">
-          <strong>Terms.</strong>{" "}
-          {mode === "lexicon"
-            ? "A result needs to match your search and at least one of these. They are matched as whole words, with their plurals."
-            : "Not part of your own search. These words are only marked in the results."}
+      {!open && found > 0 && (
+        <p className="muted counter-summary">
+          Your last counterargument search found {pluralize(found, "result")}. Open this section to see them.
         </p>
-        <CounterTerms
-          terms={terms}
-          onChange={setTerms}
-          onReset={() => setTerms([...DEFAULT_COUNTER_TERMS])}
-          isDefault={sameList(terms, DEFAULT_COUNTER_TERMS)}
-        />
-        {searched !== null && !sameList(terms, searched.terms) && (
-          <p className="muted">The terms above have changed since this search. Press the button to search with them.</p>
-        )}
-
-        <button type="submit" disabled={!canSearch}>
-          Search for counterarguments
-        </button>
-      </form>
-
-      {state.phase !== "idle" && ranked !== null && (
-        <CounterResults
-          state={state}
-          ranked={ranked}
-          terms={searched?.terms ?? []}
-          page={page}
-          onPageChange={(next) => {
-            setPage(next);
-            document.getElementById("counter-results")?.scrollIntoView({ block: "start" });
-          }}
-          panelView={panelView}
-          onPanelViewChange={(next) => {
-            setPanelView(next);
-            setPage(1);
-          }}
-          overrides={overrides}
-          libraryPrefix={libraryPrefix}
-          onOverrideChange={onOverrideChange}
-          onClearFilters={onClearFilters}
-          usedLexicon={searched?.lexicon === true}
-        />
       )}
+
+      {/* Hidden, not removed, so the terms, the search and its results survive closing the section. */}
+      <div id="counter-body" className="counter-body" hidden={!open}>
+        <p className="muted">
+          This runs a second search, so it sends another round of requests to the sources and only runs when you press the
+          button. Results are ranked and explained like the ones beside it, and the words that matched are marked in the
+          title and abstract. Reviews and meta-analyses, and retraction and correction notices, can be listed on their own
+          with the buttons above the results.
+        </p>
+
+        <form onSubmit={runSearch}>
+          <fieldset className="counter-mode">
+            <legend className="visually-hidden">What to search for</legend>
+            <label className="check">
+              <input type="radio" name="counter-mode" checked={mode === "lexicon"} onChange={() => setMode("lexicon")} />
+              <span>
+                Your search, narrowed to results that also mention <strong>any</strong> of the terms below
+              </span>
+            </label>
+            <label className="check">
+              <input type="radio" name="counter-mode" checked={mode === "own"} onChange={() => setMode("own")} />
+              <span>Only my own search, for example a claim that opposes yours</span>
+            </label>
+            {mode === "own" && (
+              <div className="field-row">
+                <label htmlFor="counter-own">Your own search</label>
+                <input
+                  id="counter-own"
+                  type="search"
+                  value={ownText}
+                  autoComplete="off"
+                  placeholder="same rules as the main search box"
+                  onChange={(event) => setOwnText(event.target.value)}
+                />
+              </div>
+            )}
+            {mode === "own" && (
+              <p className="muted own-hint">
+                Common words are removed here too, including “not” and “does”, so a sentence loses its meaning. Write the claim
+                as keywords (for example <code>hydroxychloroquine ineffective</code>), and use quotes for an exact phrase.
+              </p>
+            )}
+            {mode === "own" && ownProblem !== null && (
+              <p className="warning" role="alert">
+                {ownProblem}
+              </p>
+            )}
+          </fieldset>
+
+          <p className="terms-label">
+            <strong>Terms.</strong>{" "}
+            {mode === "lexicon"
+              ? "A result needs to match your search and at least one of these. They are matched as whole words, with their plurals."
+              : "Not part of your own search. These words are only marked in the results."}
+          </p>
+          <CounterTerms
+            terms={terms}
+            onChange={setTerms}
+            onReset={() => setTerms([...DEFAULT_COUNTER_TERMS])}
+            isDefault={sameList(terms, DEFAULT_COUNTER_TERMS)}
+          />
+          {searched !== null && !sameList(terms, searched.terms) && (
+            <p className="muted">The terms above have changed since this search. Press the button to search with them.</p>
+          )}
+
+          <button type="submit" disabled={!canSearch}>
+            Search for counterarguments
+          </button>
+        </form>
+
+        {state.phase !== "idle" && ranked !== null && (
+          <CounterResults
+            state={state}
+            ranked={ranked}
+            terms={searched?.terms ?? []}
+            page={page}
+            onPageChange={(next) => {
+              setPage(next);
+              document.getElementById("counter-results")?.scrollIntoView({ block: "start" });
+            }}
+            panelView={panelView}
+            onPanelViewChange={(next) => {
+              setPanelView(next);
+              setPage(1);
+            }}
+            overrides={overrides}
+            libraryPrefix={libraryPrefix}
+            onOverrideChange={onOverrideChange}
+            onClearFilters={onClearFilters}
+            usedLexicon={searched?.lexicon === true}
+          />
+        )}
+      </div>
     </section>
   );
 }

@@ -109,17 +109,39 @@ export function authorFromName(raw: string): Author | null {
   return { name };
 }
 
+/** A name part with stray dashes and spaces at its ends removed ("Kashyap -" becomes "Kashyap"); null if no letter is left. */
+function namePart(value: unknown): string | null {
+  const text = asString(value)?.replace(/^[\s\-–—]+|[\s\-–—]+$/g, "") ?? "";
+  return /[\p{L}\p{N}]/u.test(text) ? text : null;
+}
+
 /** An author from separate family and given names (and/or a full name). */
 export function authorFromParts(family: unknown, given: unknown, fullName?: unknown): Author | null {
-  const familyName = asString(family);
-  const givenName = asString(given);
+  const familyName = namePart(family);
+  const givenName = namePart(given);
   if (familyName !== null) {
     const author: Author = { name: [givenName, familyName].filter(Boolean).join(" "), family: familyName };
     if (givenName !== null) author.given = givenName;
     return author;
   }
-  const full = asString(fullName) ?? givenName;
+  // No usable family name (some records have a bare "-"): the whole name is the best there is.
+  const full = namePart(fullName) ?? givenName;
   return full === null ? null : { name: full };
+}
+
+/** A volume, issue or page value that a source may send as text or as a number; null when empty. */
+export function biblioText(value: unknown): string | null {
+  if (typeof value === "number" && Number.isFinite(value)) return String(value);
+  const text = asString(value);
+  return text === null || text === "" ? null : text;
+}
+
+/** "1272-1278" from a first and last page; just the first when there is no different last one. */
+export function pageRange(first: unknown, last: unknown): string | null {
+  const start = biblioText(first);
+  const end = biblioText(last);
+  if (start === null) return end;
+  return end === null || end === start ? start : `${start}-${end}`;
 }
 
 /** Most descriptive terms kept per kind for one work. */

@@ -31,8 +31,14 @@ const ANY_TAG = /<\/?[a-z][^>]*>/gi;
  */
 export function stripMarkup(text: string | null | undefined): string {
   if (!text) return "";
-  const withoutLabel = text.replace(/<(?:[a-z]+:)?title>\s*abstract\s*<\/(?:[a-z]+:)?title>/gi, " ");
-  const plain = decodeEntities(withoutLabel.replace(BLOCK_TAGS, " ").replace(ANY_TAG, ""));
+  let plain = text.replace(/<(?:[a-z]+:)?title>\s*abstract\s*<\/(?:[a-z]+:)?title>/gi, " ");
+  // Some sources send the markup itself as entities (&lt;i&gt;Candida&lt;/i&gt;), which turns into a tag
+  // only once decoded. So strip and decode again until nothing changes (a few rounds at most).
+  for (let round = 0; round < 3; round++) {
+    const next = decodeEntities(plain.replace(BLOCK_TAGS, " ").replace(ANY_TAG, ""));
+    if (next === plain) break;
+    plain = next;
+  }
   return plain.replace(/\s+/g, " ").trim();
 }
 

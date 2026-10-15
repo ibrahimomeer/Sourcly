@@ -78,6 +78,10 @@ export function parseZenodoRecord(raw: unknown, rank: number, listSize: number):
     year: parseYear(metadata.publication_date),
     venue: "Zenodo",
     venueKind: sourced("repository", "zenodo", "(Zenodo is a repository)"),
+    // This source gives no volume, issue or pages.
+    volume: null,
+    issue: null,
+    pages: null,
     doi,
     url: recordPage ?? (doi !== null ? doiUrl(doi) : null),
     abstract: plainTextOrNull(asString(metadata.description)),

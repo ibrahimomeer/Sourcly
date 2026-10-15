@@ -5,6 +5,7 @@ import type { Author, Provider, Result, SearchOptions, WorkType } from "../types
 import { childrenNamed, descend, firstChild, parseXml, textOf, XmlError, type XmlNode } from "../xml";
 import {
   authorFromParts,
+  biblioText,
   clampLimit,
   defaultFetch,
   doiOf,
@@ -105,6 +106,7 @@ export function parsePubmedArticle(node: XmlNode, rank: number, listSize: number
   const retracted = types.some((t) => t.toLowerCase() === "retracted publication") || correctionKinds.includes("RetractionIn");
 
   const venue = textOf(firstChild(journal, "Title"));
+  const issue = firstChild(journal, "JournalIssue");
   const language = toLanguageCode(textOf(firstChild(article, "Language")));
 
   return {
@@ -114,6 +116,9 @@ export function parsePubmedArticle(node: XmlNode, rank: number, listSize: number
     year,
     venue: venue === "" ? null : venue,
     venueKind: venue === "" ? null : sourced("journal", "pubmed", "Journal.Title"),
+    volume: biblioText(textOf(firstChild(issue, "Volume"))),
+    issue: biblioText(textOf(firstChild(issue, "Issue"))),
+    pages: biblioText(textOf(firstChild(firstChild(article, "Pagination"), "MedlinePgn"))),
     doi,
     url: doi !== null ? doiUrl(doi) : `https://pubmed.ncbi.nlm.nih.gov/${pmid}/`,
     abstract: abstract === "" ? null : abstract,

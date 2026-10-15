@@ -156,3 +156,50 @@ describe("Crossref subjects and syntax", () => {
     expect(createCrossrefProvider().syntax).toBe("plain");
   });
 });
+describe("Crossref: volume, issue and pages", () => {
+  it("reads them from a recorded record", () => {
+    expect(parse(items[3])).toMatchObject({ volume: "20", issue: "1pt2", pages: "129-136" });
+  });
+
+  it("falls back to the article number when there is no page", () => {
+    expect(parse({ DOI: "10.1000/x", volume: "12", issue: "3", "article-number": "e0173456" })).toMatchObject({
+      volume: "12",
+      issue: "3",
+      pages: "e0173456",
+    });
+  });
+
+  it("is null for a record that has none (most are like this)", () => {
+    expect(parse(items[0])).toMatchObject({ volume: null, issue: null, pages: null });
+  });
+
+  it("asks Crossref for exactly these four fields (select names Crossref lists)", async () => {
+    const calls: string[] = [];
+    const fetchMock = vi.fn(async (input: RequestInfo | URL) => {
+      calls.push(String(input));
+      return new Response(JSON.stringify({ status: "ok", message: { items: [] } }), { status: 200 });
+    });
+    await createCrossrefProvider({ fetch: fetchMock as unknown as typeof fetch }).search("sleep", { limit: 5 });
+    const select = new URL(calls[0] ?? "").searchParams.get("select")?.split(",") ?? [];
+    for (const field of ["volume", "issue", "page", "article-number"]) expect(select).toContain(field);
+  });
+});
+
+describe("Crossref: odd author names", () => {
+  const authorsOf = (author: unknown[]) => parse({ DOI: "10.1000/x", author }).authors;
+
+  it("drops a stray dash from a name part", () => {
+    expect(authorsOf([{ given: "Gaurav", family: "Kashyap -" }])).toEqual([{ name: "Gaurav Kashyap", family: "Kashyap", given: "Gaurav" }]);
+  });
+
+  it("uses the whole name when the family name is only a dash", () => {
+    expect(authorsOf([{ given: "Gaurav Kashyap", family: "-" }])).toEqual([{ name: "Gaurav Kashyap" }]);
+    expect(authorsOf([{ family: "–" }])).toEqual([]);
+  });
+
+  it("leaves ordinary and hyphenated names alone", () => {
+    expect(authorsOf([{ given: "Jean-Paul", family: "Smith-Jones" }])).toEqual([
+      { name: "Jean-Paul Smith-Jones", family: "Smith-Jones", given: "Jean-Paul" },
+    ]);
+  });
+});

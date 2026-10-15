@@ -170,3 +170,17 @@ describe("PubMed subjects and syntax", () => {
     expect(createPubmedProvider().syntax).toBe("boolean");
   });
 });
+describe("PubMed: volume, issue and pages", () => {
+  it("reads the volume, the issue and the page range of an article", () => {
+    const neuron = parsed.find((result) => result.volume === "111");
+    expect(neuron).toMatchObject({ volume: "111", issue: "7", pages: "1050-1075" });
+  });
+
+  it("gives every article in the recorded response a volume, an issue and pages, or null", () => {
+    for (const result of parsed) {
+      for (const value of [result.volume, result.issue, result.pages]) {
+        expect(value === null || value.length > 0).toBe(true);
+      }
+    }
+  });
+});

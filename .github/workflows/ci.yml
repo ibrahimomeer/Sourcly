@@ -26,4 +26,7 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm typecheck
       - run: pnpm test
+      - run: pnpm test:scripts
       - run: pnpm build
+      # The built site must be one self-contained index.html (plus config.js) so it works from a folder.
+      - run: pnpm check:dist

@@ -88,6 +88,10 @@ export function parseDataCiteRecord(raw: unknown, rank: number, listSize: number
     year: parseYear(attributes.publicationYear),
     venue,
     venueKind: sourced(asString(container?.type)?.toLowerCase() === "journal" ? "journal" : "repository", "datacite", "container.type"),
+    // This source gives no volume, issue or pages.
+    volume: null,
+    issue: null,
+    pages: null,
     doi,
     url: asHttpUrl(attributes.url) ?? doiUrl(doi),
     abstract: plainTextOrNull(asString(abstract?.description)),

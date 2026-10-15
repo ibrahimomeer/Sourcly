@@ -117,3 +117,16 @@ describe("Europe PMC subjects and syntax", () => {
     expect(createEuropePmcProvider().syntax).toBe("boolean");
   });
 });
+describe("Europe PMC: volume, issue and pages", () => {
+  it("reads them from journalInfo and pageInfo", () => {
+    expect(parse(results[0], 1, 6)).toMatchObject({ volume: "34", issue: "13", pages: "2801-2811.e9" });
+  });
+
+  it("keeps an article number such as eLife's, and leaves a missing issue null", () => {
+    expect(parse(results[2], 3, 6)).toMatchObject({ volume: "14", issue: null, pages: "RP104862" });
+  });
+
+  it("is null for a preprint, which has neither", () => {
+    expect(parse(results[1], 2, 6)).toMatchObject({ volume: null, issue: null, pages: null });
+  });
+});

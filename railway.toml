@@ -1,0 +1,9 @@
+# Railway builds the Dockerfile at the repository root and serves the result. Railway watches the
+# branch you connect (main); nothing here needs a server of its own.
+[build]
+builder = "DOCKERFILE"
+dockerfilePath = "Dockerfile"
+
+[deploy]
+healthcheckPath = "/"
+healthcheckTimeout = 60

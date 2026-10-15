@@ -14,10 +14,10 @@ window.SOURCLY_CONFIG = {
   // "Source on GitHub" link are built from this.
   repoUrl: "https://github.com/ibrahimomeer/Sourcly",
 
-  // Contact email for providers that ask for one (Crossref's polite pool, and
-  // Unpaywall, which requires it). OpenAlex does not use it. Leave empty to ship
-  // nothing; Unpaywall stays disabled until this is set. Do not commit a personal
-  // email. (Not used yet: those providers arrive in a later stage.)
+  // Contact email for the sources that ask for one: it is sent to Crossref (as `mailto`,
+  // which moves requests to its faster "polite pool") and to PubMed (as `email`, which NCBI
+  // asks tools to send). OpenAlex does not use it. Leave it empty to send nothing. Do not
+  // commit a personal email.
   contactEmail: "",
 
   // Library sign-in prefix for the "Open via UBC Library" button. The link is the

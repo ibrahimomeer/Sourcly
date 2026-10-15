@@ -222,3 +222,13 @@ describe("mergeResults in general", () => {
     expect(merged.reduce((sum, m) => sum + m.hits.length, 0)).toBe(pile.length);
   });
 });
+
+describe("merging volume, issue and pages", () => {
+  const doi = "10.1/biblio";
+  it("takes each from the first source that has it, in provider priority order", () => {
+    const crossref = result("crossref", { id: doi, doi, volume: "9", issue: null, pages: "1-2" });
+    const openalex = result("openalex", { id: doi, doi, volume: "12", issue: "3", pages: null });
+    const [merged] = mergeResults([crossref, openalex]);
+    expect(merged).toMatchObject({ volume: "12", issue: "3", pages: "1-2" });
+  });
+});

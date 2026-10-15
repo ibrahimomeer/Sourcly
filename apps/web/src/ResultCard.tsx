@@ -11,6 +11,7 @@ import {
 import { Badge, type BadgeStyle } from "./Badge";
 import { LabelEditor } from "./LabelEditor";
 import { LabelRows } from "./LabelRows";
+import { useSaved } from "./SavedContext";
 import { accessBadgeText, describeLexiconMatches, formatAuthors, formatNumber, reviewBadgeText } from "./format";
 import { Highlighted } from "./Highlighted";
 import { libraryUrl } from "./libraryLink";
@@ -41,6 +42,8 @@ export function ResultCard({
   const notice = noticeKind(result);
   const reviewText = reviewBadgeText(result);
   const matches = findLexiconMatches(result, highlight);
+  const saved = useSaved();
+  const isSaved = saved.isSaved(result.id);
   // Borders, not color: solid = open, dashed = not open, faint dashed = not stated.
   const accessStyle: BadgeStyle =
     openAccess.isOpen === true ? "solid" : openAccess.isOpen === false ? "dashed" : "faint-dashed";
@@ -124,31 +127,39 @@ export function ResultCard({
 
       <LabelRows labels={labels} />
 
-      {(openAccess.pdfUrl !== null || libraryHref !== null || result.doi !== null) && (
-        <div className="actions">
-          {openAccess.pdfUrl !== null && (
-            <a
-              className="button"
-              href={openAccess.pdfUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              title="Direct link to a free PDF, as reported by OpenAlex"
-            >
-              Open access PDF
-            </a>
-          )}
-          {libraryHref !== null && (
-            <a className="button" href={libraryHref} target="_blank" rel="noopener noreferrer">
-              Open via UBC Library
-            </a>
-          )}
-          {result.doi !== null && (
-            <a className="button" href={doiUrl(result.doi)} target="_blank" rel="noopener noreferrer">
-              DOI
-            </a>
-          )}
-        </div>
-      )}
+      <div className="actions">
+        {openAccess.pdfUrl !== null && (
+          <a
+            className="button"
+            href={openAccess.pdfUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            title="Direct link to a free PDF, as reported by OpenAlex"
+          >
+            Open access PDF
+          </a>
+        )}
+        {libraryHref !== null && (
+          <a className="button" href={libraryHref} target="_blank" rel="noopener noreferrer">
+            Open via UBC Library
+          </a>
+        )}
+        {result.doi !== null && (
+          <a className="button" href={doiUrl(result.doi)} target="_blank" rel="noopener noreferrer">
+            DOI
+          </a>
+        )}
+        <button
+          type="button"
+          className={isSaved ? "save-button saved-on" : "save-button"}
+          aria-pressed={isSaved}
+          disabled={!isSaved && !saved.canSave}
+          title={!isSaved && !saved.canSave ? "The saved list is full" : undefined}
+          onClick={() => saved.toggle(result)}
+        >
+          {isSaved ? "Saved (remove)" : "Save to list"}
+        </button>
+      </div>
       {libraryHref !== null && (
         <p className="muted note">Access depends on UBC Library subscriptions; you may be asked to log in.</p>
       )}

@@ -36,6 +36,28 @@ describe("stripMarkup", () => {
   });
 });
 
+describe("stripMarkup: markup sent as entities", () => {
+  it("removes a tag that arrives as &lt;i&gt;, which only becomes a tag once decoded", () => {
+    expect(stripMarkup("AI-Powered Diagnostic Techniques for &lt;i&gt;Candida albicans&lt;/i&gt; Detection: A Systematic Review")).toBe(
+      "AI-Powered Diagnostic Techniques for Candida albicans Detection: A Systematic Review",
+    );
+  });
+
+  it("removes a tag that was encoded twice", () => {
+    expect(stripMarkup("Sleep and &amp;lt;i&amp;gt;memory&amp;lt;/i&amp;gt;")).toBe("Sleep and memory");
+  });
+
+  it("still removes ordinary tags, and mixes of the two", () => {
+    expect(stripMarkup("<i>Candida</i> and &lt;b&gt;bold&lt;/b&gt; text")).toBe("Candida and bold text");
+  });
+
+  it("keeps entities that are only characters, and a less-than sign that is not a tag", () => {
+    expect(stripMarkup("Tom &amp; Jerry")).toBe("Tom & Jerry");
+    expect(stripMarkup("p &lt; 0.05 and n &gt; 10")).toBe("p < 0.05 and n > 10");
+    expect(stripMarkup("a &amp;amp; b")).toBe("a & b");
+  });
+});
+
 describe("parseYear", () => {
   it.each([
     [2024, 2024],

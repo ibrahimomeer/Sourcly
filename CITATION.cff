@@ -1,0 +1,19 @@
+cff-version: 1.2.0
+message: "If you use Sourcly in your work, please cite it as below."
+title: "Sourcly"
+type: software
+abstract: >-
+  Sourcly is an open-source web app that runs entirely in the browser. It searches several
+  scholarly databases at once and ranks the results with a transparent, adjustable formula that
+  is explained for every result. It labels each source and never hides one unless you filter.
+authors:
+  - name: "Sourcly contributors"
+repository-code: "https://github.com/ibrahimomeer/Sourcly"
+url: "https://github.com/ibrahimomeer/Sourcly"
+license: MIT
+version: 0.1.0
+keywords:
+  - academic search
+  - source discovery
+  - research tools
+  - transparent ranking

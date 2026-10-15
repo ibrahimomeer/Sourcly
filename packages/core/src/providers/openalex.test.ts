@@ -28,6 +28,9 @@ describe("parseOpenAlexWork", () => {
       year: 2005,
       venue: "Nature",
       venueKind: { value: "journal", provider: "openalex", field: "primary_location.source.type" },
+      volume: "437",
+      issue: "7063",
+      pages: "1272-1278",
       doi: "10.1038/nature04286",
       url: "https://doi.org/10.1038/nature04286",
       abstract: null,
@@ -456,5 +459,40 @@ describe("createOpenAlexProvider: optional API key", () => {
     expect(errors.map((e) => e.kind)).toEqual(["rate-limited", "failed"]);
     // The underlying error text can contain the URL (and so the key); the message we surface must not.
     for (const error of errors) expect(error.message).not.toContain(SECRET);
+  });
+});
+
+describe("OpenAlex: volume, issue and pages", () => {
+  const withBiblio = (biblio: unknown) => parseOpenAlexWork({ ...fixtures.search.results[0], biblio }, 1, 1);
+
+  it("reads them from biblio, joining the first and last page", () => {
+    const second = parseOpenAlexWork(fixtures.search.results[1], 2, 3);
+    expect(second).toMatchObject({ volume: "13", issue: "5", pages: "309-321" });
+  });
+
+  it("keeps a single page, or an article number, as it is", () => {
+    expect(withBiblio({ volume: "5", issue: null, first_page: "e12", last_page: null })).toMatchObject({
+      volume: "5",
+      issue: null,
+      pages: "e12",
+    });
+    expect(withBiblio({ first_page: "40", last_page: "40" })?.pages).toBe("40");
+  });
+
+  it("is null when there is no biblio or its values are empty", () => {
+    expect(withBiblio(undefined)).toMatchObject({ volume: null, issue: null, pages: null });
+    expect(withBiblio({ volume: "", issue: "  ", first_page: "", last_page: "" })).toMatchObject({
+      volume: null,
+      issue: null,
+      pages: null,
+    });
+  });
+});
+
+describe("OpenAlex: markup in titles", () => {
+  it("removes markup from the title and the venue, including markup sent as entities", () => {
+    const work = { ...fixtures.search.results[0], title: "Sleep in <i>Drosophila</i> and &lt;i&gt;Candida&lt;/i&gt;" };
+    const result = parseOpenAlexWork(work, 1, 1);
+    expect(result?.title).toBe("Sleep in Drosophila and Candida");
   });
 });

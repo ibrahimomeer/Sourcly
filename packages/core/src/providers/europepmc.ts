@@ -4,6 +4,7 @@ import { plainTextOrNull, stripMarkup, toLanguageCode } from "../text";
 import type { Author, Provider, Result, SearchOptions, VenueKind, WorkType } from "../types";
 import {
   authorFromParts,
+  biblioText,
   clampLimit,
   defaultFetch,
   doiOf,
@@ -101,6 +102,9 @@ export function parseEuropePmcRecord(raw: unknown, rank: number, listSize: numbe
     year: parseYear(record.pubYear),
     venue,
     venueKind: kind === null ? null : sourced(kind, "europepmc", source === "PPR" ? "source" : "journalInfo.journal.title"),
+    volume: biblioText(asRecord(record.journalInfo)?.volume),
+    issue: biblioText(asRecord(record.journalInfo)?.issue),
+    pages: biblioText(record.pageInfo),
     doi,
     url: doi !== null ? doiUrl(doi) : `https://europepmc.org/article/${source}/${id}`,
     abstract: plainTextOrNull(asString(record.abstractText)),

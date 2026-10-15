@@ -78,3 +78,17 @@ describe("DOAJ subjects and syntax", () => {
     expect(createDoajProvider().syntax).toBe("boolean");
   });
 });
+describe("DOAJ: volume, issue and pages", () => {
+  it("reads the volume, the issue (DOAJ's 'number') and the start page", () => {
+    expect(parse(hits[0])).toMatchObject({ volume: "13", issue: "7", pages: "940" });
+  });
+
+  it("treats empty strings as missing, and keeps a start page alone as the article number", () => {
+    expect(parse(hits[1])).toMatchObject({ volume: "253", issue: null, pages: "119055" });
+  });
+
+  it("joins a start and end page", () => {
+    const raw = { ...hits[0], bibjson: { ...hits[0]?.bibjson, start_page: "940", end_page: "955" } };
+    expect(parse(raw).pages).toBe("940-955");
+  });
+});
