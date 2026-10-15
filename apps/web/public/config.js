@@ -20,7 +20,7 @@ window.SOURCLY_CONFIG = {
   // commit a personal email.
   contactEmail: "",
 
-  // Library sign-in prefix for the "Open via UBC Library" button. The link is the
+  // Library sign-in prefix for the "Access with UBC Library" button. The link is the
   // prefix followed by the work's address, percent-encoded as one value: the
   // publisher's landing page when the result has one, otherwise https://doi.org/<DOI>.
   // Leave it empty ("") to hide the button.

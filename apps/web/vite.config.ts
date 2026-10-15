@@ -1,13 +1,14 @@
 import react from "@vitejs/plugin-react";
 import { defineConfig } from "vitest/config";
 import { viteSingleFile } from "vite-plugin-singlefile";
-import packageJson from "./package.json";
+import rootPackage from "../../package.json";
 
 export default defineConfig({
   // Relative base so the built site works from any path, including file://.
   base: "./",
-  // The app's version, from package.json, so the search protocol can say which version made it.
-  define: { __APP_VERSION__: JSON.stringify(packageJson.version) },
+  // The app's version, from the one place it is written (the root package.json). It is shown in the
+  // footer and recorded in the search protocol.
+  define: { __APP_VERSION__: JSON.stringify(rootPackage.version) },
   // One self-contained index.html (scripts and styles inlined) that works when double-clicked from a
   // folder. config.js stays a separate file next to it, so it can be edited after the build.
   plugins: [react(), viteSingleFile()],

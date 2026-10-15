@@ -10,7 +10,6 @@ import {
   type ResultFilters,
   type ScoringSettings,
 } from "@sourcly/core";
-import { useState } from "react";
 import { maskApiKey } from "./apiKey";
 import { valueName } from "./format";
 import { NumberInput } from "./NumberInput";
@@ -47,25 +46,15 @@ export interface SettingsPanelProps {
   onApiKeyChange: (key: string) => void;
   /** False when the browser refused to store the key. */
   keyIsStored: boolean;
+  /** Whether the panel is showing. The button that opens it is in the toolbar. */
+  open: boolean;
 }
 
 export function SettingsPanel(props: SettingsPanelProps) {
-  const [open, setOpen] = useState(false);
-
   return (
     <div className="settings">
-      <button
-        type="button"
-        className="settings-toggle"
-        aria-expanded={open}
-        aria-controls="settings-panel"
-        onClick={() => setOpen((current) => !current)}
-      >
-        Settings
-      </button>
-
       {/* Hidden, not removed, so what you typed survives closing the panel. */}
-      <div id="settings-panel" className="settings-panel" hidden={!open}>
+      <div id="settings-panel" className="settings-panel" hidden={!props.open}>
         <SourcesSection {...props} />
         <RankingSection {...props} />
         <FiltersSection {...props} />

@@ -29,7 +29,7 @@ function SavedLinks({
       {library !== null && (
         <>
           <a href={library} target="_blank" rel="noopener noreferrer">
-            Open via UBC Library
+            Access with UBC Library
           </a>
           {" · "}
         </>
@@ -60,6 +60,7 @@ export function SavedPanel({
   onClear,
   isStored,
   libraryPrefix,
+  open,
 }: {
   items: readonly SavedItem[];
   onRemove: (id: string) => void;
@@ -68,8 +69,9 @@ export function SavedPanel({
   isStored: boolean;
   /** config.libraryProxyPrefix; empty hides the library links. */
   libraryPrefix: string;
+  /** Whether the panel is showing. The button that opens it is in the toolbar. */
+  open: boolean;
 }) {
-  const [open, setOpen] = useState(false);
   const [message, setMessage] = useState("");
 
   // Built when the list changes, in the order it is exported (alphabetical), and not before it is opened.
@@ -105,16 +107,6 @@ export function SavedPanel({
 
   return (
     <div className="saved">
-      <button
-        type="button"
-        className="settings-toggle"
-        aria-expanded={open}
-        aria-controls="saved-panel"
-        onClick={() => setOpen((current) => !current)}
-      >
-        Saved list ({items.length})
-      </button>
-
       <div id="saved-panel" className="settings-panel" hidden={!open}>
         <p className="muted">
           Press “Save to list” on any result to add it here. The list stays in this browser for your next visit and is
@@ -169,7 +161,7 @@ export function SavedPanel({
             </p>
             {libraryPrefix.trim() !== "" && (
               <p className="muted note">
-                “Open via UBC Library” depends on UBC Library subscriptions; you may be asked to log in.
+                “Access with UBC Library” depends on UBC Library subscriptions; you may be asked to log in.
               </p>
             )}
             <p className="muted note">

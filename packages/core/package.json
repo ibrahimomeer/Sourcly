@@ -1,6 +1,5 @@
 {
   "name": "@sourcly/core",
-  "version": "0.1.0",
   "private": true,
   "description": "Providers, classification, scoring, deduplication and APA formatting. No UI code.",
   "license": "MIT",

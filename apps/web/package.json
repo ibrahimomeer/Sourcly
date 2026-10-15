@@ -1,6 +1,5 @@
 {
   "name": "@sourcly/web",
-  "version": "0.1.0",
   "private": true,
   "description": "Sourcly web app (React + Vite). Runs entirely in the browser.",
   "license": "MIT",

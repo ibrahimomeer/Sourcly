@@ -1,6 +1,6 @@
 {
   "name": "sourcly",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "description": "Transparent, tunable academic source discovery. Runs entirely in the browser.",
   "license": "MIT",
@@ -15,7 +15,9 @@
     "test": "pnpm -r test",
     "build": "pnpm -r build",
     "check:dist": "node scripts/check-dist.mjs",
-    "test:scripts": "node --test \"scripts/*.test.mjs\""
+    "test:scripts": "node --test \"scripts/*.test.mjs\"",
+    "version:set": "node scripts/version.mjs set",
+    "version:check": "node scripts/version.mjs check"
   },
   "devDependencies": {
     "typescript": "^7.0.2"

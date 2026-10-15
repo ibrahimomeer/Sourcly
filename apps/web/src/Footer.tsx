@@ -1,6 +1,7 @@
 import { Fragment, type ReactNode } from "react";
 import type { SourclyConfig } from "./config";
 import { copyrightYears } from "./copyright";
+import { APP_VERSION, versionLabel } from "./version";
 
 export function Footer({ config }: { config: SourclyConfig }) {
   const years = copyrightYears(new Date().getFullYear());
@@ -23,6 +24,9 @@ export function Footer({ config }: { config: SourclyConfig }) {
       </a>,
     );
   }
+
+  const version = versionLabel(APP_VERSION);
+  if (version !== "") parts.push(<span title={`Sourcly version ${APP_VERSION}`}>{version}</span>);
 
   return (
     <footer className="site-footer">

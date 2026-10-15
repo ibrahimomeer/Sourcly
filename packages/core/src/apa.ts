@@ -18,6 +18,14 @@ export interface ApaOptions {
   retrievedOn?: Date;
 }
 
+/** The two ways to cite a source in a sentence: in brackets, or with the author as part of the sentence. */
+export interface ApaCitation {
+  /** (Stickgold, 2005) */
+  parenthetical: ApaPart[];
+  /** Stickgold (2005) */
+  narrative: ApaPart[];
+}
+
 export interface ApaEntry {
   result: Result;
   parts: ApaPart[];
@@ -27,6 +35,8 @@ export interface ApaEntry {
   html: string;
   /** What to check before handing it in. */
   checks: string[];
+  /** How to cite it in the text. Worked out with the whole list, because the same names or years can need telling apart. */
+  citation: ApaCitation;
 }
 
 // ---- Names
@@ -326,6 +336,11 @@ function htmlOf(parts: readonly ApaPart[]): string {
   return `<p style="margin:0 0 0 36pt;text-indent:-36pt;line-height:2">${inner}</p>`;
 }
 
+/** Parts as inline HTML (italics only), for pasting a citation into a word processor. */
+export function apaInlineHtml(parts: readonly ApaPart[]): string {
+  return parts.map((part) => (part.italic ? `<i>${escapeHtml(part.text)}</i>` : escapeHtml(part.text))).join("");
+}
+
 const yearOf = (result: Result): string => (result.year === null ? "n.d." : String(result.year));
 
 /** One reference, as parts. Use buildReferenceList for a whole list: it also sorts and tells apart same-year works. */
@@ -411,13 +426,8 @@ function compareResults(a: Result, b: Result): number {
   return compareText(titleKey(a.title), titleKey(b.title)) || compareText(a.id, b.id);
 }
 
-/**
- * Formats results as an APA 7 reference list: alphabetical by first author's family name (letter
- * by letter), then year; works with the same authors and the same year get a, b, c after the year in
- * title order. Nothing is added or removed, and the input is not changed.
- */
-export function buildReferenceList(results: readonly Result[], options: ApaOptions = {}): ApaEntry[] {
-  const sorted = [...results].sort(compareResults);
+/** The year as it is written for each result in a sorted list: 2020, or 2020a and 2020b for the same authors in the same year (n.d.-a for no date). */
+function yearLabels(sorted: readonly Result[]): string[] {
   const keyOf = (result: Result) => `${formatApaAuthors(result.authors) || titleKey(result.title)}|${yearOf(result)}`;
   const groups = new Map<string, number>();
   for (const result of sorted) groups.set(keyOf(result), (groups.get(keyOf(result)) ?? 0) + 1);
@@ -429,9 +439,145 @@ export function buildReferenceList(results: readonly Result[], options: ApaOptio
     seen.set(key, index + 1);
     const suffix = (groups.get(key) ?? 1) > 1 ? String.fromCharCode(97 + (index % 26)) : "";
     const year = yearOf(result);
-    const label = suffix === "" ? year : year === "n.d." ? `n.d.-${suffix}` : `${year}${suffix}`;
-    const parts = build(result, label, options);
-    return { result, parts, text: textOf(parts), html: htmlOf(parts), checks: apaChecks(result) };
+    return suffix === "" ? year : year === "n.d." ? `n.d.-${suffix}` : `${year}${suffix}`;
+  });
+}
+
+// ---- Citing in the text
+
+interface CiteAuthor {
+  family: string;
+  initials: string;
+}
+
+function citeAuthors(result: Result): CiteAuthor[] {
+  return result.authors
+    .map(splitName)
+    .map((name): CiteAuthor => (name.kind === "group" ? { family: name.name, initials: "" } : { family: name.family, initials: name.initials }))
+    .filter((author) => author.family !== "");
+}
+
+/** A title for the author position of a citation: the part before a colon, at most six words, main words capitalised. */
+function citeTitle(title: string): string {
+  const words = cleanTitle(title).split(/:\s/)[0]?.split(" ").filter((word) => word !== "").slice(0, 6) ?? [];
+  // A shortened title should not end on "of" or "the".
+  while (words.length > 1 && SMALL_WORDS.has((words[words.length - 1] ?? "").toLowerCase())) words.pop();
+  const cased = words.map((word, index) => {
+    if (/\p{Lu}/u.test(word.slice(1))) return word; // capitals inside already: COVID-19, mRNA
+    if (index > 0 && SMALL_WORDS.has(word.toLowerCase())) return word.toLowerCase();
+    return `${(Array.from(word)[0] ?? "").toUpperCase()}${Array.from(word).slice(1).join("")}`;
+  });
+  return cased.join(" ").replace(/[,;:.]+$/, "");
+}
+
+const STANDALONE_KINDS: ReadonlySet<Kind> = new Set<Kind>(["book", "dataset", "thesis", "report"]);
+
+/**
+ * How to cite each work in the text, for a sorted list. The rules (APA 7, 8.17 to 8.20):
+ * one author (Smith, 2020); two (Smith & Jones, 2020), and "Smith and Jones (2020)" in a sentence;
+ * three or more (Smith et al., 2020). First authors with the same surname but different initials get
+ * their initials (J. Smith); works whose shortened form would be identical show as many authors as
+ * it takes to tell them apart (Smith, Jones, et al., 2020). With no author, the title is used (in
+ * quotation marks, or italic for a book or report), and with no year it is (Smith, n.d.).
+ */
+function buildCitations(sorted: readonly Result[], labels: readonly string[]): ApaCitation[] {
+  const authors = sorted.map(citeAuthors);
+
+  // First authors who share a surname but not initials need their initials in every citation.
+  const initialsSeen = new Map<string, Set<string>>();
+  for (const list of authors) {
+    const first = list[0];
+    if (first === undefined) continue;
+    const key = alphaKey(first.family);
+    initialsSeen.set(key, (initialsSeen.get(key) ?? new Set()).add(alphaKey(first.initials)));
+  }
+  const nameOf = (author: CiteAuthor, isFirst: boolean): string => {
+    const needsInitials = isFirst && author.initials !== "" && (initialsSeen.get(alphaKey(author.family))?.size ?? 0) > 1;
+    return needsInitials ? `${author.initials} ${author.family}` : author.family;
+  };
+
+  // Works with three or more authors that would shorten to the same "Smith et al., 2020".
+  const shortForm = (list: CiteAuthor[], index: number) => `${nameOf(list[0] as CiteAuthor, true)}|${labels[index]}`;
+  const crowded = new Map<string, number[]>();
+  authors.forEach((list, index) => {
+    if (list.length < 3) return;
+    const key = shortForm(list, index);
+    crowded.set(key, [...(crowded.get(key) ?? []), index]);
+  });
+  const shown = new Map<number, number>(); // how many authors to name before "et al."
+  for (const indexes of crowded.values()) {
+    if (indexes.length < 2) continue;
+    const longest = Math.max(...indexes.map((index) => (authors[index] as CiteAuthor[]).length));
+    let count = longest - 1;
+    for (let k = 2; k < longest; k++) {
+      const tuples = indexes.map((index) =>
+        (authors[index] as CiteAuthor[]).slice(0, k).map((author) => alphaKey(`${author.family} ${author.initials}`)).join("|"),
+      );
+      if (new Set(tuples).size === tuples.length) {
+        count = k;
+        break;
+      }
+    }
+    for (const index of indexes) shown.set(index, Math.min(count, (authors[index] as CiteAuthor[]).length - 1));
+  }
+
+  return sorted.map((result, index): ApaCitation => {
+    const list = authors[index] as CiteAuthor[];
+    const label = labels[index] as string;
+    const part = (text: string, italic = false): ApaPart => ({ text, italic });
+
+    if (list.length === 0) {
+      const title = citeTitle(result.title === "" ? "Untitled" : result.title);
+      if (STANDALONE_KINDS.has(referenceKind(result))) {
+        return {
+          parenthetical: [part("("), part(title, true), part(`, ${label})`)],
+          narrative: [part(title, true), part(` (${label})`)],
+        };
+      }
+      const comma = /[?!]$/.test(title) ? "" : ",";
+      return {
+        parenthetical: [part(`(“${title}${comma}” ${label})`)],
+        narrative: [part(`“${title}” (${label})`)],
+      };
+    }
+
+    const names = list.map((author, position) => nameOf(author, position === 0));
+    let lead: { parenthetical: string; narrative: string };
+    if (names.length === 1) lead = { parenthetical: names[0] as string, narrative: names[0] as string };
+    else if (names.length === 2) lead = { parenthetical: `${names[0]} & ${names[1]}`, narrative: `${names[0]} and ${names[1]}` };
+    else {
+      const count = shown.get(index) ?? 1;
+      const text = `${names.slice(0, count).join(", ")}${count > 1 ? "," : ""} et al.`;
+      lead = { parenthetical: text, narrative: text };
+    }
+    return {
+      parenthetical: [part(`(${lead.parenthetical}, ${label})`)],
+      narrative: [part(`${lead.narrative} (${label})`)],
+    };
+  });
+}
+
+/**
+ * Formats results as an APA 7 reference list: alphabetical by first author's family name (letter
+ * by letter), then year; works with the same authors and the same year get a, b, c after the year in
+ * title order. Each entry also carries how to cite it in the text. Nothing is added or removed, and
+ * the input is not changed.
+ */
+export function buildReferenceList(results: readonly Result[], options: ApaOptions = {}): ApaEntry[] {
+  const sorted = [...results].sort(compareResults);
+  const labels = yearLabels(sorted);
+  const citations = buildCitations(sorted, labels);
+
+  return sorted.map((result, index) => {
+    const parts = build(result, labels[index] as string, options);
+    return {
+      result,
+      parts,
+      text: textOf(parts),
+      html: htmlOf(parts),
+      checks: apaChecks(result),
+      citation: citations[index] as ApaCitation,
+    };
   });
 }
 

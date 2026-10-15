@@ -27,6 +27,8 @@ jobs:
       - run: pnpm typecheck
       - run: pnpm test
       - run: pnpm test:scripts
+      # package.json holds the one version; CITATION.cff must agree with it.
+      - run: pnpm version:check
       - run: pnpm build
       # The built site must be one self-contained index.html (plus config.js) so it works from a folder.
       - run: pnpm check:dist

@@ -141,7 +141,7 @@ export function ResultCard({
         )}
         {libraryHref !== null && (
           <a className="button" href={libraryHref} target="_blank" rel="noopener noreferrer">
-            Open via UBC Library
+            Access with UBC Library
           </a>
         )}
         {result.doi !== null && (
