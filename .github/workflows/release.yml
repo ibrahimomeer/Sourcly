@@ -56,5 +56,10 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           version="${GITHUB_REF_NAME#v}"
-          gh release create "$GITHUB_REF_NAME" "sourcly-$version.zip" \
-            --title "Sourcly $version" --generate-notes
+          zip_file="sourcly-$version.zip"
+          if gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1; then
+            gh release upload "$GITHUB_REF_NAME" "$zip_file" --clobber
+          else
+            gh release create "$GITHUB_REF_NAME" "$zip_file" \
+              --title "Sourcly $version" --generate-notes
+          fi
