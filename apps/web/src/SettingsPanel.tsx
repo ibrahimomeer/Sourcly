@@ -20,6 +20,7 @@ import {
 import { maskApiKey } from "./apiKey";
 import type { SourclyConfig } from "./config";
 import { libraryLinkNote } from "./disclaimer";
+import { textProblem } from "./userSettings";
 import { valueName } from "./format";
 import { NumberInput } from "./NumberInput";
 import { PROVIDER_OPTIONS, UNAVAILABLE_PROVIDERS } from "./providers";
@@ -42,6 +43,14 @@ const FACTOR_HELP: Record<FactorId, string> = {
     "The share of the sources that answered which returned this result. Found by all of them scores 1. Sources often share data, so treat agreement as a hint, not proof.",
   studyType: "Prefer some levels (primary, secondary, ...). Does nothing until you pick at least one.",
 };
+
+/** What the person typed for the library link and the contact email. */
+export interface LibraryChoices {
+  name: string | null;
+  prefix: string | null;
+  searchUrl: string | null;
+  email: string | null;
+}
 
 export interface SettingsPanelProps {
   scoring: ScoringSettings;
@@ -70,8 +79,15 @@ export interface SettingsPanelProps {
   onApiKeyChange: (key: string) => void;
   /** False when the browser refused to store the key. */
   keyIsStored: boolean;
-  /** The site's configuration (config.js): the library name and sign-in prefix shown in "Library link". */
-  config: SourclyConfig;
+  /** The site's own values (built-in defaults and config.js): shown as the placeholder of each library and contact field. */
+  site: SourclyConfig;
+  /** The person's own choices for the library link and contact email; null = not chosen (the site's value is used). */
+  library: LibraryChoices;
+  onLibraryChange: (change: Partial<LibraryChoices>) => void;
+  /** "Reset all settings": every choice back to its default, and the saved OpenAlex key forgotten. */
+  onResetAll: () => void;
+  /** False when the browser refused to keep the settings, so they last only for this visit. */
+  settingsAreStored: boolean;
   /** Whether the panel is showing. The button that opens it is in the toolbar. */
   open: boolean;
 }
@@ -81,6 +97,10 @@ export function SettingsPanel(props: SettingsPanelProps) {
     <div className="settings">
       {/* Hidden, not removed, so what you typed survives closing the panel. */}
       <div id="settings-panel" className="settings-panel" hidden={!props.open}>
+        <p className="muted settings-saved-note">
+          Settings are saved only in this browser.
+          {!props.settingsAreStored && " This browser would not keep them, so they last only until you close this page."}
+        </p>
         <SearchSection {...props} />
         <SourcesSection {...props} />
         <RankingSection {...props} />
@@ -88,7 +108,9 @@ export function SettingsPanel(props: SettingsPanelProps) {
         <FiltersSection {...props} />
         <CommonWordsSection />
         <LibrarySection {...props} />
+        <ContactSection {...props} />
         <ApiKeySection {...props} />
+        <ResetSection {...props} />
       </div>
     </div>
   );
@@ -412,23 +434,125 @@ function CommonWordsSection() {
   );
 }
 
-function LibrarySection({ config }: SettingsPanelProps) {
+/** One text field the person may change: the site's value shows as the placeholder, and a "use the default" link undoes the choice. */
+function ChoiceField({
+  id,
+  label,
+  value,
+  placeholder,
+  help,
+  problem,
+  onChange,
+  type = "text",
+}: {
+  id: string;
+  label: string;
+  value: string | null;
+  placeholder: string;
+  help?: string;
+  problem: string | null;
+  onChange: (value: string | null) => void;
+  type?: "text" | "email";
+}) {
+  return (
+    <div className="choice-field">
+      <div className="field-row">
+        <label htmlFor={id}>{label}</label>
+        <input
+          id={id}
+          type={type}
+          value={value ?? ""}
+          placeholder={placeholder}
+          autoComplete="off"
+          spellCheck={false}
+          onChange={(event) => onChange(event.target.value)}
+        />
+        <button type="button" disabled={value === null} onClick={() => onChange(null)}>
+          Use the default
+        </button>
+      </div>
+      {help !== undefined && <p className="muted help">{help}</p>}
+      {problem !== null && <p className="warning" role="status">{problem}</p>}
+    </div>
+  );
+}
+
+function LibrarySection({ site, library, onLibraryChange }: SettingsPanelProps) {
   return (
     <fieldset>
       <legend>Library link</legend>
-      <p>
-        <strong>Library name:</strong> {config.libraryName === "" ? <span className="muted">not set</span> : config.libraryName}
+      <p className="muted">
+        The “Access with …” button on every result opens your library’s login for that work. Change the name and the link
+        here to use your own library.
       </p>
-      <p>
-        <strong>Sign-in prefix:</strong>{" "}
-        {config.libraryProxyPrefix === "" ? (
-          <span className="muted">none, so the library button is hidden</span>
-        ) : (
-          <code>{config.libraryProxyPrefix}</code>
-        )}
+      <ChoiceField
+        id="library-name"
+        label="Library name"
+        value={library.name}
+        placeholder={site.libraryName}
+        problem={null}
+        onChange={(name) => onLibraryChange({ name })}
+      />
+      <ChoiceField
+        id="library-prefix"
+        label="Library link prefix"
+        value={library.prefix}
+        placeholder={site.libraryProxyPrefix}
+        help="The link is this prefix followed by the work’s address. Empty hides the button."
+        problem={textProblem("libraryProxyPrefix", library.prefix ?? "")}
+        onChange={(prefix) => onLibraryChange({ prefix })}
+      />
+      <ChoiceField
+        id="library-search"
+        label="Library search address"
+        value={library.searchUrl}
+        placeholder={site.librarySearchUrl}
+        help="Used for the library link under “Search elsewhere”: this address followed by your search. Empty hides it."
+        problem={textProblem("librarySearchUrl", library.searchUrl ?? "")}
+        onChange={(searchUrl) => onLibraryChange({ searchUrl })}
+      />
+      <p>{libraryLinkNote(site)}</p>
+    </fieldset>
+  );
+}
+
+function ContactSection({ site, library, onLibraryChange }: SettingsPanelProps) {
+  return (
+    <fieldset>
+      <legend>Contact email (optional)</legend>
+      <p className="muted">
+        Crossref, PubMed and Unpaywall ask tools to send a contact address with their requests (Crossref then answers
+        faster, and Unpaywall needs one to be asked at all). It is sent only to them, as the parameter they document. It is
+        never put in an export, the search protocol, a link or this page’s address. Leave it empty to send nothing.
       </p>
-      <p className="muted">Both are set in config.js, next to index.html, not here.</p>
-      <p>{libraryLinkNote(config)}</p>
+      <ChoiceField
+        id="contact-email"
+        label="Email"
+        type="email"
+        value={library.email}
+        placeholder={site.contactEmail === "" ? "none" : "set by this site"}
+        problem={textProblem("contactEmail", library.email ?? "")}
+        onChange={(email) => onLibraryChange({ email })}
+      />
+    </fieldset>
+  );
+}
+
+function ResetSection({ onResetAll, settingsAreStored }: SettingsPanelProps) {
+  return (
+    <fieldset>
+      <legend>Reset</legend>
+      <p className="muted">
+        Puts every setting back to its default: sources, weights, filters, language and matching options, the library link, the
+        contact email, and forgets the OpenAlex key. Your saved list of sources is kept.
+      </p>
+      <button type="button" onClick={onResetAll}>
+        Reset all settings
+      </button>
+      <p className="muted">
+        Settings are saved only in this browser.
+        {!settingsAreStored && " This browser would not keep them, so they last only until you close this page."}
+      </p>
     </fieldset>
   );
 }

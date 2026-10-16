@@ -27,7 +27,7 @@ describe("the notice, with the default configuration", () => {
 
   it("is the line beside the library fields in Settings", () => {
     expect(libraryLinkNote(DEFAULT_CONFIG)).toBe(
-      "This only builds a link to your library's login. Sourcly never sees your password or your library account.",
+      "This only builds a link to your library's login. Sourcly never sees your password or library account.",
     );
   });
 
@@ -38,11 +38,12 @@ describe("the notice, with the default configuration", () => {
     expect(methodology).toContain(`## About this project\n\n${fullDisclaimer(DEFAULT_CONFIG)}`);
   });
 
-  it("is the one config.js ships with: the defaults name UBC and UBC Library", () => {
+  it("is built in: the defaults name UBC and UBC Library, and config.js only documents how a fork overrides them", () => {
+    expect([DEFAULT_CONFIG.institutionName, DEFAULT_CONFIG.libraryName]).toEqual(["UBC", "UBC Library"]);
     const config = read("public/config.js");
-    expect(config).toContain(`institutionName: "${DEFAULT_CONFIG.institutionName}"`);
-    expect(config).toContain(`libraryName: "${DEFAULT_CONFIG.libraryName}"`);
-    expect(config).toMatch(/FORKS: change these to your own institution and library/);
+    expect(config).toContain(`// institutionName: "${DEFAULT_CONFIG.institutionName}"`);
+    expect(config).toContain(`// libraryName: "${DEFAULT_CONFIG.libraryName}"`);
+    expect(config).toMatch(/FORKS: change institutionName and libraryName to your own institution and library/);
   });
 });
 

@@ -9,7 +9,7 @@ WORKDIR /app
 # The pnpm version comes from "packageManager" in package.json.
 RUN corepack enable
 COPY . .
-RUN pnpm install --frozen-lockfile && pnpm --filter @sourcly/web build && node scripts/check-dist.mjs
+RUN pnpm install --frozen-lockfile && pnpm --filter @sourcly/web build && node scripts/check-single-file.mjs
 
 FROM nginx:stable-alpine
 # nginx fills in ${PORT} from the environment when the container starts. Railway sets PORT.

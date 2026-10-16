@@ -1,59 +1,23 @@
-// Sourcly configuration.
+// Sourcly configuration: OPTIONAL. Sourcly works without this file. Every value below already has a built-in
+// default, and the offline copy (a single .html file) does not need this file next to it. Leave it as it is,
+// or delete it, unless you run your own copy of the site (a fork).
 //
-// This is a plain classic script. It is NOT bundled or inlined into the app, so
-// you can edit it after building (or after unzipping a release) to rebrand the
-// site. Forks and downloaders only need to change this file.
+// This is a plain classic script. It is NOT bundled into the app, so you can edit it after building without
+// rebuilding. Uncomment a line to override that one value; anything you leave out keeps its default. Normal users
+// do not edit files: the library name, the library link, the contact email and the OpenAlex key are in Settings.
+//
+// FORKS: change institutionName and libraryName to your own institution and library, and adapt the "Disclaimer"
+// in README.md and "About this project" in docs/methodology.md to match, so the "independent student project, not
+// affiliated with ..." notice never names an institution that is not yours. Use no logo, crest, colour or wording
+// that suggests an official service of that institution. An empty string ("") names none.
 window.SOURCLY_CONFIG = {
-  // Name shown in the page title and header.
-  siteName: "Sourcly",
-
-  // Shown in the footer copyright line. Use a person, team or project name.
-  authorName: "Sourcly",
-
-  // The names used in the "independent student project, not affiliated with ..." notice (the
-  // footer's second line, the Settings note and the README / Methodology disclaimer). The defaults
-  // name UBC, where Sourcly was made. FORKS: change these to your own institution and library, and
-  // adapt the "Disclaimer" in README.md and "About this project" in docs/methodology.md to match,
-  // so that the notice never names an institution that is not yours. An empty string ("") names none.
-  // Use no logo, crest, colour or wording that suggests an official service of that institution.
-  institutionName: "UBC",
-  libraryName: "UBC Library",
-
-  // Source repository. The header's GitHub and Methodology links and the footer's
-  // "Source on GitHub" link are built from this.
-  repoUrl: "https://github.com/ibrahimomeer/Sourcly",
-
-  // Contact email for the sources that ask for one: it is sent to Crossref (as `mailto`,
-  // which moves requests to its faster "polite pool") and to PubMed (as `email`, which NCBI
-  // asks tools to send). OpenAlex does not use it. Leave it empty to send nothing. Do not
-  // commit a personal email.
-  contactEmail: "",
-
-  // Library sign-in prefix for the "Access with UBC Library" button. The link is the
-  // prefix followed by the work's address, percent-encoded as one value: the
-  // publisher's landing page when the result has one, otherwise https://doi.org/<DOI>.
-  // Leave it empty ("") to hide the button.
-  //
-  // The default is UBC Library's OpenAthens redirector, the library's current method
-  // (guides.library.ubc.ca/connect, updated July 2026). It was tested with a publisher
-  // landing page and with a doi.org link, both percent-encoded.
-  //
-  // NOTE: the legacy EZproxy prefix, https://login.ezproxy.library.ubc.ca/login?url=,
-  // no longer works for most resources. UBC replaced EZproxy with OpenAthens in 2021
-  // and says only a few resources (it names three) still require it. Do not use it.
-  //
-  // Other libraries: put your own proxy prefix here. For an old-style EZproxy prefix,
-  // end it in "qurl=" rather than "url=", because the address is sent encoded.
-  libraryProxyPrefix: "https://go.openathens.net/redirector/ubc.ca?url=",
-
-  // Library search address for the "UBC Library search" link in the "Search elsewhere"
-  // row: this value followed by the percent-encoded query. Leave it empty ("") to hide
-  // the link. UBC Library publishes no official search-link pattern; this is the address
-  // its own search box submits to (a plain GET with the query in `s.q`), checked on
-  // 2026-10-14 in a browser. Do not use https://search.library.ubc.ca/?q=, which does
-  // not run a search.
-  librarySearchUrl: "https://ubc.summon.serialssolutions.com/search?s.q=",
-
-  // Target of the footer "Download" link.
-  downloadUrl: "https://github.com/ibrahimomeer/Sourcly/releases/latest",
+  // siteName: "Sourcly",                  // shown in the page title and header
+  // authorName: "Sourcly",                // the footer's copyright line
+  // institutionName: "UBC",               // named in the "not affiliated" notice
+  // libraryName: "UBC Library",           // the library the "Access with ..." button signs in to
+  // repoUrl: "https://github.com/ibrahimomeer/Sourcly",   // the GitHub and Methodology links, and the Download link
+  // siteUrl: "https://sourcly.getscove.com",              // where the newest version lives (shown by the offline copy)
+  // libraryProxyPrefix: "https://go.openathens.net/redirector/ubc.ca?url=",   // "" hides the library button
+  // librarySearchUrl: "https://ubc.summon.serialssolutions.com/search?s.q=",  // "" hides the library search link
+  // contactEmail: "",                     // do not commit a personal address; people set their own in Settings
 };

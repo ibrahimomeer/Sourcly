@@ -58,9 +58,16 @@ test("says when a workspace package has its own version", () => {
 });
 
 test("checks a git tag against the version", () => {
-  assert.match(findProblems({ packageVersion: "0.1.0", cffText: cff, tag: "v0.2.0" })[0], /tag v0\.2\.0 does not match package\.json version 0\.1\.0/);
+  assert.match(findProblems({ packageVersion: "0.1.0", cffText: cff, tag: "v0.2.0" })[0], /tag v0\.2\.0 does not match package\.json \(version 0\.1\.0\): the tag must be v0\.1\.0/);
   assert.match(findProblems({ packageVersion: "0.1.0", cffText: cff, tag: "latest" })[0], /not a version tag/);
-  assert.deepEqual(findProblems({ packageVersion: "0.1.0", cffText: cff, tag: "0.1.0" }), []);
+  assert.deepEqual(findProblems({ packageVersion: "0.1.0", cffText: cff, tag: "v0.1.0" }), []);
+});
+
+test("requires the tag to be exactly v + the package.json version, with the v", () => {
+  assert.match(findProblems({ packageVersion: "0.1.0", cffText: cff, tag: "0.1.0" })[0], /not a version tag/);
+  assert.match(findProblems({ packageVersion: "0.1.5", cffText: cff.replace("0.1.0", "0.1.5"), tag: "v0.1.50" })[0], /the tag must be v0\.1\.5/);
+  assert.match(findProblems({ packageVersion: "0.1.5", cffText: cff.replace("0.1.0", "0.1.5"), tag: "v0.1.4" })[0], /Fix the version with pnpm version:set, commit, and tag again/);
+  assert.deepEqual(findProblems({ packageVersion: "0.1.5", cffText: cff.replace("0.1.0", "0.1.5"), tag: "v0.1.5" }), []);
 });
 
 test("rejects a package.json version that is not a version", () => {

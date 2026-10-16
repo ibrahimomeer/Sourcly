@@ -35,5 +35,5 @@ export function fullDisclaimer(config: Pick<SourclyConfig, "siteName" | "institu
 
 /** The line shown in Settings beside the library name and sign-in prefix. */
 export function libraryLinkNote(config: Pick<SourclyConfig, "siteName">): string {
-  return `This only builds a link to your library's login. ${config.siteName} never sees your password or your library account.`;
+  return `This only builds a link to your library's login. ${config.siteName} never sees your password or library account.`;
 }

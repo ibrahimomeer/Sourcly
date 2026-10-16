@@ -115,6 +115,26 @@ describe("lookupWork: other identifiers", () => {
   });
 });
 
+describe("lookupWork: a failure of the browser itself", () => {
+  it("says so when a request failed in the browser (a fetch TypeError), for the page to explain", async () => {
+    const outcome = await lookupWork({ kind: "doi", doi: DOI }, { fetch: () => Promise.reject(new TypeError("Failed to fetch")) });
+    expect(outcome.result).toBeNull();
+    expect(outcome.network).toBe(true);
+  });
+
+  it("does not say so for an HTTP error, which is the source's answer", async () => {
+    const outcome = await lookupWork({ kind: "doi", doi: DOI }, { fetch: () => Promise.resolve(new Response("{}", { status: 500 })) });
+    expect(outcome.result).toBeNull();
+    expect(outcome).not.toHaveProperty("network");
+  });
+
+  it("does not say so when the work was found", async () => {
+    const outcome = await lookupWork({ kind: "doi", doi: DOI }, { fetch: routed(everything) });
+    expect(outcome.result).not.toBeNull();
+    expect(outcome).not.toHaveProperty("network");
+  });
+});
+
 describe("addressVariants", () => {
   it("lists the ways one landing page address may be stored: http and https, with and without www, with and without a trailing slash", () => {
     const variants = addressVariants("https://www.nature.com/articles/s42004-024-01373-2#section");

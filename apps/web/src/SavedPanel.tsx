@@ -11,7 +11,8 @@ import {
 import { useMemo, useState } from "react";
 import { copyRichText, downloadTextFile } from "./exportFiles";
 import { pluralize } from "./format";
-import { libraryUrl } from "./libraryLink";
+import { useLibraryName } from "./LibraryContext";
+import { libraryLabel, libraryUrl } from "./libraryLink";
 
 /** The small links under a saved reference: open it through the library, or take it off the list. */
 function SavedLinks({
@@ -24,12 +25,13 @@ function SavedLinks({
   onRemove: (id: string) => void;
 }) {
   const library = libraryUrl(libraryPrefix, result);
+  const libraryName = libraryLabel(useLibraryName());
   return (
     <>
       {library !== null && (
         <>
           <a href={library} target="_blank" rel="noopener noreferrer">
-            Access with UBC Library
+            Access with {libraryName}
           </a>
           {" · "}
         </>
@@ -73,6 +75,7 @@ export function SavedPanel({
   open: boolean;
 }) {
   const [message, setMessage] = useState("");
+  const libraryName = libraryLabel(useLibraryName());
 
   // Built when the list changes, in the order it is exported (alphabetical), and not before it is opened.
   const entries = useMemo(
@@ -161,7 +164,7 @@ export function SavedPanel({
             </p>
             {libraryPrefix.trim() !== "" && (
               <p className="muted note">
-                “Access with UBC Library” depends on UBC Library subscriptions; you may be asked to log in.
+                “Access with {libraryName}” depends on {libraryName} subscriptions; you may be asked to log in.
               </p>
             )}
             <p className="muted note">

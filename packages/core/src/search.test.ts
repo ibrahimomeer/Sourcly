@@ -432,6 +432,29 @@ describe("searchProviders: what is sent", () => {
   });
 });
 
+describe("searchProviders: a failure of the browser itself", () => {
+  const failing = (error: unknown): Provider => ({ id: "openalex", name: "OpenAlex", syntax: "boolean", search: async () => { throw error; } });
+
+  it("marks a failed request (a fetch TypeError) as a network failure", async () => {
+    const error = new ProviderError("failed", "Could not reach OpenAlex (network error or request blocked)", { cause: new TypeError("Failed to fetch") });
+    const outcome = await searchProviders([failing(error)], "sleep", { limit: 5 });
+    expect(outcome.statuses[0]).toEqual({ provider: "openalex", state: "failed", message: error.message, network: true });
+  });
+
+  it("does not mark an HTTP error, a rate limit, a cancelled search or an unexpected error", async () => {
+    const cases = [
+      new ProviderError("failed", "OpenAlex answered HTTP 500", { httpStatus: 500 }),
+      new ProviderError("rate-limited", "OpenAlex rate limit (HTTP 429)", { httpStatus: 429, cause: new TypeError("x") }),
+      new ProviderError("failed", "Search was cancelled", { cause: new DOMException("aborted", "AbortError") }),
+      new Error("boom"),
+    ];
+    for (const error of cases) {
+      const outcome = await searchProviders([failing(error)], "sleep", { limit: 5 });
+      expect(outcome.statuses[0]).not.toHaveProperty("network");
+    }
+  });
+});
+
 describe("the fallback pass", () => {
   const found = () => [makeResult({ id: "10.1/a", hits: [{ provider: "openalex", id: "W1", rank: 1, listSize: 1, score: null }] })];
   const openalex = (search: Provider["search"] = async () => found()): Provider => ({ id: "openalex", name: "OpenAlex", syntax: "boolean", search });

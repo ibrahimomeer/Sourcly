@@ -4,6 +4,13 @@ import { searchElsewhereLinks } from "./searchLinks";
 const UBC = "https://ubc.summon.serialssolutions.com/search?s.q=";
 
 describe("searchElsewhereLinks", () => {
+  it("names the library link after the library the person set", () => {
+    const labels = (name?: string) => searchElsewhereLinks("sleep", UBC, name).map((l) => l.label);
+    expect(labels("Example Library")[3]).toBe("Example Library search");
+    expect(labels("  ")[3]).toBe("Your library search");
+    expect(labels()[3]).toBe("UBC Library search");
+  });
+
   it("builds one link per site, in a fixed order, each carrying the query", () => {
     const links = searchElsewhereLinks("sleep and memory", UBC);
     expect(links.map((l) => l.label)).toEqual(["Google Scholar", "Google", "DuckDuckGo", "UBC Library search"]);

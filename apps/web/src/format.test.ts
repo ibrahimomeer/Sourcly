@@ -69,6 +69,12 @@ describe("accessBadgeText", () => {
     expect(accessBadgeText(access(true, "unknown"), true)).toBe("Open access");
   });
 
+  it("names the library the person set, or 'your library' when none", () => {
+    expect(accessBadgeText(access(false, "closed"), true, "Example Library")).toBe("Not open access, try Example Library");
+    expect(accessBadgeText(access(null, "unknown"), true, "  ")).toBe("Open access status unknown, try your library");
+    expect(accessBadgeText(access(false, "closed"), false, "Example Library")).toBe("Not open access");
+  });
+
   it("points to UBC Library for a work that is not open access", () => {
     expect(accessBadgeText(access(false, "closed"), true)).toBe("Not open access, try UBC Library");
   });

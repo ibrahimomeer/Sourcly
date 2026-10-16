@@ -5,8 +5,6 @@ import {
   countLanguages,
   createSearchCache,
   defaultFilters,
-  defaultLayoutSettings,
-  defaultScoringSettings,
   describeInput,
   createOpenAlexCounter,
   hardBlocks,
@@ -28,6 +26,9 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { browserStorage, loadApiKey, saveApiKey } from "./apiKey";
 import type { SourclyConfig } from "./config";
 import { Footer } from "./Footer";
+import { LibraryNameProvider } from "./LibraryContext";
+import { runningFromFile } from "./runtime";
+import { RuntimeProvider } from "./RuntimeContext";
 import { CitationsPanel } from "./CitationsPanel";
 import { CounterPanel } from "./CounterPanel";
 import { Header } from "./Header";
@@ -35,40 +36,99 @@ import { allResults, hasFewFullMatches, rankResults, scoringContext, suggestedFo
 import { ClosestMatch, LookupPanel } from "./LookupPanel";
 import { ProtocolExport } from "./ProtocolExport";
 import { protocolInputFrom, type CounterRecord } from "./protocolRecord";
-import { createProviders, DEFAULT_PROVIDERS, skippedStatuses } from "./providers";
+import { createProviders, skippedStatuses } from "./providers";
 import { addTermToQuery, explainUnusable, prepareSearch } from "./queryText";
 import { Results } from "./Results";
 import { SavedProvider, type SavedApi } from "./SavedContext";
 import { SavedPanel } from "./SavedPanel";
 import { loadSavedList, persistSavedList } from "./savedStore";
 import { SearchBox } from "./SearchBox";
-import { DEFAULT_PER_SOURCE, toggleInList, withOverride } from "./settings";
-import { SettingsPanel } from "./SettingsPanel";
+import { toggleInList, withOverride } from "./settings";
+import { SettingsPanel, type LibraryChoices } from "./SettingsPanel";
 import { SuggestedTerms } from "./SuggestedTerms";
 import { useLookup, useTitleMatch, type LookupTarget } from "./useLookup";
 import { isSearching } from "./searchState";
 import { useSearch } from "./useSearch";
+import { clearSettings, defaultUserSettings, effectiveConfig, loadSettings, saveSettings, type UserSettings } from "./userSettings";
 import { APP_VERSION } from "./version";
 
 const REFERENCE_YEAR = new Date().getFullYear();
 
-export function App({ config }: { config: SourclyConfig }) {
-  const [scoring, setScoring] = useState<ScoringSettings>(defaultScoringSettings);
+export function App({ config: site }: { config: SourclyConfig }) {
+  const [storage] = useState(browserStorage);
+  // What the person chose in Settings on an earlier visit, checked field by field (see userSettings.ts).
+  const [initial] = useState(() => loadSettings(storage));
+
+  const [scoring, setScoring] = useState<ScoringSettings>(initial.scoring);
   const [filters, setFilters] = useState<ResultFilters>(defaultFilters);
-  const [layout, setLayout] = useState<LayoutSettings>(defaultLayoutSettings);
-  const [enabledProviders, setEnabledProviders] = useState<ProviderId[]>([...DEFAULT_PROVIDERS]);
-  const [perSource, setPerSource] = useState(DEFAULT_PER_SOURCE);
+  const [layout, setLayout] = useState<LayoutSettings>(initial.layout);
+  const [enabledProviders, setEnabledProviders] = useState<ProviderId[]>(initial.enabledProviders);
+  const [perSource, setPerSource] = useState(initial.perSource);
+  const [library, setLibrary] = useState<LibraryChoices>({
+    name: initial.libraryName,
+    prefix: initial.libraryProxyPrefix,
+    searchUrl: initial.librarySearchUrl,
+    email: initial.contactEmail,
+  });
+  // Opened from a file (double-clicked) or served: the footer and the "blocked request" notice differ.
+  const runtime = useMemo(() => ({ isLocalFile: runningFromFile(), siteUrl: site.siteUrl }), [site.siteUrl]);
+  // The site's values with the person's own choices on top: this is what the library links and the sources use.
+  const config = useMemo(
+    () =>
+      effectiveConfig(site, {
+        libraryName: library.name,
+        libraryProxyPrefix: library.prefix,
+        librarySearchUrl: library.searchUrl,
+        contactEmail: library.email,
+      }),
+    [site, library],
+  );
   const [overrides, setOverrides] = useState<ReadonlyMap<string, LabelOverride>>(() => new Map());
   const [page, setPage] = useState(1);
   const [queryText, setQueryText] = useState("");
   const [queryProblem, setQueryProblem] = useState<string | null>(null);
   // How the text is read (Settings). The text itself is never changed by any of this.
-  const [exact, setExact] = useState(false);
-  const [synonyms, setSynonyms] = useState(true);
+  const [exact, setExact] = useState(initial.exact);
+  const [synonyms, setSynonyms] = useState(initial.synonyms);
 
-  const [storage] = useState(browserStorage);
   const [apiKey, setApiKey] = useState(() => loadApiKey(storage));
   const [keyIsStored, setKeyIsStored] = useState(true);
+
+  // Settings are saved in this browser whenever they change (only what differs from the defaults), and nowhere else.
+  const [settingsAreStored, setSettingsAreStored] = useState(true);
+  const chosen = useMemo<UserSettings>(
+    () => ({
+      enabledProviders,
+      perSource,
+      scoring,
+      layout,
+      exact,
+      synonyms,
+      libraryName: library.name,
+      libraryProxyPrefix: library.prefix,
+      librarySearchUrl: library.searchUrl,
+      contactEmail: library.email,
+    }),
+    [enabledProviders, perSource, scoring, layout, exact, synonyms, library],
+  );
+  useEffect(() => {
+    setSettingsAreStored(saveSettings(storage, chosen));
+  }, [storage, chosen]);
+
+  // "Reset all settings": every choice back to its default, the saved OpenAlex key forgotten, the saved list of sources kept.
+  function handleResetSettings() {
+    const defaults = defaultUserSettings();
+    setScoring(defaults.scoring);
+    setLayout(defaults.layout);
+    setEnabledProviders(defaults.enabledProviders);
+    setPerSource(defaults.perSource);
+    setExact(defaults.exact);
+    setSynonyms(defaults.synonyms);
+    setLibrary({ name: null, prefix: null, searchUrl: null, email: null });
+    setFilters(defaultFilters());
+    setApiKey("");
+    clearSettings(storage);
+  }
 
   // Sources the person saved to their list: kept in this browser's localStorage, and nowhere else.
   const [saved, setSaved] = useState<SavedItem[]>(() => loadSavedList(storage));
@@ -241,9 +301,11 @@ export function App({ config }: { config: SourclyConfig }) {
   }
 
   return (
+    <RuntimeProvider value={runtime}>
+    <LibraryNameProvider value={config.libraryName}>
     <SavedProvider value={savedApi}>
     <div className={counterOpen && state.phase !== "idle" ? "page page-wide" : "page"}>
-      <Header config={config} />
+      <Header config={site} />
       <main>
         <div className="top">
           <SearchBox value={queryText} onChange={changeQueryText} onSearch={handleSearch}>
@@ -314,7 +376,11 @@ export function App({ config }: { config: SourclyConfig }) {
           </div>
 
           <SettingsPanel
-            config={config}
+            site={site}
+            library={library}
+            onLibraryChange={(change) => setLibrary((current) => ({ ...current, ...change }))}
+            onResetAll={handleResetSettings}
+            settingsAreStored={settingsAreStored}
             open={openPanels.settings}
             scoring={scoring}
             onScoringChange={setScoring}
@@ -413,8 +479,10 @@ export function App({ config }: { config: SourclyConfig }) {
           </div>
         )}
       </main>
-      <Footer config={config} />
+      <Footer config={site} isLocalFile={runtime.isLocalFile} />
     </div>
     </SavedProvider>
+    </LibraryNameProvider>
+    </RuntimeProvider>
   );
 }

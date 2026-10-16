@@ -13,6 +13,8 @@ import { Pagination } from "./Pagination";
 import { paginate } from "./paginate";
 import { ResultCard } from "./ResultCard";
 import { scoreWithoutQuery, type ViewSettings } from "./pipeline";
+import { BlockedFromFileNotice, useRuntime } from "./RuntimeContext";
+import { looksBlockedFromFile } from "./runtime";
 import type { NeighboursState, LookupState, TitleMatchState } from "./useLookup";
 
 const NEIGHBOUR_BUTTONS: readonly { kind: Neighbours; label: string; empty: string }[] = [
@@ -107,6 +109,7 @@ export function LookupPanel({
   libraryPrefix: string;
   onOverrideChange: (resultId: string, change: LabelOverride) => void;
 }) {
+  const { isLocalFile } = useRuntime();
   const card = useMemo(() => {
     if (lookup.phase !== "done" || lookup.outcome.result === null) return null;
     return scoreWithoutQuery([lookup.outcome.result], view, referenceYear)[0] ?? null;
@@ -133,6 +136,7 @@ export function LookupPanel({
         Looked up by {describeInput(lookup.target)}
         {outcome.sources.length > 0 && ` in ${outcome.sources.join(", ")}`}. Nothing was searched for.
       </p>
+      {looksBlockedFromFile(isLocalFile, [outcome]) && <BlockedFromFileNotice />}
       {outcome.notes.map((note) => (
         <p key={note} className="muted note">
           {note}

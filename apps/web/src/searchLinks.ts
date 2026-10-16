@@ -14,7 +14,7 @@ export interface SearchLink {
  * `https://ubc.summon.serialssolutions.com/search?s.q=`). When it is empty the
  * library link is left out.
  */
-export function searchElsewhereLinks(query: string, librarySearchUrl: string): SearchLink[] {
+export function searchElsewhereLinks(query: string, librarySearchUrl: string, libraryName = "UBC Library"): SearchLink[] {
   const q = encodeURIComponent(query.trim());
   if (q === "") return [];
 
@@ -24,6 +24,6 @@ export function searchElsewhereLinks(query: string, librarySearchUrl: string): S
     { id: "duckduckgo", label: "DuckDuckGo", url: `https://duckduckgo.com/?q=${q}` },
   ];
   const library = librarySearchUrl.trim();
-  if (library !== "") links.push({ id: "library", label: "UBC Library search", url: `${library}${q}` });
+  if (library !== "") links.push({ id: "library", label: `${libraryName.trim() === "" ? "Your library" : libraryName.trim()} search`, url: `${library}${q}` });
   return links;
 }
