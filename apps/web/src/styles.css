@@ -139,6 +139,14 @@ button:hover {
   color: var(--muted);
 }
 
+.site-footer p {
+  margin: 0;
+}
+
+.footer-notice {
+  margin-top: 0.25rem;
+}
+
 [hidden] {
   display: none !important;
 }

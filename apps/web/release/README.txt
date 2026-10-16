@@ -33,6 +33,10 @@ What is kept on your computer
 Only in this browser, and never sent anywhere: the list of sources you save, and (if you choose to
 paste one in Settings) a personal OpenAlex API key. Results are not saved.
 
+Sourcly is an independent student project. It is not an official UBC service and is not affiliated
+with, endorsed by or supported by UBC or UBC Library. UBC Library links use your own UBC login, and
+access depends on UBC Library's subscriptions.
+
 Labels and rankings are heuristics based on metadata. Verify sources before citing. How
 everything is worked out is described in docs/methodology.md in the source repository (see the
 "Methodology" link in the page header).

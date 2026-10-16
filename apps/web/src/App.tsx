@@ -314,6 +314,7 @@ export function App({ config }: { config: SourclyConfig }) {
           </div>
 
           <SettingsPanel
+            config={config}
             open={openPanels.settings}
             scoring={scoring}
             onScoringChange={setScoring}

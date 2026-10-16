@@ -10,3 +10,11 @@ coverage/
 # The eval script keeps live answers here so repeated runs do not use up free allowances.
 apps/web/eval/.cache/
 apps/web/eval/output/
+
+# Local AI-tool folders and notes: they can hold personal paths and notes, and do not belong in the repository.
+.claude/
+.opencode/
+.cursor/
+.aider*
+AGENTS.md
+CLAUDE.md

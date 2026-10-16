@@ -18,6 +18,8 @@ import {
   type ScoringSettings,
 } from "@sourcly/core";
 import { maskApiKey } from "./apiKey";
+import type { SourclyConfig } from "./config";
+import { libraryLinkNote } from "./disclaimer";
 import { valueName } from "./format";
 import { NumberInput } from "./NumberInput";
 import { PROVIDER_OPTIONS, UNAVAILABLE_PROVIDERS } from "./providers";
@@ -68,6 +70,8 @@ export interface SettingsPanelProps {
   onApiKeyChange: (key: string) => void;
   /** False when the browser refused to store the key. */
   keyIsStored: boolean;
+  /** The site's configuration (config.js): the library name and sign-in prefix shown in "Library link". */
+  config: SourclyConfig;
   /** Whether the panel is showing. The button that opens it is in the toolbar. */
   open: boolean;
 }
@@ -83,6 +87,7 @@ export function SettingsPanel(props: SettingsPanelProps) {
         <LayoutSection {...props} />
         <FiltersSection {...props} />
         <CommonWordsSection />
+        <LibrarySection {...props} />
         <ApiKeySection {...props} />
       </div>
     </div>
@@ -403,6 +408,27 @@ function CommonWordsSection() {
         <summary>Show the generic words ({GENERIC_WORDS.length})</summary>
         <p className="word-list">{GENERIC_WORDS.join(" ")}</p>
       </details>
+    </fieldset>
+  );
+}
+
+function LibrarySection({ config }: SettingsPanelProps) {
+  return (
+    <fieldset>
+      <legend>Library link</legend>
+      <p>
+        <strong>Library name:</strong> {config.libraryName === "" ? <span className="muted">not set</span> : config.libraryName}
+      </p>
+      <p>
+        <strong>Sign-in prefix:</strong>{" "}
+        {config.libraryProxyPrefix === "" ? (
+          <span className="muted">none, so the library button is hidden</span>
+        ) : (
+          <code>{config.libraryProxyPrefix}</code>
+        )}
+      </p>
+      <p className="muted">Both are set in config.js, next to index.html, not here.</p>
+      <p>{libraryLinkNote(config)}</p>
     </fieldset>
   );
 }

@@ -2,7 +2,11 @@
 
 Sourcly is an open-source, fully client-side web app for transparent, tunable academic source discovery. You search several scholarly databases at once, and you can see and change exactly how the results are ranked.
 
-It is made by a UBC first-year student for UBC's SCIE 113 course. Other students and universities are welcome to reuse it.
+Sourcly is an independent student project. Other students and universities are welcome to reuse it.
+
+## Disclaimer
+
+Sourcly is an independent student project. It is not an official UBC service and is not affiliated with, endorsed by or supported by UBC or UBC Library. UBC Library links use your own UBC login, and access depends on UBC Library's subscriptions. Labels and rankings are heuristics based on metadata; verify sources before citing.
 
 > **Status: early development (v0.1).** Search across sources at once (OpenAlex, Crossref, PubMed and Europe PMC are on by default; DOAJ, DataCite, Zenodo, Wikipedia and Semantic Scholar are one click away in Settings), duplicate merging, source labels, transparent ranking (BM25 relevance, term coverage, phrase matching, citations, recency, peer review, open access, provider agreement), filters, a keyword-based counterarguments panel, a saved list with APA 7 references, a search-protocol export, and a single-file build all work. A DOI, link or ID looks up one work (with Unpaywall PDF links when a contact email is set). arXiv cannot be searched from a browser (see docs/methodology.md).
 
@@ -52,7 +56,7 @@ Four ways to run Sourcly. All of them work the same way: your searches go straig
 3. **Zip with a local server.** Unzip, then run `npx serve` in the folder and open the address it prints. Some people prefer this to opening a file.
 4. **Development setup.** See below.
 
-Everything you might want to change is in one plain file, `config.js`, which sits next to `index.html` and is not bundled: the site name, the name in the footer, the repository and download links, the library sign-in prefix for the "Access with UBC Library" button (empty hides it), and an optional contact email. Forks and downloaders edit only that file to rebrand, with no rebuild.
+Everything you might want to change is in one plain file, `config.js`, which sits next to `index.html` and is not bundled: the site name, the name in the footer, the institution and library names used in the "not affiliated" notice (forks: change them and the README Disclaimer), the repository and download links, the library sign-in prefix for the "Access with UBC Library" button (empty hides it), and an optional contact email. Forks and downloaders edit only that file to rebrand, with no rebuild.
 
 Checked in Chrome from a downloaded folder (`file://`): all sources that allow browser requests answered, and the saved list, exports and counterarguments panel worked. Other browsers treat files differently and were not checked.
 

@@ -7,11 +7,11 @@ abstract: >-
   scholarly databases at once and ranks the results with a transparent, adjustable formula that
   is explained for every result. It labels each source and never hides one unless you filter.
 authors:
-  - name: "Sourcly contributors"
+  - name: "Sourcly"
 repository-code: "https://github.com/ibrahimomeer/Sourcly"
 url: "https://github.com/ibrahimomeer/Sourcly"
 license: MIT
-version: 0.1.4
+version: 0.1.5
 keywords:
   - academic search
   - source discovery

@@ -10,6 +10,15 @@ window.SOURCLY_CONFIG = {
   // Shown in the footer copyright line. Use a person, team or project name.
   authorName: "Sourcly",
 
+  // The names used in the "independent student project, not affiliated with ..." notice (the
+  // footer's second line, the Settings note and the README / Methodology disclaimer). The defaults
+  // name UBC, where Sourcly was made. FORKS: change these to your own institution and library, and
+  // adapt the "Disclaimer" in README.md and "About this project" in docs/methodology.md to match,
+  // so that the notice never names an institution that is not yours. An empty string ("") names none.
+  // Use no logo, crest, colour or wording that suggests an official service of that institution.
+  institutionName: "UBC",
+  libraryName: "UBC Library",
+
   // Source repository. The header's GitHub and Methodology links and the footer's
   // "Source on GitHub" link are built from this.
   repoUrl: "https://github.com/ibrahimomeer/Sourcly",
