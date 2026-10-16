@@ -9,12 +9,12 @@ import type { Result, WorkType } from "./types";
 //  1. a dataset, thesis, report, encyclopedia entry or other non-article type, or a work only a repository such as
 //     Zenodo or DataCite holds, goes to "Datasets, presentations and other types" (unless the person chose to show them);
 //  2. a result whose language is known and is not one of the preferred languages goes to "Other languages";
-//  3. of the rest, those that contain every term go to the main list. If fewer than 10 do, those that contain all
-//     but one of the terms join them, each labelled "Matches N of M words", after the full matches;
+//  3. of the rest, those that match every concept go to the main list. If fewer than 15 do, those that match all
+//     but one of the concepts join them, each labelled "Matches N of M concepts", after the full matches;
 //  4. everything else goes to "Partial matches".
 
-/** The main list is widened with near matches while fewer results than this contain every term. */
-export const FEW_FULL_MATCHES = 10;
+/** The main list is widened with near matches while fewer results than this match every concept. */
+export const FEW_FULL_MATCHES = 15;
 
 export interface LayoutSettings {
   /** ISO 639-1 codes. A result detected as another language goes to "Other languages". Empty = any language. */
@@ -67,11 +67,11 @@ const containsEveryTerm = (item: ScoredResult) => item.coverage === null || item
 const containsAllButOne = (item: ScoredResult) =>
   item.coverage !== null && item.coverage.total >= 2 && item.coverage.matchedCount === item.coverage.total - 1;
 
-/** "Matches 2 of 3 words" for a result that does not contain every term, or null. */
+/** "Matches 2 of 3 concepts" for a result that does not match every concept, or null. */
 export function matchCountLabel(item: Pick<ScoredResult, "coverage">): string | null {
   const coverage = item.coverage;
   if (coverage === null || coverage.total === 0 || coverage.matchedCount === coverage.total) return null;
-  return `Matches ${coverage.matchedCount} of ${coverage.total} words`;
+  return `Matches ${coverage.matchedCount} of ${coverage.total} concepts`;
 }
 
 /** Splits ranked results into the main list and the three sections. The order inside each is the order given. */

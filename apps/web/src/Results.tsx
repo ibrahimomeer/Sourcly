@@ -1,4 +1,4 @@
-import type { LabelOverride, RelatedTerm, TypoSuggestion } from "@sourcly/core";
+import type { LabelOverride, TypoSuggestion } from "@sourcly/core";
 import type { ReactNode } from "react";
 import { fewResultsMessage, ORDER_SENTENCE, pluralize } from "./format";
 import { Pagination } from "./Pagination";
@@ -6,7 +6,6 @@ import { paginate } from "./paginate";
 import { allResults, hasFewFullMatches, type RankedView } from "./pipeline";
 import { ProviderStatuses } from "./ProviderStatuses";
 import { QueryNote } from "./QueryNote";
-import { RelatedTerms } from "./RelatedTerms";
 import { ResultCard } from "./ResultCard";
 import { SearchElsewhere } from "./SearchElsewhere";
 import { isSearching, type SearchState } from "./searchState";
@@ -22,8 +21,6 @@ export function Results({
   librarySearchUrl,
   onOverrideChange,
   onClearFilters,
-  related,
-  onAddRelatedTerm,
   exportSlot,
   suggestion,
   onUseSuggestion,
@@ -41,9 +38,6 @@ export function Results({
   librarySearchUrl: string;
   onOverrideChange: (resultId: string, change: LabelOverride) => void;
   onClearFilters: () => void;
-  /** Terms to suggest, from the top results. */
-  related: readonly RelatedTerm[];
-  onAddRelatedTerm: (term: string) => void;
   /** Shown under "Search elsewhere": the search protocol download. */
   exportSlot?: ReactNode;
   /** A "Did you mean ...?" for the search, or null. It is only a link: nothing changes until it is clicked. */
@@ -73,7 +67,7 @@ export function Results({
   return (
     <section id="results" className="results" aria-label="Results" aria-live="polite">
       <ProviderStatuses search={state} />
-      <QueryNote search={state} restorable />
+      <QueryNote search={state} />
       <SearchElsewhere query={state.query} librarySearchUrl={librarySearchUrl} />
       {exportSlot}
 
@@ -145,8 +139,6 @@ export function Results({
           matched.
         </p>
       )}
-
-      <RelatedTerms terms={related} onAdd={onAddRelatedTerm} />
 
       {pagination("Pages (top)")}
       <ol className="result-list" start={current.offset + 1}>

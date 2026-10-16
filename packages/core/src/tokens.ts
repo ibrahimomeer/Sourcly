@@ -24,21 +24,14 @@ const IRREGULAR_PLURALS: ReadonlyMap<string, string> = new Map([
   ["theses", "thesis"],
 ]);
 
-/** A doubled final consonant that comes from adding -ing or -ed (running -> run), but not one that belongs to the word (falling -> fall). */
-function undouble(stem: string): string {
-  const last = stem.charAt(stem.length - 1);
-  return stem.length >= 2 && stem.charAt(stem.length - 2) === last && /[bdgmnprt]/.test(last) ? stem.slice(0, -1) : stem;
-}
-
 /**
- * How a word is compared, deliberately conservative so two different words are not made one:
+ * How a word is compared, deliberately light so two different words are not made one:
  * - a word under 5 letters is left exactly as it is ("caos" is not "cao", "cats" is not "cat");
- * - a plural -s or -es is removed (memories -> memory, processes -> process, models -> model), except
- *   for -ss, -us and -is endings and a few words that are singular (chaos, bias, series);
- * - -ing and -ed are removed only from a word of 6 or more letters, and only when 4 or more letters
- *   remain (sleeping -> sleep, learned -> learn, but "string", "during" and "making" are left alone).
- * Nothing else changes: "prediction" stays "prediction". The same steps are applied to the query and to
- * every result, so they always agree. It is not a stemmer: synonyms and other word forms do not match.
+ * - a plural -s or -es is removed from 5 letters up (memories -> memory, processes -> process, models -> model),
+ *   except for -ss, -us and -is endings and a few words that are singular (chaos, bias, series).
+ * Nothing else changes: there is no stemming. "predicting" is not "predict" and "prediction" stays "prediction"; where a
+ * paper may write another form, the curated thesaurus lists it (thesaurus.ts). The same steps are applied to the query
+ * and to every result, so they always agree.
  */
 export function normalizeWord(word: string): string {
   const irregular = IRREGULAR_PLURALS.get(word);
@@ -48,10 +41,6 @@ export function normalizeWord(word: string): string {
   if (word.endsWith("ies")) return `${word.slice(0, -3)}y`;
   if (/(?:sses|shes|ches|xes|zes)$/.test(word)) return word.slice(0, -2);
   if (word.endsWith("s")) return /(?:ss|us|is)$/.test(word) ? word : word.slice(0, -1);
-
-  if (word.length >= 6 && word.endsWith("ied") && word.length - 3 >= 3) return `${word.slice(0, -3)}y`;
-  if (word.length >= 6 && word.endsWith("ing") && word.length - 3 >= 4) return undouble(word.slice(0, -3));
-  if (word.length >= 6 && word.endsWith("ed") && word.length - 2 >= 4) return undouble(word.slice(0, -2));
   return word;
 }
 

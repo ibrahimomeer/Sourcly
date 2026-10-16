@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { parseConcepts } from "./concepts";
 import { MAX_TYPO_DISTANCE, MIN_SUGGESTION_RESULTS, damerauLevenshtein, suggestTypos, wordsToCheck } from "./typo";
 import { parseQuery } from "./query";
 
@@ -35,6 +36,12 @@ describe("wordsToCheck", () => {
 
   it("is the plain words of the search, lowercase, each once, in order", () => {
     expect(words("Chaos double pendulm chaos")).toEqual(["chaos", "double", "pendulm"]);
+  });
+
+  it("reads concept blocks too, and leaves out a word the thesaurus joined into a phrase", () => {
+    expect(wordsToCheck(parseConcepts("caos double pendulum"))).toEqual(["caos"]);
+    expect(wordsToCheck(parseConcepts("climate change impact on coral reefs"))).toEqual([]);
+    expect(wordsToCheck("sleep memry")).toEqual(["sleep", "memry"]);
   });
 
   it("leaves out phrases, hyphenated words, words with digits, groups of alternatives, words after NOT, abbreviations and short words", () => {

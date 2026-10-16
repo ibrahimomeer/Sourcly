@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { parseConcepts } from "./concepts";
 import { defaultFilters } from "./filters";
 import { defaultLayoutSettings } from "./sections";
 import {
@@ -15,8 +16,7 @@ import { defaultScoringSettings } from "./scoring";
 
 const search = (typed: string): ProtocolSearch => ({
   typedQuery: typed,
-  searchedQuery: "effect sleep memory",
-  commonWordsRemoved: ["what", "is", "the"],
+  concepts: parseConcepts(typed),
   sentQueries: [
     { provider: "openalex", text: "effect AND sleep AND memory", notes: [] },
     { provider: "crossref", text: "effect sleep memory", notes: ["a note"] },
@@ -25,7 +25,7 @@ const search = (typed: string): ProtocolSearch => ({
     { provider: "openalex", state: "ok", count: 100 },
     { provider: "crossref", state: "rate-limited", message: "busy" },
   ],
-  expandedPass: null,
+  fallbackPasses: [],
   counts: { fetched: 200, merged: 180, shown: 130, partialMatches: 20, otherLanguages: 12, otherTypes: 8, hiddenByFilters: 10 },
 });
 
@@ -55,11 +55,23 @@ describe("buildProtocol", () => {
     });
   });
 
-  it("records the query as typed and as searched, with the exact text each source received", () => {
-    const { search: recorded } = buildProtocol(input());
-    expect(recorded.typedQuery).toBe("What is the effect of sleep on memory?");
-    expect(recorded.searchedQuery).toBe("effect sleep memory");
-    expect(recorded.commonWordsRemoved).toEqual(["what", "is", "the"]);
+  it("records the query as typed and as read, with the exact text each source received", () => {
+    const { search: recorded } = buildProtocol(input({ main: search("How AI understand odor") }));
+    expect(recorded.typedQuery).toBe("How AI understand odor");
+    expect(recorded.reading.exactlyAsTyped).toBe(false);
+    expect(recorded.reading.curatedSynonyms).toBe(true);
+    expect(recorded.reading.commonWordsLeftOut).toEqual(["how"]);
+    expect(recorded.reading.softTerms).toEqual(["understand"]);
+    expect(recorded.reading.concepts.map((concept) => concept.concept)).toEqual(["AI", "odor"]);
+    expect(recorded.reading.concepts[1]?.variants.map((variant) => [variant.text, variant.from])).toEqual([
+      ["odor", "typed"],
+      ["odour", "curated thesaurus"],
+      ["odorant", "curated thesaurus"],
+      ["olfaction", "curated thesaurus"],
+      ["olfactory", "curated thesaurus"],
+      ["sense of smell", "curated thesaurus"],
+    ]);
+    expect(recorded.reading.concepts[1]?.variants[1]).toMatchObject({ entryType: "spelling" });
     expect(recorded.sentQueries).toEqual([
       { source: "openalex", query: "effect AND sleep AND memory", notes: [] },
       { source: "crossref", query: "effect sleep memory", notes: ["a note"] },
@@ -90,18 +102,24 @@ describe("buildProtocol", () => {
     expect(protocol.filters).toEqual({ yearFrom: 2015, yearTo: null, levels: [], peerReview: [], openAccessOnly: true });
   });
 
-  it("records the expanded second pass, with what each source asked in it received, when it ran", () => {
-    const withPass = search("sleep");
-    withPass.expandedPass = {
-      sentQueries: [{ provider: "openalex", text: "sleep memory", notes: ["a looser note"] }],
-      statuses: [{ provider: "openalex", state: "ok", count: 100 }],
-    };
+  it("records the fallback passes, with the concept each one dropped and what each source asked in it received", () => {
+    const withPass = search("sleep memory");
+    withPass.fallbackPasses = [
+      {
+        dropped: "memory",
+        sentQueries: [{ provider: "openalex", text: "sleep", notes: ["a note"] }],
+        statuses: [{ provider: "openalex", state: "ok", count: 100 }],
+      },
+    ];
     const { search: recorded } = buildProtocol(input({ main: withPass }));
-    expect(recorded.expandedPass).toEqual({
-      sentQueries: [{ source: "openalex", query: "sleep memory", notes: ["a looser note"] }],
-      statuses: [{ provider: "openalex", state: "ok", count: 100 }],
-    });
-    expect(buildProtocol(input()).search.expandedPass).toBeNull();
+    expect(recorded.fallbackPasses).toEqual([
+      {
+        droppedConcept: "memory",
+        sentQueries: [{ source: "openalex", query: "sleep", notes: ["a note"] }],
+        statuses: [{ provider: "openalex", state: "ok", count: 100 }],
+      },
+    ]);
+    expect(buildProtocol(input()).search.fallbackPasses).toEqual([]);
   });
 
   it("records every weight and switch, the half-life and the reference year, so a ranking can be repeated", () => {
@@ -110,7 +128,7 @@ describe("buildProtocol", () => {
     expect(ranking.recencyHalfLifeYears).toBe(10);
     expect(ranking.relevance).toContain("BM25 (k1 = 1.2, b = 0.75)");
     expect(ranking.formula).toContain("sum(weight * factor) / sum(weight)");
-    expect(ranking.layout).toEqual({ preferredLanguages: ["en"], showNonArticleTypes: false, fewFullMatches: 10 });
+    expect(ranking.layout).toEqual({ preferredLanguages: ["en"], showNonArticleTypes: false, fewFullMatches: 15 });
     expect(Object.keys(ranking.factors)).toEqual([
       "relevance",
       "termCoverage",

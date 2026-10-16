@@ -28,8 +28,58 @@ import {
 
 const WORKS_URL = "https://api.openalex.org/works";
 const MAX_PER_PAGE = 100;
+/** The most works one search asks for: two pages of 100. */
+const MAX_RESULTS = 200;
 /** Guards against a corrupt abstract_inverted_index asking for a huge array. */
 const MAX_ABSTRACT_WORDS = 20_000;
+
+// OpenAlex answers a query with more than 5 boolean operators (every search with synonyms is one: 10 for "AI" and "odor")
+// at one request per second per client, with HTTP 429, `Retry-After: 1` and a message asking to wait a second and retry
+// (checked 2026-10-15; with a key it is 5 requests per second). The second page of a search is asked for right after the
+// first, so without that wait it fails. A wait this short is waited out, at most twice; a longer one (a spent daily
+// budget) is reported as it is.
+const MAX_RETRY_WAIT_SECONDS = 5;
+const MAX_RETRIES = 2;
+const RETRY_MARGIN_MS = 100;
+
+type Sleep = (milliseconds: number, signal: AbortSignal | undefined) => Promise<void>;
+
+const defaultSleep: Sleep = (milliseconds, signal) =>
+  new Promise((resolve, reject) => {
+    if (signal?.aborted === true) {
+      reject(new DOMException("Aborted", "AbortError"));
+      return;
+    }
+    const onAbort = () => {
+      clearTimeout(timer);
+      reject(new DOMException("Aborted", "AbortError"));
+    };
+    const timer = setTimeout(() => {
+      signal?.removeEventListener("abort", onAbort);
+      resolve();
+    }, milliseconds);
+    signal?.addEventListener("abort", onAbort, { once: true });
+  });
+
+/** The seconds OpenAlex asks to wait before asking again, when that is short enough to wait for. */
+function shortRetryAfter(response: Response): number | null {
+  const seconds = Number(response.headers.get("retry-after"));
+  return Number.isFinite(seconds) && seconds > 0 && seconds <= MAX_RETRY_WAIT_SECONDS ? seconds : null;
+}
+
+async function fetchWithShortRetries(
+  doFetch: typeof globalThis.fetch,
+  url: URL,
+  signal: AbortSignal | undefined,
+  sleep: Sleep,
+): Promise<Response> {
+  for (let attempt = 0; ; attempt += 1) {
+    const response = await doFetch(url, { signal });
+    const wait = response.status === 429 && attempt < MAX_RETRIES ? shortRetryAfter(response) : null;
+    if (wait === null) return response;
+    await sleep(wait * 1000 + RETRY_MARGIN_MS, signal);
+  }
+}
 
 /** The fields asked for from OpenAlex: only what the app reads. */
 export const SELECT_FIELDS = [
@@ -242,37 +292,66 @@ export interface OpenAlexOptions {
    * to api.openalex.org and never appears in a ProviderError message.
    */
   apiKey?: string;
+  /** Replaceable for tests: how the wait before a second try is made. */
+  sleep?: Sleep;
 }
 
 export function createOpenAlexProvider(options: OpenAlexOptions = {}): Provider {
   const doFetch: typeof globalThis.fetch =
     options.fetch ?? ((input, init) => globalThis.fetch(input, init));
   const apiKey = options.apiKey?.trim() ?? "";
+  const sleep = options.sleep ?? defaultSleep;
 
   return {
     id: "openalex",
     name: "OpenAlex",
     syntax: "boolean",
     requestNotes: ["Looks in titles and abstracts only, not in the full text"],
-    expandedSyntax: "plain",
-    expandedRequestNotes: ["OpenAlex’s default relevance search: it also reads keywords and the full text, and does not require every word"],
 
-    async search(query: string, { limit, signal, expanded }: SearchOptions): Promise<Result[]> {
+    async search(query: string, { limit, signal }: SearchOptions): Promise<Result[]> {
       const text = query.trim();
       if (text === "") return [];
+      // OpenAlex is the backbone of the search, so when a full page is asked for it is asked for two (200 works).
+      const asked = Math.max(1, Math.floor(limit));
+      const wanted = asked >= MAX_PER_PAGE ? MAX_RESULTS : asked;
+      const pages = Math.ceil(wanted / MAX_PER_PAGE);
+      const works: unknown[] = [];
+      // Up to two pages of 100, strictly one after the other: the second only if the first was full.
+      for (let page = 1; page <= pages; page += 1) {
+        const batch = await fetchPage(page, Math.min(MAX_PER_PAGE, wanted - works.length));
+        works.push(...batch);
+        if (batch.length < MAX_PER_PAGE) break;
+      }
+      return works
+        .map((work, index) => parseOpenAlexWork(work, index + 1, works.length))
+        .filter((result): result is Result => result !== null);
+
+      async function fetchPage(page: number, perPage: number): Promise<unknown[]> {
+        return pageOfWorks(await requestWorks(text, { page, perPage, select: SELECT_FIELDS }, signal));
+      }
+    },
+  };
+
+  async function requestWorks(
+    text: string,
+    { page, perPage, select }: { page: number; perPage: number; select: readonly string[] },
+    signal: AbortSignal | undefined,
+  ): Promise<unknown> {
       const url = new URL(WORKS_URL);
       // The plain `search` parameter also reads the full text, which brought back works that only mention
       // the words in passing (checked 2026-10-14). OpenAlex documents this scoped form as "title and abstract text only".
-      // The expanded pass uses OpenAlex's default relevance search, which is the looser one.
-      url.searchParams.set(expanded === true ? "search" : "search.title_and_abstract", text);
-      url.searchParams.set("per_page", String(Math.min(MAX_PER_PAGE, Math.max(1, Math.floor(limit)))));
-      url.searchParams.set("select", SELECT_FIELDS.join(","));
+      // It accepts uppercase AND / OR, parentheses and quoted phrases (checked 2026-10-15), which is how the
+      // concept blocks are sent: each block an OR-group, AND between blocks.
+      url.searchParams.set("search.title_and_abstract", text);
+      url.searchParams.set("per_page", String(perPage));
+      if (page > 1) url.searchParams.set("page", String(page));
+      url.searchParams.set("select", select.join(","));
       if (apiKey !== "") url.searchParams.set("api_key", apiKey);
 
       let response: Response;
       try {
         // No custom headers: a plain GET avoids a CORS preflight request.
-        response = await doFetch(url, { signal });
+        response = await fetchWithShortRetries(doFetch, url, signal, sleep);
       } catch (cause) {
         throw new ProviderError("failed", describeNetworkFailure(cause), { cause });
       }
@@ -299,21 +378,46 @@ export function createOpenAlexProvider(options: OpenAlexOptions = {}): Provider 
         });
       }
 
-      let body: unknown;
       try {
-        body = await response.json();
+        return await response.json();
       } catch (cause) {
         throw new ProviderError("failed", "OpenAlex sent a response that is not valid JSON", { cause });
       }
-      const works = asRecord(body)?.results;
-      if (!Array.isArray(works)) {
-        throw new ProviderError("failed", "OpenAlex response has no results list");
-      }
+  }
 
-      return works
-        .map((work, index) => parseOpenAlexWork(work, index + 1, works.length))
-        .filter((result): result is Result => result !== null);
-    },
+  function pageOfWorks(body: unknown): unknown[] {
+    const works = asRecord(body)?.results;
+    if (!Array.isArray(works)) throw new ProviderError("failed", "OpenAlex response has no results list");
+    return works;
+  }
+}
+
+/**
+ * How many works OpenAlex matches for a query, from a request for one work (`per_page=1`, `select=id`), whose
+ * `meta.count` is the total. Used to judge how specific each concept of a search is (see fallbackOrder).
+ * Returns null when OpenAlex does not answer; never throws, because it only refines the order of a fallback.
+ */
+export function createOpenAlexCounter(
+  options: OpenAlexOptions = {},
+): (query: string, signal?: AbortSignal) => Promise<number | null> {
+  const doFetch: typeof globalThis.fetch = options.fetch ?? ((input, init) => globalThis.fetch(input, init));
+  const apiKey = options.apiKey?.trim() ?? "";
+  const sleep = options.sleep ?? defaultSleep;
+  return async (query, signal) => {
+    const text = query.trim();
+    if (text === "") return null;
+    const url = new URL(WORKS_URL);
+    url.searchParams.set("search.title_and_abstract", text);
+    url.searchParams.set("per_page", "1");
+    url.searchParams.set("select", "id");
+    if (apiKey !== "") url.searchParams.set("api_key", apiKey);
+    try {
+      const response = await fetchWithShortRetries(doFetch, url, signal, sleep);
+      if (!response.ok) return null;
+      return asInteger(asRecord(asRecord(await response.json())?.meta)?.count) ?? null;
+    } catch {
+      return null;
+    }
   };
 }
 

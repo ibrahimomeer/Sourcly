@@ -1,4 +1,4 @@
-import type { Author, OaStatus, OpenAccessInfo, ProviderId, Result, RetractionInfo, Subject, WorkType } from "./types";
+import type { Author, OaStatus, OpenAccessInfo, ProviderHit, ProviderId, Result, RetractionInfo, Subject, WorkType } from "./types";
 
 // Merging results that several providers returned for the same work.
 //
@@ -219,4 +219,18 @@ export function mergeResults(results: readonly Result[]): Result[] {
   }
 
   return groups.map((group) => (group.length === 1 ? (group[0] as Result) : mergeGroup(group)));
+}
+
+/**
+ * One hit per source, for the "Found by" badges: a work that a source returned twice (in the strict search and again in a
+ * fallback pass, or under two records) is listed once, with that source's best rank, in the order the sources first
+ * appeared. The merged result itself keeps every hit, so nothing is lost; only the display is deduplicated.
+ */
+export function uniqueProviderHits(hits: readonly ProviderHit[]): ProviderHit[] {
+  const best = new Map<ProviderHit["provider"], ProviderHit>();
+  for (const hit of hits) {
+    const seen = best.get(hit.provider);
+    if (seen === undefined || hit.rank < seen.rank) best.set(hit.provider, hit);
+  }
+  return [...best.values()];
 }

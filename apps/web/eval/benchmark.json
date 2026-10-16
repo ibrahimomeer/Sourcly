@@ -1,0 +1,60 @@
+{
+  "about": "The queries `pnpm eval:search` runs against the live sources, with the papers a good search for each one should find. A mustInclude entry is a DOI that was checked (Crossref or DataCite) to resolve to the title written next to it. Nothing in the ranking code mentions any of these queries or papers: they only measure it. The `check` field names the automatic check run on that query (see search.eval.ts).",
+  "queries": [
+    {
+      "text": "How AI understand odor",
+      "check": "odor",
+      "mustInclude": [
+        { "doi": "10.1126/science.ade4401", "title": "A principal odor map unifies diverse tasks in olfactory perception" },
+        { "doi": "10.1126/science.aal2014", "title": "Predicting human olfactory perception from chemical features of odor molecules" },
+        { "doi": "10.1038/s42004-024-01373-2", "title": "Odor prediction of whiskies based on their molecular composition" }
+      ]
+    },
+    {
+      "text": "machine learning odor prediction",
+      "check": "odor",
+      "mustInclude": [
+        { "doi": "10.1126/science.ade4401", "title": "A principal odor map unifies diverse tasks in olfactory perception" },
+        { "doi": "10.1126/science.aal2014", "title": "Predicting human olfactory perception from chemical features of odor molecules" },
+        { "doi": "10.1038/s42004-024-01373-2", "title": "Odor prediction of whiskies based on their molecular composition" }
+      ]
+    },
+    {
+      "text": "caos double pendulum",
+      "check": "pendulum",
+      "expectSuggestion": "chaos",
+      "mustInclude": []
+    },
+    {
+      "text": "chaos double pendulum",
+      "check": "pendulum",
+      "mustInclude": [{ "doi": "10.1119/1.17335", "title": "Double pendulum: An experiment in chaos" }]
+    },
+    { "text": "CAN bus protocol", "check": "can-bus", "mustInclude": [] },
+    {
+      "text": "climate change impact on coral reefs",
+      "check": "english",
+      "mustInclude": [{ "doi": "10.1126/science.1152509", "title": "Coral Reefs Under Rapid Climate Change and Ocean Acidification" }]
+    },
+    {
+      "text": "CRISPR off-target effects prediction",
+      "check": "english",
+      "mustInclude": [
+        { "doi": "10.1038/nbt.3437", "title": "Optimized sgRNA design to maximize activity and minimize off-target effects of CRISPR-Cas9" }
+      ]
+    },
+    { "text": "microplastics effects on marine fish", "check": "english", "mustInclude": [] },
+    {
+      "text": "attention mechanism in transformers explained",
+      "check": "english",
+      "mustInclude": [{ "doi": "10.48550/arxiv.1706.03762", "title": "Attention Is All You Need" }]
+    },
+    { "text": "intermittent fasting and cognitive performance", "check": "english", "mustInclude": [] },
+    { "text": "perovskite solar cell stability", "check": "english", "mustInclude": [] },
+    { "text": "how do vaccines train the immune system", "check": "english", "mustInclude": [] }
+  ],
+  "lookups": [
+    { "text": "10.1016/B978-0-323-99796-6.00014-X", "expectDoi": "10.1016/b978-0-323-99796-6.00014-x" },
+    { "text": "https://www.nature.com/articles/s42004-024-01373-2", "expectDoi": "10.1038/s42004-024-01373-2" }
+  ]
+}

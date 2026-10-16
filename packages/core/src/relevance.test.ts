@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { coverageSpec } from "./coverage";
 import { documentText, relevanceReadings } from "./relevance";
 import { makeResult } from "./testing/make-result";
 
@@ -193,5 +194,51 @@ describe("relevanceReadings: exactly as typed", () => {
     expect(exact[0]?.raw).toBeGreaterThan(0);
     expect(exact[1]?.raw).toBe(0);
     expect(relevanceReadings(withThe, ["the"])[0]?.raw).toBeNull();
+  });
+});
+
+describe("relevanceReadings over concepts", () => {
+  const spec = (text: string) => coverageSpec(text);
+  const docs = [
+    makeResult({ id: "10.1/ml", title: "Machine learning predicts odor", abstract: "A model of olfaction." }),
+    makeResult({ id: "10.1/odor", title: "Odor perception in rats", abstract: "Behaviour." }),
+    makeResult({ id: "10.1/apple", title: "Volatile aroma of apples", abstract: "Flavor compounds and esters." }),
+  ];
+
+  it("scores a result higher the more concepts of the search it matches, and the unrelated one 0", () => {
+    const [ml, odor, apple] = relevanceReadings(docs, [], [], {}, spec("AI odor"));
+    expect(ml?.normalized).toBe(1);
+    expect(odor?.normalized).toBeGreaterThan(0);
+    expect(odor?.normalized).toBeLessThan(1);
+    expect(apple?.raw).toBe(0);
+    expect(apple?.normalized).toBe(0);
+  });
+
+  it("gives a small boost for a generic word, and a result with only the generic word scores less than one with the concept", () => {
+    const set = [
+      makeResult({ id: "10.1/c", title: "Odor", abstract: "We measure it." }),
+      makeResult({ id: "10.1/cg", title: "Odor", abstract: "We understand it." }),
+      makeResult({ id: "10.1/g", title: "Words", abstract: "We understand it." }),
+    ];
+    const [concept, conceptAndWord, wordOnly] = relevanceReadings(set, [], [], {}, spec("understand odor"));
+    expect(conceptAndWord?.raw).toBeGreaterThan(concept?.raw ?? 0);
+    expect(wordOnly?.raw).toBeGreaterThan(0);
+    expect(wordOnly?.raw).toBeLessThan(concept?.raw ?? 0);
+  });
+
+  it("never requires a generic word: a result without it still scores on the concepts", () => {
+    const [onlyConcept] = relevanceReadings([makeResult({ title: "Odor", abstract: null })], [], [], {}, spec("understand odor"));
+    expect(onlyConcept?.raw).toBeGreaterThan(0);
+  });
+
+  it("matches by variants, so a paper that says olfaction counts for odor", () => {
+    const [reading] = relevanceReadings([makeResult({ title: "Olfaction", abstract: null })], [], [], {}, spec("odor"));
+    expect(reading?.raw).toBeGreaterThan(0);
+  });
+
+  it("says in words what was matched", () => {
+    const [ml] = relevanceReadings(docs, [], [], {}, spec("AI odor"));
+    expect(ml?.detail).toMatch(/BM25 over the title, abstract and author keywords/);
+    expect(ml?.detail).toMatch(/Matched/);
   });
 });

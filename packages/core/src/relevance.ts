@@ -1,4 +1,6 @@
 import { scoreBm25, scoreBm25FromCounts } from "./bm25";
+import { matchBlock, matchSoft, streamsOf } from "./conceptmatch";
+import type { CoverageSpec } from "./coverage";
 import { findTerms, usableCounterTerms } from "./counter";
 import { tokenize, type TokenizeOptions } from "./tokens";
 import type { Result } from "./types";
@@ -58,6 +60,63 @@ function topicReadings(
   });
 }
 
+/** How much a soft term counts in the relevance score, against 1 for a hard concept. */
+export const SOFT_WEIGHT = 0.3;
+
+/**
+ * BM25 over the concepts of the query, counted in the title, author keywords and abstract only. Each hard concept is one
+ * "term" whose count is how many times any of its variants occurs, and it weighs 1; each soft term weighs 0.3. A rare
+ * concept counts for more, a repeated one has diminishing returns, and a long abstract is discounted (see bm25.ts).
+ */
+function conceptReadings(results: readonly Result[], spec: CoverageSpec): RelevanceReading[] {
+  const labels = new Map<string, string>();
+  const weights = new Map<string, number>();
+  for (const block of spec.blocks) {
+    labels.set(block.id, block.label);
+    weights.set(block.id, 1);
+  }
+  for (const soft of spec.soft) {
+    labels.set(`soft:${soft.text}`, `${soft.text} (soft)`);
+    weights.set(`soft:${soft.text}`, SOFT_WEIGHT);
+  }
+  const counts: Map<string, number>[] = [];
+  const lengths: number[] = [];
+  for (const result of results) {
+    const streams = streamsOf(result, spec.exact);
+    const found = new Map<string, number>();
+    for (const block of spec.blocks) {
+      const hits = matchBlock(streams, block).hits.length;
+      if (hits > 0) found.set(block.id, hits);
+    }
+    for (const [text, count] of matchSoft(streams, spec.soft)) found.set(`soft:${text}`, count);
+    counts.push(found);
+    lengths.push(streams.reduce((sum, stream) => sum + stream.tokens.filter((token) => token.boundary !== true).length, 0));
+  }
+
+  const bm25 = scoreBm25FromCounts(counts, lengths, [...weights.keys()], { weights });
+  return results.map((_, index) => {
+    const raw = bm25.scores[index] ?? 0;
+    if (raw === 0) {
+      return {
+        raw,
+        normalized: 0,
+        detail: `None of the concepts (${spec.blocks.map((block) => block.label).join(", ")}) is in the title, author keywords or abstract: BM25 score 0`,
+      };
+    }
+    const matched = (bm25.matches[index] ?? [])
+      .slice(0, 4)
+      .map((match) => `${labels.get(match.term) ?? match.term} ×${match.count}`)
+      .join(", ");
+    return {
+      raw,
+      normalized: raw / bm25.maxScore,
+      detail:
+        `BM25 over the title, abstract and author keywords, each concept weighing 1 and each soft term ${SOFT_WEIGHT}: score ${raw.toFixed(2)}; ` +
+        `the best of these ${bm25.documentCount} results scores ${bm25.maxScore.toFixed(2)}, so this is ${((raw / bm25.maxScore) * 100).toFixed(0)}% of it. Matched ${matched}`,
+    };
+  });
+}
+
 const percent = (share: number) => `${(share * 100).toFixed(0)}%`;
 
 /**
@@ -78,8 +137,11 @@ export function relevanceReadings(
   queryTerms: readonly string[],
   signalTerms: readonly string[] = [],
   tokenizeOptions: TokenizeOptions = {},
+  /** The concepts of the search. When given, relevance is BM25 over them (see conceptReadings) and `queryTerms` is not used. */
+  concepts?: CoverageSpec,
 ): RelevanceReading[] {
-  const topic = topicReadings(results, queryTerms, tokenizeOptions);
+  const topic =
+    concepts !== undefined && concepts.blocks.length > 0 ? conceptReadings(results, concepts) : topicReadings(results, queryTerms, tokenizeOptions);
   const terms = usableCounterTerms(signalTerms);
   if (terms.length === 0) return topic;
 

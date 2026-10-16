@@ -1,6 +1,10 @@
 export interface SourclyConfig {
   siteName: string;
   authorName: string;
+  /** The university the project is made at, named only in the "not affiliated" notice. Empty names none. */
+  institutionName: string;
+  /** The library the "Access with ..." button signs in to, named only in notices. Empty names none. */
+  libraryName: string;
   repoUrl: string;
   contactEmail: string;
   libraryProxyPrefix: string;
@@ -18,13 +22,18 @@ declare global {
 /** Used for any field config.js leaves out. Nothing personal belongs here. */
 export const DEFAULT_CONFIG: SourclyConfig = {
   siteName: "Sourcly",
-  authorName: "",
+  authorName: "Sourcly",
+  institutionName: "UBC",
+  libraryName: "UBC Library",
   repoUrl: "",
   contactEmail: "",
   libraryProxyPrefix: "",
   librarySearchUrl: "",
   downloadUrl: "",
 };
+
+/** Text fields where an empty string is a real answer ("this project names no institution"), not a missing value. */
+const MAY_BE_EMPTY = ["institutionName", "libraryName"] as const;
 
 const URL_FIELDS = ["repoUrl", "libraryProxyPrefix", "librarySearchUrl", "downloadUrl"] as const;
 
@@ -45,7 +54,8 @@ export function resolveConfig(raw: unknown): SourclyConfig {
   const source = raw as Record<string, unknown>;
   for (const key of Object.keys(DEFAULT_CONFIG) as (keyof SourclyConfig)[]) {
     const value = source[key];
-    if (typeof value !== "string" || value.trim() === "") continue;
+    if (typeof value !== "string") continue;
+    if (value.trim() === "" && !((MAY_BE_EMPTY as readonly string[]).includes(key) && value === "")) continue;
     const trimmed = value.trim();
     if ((URL_FIELDS as readonly string[]).includes(key) && !isHttpUrl(trimmed)) continue;
     config[key] = trimmed;

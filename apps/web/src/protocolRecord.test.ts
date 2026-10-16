@@ -1,4 +1,4 @@
-import { addSaved, buildProtocol, defaultFilters, defaultLayoutSettings, defaultScoringSettings, parseQuery, planQueries, protocolJson, type ProviderId } from "@sourcly/core";
+import { addSaved, buildProtocol, defaultFilters, defaultLayoutSettings, defaultScoringSettings, parseConcepts, planQueries, protocolJson, type ProviderId } from "@sourcly/core";
 import { makeResult } from "@sourcly/core/testing";
 import { describe, expect, it } from "vitest";
 import { rankResults, scoringContext } from "./pipeline";
@@ -11,12 +11,12 @@ const providers: { id: ProviderId; syntax: "boolean" | "plain" }[] = [
 ];
 
 function finished(text: string, ids: string[]): ActiveSearch {
-  const parsed = parseQuery(text);
+  const concepts = parseConcepts(text);
   let state = searchReducer(idleSearch, {
     type: "start",
     id: 1,
-    parsed,
-    sent: planQueries(providers, parsed),
+    concepts,
+    sent: planQueries(providers, concepts),
     order: providers.map((p) => p.id),
     skipped: [{ provider: "arxiv", state: "skipped", message: "no CORS" }],
   });
@@ -43,16 +43,18 @@ const view = { scoring: defaultScoringSettings(), filters: defaultFilters(), ove
 const rank = (search: ActiveSearch) => rankResults(search.results, view, scoringContext(search, 2026));
 
 describe("searchRecord", () => {
-  it("records the typed query, the tidy one, what was removed, what each source got and how each answered", () => {
+  it("records the typed query, how it was read, what each source got and how each answered", () => {
     const search = finished("What is the effect of sleep on memory?", ["10.1/a", "10.1/b"]);
     const record = searchRecord(search, rank(search));
     expect(record.typedQuery).toBe("What is the effect of sleep on memory?");
-    expect(record.searchedQuery).toBe("effect sleep memory");
-    expect(record.commonWordsRemoved).toEqual(["what", "is", "the", "of", "on"]);
+    expect(record.concepts.stopwords).toEqual(["what", "is", "the", "of", "on"]);
+    expect(record.concepts.soft.map((term) => term.text)).toEqual(["effect"]);
+    expect(record.concepts.blocks.map((block) => block.label)).toEqual(["sleep", "memory"]);
     expect(record.sentQueries.map((q) => [q.provider, q.text])).toEqual([
-      ["openalex", "effect AND sleep AND memory"],
-      ["crossref", "effect sleep memory"],
+      ["openalex", "sleep AND memory"],
+      ["crossref", "sleep memory"],
     ]);
+    expect(record.fallbackPasses).toEqual([]);
     // Statuses come in the order the sources were asked, with skipped ones last.
     expect(record.statuses.map((s) => [s.provider, s.state])).toEqual([
       ["openalex", "ok"],
@@ -68,19 +70,19 @@ describe("searchRecord", () => {
     expect(searchRecord(search, filtered).counts).toEqual({ fetched: 3, merged: 3, shown: 0, partialMatches: 0, otherLanguages: 0, otherTypes: 0, hiddenByFilters: 3 });
   });
 
-  it("counts results that lack more than one search word as partial matches, not as shown", () => {
+  it("counts results that lack more than one concept as partial matches, not as shown", () => {
     const search = finished("sleep memory dreams nightmares", ["10.1/a", "10.1/b"]);
     expect(searchRecord(search, rank(search)).counts).toMatchObject({ fetched: 2, merged: 2, shown: 0, partialMatches: 2 });
   });
 
-  it("counts results that lack one word as shown while few contain every word", () => {
+  it("counts results that lack one concept as shown while few match every concept", () => {
     const search = finished("sleep memory dreams", ["10.1/a", "10.1/b"]);
     expect(searchRecord(search, rank(search)).counts).toMatchObject({ shown: 2, partialMatches: 0 });
   });
 
   it("counts the results kept apart as other languages and as other types", () => {
-    const parsed = parseQuery("pendulum");
-    let state = searchReducer(idleSearch, { type: "start", id: 1, parsed, sent: planQueries(providers, parsed), order: ["openalex"], skipped: [] });
+    const concepts = parseConcepts("pendulum");
+    let state = searchReducer(idleSearch, { type: "start", id: 1, concepts, sent: planQueries(providers, concepts), order: ["openalex"], skipped: [] });
     state = searchReducer(state, {
       type: "provider-done",
       id: 1,
@@ -98,24 +100,25 @@ describe("searchRecord", () => {
     expect(searchRecord(state, rank(state)).counts).toMatchObject({ merged: 3, shown: 1, otherLanguages: 1, otherTypes: 1 });
   });
 
-  it("records the expanded pass when it ran, and null when it did not", () => {
+  it("records the fallback passes when they ran, and none when they did not", () => {
     const search = finished("sleep memory", ["10.1/a"]);
-    expect(searchRecord(search, rank(search)).expandedPass).toBeNull();
-    const expanded = searchReducer(searchReducer(search, { type: "expand-start", id: 1, sent: [{ provider: "openalex", text: "sleep memory", notes: [] }], order: ["openalex"] }), {
-      type: "expand-provider-done",
+    expect(searchRecord(search, rank(search)).fallbackPasses).toEqual([]);
+    let fallback = searchReducer(search, { type: "fallback-start", id: 1 });
+    fallback = searchReducer(fallback, { type: "fallback-pass-start", id: 1, dropped: "memory", sent: [{ provider: "openalex", text: "sleep", notes: [] }], order: ["openalex"] });
+    fallback = searchReducer(fallback, {
+      type: "fallback-provider-done",
       id: 1,
       update: { provider: "openalex", status: { provider: "openalex", state: "ok", count: 0 }, results: [] },
     });
-    if (expanded.phase === "idle") throw new Error("expected an active search");
-    expect(searchRecord(expanded, rank(expanded)).expandedPass).toEqual({
-      sentQueries: [{ provider: "openalex", text: "sleep memory", notes: [] }],
-      statuses: [{ provider: "openalex", state: "ok", count: 0 }],
-    });
+    if (fallback.phase === "idle") throw new Error("expected an active search");
+    expect(searchRecord(fallback, rank(fallback)).fallbackPasses).toEqual([
+      { dropped: "memory", sentQueries: [{ provider: "openalex", text: "sleep", notes: [] }], statuses: [{ provider: "openalex", state: "ok", count: 0 }] },
+    ]);
   });
 
   it("counts duplicates as fetched but not as merged", () => {
-    const parsed = parseQuery("sleep");
-    let state = searchReducer(idleSearch, { type: "start", id: 1, parsed, sent: planQueries(providers, parsed), order: ["openalex", "crossref"], skipped: [] });
+    const concepts = parseConcepts("sleep");
+    let state = searchReducer(idleSearch, { type: "start", id: 1, concepts, sent: planQueries(providers, concepts), order: ["openalex", "crossref"], skipped: [] });
     for (const provider of ["openalex", "crossref"] as const) {
       state = searchReducer(state, {
         type: "provider-done",
@@ -159,7 +162,7 @@ describe("protocolInputFrom", () => {
 
   it("includes a finished counterargument search with its mode and terms", () => {
     const search = finished("sleep memory", ["10.1/a"]);
-    const counterSearch = finished("sleep memory (limitation OR bias)", ["10.1/c"]);
+    const counterSearch = finished("sleep memory limitation", ["10.1/c"]);
     const counter: CounterRecord = { search: counterSearch, ranked: rank(counterSearch), mode: "terms", terms: ["limitation", "bias"] };
     const input = protocolInputFrom({
       search,
@@ -174,7 +177,7 @@ describe("protocolInputFrom", () => {
       appVersion: "0.1.0",
       date: new Date("2026-10-14T12:00:00Z"),
     });
-    expect(input.counter).toMatchObject({ mode: "terms", terms: ["limitation", "bias"], typedQuery: "sleep memory (limitation OR bias)" });
+    expect(input.counter).toMatchObject({ mode: "terms", terms: ["limitation", "bias"], typedQuery: "sleep memory limitation" });
   });
 
   it("makes a protocol that holds no key or email, whatever else is on the page", () => {
@@ -195,6 +198,6 @@ describe("protocolInputFrom", () => {
     const json = protocolJson(buildProtocol(input));
     expect(json).not.toMatch(/api[_-]?key"\s*:/i);
     expect(json).not.toContain("@");
-    expect(JSON.parse(json).search.searchedQuery).toBe("sleep");
+    expect(JSON.parse(json).search.reading.concepts[0].concept).toBe("sleep");
   });
 });

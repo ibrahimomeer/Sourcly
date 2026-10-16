@@ -1,4 +1,5 @@
-import { coverageSpec } from "./coverage";
+import { hardBlocks, type ConceptQuery } from "./concepts";
+import { toConcepts } from "./conceptquery";
 import type { ParsedQuery } from "./query";
 import { normalizeWord } from "./tokens";
 import type { Result } from "./types";
@@ -26,18 +27,17 @@ const VERY_FEW_AT_LEAST = 3;
 const MIN_LENGTH = 4;
 
 /**
- * The words of the search that can be checked: plain words of letters, not inside quotes, not hyphenated,
- * not in a group of alternatives, not after NOT, not an all-capital abbreviation and at least 4 letters.
- * Lowercase, each once, in order.
+ * The words of the search that can be checked: plain words of letters that were typed on their own (so not inside
+ * quotes, not hyphenated, not in a group of alternatives, not after NOT, not part of a phrase the thesaurus joined,
+ * not an all-capital abbreviation) and at least 4 letters. Lowercase, each once, in order.
  */
-export function wordsToCheck(query: ParsedQuery): string[] {
+export function wordsToCheck(query: ConceptQuery | ParsedQuery | string): string[] {
   const words: string[] = [];
-  for (const unit of coverageSpec(query).units) {
-    const atoms = unit.alternatives.length === 1 ? unit.alternatives[0] : undefined;
-    const only = atoms?.length === 1 ? atoms[0] : undefined;
-    if (only === undefined || only.keys.length !== 1) continue;
-    const word = only.text;
-    if (!/^\p{L}+$/u.test(word) || word.length < MIN_LENGTH || word === word.toUpperCase()) continue;
+  for (const block of hardBlocks(toConcepts(query))) {
+    const typed = block.variants[0];
+    if (block.quoted || typed === undefined || typed.origin !== "typed" || typed.words.length !== 1) continue;
+    const word = typed.text;
+    if (word !== typed.words[0] || !/^\p{L}+$/u.test(word) || word.length < MIN_LENGTH || word === word.toUpperCase()) continue;
     const lower = word.toLowerCase();
     if (!words.includes(lower)) words.push(lower);
   }
@@ -135,7 +135,7 @@ const mostCommon = (surfaces: Map<string, number>) =>
  * typed word (2 times for a word one edit away). Of those, the nearest wins, then the one in the most results, then the
  * first alphabetically. Words are compared as normalized keys, so "pendulums" counts for "pendulum".
  */
-export function suggestTypos(query: ParsedQuery, results: readonly Pick<Result, "title" | "abstract">[]): TypoSuggestion | null {
+export function suggestTypos(query: ConceptQuery | ParsedQuery, results: readonly Pick<Result, "title" | "abstract">[]): TypoSuggestion | null {
   if (results.length === 0) return null;
   const words = wordsToCheck(query);
   if (words.length === 0) return null;
@@ -172,6 +172,7 @@ export function suggestTypos(query: ParsedQuery, results: readonly Pick<Result, 
   }
   if (changes.length === 0) return null;
 
-  const text = changes.reduce((current, change) => replaceWord(current, change.from, change.to), query.original);
-  return text === query.original ? null : { text, changes };
+  const { original } = query;
+  const text = changes.reduce((current, change) => replaceWord(current, change.from, change.to), original);
+  return text === original ? null : { text, changes };
 }

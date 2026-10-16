@@ -181,19 +181,19 @@ function relevanceFactor(reading: { raw: number | null; normalized: number | nul
   return { raw: reading.raw, detail: reading.detail, normalized: reading.normalized ?? NEUTRAL };
 }
 
-const WEIGHT_NOTE = `Each term counts ${FIELD_WEIGHTS.title} if it is in the title, ${FIELD_WEIGHTS.keywords} in the author keywords, ${FIELD_WEIGHTS.abstract} if only in the abstract`;
+const WEIGHT_NOTE = `Each concept counts ${FIELD_WEIGHTS.title} if it is in the title, ${FIELD_WEIGHTS.keywords} in the author keywords, ${FIELD_WEIGHTS.abstract} if only in the abstract`;
 
 function coverageFactor(coverage: Coverage | null): FactorValue {
   if (coverage === null || coverage.total === 0) {
-    return { raw: null, detail: "The query has no terms to look for, so this scores neutral (0.5)", normalized: NEUTRAL };
+    return { raw: null, detail: "The query has no concepts to look for, so this scores neutral (0.5)", normalized: NEUTRAL };
   }
   const found = coverage.units.filter((unit) => unit.matched);
   const missing = coverage.units.filter((unit) => !unit.matched).map((unit) => unit.label);
-  const where = found.map((unit) => `${unit.found.join(" and ")} (${unit.fields.join(", ")})`).join("; ");
+  const where = found.map((unit) => `${unit.label} as “${unit.variant}” (${unit.fields.join(", ")})`).join("; ");
   return {
-    raw: `${found.map((unit) => unit.found.join(" ")).join(", ") || "none"} (${coverage.matchedCount} of ${coverage.total})`,
+    raw: `${found.map((unit) => unit.label).join(", ") || "none"} (${coverage.matchedCount} of ${coverage.total})`,
     detail:
-      `Found ${coverage.matchedCount} of ${coverage.total} terms${where === "" ? "" : `: ${where}`}. ` +
+      `Found ${coverage.matchedCount} of ${coverage.total} concepts${where === "" ? "" : `: ${where}`}. ` +
       `${missing.length > 0 ? `Not found: ${missing.join(", ")}. ` : ""}${WEIGHT_NOTE}.`,
     normalized: clamp01(coverage.weighted),
   };
@@ -203,7 +203,7 @@ function phraseFactor(coverage: Coverage | null): FactorValue {
   if (coverage === null || coverage.phraseScore === null) {
     return {
       raw: null,
-      detail: "The query has no two words next to each other, so this scores neutral (0.5)",
+      detail: "The query has no two neighbouring concepts, so this scores neutral (0.5)",
       normalized: NEUTRAL,
     };
   }
@@ -212,7 +212,7 @@ function phraseFactor(coverage: Coverage | null): FactorValue {
   return {
     raw: `${together.length} of ${coverage.pairs.length} pairs`,
     detail:
-      `Query words that are next to each other in the query and in the text: ` +
+      `Neighbouring concepts of the query that are next to each other, in order, in the text: ` +
       `${together.length === 0 ? "none" : together.map((pair) => `${pair.text} (${pair.found})`).join(", ")}. ` +
       `${apart.length > 0 ? `Not found together: ${apart.join(", ")}. ` : ""}` +
       `A pair in the title counts ${PHRASE_WEIGHTS.title}, in the abstract ${PHRASE_WEIGHTS.abstract}.`,
@@ -288,12 +288,15 @@ function studyTypeFactor({ level }: Labels, preferred: readonly SourceLevel[]): 
 }
 
 /**
- * The order of results: coverage tier first (all terms, then most, then few), then phrase match (the share of
- * neighbouring query words found next to each other, in order, in the title or abstract), then the weighted score.
- * Equal on all three, the DOI or id decides.
+ * The order of results: coverage tier first (every concept, then most, then few), and inside a tier the number of concepts
+ * matched, then phrase match (the share of neighbouring concepts found next to each other, in order, in the title or
+ * abstract), then the weighted score. Equal on all of them, the DOI or id decides.
  */
 function compareScored(a: ScoredResult, b: ScoredResult): number {
   if (a.tier !== b.tier) return a.tier - b.tier;
+  const matchedA = a.coverage?.matchedCount ?? 0;
+  const matchedB = b.coverage?.matchedCount ?? 0;
+  if (matchedA !== matchedB) return matchedB - matchedA;
   const phraseA = a.coverage?.phraseScore ?? 0;
   const phraseB = b.coverage?.phraseScore ?? 0;
   if (phraseA !== phraseB) return phraseB - phraseA;
@@ -326,6 +329,7 @@ export function scoreResults(
     queryTerms,
     signalTerms,
     exact === true ? { exact: true } : {},
+    spec,
   );
   const rates = items.map(({ result }) => citationRate(result, referenceYear));
   const population = rates.filter((rate): rate is number => rate !== null);
@@ -337,7 +341,7 @@ export function scoreResults(
 
   const scored = items.map((item, index): ScoredResult => {
     const { result, labels } = item;
-    const coverage = spec === undefined || spec.units.length === 0 ? null : measureCoverage(result, spec);
+    const coverage = spec === undefined || spec.blocks.length === 0 ? null : measureCoverage(result, spec);
     const values: Record<FactorId, FactorValue> = {
       relevance: relevanceFactor(relevance[index]),
       termCoverage: coverageFactor(coverage),

@@ -157,13 +157,13 @@ describe("describeLexiconMatches", () => {
 });
 
 describe("ORDER_SENTENCE and fewResultsMessage", () => {
-  it("says how the main list is ordered: words, then adjacency, then score", () => {
-    expect(ORDER_SENTENCE).toBe("Sorted by how many of your words each result contains, then by whether your words appear next to each other in order, then by score.");
+  it("says how the main list is ordered: concepts, then adjacency, then score", () => {
+    expect(ORDER_SENTENCE).toBe("Sorted by how many of your concepts each result matches, then by whether neighbouring concepts appear next to each other in order, then by score.");
   });
 
-  it("says what the page does when few results contain every word", () => {
+  it("says what the page does when few results match every concept", () => {
     expect(fewResultsMessage()).toBe(
-      "Few results match all your words, so results that match all but one are listed too, labelled “Matches N of M words”. Check spelling or try synonyms.",
+      "Fewer than 15 results match all your concepts, so results that match all but one are listed too, labelled “Matches N of M concepts”. Check spelling or try different words.",
     );
   });
 });

@@ -29,10 +29,11 @@ import { doiUrl } from "../doi";
 const WORKS_URL = "https://api.crossref.org/works";
 /**
  * Crossref cannot require every word, so its order gets loose: for "chaos double pendulum", 24 of the 27 results in the
- * first 100 that had all three words were among the first 50 (checked 2026-10-14), and the others add noise. 25 is a
- * further cut: Crossref is one of four default sources, and its fuzzy matches must not dominate the pool.
+ * first 100 that had all three words were among the first 50 (checked 2026-10-14), and the others add noise. 20 is a
+ * further cut: Crossref is only a supplement, and its fuzzy matches must not dominate the pool. Every result it sends
+ * still passes the same local concept matching as the others (a result that fails goes to "Partial matches").
  */
-const MAX_ROWS = 25;
+const MAX_ROWS = 20;
 /**
  * Only scholarly types (checked 2026-10-14: several `type` filters are ORed, and without them datasets, components,
  * reference entries and peer-review records come back): journal articles, conference papers, preprints, book chapters, books.
@@ -209,7 +210,7 @@ export function createCrossrefProvider(options: CrossrefOptions = {}): Provider 
     // Crossref's `query` is free text: it ignores AND, OR, NOT and quotes (checked 2026-10-14).
     syntax: "plain",
     requestNotes: [
-      "Looks in titles, authors and other bibliographic details, only for journal articles, conference papers, preprints, book chapters and books. It cannot require every word, so some results contain only some of them; at most 25 results are asked for",
+      "Looks in titles, authors and other bibliographic details, only for journal articles, conference papers, preprints, book chapters and books. It cannot require every word, so some results contain only some of them; at most 20 results are asked for, as a supplement",
     ],
 
     async search(query: string, { limit, signal }: SearchOptions): Promise<Result[]> {

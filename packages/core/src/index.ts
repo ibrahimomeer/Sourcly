@@ -78,11 +78,18 @@ export {
   type TermMatch,
 } from "./counter";
 export { NOTICE_LABELS, noticeKind, type NoticeKind } from "./notices";
-export { relatedTerms, type RelatedTerm } from "./related";
+export {
+  SUGGESTION_MAX_TERMS,
+  SUGGESTION_MIN_RESULTS,
+  SUGGESTION_MIN_SHOWN,
+  SUGGESTION_POOL,
+  suggestedTerms,
+  type SuggestedTerm,
+} from "./suggested";
 export { BM25_B, BM25_K1 } from "./bm25";
 export { normalizeWord, tokenize, type TokenizeOptions } from "./tokens";
 export { STOPWORDS } from "./stopwords";
-export { createOpenAlexProvider, type OpenAlexOptions } from "./providers/openalex";
+export { createOpenAlexCounter, createOpenAlexProvider, type OpenAlexOptions } from "./providers/openalex";
 export { createCrossrefProvider, type CrossrefOptions } from "./providers/crossref";
 export { createPubmedProvider, type PubmedOptions } from "./providers/pubmed";
 export { createEuropePmcProvider, type EuropePmcOptions } from "./providers/europepmc";
@@ -93,8 +100,7 @@ export { createWikipediaProvider, type WikipediaOptions } from "./providers/wiki
 export { createSemanticScholarProvider, type SemanticScholarOptions } from "./providers/semanticscholar";
 export {
   DEFAULT_TIMEOUT_MS,
-  expandable,
-  planExpandedQueries,
+  fallbackOrder,
   planQueries,
   searchProviders,
   type ProviderUpdate,
@@ -103,6 +109,42 @@ export {
   type SentQuery,
 } from "./search";
 export { createSearchCache, type SearchCache } from "./cache";
+export {
+  FALLBACK_BELOW,
+  MAX_FALLBACK_PASSES,
+  countConcepts,
+  enoughResults,
+  fallbackPasses,
+  runFallback,
+  type Counter,
+  type FallbackHooks,
+  type FallbackPass,
+  type FallbackReport,
+  type FallbackRunOptions,
+} from "./fallback";
+export {
+  MAX_VARIANTS,
+  describeBlock,
+  foldWord,
+  hardBlocks,
+  isAbbreviation,
+  isUsableConcepts,
+  keyOf,
+  parseConcepts,
+  variantSignature,
+  withLexicon,
+  withoutBlock,
+  type Block,
+  type ConceptOptions,
+  type ConceptQuery,
+  type SoftTerm,
+  type Variant,
+  type VariantOrigin,
+} from "./concepts";
+export { renderConcepts, toConcepts } from "./conceptquery";
+export { FIELD_ORDER, fieldStreams, matchBlock, matchSoft, snippetOf, streamsOf, type BlockMatch, type FieldStream, type Hit } from "./conceptmatch";
+export { KNOWN_PHRASES, THESAURUS, type ThesaurusEntry, type ThesaurusType } from "./thesaurus";
+export { SOFT_TERMS } from "./softterms";
 export { MIN_TITLE_WORDS, describeInput, parseInput, type DetectedInput } from "./identifiers";
 export {
   MIN_TITLE_SIMILARITY,
@@ -117,7 +159,7 @@ export {
   type LookupOutcome,
   type Neighbours,
 } from "./lookup";
-export { PROVIDER_PRIORITY, mergeResults } from "./dedupe";
+export { PROVIDER_PRIORITY, mergeResults, uniqueProviderHits } from "./dedupe";
 export { applyFilters, defaultFilters, isFiltering, type ResultFilters } from "./filters";
 export {
   UNKNOWN_LANGUAGE,
@@ -171,9 +213,10 @@ export {
   measureCoverage,
   type Coverage,
   type CoverageSpec,
-  type CoverageUnit,
   type MatchField,
   type PairMatch,
+  type Snippet,
+  type Span,
   type Tier,
   type UnitMatch,
 } from "./coverage";

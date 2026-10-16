@@ -9,10 +9,12 @@ import {
   matchCountLabel,
   noticeKind,
   resolveLanguage,
+  uniqueProviderHits,
   type HighlightGroup,
   type LabelOverride,
   type ScoredResult,
   type SectionId,
+  type UnitMatch,
 } from "@sourcly/core";
 import { Badge, type BadgeStyle } from "./Badge";
 import { LabelEditor } from "./LabelEditor";
@@ -22,6 +24,11 @@ import { accessBadgeText, describeLexiconMatches, formatAuthors, formatNumber, r
 import { Highlighted } from "./Highlighted";
 import { libraryUrl } from "./libraryLink";
 import { WhyThisRank } from "./WhyThisRank";
+
+/** “odor (odour, title)”: the concept, the variant that matched, and where. */
+function describeMatch(unit: UnitMatch): string {
+  return `${unit.label} (${unit.variant ?? unit.label}, ${unit.fields[0] ?? ""})`;
+}
 
 export function ResultCard({
   position,
@@ -57,16 +64,24 @@ export function ResultCard({
   const notice = noticeKind(result);
   const reviewText = reviewBadgeText(result);
   const language = resolveLanguage(result);
-  // In the main list, a result that lacks a word is there only because few results have them all: say how many it has.
+  // In the main list, a result that lacks a concept is there only because few results have them all: say how many it has.
   const matchCount = section === "main" ? matchCountLabel(scored) : null;
-  // Found only by the expanded second pass, and not containing every word.
-  const expandedOnly =
-    result.hits.length > 0 && result.hits.every((hit) => hit.expanded === true) && matchCountLabel(scored) !== null;
+  // Found only by a fallback pass (a concept dropped), and not matching every concept.
+  const fallbackOnly =
+    result.hits.length > 0 && result.hits.every((hit) => hit.fallback === true) && matchCountLabel(scored) !== null;
+  // One badge per source, even when a source found it in both the strict pass and a fallback pass (the best rank is kept).
+  const foundBy = uniqueProviderHits(result.hits);
   const matches = findLexiconMatches(result, highlight);
   const coverage = scored.coverage;
-  // What to mark: the words of the search that were found (lightly) and the counterargument terms (heavily).
-  const groups: HighlightGroup[] = [
-    { name: "query", terms: coverage?.foundTerms ?? [], query: true, exact: coverage?.exact === true },
+  // What to mark: the places where the concepts of the search matched (lightly; these are the same places the ranking
+  // counted) and the counterargument terms (heavily).
+  const spansIn = (field: "title" | "abstract") => coverage?.spans[field] ?? [];
+  const titleGroups: HighlightGroup[] = [
+    { name: "query", terms: [], spans: spansIn("title") },
+    { name: "counter", terms: highlight },
+  ];
+  const abstractGroups: HighlightGroup[] = [
+    { name: "query", terms: [], spans: spansIn("abstract") },
     { name: "counter", terms: highlight },
   ];
   const saved = useSaved();
@@ -86,10 +101,10 @@ export function ResultCard({
             </>
           )}
           {result.url === null ? (
-            <Highlighted text={title} groups={groups} />
+            <Highlighted text={title} groups={titleGroups} />
           ) : (
             <a href={result.url} target="_blank" rel="noopener noreferrer">
-              <Highlighted text={title} groups={groups} />
+              <Highlighted text={title} groups={titleGroups} />
             </a>
           )}
         </h3>
@@ -137,19 +152,19 @@ export function ResultCard({
         </li>
         {matchCount !== null && (
           <li>
-            <Badge style="dotted" title="This result does not contain every word of your search. It is in the main list because few results do.">
+            <Badge style="dotted" title="This result does not match every concept of your search. It is in the main list because few results do.">
               {matchCount}
             </Badge>
           </li>
         )}
-        {expandedOnly && (
+        {fallbackOnly && (
           <li>
-            <Badge style="dashed" title="Only the second, expanded pass of the search found this result. See “Queries sent”.">
-              Expanded search: not every word matched
+            <Badge style="dashed" title="Only a fallback pass of the search (one concept dropped) found this result. See “How we searched”.">
+              Fallback search: not every concept matched
             </Badge>
           </li>
         )}
-        {result.hits.map((hit) => (
+        {foundBy.map((hit) => (
           <li key={hit.provider}>
             <Badge style="faint" title={`Ranked #${hit.rank} of ${hit.listSize} by ${PROVIDER_NAMES[hit.provider]}`}>
               Found by {PROVIDER_NAMES[hit.provider]}
@@ -168,7 +183,7 @@ export function ResultCard({
       {coverage !== null && coverage.total > 0 && (
         <p className="matched-terms">
           <strong>Matched:</strong>{" "}
-          {coverage.units.filter((unit) => unit.matched).map((unit) => unit.found.join(" ")).join(", ") || "none of your terms"} (
+          {coverage.units.filter((unit) => unit.matched).map(describeMatch).join(" · ") || "none of your concepts"} (
           {coverage.matchedCount} of {coverage.total})
           {coverage.matchedCount < coverage.total && (
             <>
@@ -235,7 +250,7 @@ export function ResultCard({
         <details className="panel" open={detailed}>
           <summary>Abstract</summary>
           <p>
-            <Highlighted text={result.abstract} groups={groups} />
+            <Highlighted text={result.abstract} groups={abstractGroups} />
           </p>
         </details>
       )}

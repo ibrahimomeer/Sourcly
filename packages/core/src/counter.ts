@@ -1,4 +1,6 @@
-import { formatQuery, termNode, type ParsedQuery, type QueryNode } from "./query";
+import { hardBlocks, withLexicon, type ConceptQuery } from "./concepts";
+import { toConcepts } from "./conceptquery";
+import { termNode, type ParsedQuery } from "./query";
 import { tokenize, wordKey, wordKeys } from "./tokens";
 import type { Result } from "./types";
 
@@ -62,27 +64,15 @@ export function usableCounterTerms(terms: readonly string[]): string[] {
 }
 
 /**
- * The query for the counterargument search: everything in the main query, and at least one of
- * the terms. For `sleep memory` and the terms `limitation` and `no evidence` that is
- * `sleep memory (limitation OR "no evidence")`. With no usable term, the main query comes back
- * unchanged.
+ * The query for the counterargument search: every concept of the main query, and at least one of the terms (one more
+ * block, "any of these"). For `sleep memory` and the terms `limitation` and `no evidence` that is
+ * `sleep memory (limitation OR "no evidence")`. With no usable term, the main query comes back unchanged.
  */
-export function counterQuery(main: ParsedQuery, terms: readonly string[]): ParsedQuery {
-  const nodes: QueryNode[] = [];
-  for (const term of usableCounterTerms(terms)) {
-    const node = termNode(term);
-    if (node !== null) nodes.push(node);
-  }
-  if (main.root === null || nodes.length === 0) return main;
-
-  // "Any of these terms" is optional for sources that cannot say it: they get only the main query.
-  const lexicon: QueryNode = nodes.length === 1 ? (nodes[0] as QueryNode) : { type: "or", items: nodes, optional: true };
-  const root: QueryNode = {
-    type: "and",
-    items: [...(main.root.type === "and" ? main.root.items : [main.root]), lexicon],
-  };
-  const draft: ParsedQuery = { original: "", root, droppedStopwords: [] };
-  return { ...draft, original: formatQuery(draft) };
+export function counterQuery(main: ConceptQuery | ParsedQuery | string, terms: readonly string[]): ConceptQuery {
+  const concepts = toConcepts(main);
+  const usable = usableCounterTerms(terms);
+  if (hardBlocks(concepts).length === 0 || usable.length === 0) return concepts;
+  return withLexicon(concepts, usable);
 }
 
 // ---- Finding the terms in a text.
@@ -217,6 +207,8 @@ export interface HighlightGroup {
   /** Look terms up as a search does (common words and hyphens allowed) rather than as counterargument terms. */
   query?: boolean;
   exact?: boolean;
+  /** Where the matches already are (from the coverage of the result): used as they are instead of looking `terms` up. */
+  spans?: readonly { start: number; end: number; term: string }[];
 }
 
 export interface MarkedSegment {
@@ -235,7 +227,12 @@ export interface MarkedSegment {
 export function markText(text: string, groups: readonly HighlightGroup[]): MarkedSegment[] {
   const accepted: (TermMatch & { group: string })[] = [];
   for (const group of groups) {
-    const found = group.query === true ? findQueryTerms(text, group.terms, group.exact === true) : findTerms(text, group.terms);
+    const found: TermMatch[] =
+      group.spans !== undefined
+        ? group.spans.filter((span) => span.end <= text.length).map((span) => ({ start: span.start, end: span.end, term: span.term }))
+        : group.query === true
+          ? findQueryTerms(text, group.terms, group.exact === true)
+          : findTerms(text, group.terms);
     for (const match of found) {
       if (!accepted.some((other) => match.start < other.end && other.start < match.end)) accepted.push({ ...match, group: group.name });
     }

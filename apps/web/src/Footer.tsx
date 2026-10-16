@@ -1,6 +1,7 @@
 import { Fragment, type ReactNode } from "react";
 import type { SourclyConfig } from "./config";
 import { copyrightYears } from "./copyright";
+import { footerNotice } from "./disclaimer";
 import { APP_VERSION, versionLabel } from "./version";
 
 export function Footer({ config }: { config: SourclyConfig }) {
@@ -30,12 +31,15 @@ export function Footer({ config }: { config: SourclyConfig }) {
 
   return (
     <footer className="site-footer">
-      {parts.map((part, index) => (
-        <Fragment key={index}>
-          {index > 0 && " · "}
-          {part}
-        </Fragment>
-      ))}
+      <p className="footer-line">
+        {parts.map((part, index) => (
+          <Fragment key={index}>
+            {index > 0 && " · "}
+            {part}
+          </Fragment>
+        ))}
+      </p>
+      <p className="footer-notice">{footerNotice(config)}</p>
     </footer>
   );
 }

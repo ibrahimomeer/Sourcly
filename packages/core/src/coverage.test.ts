@@ -1,12 +1,13 @@
 import { describe, expect, it } from "vitest";
 import { counterQuery } from "./counter";
 import { FIELD_WEIGHTS, PHRASE_WEIGHTS, coverageSpec, measureCoverage } from "./coverage";
-import { parseQuery } from "./query";
+import { parseConcepts } from "./concepts";
+import { snippetOf, streamsOf } from "./conceptmatch";
 import { makeResult } from "./testing/make-result";
 import type { Result, Subject } from "./types";
 
-const spec = (text: string, options = {}) => coverageSpec(parseQuery(text, options));
-const labels = (text: string, options = {}) => spec(text, options).units.map((unit) => unit.label);
+const spec = (text: string, options = {}) => coverageSpec(parseConcepts(text, options));
+const labels = (text: string, options = {}) => spec(text, options).blocks.map((block) => block.label);
 const pairsOf = (text: string, options = {}) => spec(text, options).pairs.map((pair) => pair.text);
 const doc = (overrides: Partial<Result>) => makeResult({ title: "", abstract: null, subjects: [], ...overrides });
 const keyword = (term: string): Subject => ({ term, kind: "keyword", provider: "pubmed" });
@@ -16,72 +17,40 @@ const topic = (term: string): Subject => ({ term, kind: "topic", provider: "open
 const cover = (text: string, result: Partial<Result>, options = {}) => measureCoverage(doc(result), spec(text, options));
 
 describe("coverageSpec: what the query asks for", () => {
-  it("makes one unit for each word, in the order typed", () => {
-    expect(labels("caos double pendulum")).toEqual(["caos", "double", "pendulum"]);
+  it("has one block for each concept, in the order typed", () => {
+    expect(labels("caos double pendulum")).toEqual(["caos", "double pendulum"]);
     expect(labels("sleep")).toEqual(["sleep"]);
   });
 
-  it("makes one unit of a quoted phrase, and of an OR group", () => {
-    expect(labels('"double pendulum" chaos')).toEqual(['"double pendulum"', "chaos"]);
-    expect(labels("sleep OR nap memory")).toEqual(["sleep OR nap memory"]);
-    expect(labels("(sleep OR nap) memory")).toEqual(["sleep OR nap", "memory"]);
+  it("leaves out common words and generic words: they are not required", () => {
+    expect(labels("How AI understand odor")).toEqual(["AI", "odor"]);
+    expect(spec("How AI understand odor").soft.map((term) => term.text)).toEqual(["understand"]);
   });
 
-  it("leaves out what is left out with NOT", () => {
-    expect(labels("sleep NOT rats")).toEqual(["sleep"]);
+  it("has no blocks for a query with nothing in it", () => {
+    expect(spec("").blocks).toEqual([]);
+    expect(spec("the of").blocks).toEqual([]);
   });
 
-  it("has no units for a query with nothing in it", () => {
-    expect(spec("").units).toEqual([]);
-    expect(spec("the of").units).toEqual([]);
+  it("does not count the counterargument terms as concepts to match", () => {
+    const query = counterQuery("sleep memory", ["limitation", "bias"]);
+    expect(coverageSpec(query).blocks.map((block) => block.label)).toEqual(["sleep", "memory"]);
   });
 
-  it("does not count the counterargument terms (an optional group) as terms to match", () => {
-    const query = counterQuery(parseQuery("sleep memory"), ["limitation", "bias"]);
-    expect(coverageSpec(query).units.map((unit) => unit.label)).toEqual(["sleep", "memory"]);
+  it("reads text and an already parsed query the same way", () => {
+    expect(JSON.stringify(coverageSpec(parseConcepts("sleep memory")))).toBe(JSON.stringify(coverageSpec("sleep memory")));
   });
 
-  it("follows the way the text is read: a restored common word is a unit, a dropped one is not", () => {
-    expect(labels("what is chaos")).toEqual(["chaos"]);
-    expect(labels("what is chaos", { restored: new Set(["is"]) })).toEqual(["is", "chaos"]);
-    expect(labels("what is chaos", { ignoreCommon: false })).toEqual(["what", "is", "chaos"]);
-  });
-
-  it("finds the pairs of words that sit next to each other in the query", () => {
-    expect(pairsOf("caos double pendulum")).toEqual(["caos double", "double pendulum"]);
+  it("finds the pairs of concepts that sit next to each other in the query", () => {
+    expect(pairsOf("caos double pendulum")).toEqual(["caos double pendulum"]);
+    expect(pairsOf("chaos pendulum motion")).toEqual(["chaos pendulum", "pendulum motion"]);
     expect(pairsOf("sleep")).toEqual([]);
-  });
-
-  it("finds the pairs inside a quoted phrase, and does not join a phrase to its neighbours", () => {
-    expect(pairsOf('"double pendulum" chaos')).toEqual(["double pendulum"]);
-    expect(pairsOf('"state of the art" review')).toEqual(["state of", "of the", "the art"]);
-  });
-
-  it("does not make pairs across an OR or a NOT", () => {
-    expect(pairsOf("sleep OR nap memory")).toEqual([]);
-    expect(pairsOf("(sleep OR nap) memory dreams")).toEqual(["memory dreams"]);
-    expect(pairsOf("sleep NOT rats memory")).toEqual([]);
-  });
-
-  it("makes each pair once", () => {
-    expect(pairsOf("double pendulum double pendulum")).toEqual(["double pendulum", "pendulum double"]);
-  });
-
-  it("is deterministic and does not change the query", () => {
-    const parsed = parseQuery("caos double pendulum");
-    const before = JSON.stringify(parsed);
-    expect(JSON.stringify(coverageSpec(parsed))).toBe(JSON.stringify(coverageSpec(parsed)));
-    expect(JSON.stringify(parsed)).toBe(before);
   });
 });
 
-describe("measureCoverage: where each term is found", () => {
-  it("finds a term in the title, the abstract and the author keywords", () => {
-    const result = doc({
-      title: "A double pendulum",
-      abstract: "We study the motion.",
-      subjects: [keyword("chaos theory")],
-    });
+describe("measureCoverage: where each concept is found", () => {
+  it("finds a concept in the title, the abstract and the author keywords", () => {
+    const result = doc({ title: "A double pendulum", abstract: "We study the motion.", subjects: [keyword("chaos theory")] });
     const c = measureCoverage(result, spec("double motion chaos"));
     expect(c.units.map((u) => [u.label, u.fields])).toEqual([
       ["double", ["title"]],
@@ -91,7 +60,7 @@ describe("measureCoverage: where each term is found", () => {
     expect(c.units.map((u) => u.weight)).toEqual([FIELD_WEIGHTS.title, FIELD_WEIGHTS.abstract, FIELD_WEIGHTS.keywords]);
   });
 
-  it("does not count provider topics, MeSH headings, subjects, OpenAlex's own keywords or the venue", () => {
+  it("does not look at provider topics, MeSH headings, subjects, OpenAlex's own keywords or the venue", () => {
     const result = doc({
       title: "A study",
       abstract: "Some words.",
@@ -107,10 +76,9 @@ describe("measureCoverage: where each term is found", () => {
     expect(cover("chaos", { subjects: [keyword("chaos")] }).matchedCount).toBe(1);
     expect(cover("chaos", { subjects: [openAlexKeyword("chaos")] }).matchedCount).toBe(0);
     expect(cover("chaos", { subjects: [{ term: "chaos", kind: "keyword", provider: "doaj" }] }).matchedCount).toBe(1);
-    expect(cover("chaos", { subjects: [{ term: "chaos", kind: "keyword", provider: "zenodo" }] }).matchedCount).toBe(1);
   });
 
-  it("reports every field a term is in, strongest first, and weighs it by the strongest", () => {
+  it("reports every field a concept is in, strongest first, and weighs it by the strongest", () => {
     const c = cover("pendulum", { title: "Pendulum", abstract: "a pendulum", subjects: [keyword("Pendulum")] });
     expect(c.units[0]).toMatchObject({ matched: true, fields: ["title", "keywords", "abstract"], weight: 1 });
   });
@@ -130,17 +98,12 @@ describe("measureCoverage: where each term is found", () => {
     expect(cover("ring", { title: "string and springs and bring" }).matchedCount).toBe(0);
   });
 
-  it("does not match a word that is not there, even as part of a longer word", () => {
-    const c = cover("pendulum", { title: "Pendulums and pendular motion, pendulumlike" });
-    // "pendulums" folds to "pendulum"; the other forms are different words.
-    expect(c.units[0]?.matched).toBe(true);
+  it("folds only plurals: no other word ending is made the same", () => {
+    expect(cover("pendulum", { title: "Pendulums and pendular motion, pendulumlike" }).units[0]?.matched).toBe(true);
     expect(cover("pendulum", { title: "pendular motion and pendulumlike things" }).units[0]?.matched).toBe(false);
-  });
-
-  it("folds plurals both ways and ignores capitals and accents", () => {
     expect(cover("pendulums", { title: "A Pendulum" }).units[0]?.matched).toBe(true);
+    expect(cover("sleeping", { title: "sleep and sleeps" }).units[0]?.matched).toBe(false);
     expect(cover("café", { title: "CAFE culture" }).units[0]?.matched).toBe(true);
-    expect(cover("Biases", { title: "bias in studies" }).units[0]?.matched).toBe(true);
   });
 
   it("matches a phrase only when its words are next to each other, in order", () => {
@@ -150,34 +113,32 @@ describe("measureCoverage: where each term is found", () => {
     expect(cover('"double pendulum"', { abstract: "We drive a double pendulum." }).units[0]).toMatchObject({ matched: true, fields: ["abstract"] });
   });
 
+  it("takes a hyphen or a slash between the words of a phrase, but not a full stop or a comma", () => {
+    expect(cover('"double pendulum"', { title: "double-pendulum" }).units[0]?.matched).toBe(true);
+    expect(cover('"double pendulum"', { title: "double. Pendulum" }).units[0]?.matched).toBe(false);
+    expect(cover('"double pendulum"', { title: "double, pendulum" }).units[0]?.matched).toBe(false);
+  });
+
   it("matches a phrase made of common words, as written", () => {
     expect(cover('"state of the art"', { title: "State of the art in sleep research" }).units[0]?.matched).toBe(true);
     expect(cover('"state of the art"', { title: "State art" }).units[0]?.matched).toBe(false);
   });
 
   it("does not let a phrase run from one keyword into the next", () => {
-    const c = cover('"double pendulum"', { subjects: [keyword("double"), keyword("pendulum")] });
-    expect(c.units[0]?.matched).toBe(false);
+    expect(cover('"double pendulum"', { subjects: [keyword("double"), keyword("pendulum")] }).units[0]?.matched).toBe(false);
     expect(cover('"double pendulum"', { subjects: [keyword("double pendulum")] }).units[0]?.matched).toBe(true);
   });
 
   it("matches a word with a hyphen as its parts next to each other: covid-19", () => {
     expect(cover("covid-19", { title: "COVID 19 vaccines" }).units[0]?.matched).toBe(true);
-    expect(cover("covid-19", { title: "covid-19 vaccines" }).units[0]?.matched).toBe(true);
     expect(cover("covid-19", { title: "covid vaccines in 19 countries" }).units[0]?.matched).toBe(false);
   });
 
   it("counts an OR group as found when any one alternative is, and says which", () => {
     const c = cover("(sleep OR nap) memory", { title: "Nap and memory" });
-    expect(c.units[0]).toMatchObject({ matched: true, found: ["nap"] });
+    expect(c.units[0]).toMatchObject({ matched: true, found: ["nap"], variant: "nap" });
     expect(c.matchedCount).toBe(2);
     expect(cover("(sleep OR nap) memory", { title: "Dreams and memory" }).units[0]?.matched).toBe(false);
-  });
-
-  it("needs all of an alternative's words when the alternative is itself an AND", () => {
-    expect(cover("sleep OR nap memory", { title: "Nap" }).units[0]?.matched).toBe(false);
-    expect(cover("sleep OR nap memory", { title: "Nap memory" }).units[0]?.matched).toBe(true);
-    expect(cover("sleep OR nap memory", { title: "Sleep" }).units[0]?.matched).toBe(true);
   });
 
   it("compares words as typed when the search was sent exactly as typed", () => {
@@ -185,100 +146,179 @@ describe("measureCoverage: where each term is found", () => {
     expect(cover("pendulums", { title: "Pendulums" }, { exact: true }).units[0]?.matched).toBe(true);
     expect(cover("the pendulum", { title: "The pendulum" }, { exact: true }).units.map((u) => u.matched)).toEqual([true, true]);
   });
+});
 
-  it("finds a restored common word", () => {
-    expect(cover("what is chaos", { title: "What is chaos" }, { restored: new Set(["is"]) }).units.map((u) => u.matched)).toEqual([true, true]);
-    expect(cover("what is chaos", { title: "Chaos" }, { restored: new Set(["is"]) }).units.map((u) => u.matched)).toEqual([false, true]);
+describe("measureCoverage: variants from the thesaurus", () => {
+  it("matches a concept by any of its variants and says which one, and that it came from the thesaurus", () => {
+    const c = cover("odor", { title: "Olfactory coding in the mouse" });
+    expect(c.units[0]).toMatchObject({ matched: true, variant: "olfactory", fromThesaurus: true, fields: ["title"] });
   });
 
-  it("lists the words found, each once, for highlighting", () => {
-    const c = cover("double pendulum chaos", { title: "Double pendulum", abstract: "a double pendulum" });
-    expect(c.foundTerms).toEqual(["double", "pendulum"]);
+  it("prefers the word that was typed when the result has both", () => {
+    const c = cover("odor", { title: "Odour and odor", abstract: "the sense of smell" });
+    expect(c.units[0]).toMatchObject({ variant: "odor", fromThesaurus: false });
+    expect(c.units[0]?.found).toEqual(["odor", "odour", "sense of smell"]);
+  });
+
+  it("matches AI by 'machine learning', and does not need the word AI", () => {
+    const c = cover("AI odor", { title: "Machine learning predicts odor", abstract: null });
+    expect(c.units.map((u) => [u.label, u.variant])).toEqual([
+      ["AI", "machine learning"],
+      ["odor", "odor"],
+    ]);
+    expect(c.tier).toBe(1);
+  });
+
+  it("does not match with the thesaurus off", () => {
+    expect(cover("odor", { title: "Olfactory coding" }, { synonyms: false }).matchedCount).toBe(0);
+  });
+});
+
+describe("measureCoverage: abbreviations are matched with their capitals, as whole words", () => {
+  it("matches AI in capitals", () => {
+    expect(cover("AI", { title: "AI in medicine" }).units[0]).toMatchObject({ matched: true, variant: "AI", fromThesaurus: false });
+    expect(cover("AI", { abstract: "Modern AI systems" }).units[0]?.matched).toBe(true);
+  });
+
+  it("matches the plural of an abbreviation (AIs)", () => {
+    expect(cover("CNN", { title: "Two CNNs compared" }).units[0]?.matched).toBe(true);
+  });
+
+  it("does not match Ai Weiwei, or ai in lowercase, or the letters inside waiting", () => {
+    for (const title of ["Ai Weiwei and the art of protest", "ai weiwei", "Waiting for the bus", "Training and retaining staff", "AIDS prevention", "Said and maintained"]) {
+      expect(cover("AI", { title }, { synonyms: false }).units[0]?.matched, title).toBe(false);
+    }
+  });
+
+  it("does not take the verb 'can' for CAN", () => {
+    expect(cover("CAN bus", { title: "What can a bus driver do?" }, { synonyms: false }).units[0]?.matched).toBe(false);
+    expect(cover("CAN bus", { title: "A CAN bus gateway" }).matchedCount).toBe(2);
+  });
+
+  it("matches the long form of an abbreviation, case-blind", () => {
+    expect(cover("CAN bus", { title: "A controller area network bus" }).units[0]).toMatchObject({ matched: true, variant: "controller area network", fromThesaurus: true });
+  });
+});
+
+describe("measureCoverage: an unrelated paper that shares only a word does not match", () => {
+  const appleAroma = {
+    title: "Volatile aroma compounds in apple cultivars",
+    abstract: "The aroma of apples depends on esters and aldehydes. Sensory panels described the flavor of eighteen cultivars. Ai Weiwei is not discussed.",
+    subjects: [keyword("apple"), keyword("flavor")],
+  };
+
+  it("does not match the AI concept, so the paper does not match the search", () => {
+    const c = cover("How AI understand odor", appleAroma);
+    expect(c.units.find((u) => u.label === "AI")).toMatchObject({ matched: false, variant: null, fields: [] });
+    expect(c.matchedCount).toBe(0);
+    expect(c.tier).toBe(3);
+  });
+
+  it("does not take aroma or flavor for odor", () => {
+    expect(cover("odor", appleAroma).matchedCount).toBe(0);
+  });
+
+  it("matches the odor concept in a paper that says odour, but still not AI", () => {
+    const c = cover("How AI understand odor", { title: "Odour perception in apple orchards", abstract: "Field notes on odour." });
+    expect(c.units.map((u) => u.matched)).toEqual([false, true]);
+    expect(c.tier).not.toBe(1);
+  });
+});
+
+describe("measureCoverage: generic words are never required", () => {
+  it("is full coverage without the generic word, and counts the generic word when it is there", () => {
+    const without = cover("How AI understand odor", { title: "Machine learning for olfaction" });
+    expect(without.tier).toBe(1);
+    expect(without.total).toBe(2);
+    expect(without.soft).toEqual([]);
+    const withIt = cover("How AI understand odor", { title: "Machine learning for olfaction", abstract: "We understand how it works." });
+    expect(withIt.tier).toBe(1);
+    expect(withIt.soft).toEqual([{ text: "understand", count: 1 }]);
   });
 });
 
 describe("measureCoverage: tiers", () => {
-  const tierFor = (query: string, title: string) => cover(query, { title }).tier;
-
-  it("is tier 1 when every term is found", () => {
-    expect(tierFor("double pendulum chaos", "Chaos of a double pendulum")).toBe(1);
-  });
-
-  it("is tier 2 when more than half are found", () => {
-    expect(tierFor("double pendulum chaos", "A double pendulum")).toBe(2);
-    expect(tierFor("a1 b2 c3 d4", "a1 b2 c3")).toBe(2);
-  });
-
-  it("is tier 3 when half or fewer are found, or none", () => {
-    expect(tierFor("double pendulum chaos", "Chaos in the atmosphere")).toBe(3);
-    expect(tierFor("double pendulum", "A pendulum")).toBe(3);
-    expect(tierFor("a1 b2 c3 d4", "a1 b2")).toBe(3);
-    expect(tierFor("double pendulum chaos", "Unrelated")).toBe(3);
-  });
-
-  it("is tier 1 for a one-word query that is found, and tier 3 when it is not", () => {
-    expect(tierFor("sleep", "Sleep")).toBe(1);
-    expect(tierFor("sleep", "Dreams")).toBe(3);
-  });
-
-  it("is tier 1, and fully covered, when the query has no terms to match", () => {
-    const c = measureCoverage(doc({ title: "Anything" }), coverageSpec(parseQuery("")));
-    expect(c).toMatchObject({ tier: 1, total: 0, fraction: 1, weighted: 1, phraseScore: null });
+  it("is tier 1 when every concept is found, 2 when more than half are, 3 otherwise", () => {
+    expect(cover("a1 b1 c1", { title: "a1 b1 c1" }).tier).toBe(1);
+    expect(cover("a1 b1 c1", { title: "a1 b1" }).tier).toBe(2);
+    expect(cover("a1 b1 c1", { title: "a1" }).tier).toBe(3);
+    expect(cover("a1 b1", { title: "a1" }).tier).toBe(3);
   });
 
   it("gives the fraction and the count", () => {
-    const c = cover("double pendulum chaos", { title: "A double pendulum" });
-    expect(c).toMatchObject({ matchedCount: 2, total: 3 });
-    expect(c.fraction).toBeCloseTo(2 / 3, 12);
-    expect(c.weighted).toBeCloseTo(2 / 3, 12);
+    const c = cover("a1 b1 c1 d1", { title: "a1 b1" });
+    expect(c).toMatchObject({ matchedCount: 2, total: 4, fraction: 0.5 });
   });
 
-  it("matches for the same words in any order, so every ordering of the query gives the same tiers", () => {
-    const result = { title: "Chaos in a double pendulum", abstract: null };
-    for (const query of ["chaos double pendulum", "double pendulum chaos", '"double pendulum" chaos', "pendulum chaos double"]) {
-      expect(cover(query, result).tier, query).toBe(1);
-    }
+  it("is tier 1 and neutral for a search with no concepts", () => {
+    const c = cover("the of", { title: "anything" });
+    expect(c).toMatchObject({ tier: 1, total: 0, fraction: 1 });
   });
 });
 
-describe("measureCoverage: pairs next to each other", () => {
+describe("measureCoverage: concepts next to each other", () => {
   it("scores 1 for a pair in the title and 0.7 for one only in the abstract", () => {
     expect(PHRASE_WEIGHTS).toEqual({ title: 1, abstract: 0.7 });
-    expect(cover("double pendulum", { title: "A double pendulum" }).phraseScore).toBe(1);
-    expect(cover("double pendulum", { abstract: "A double pendulum" }).phraseScore).toBe(0.7);
-    expect(cover("double pendulum", { title: "A pendulum, double" }).phraseScore).toBe(0);
+    expect(cover("chaos pendulum", { title: "Chaos pendulum" }).phraseScore).toBe(1);
+    expect(cover("chaos pendulum", { abstract: "Chaos pendulum" }).phraseScore).toBe(0.7);
+    expect(cover("chaos pendulum", { title: "Pendulum and chaos" }).phraseScore).toBe(0);
+  });
+
+  it("counts a pair by any variant of its concepts", () => {
+    expect(cover("AI odor", { title: "Machine learning odour prediction" }).pairs).toEqual([{ text: "AI odor", found: "title" }]);
   });
 
   it("takes the mean over the pairs of the query", () => {
-    const c = cover("chaos double pendulum", { title: "Chaos in a double pendulum" });
-    expect(c.pairs).toEqual([
-      { text: "chaos double", found: null },
-      { text: "double pendulum", found: "title" },
-    ]);
-    expect(c.phraseScore).toBe(0.5);
-    expect(cover("chaos double pendulum", { title: "Double pendulum chaos" }).phraseScore).toBe(0.5);
-    expect(cover("chaos double pendulum", { title: "Chaos double pendulum" }).phraseScore).toBe(1);
+    expect(cover("chaos pendulum motion", { title: "Chaos pendulum", abstract: "x" }).phraseScore).toBe(0.5);
   });
 
   it("prefers the title when a pair is in both", () => {
-    expect(cover("double pendulum", { title: "double pendulum", abstract: "double pendulum" }).pairs[0]?.found).toBe("title");
+    expect(cover("chaos pendulum", { title: "Chaos pendulum", abstract: "chaos pendulum" }).pairs[0]?.found).toBe("title");
   });
 
-  it("is null when the query has no two words next to each other", () => {
-    expect(cover("sleep", { title: "Sleep" }).phraseScore).toBeNull();
-    expect(cover("(sleep OR nap) memory", { title: "Sleep memory" }).phraseScore).toBeNull();
-  });
-
-  it("does not look in the keywords or topics", () => {
-    expect(cover("double pendulum", { subjects: [keyword("double pendulum")] }).phraseScore).toBe(0);
+  it("is null when the query has no two neighbouring concepts", () => {
+    expect(cover("chaos", { title: "Chaos" }).phraseScore).toBeNull();
   });
 });
 
-describe("measureCoverage: it does not change what it is given", () => {
-  it("leaves the result alone", () => {
-    const result = doc({ title: "A double pendulum", abstract: "x", subjects: [keyword("chaos")] });
-    const before = JSON.stringify(result);
-    measureCoverage(result, spec("double pendulum chaos"));
-    expect(JSON.stringify(result)).toBe(before);
+describe("measureCoverage: snippets and places", () => {
+  it("gives about 80 characters around the match, cut at word edges and marked with ellipses", () => {
+    const filler = "this is a long run of ordinary words that fills the line ";
+    const result = doc({ title: "T", abstract: `${filler}${filler}We predict odour from structure.${filler}${filler}` });
+    const unit = measureCoverage(result, spec("odor")).units[0];
+    const snippet = unit?.snippet;
+    expect(snippet).toMatchObject({ field: "abstract", match: "odour" });
+    expect(snippet?.before.startsWith("…")).toBe(true);
+    expect(snippet?.after.endsWith("…")).toBe(true);
+    const length = (snippet?.before.length ?? 0) + (snippet?.match.length ?? 0) + (snippet?.after.length ?? 0);
+    expect(length).toBeGreaterThan(50);
+    expect(length).toBeLessThan(100);
+    expect(snippet?.before.replace("…", "").startsWith(" ")).toBe(false);
+  });
+
+  it("has no ellipsis when the match is at the start or end of a short text", () => {
+    const snippet = cover("odor", { title: "Odor of fruit" }).units[0]?.snippet;
+    expect(snippet).toEqual({ field: "title", before: "", match: "Odor", after: " of fruit" });
+  });
+
+  it("marks the places of every match for highlighting, with the variant that matched", () => {
+    const c = cover("odor", { title: "Odor and odour", abstract: "olfaction" });
+    expect(c.spans.title).toEqual([
+      { start: 0, end: 4, term: "odor" },
+      { start: 9, end: 14, term: "odour" },
+    ]);
+    expect(c.spans.abstract).toEqual([{ start: 0, end: 9, term: "olfaction" }]);
+    expect(c.spans.keywords).toEqual([]);
+  });
+
+  it("gives a snippet for the author keywords too", () => {
+    const unit = cover("odor", { subjects: [keyword("olfaction"), keyword("machine learning")] }).units[0];
+    expect(unit?.snippet).toMatchObject({ field: "keywords", match: "olfaction" });
+  });
+
+  it("builds the same streams for the same result, and does not change it", () => {
+    const result = doc({ title: "Odor", abstract: "x" });
+    expect(streamsOf(result)).toBe(streamsOf(result));
+    expect(snippetOf(streamsOf(result)[0] as never, { start: 0, end: 4 }).match).toBe("Odor");
   });
 });

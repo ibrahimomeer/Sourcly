@@ -1,5 +1,4 @@
 import { describe, expect, it } from "vitest";
-import { counterQuery } from "./counter";
 import {
   excludedTerms,
   isAllCapsTerm,
@@ -341,14 +340,6 @@ describe("renderQuery: a source that ignores a group inside a larger search (fla
       text: "sleep",
       notes: ["Ignored a group of alternatives (“either word”), because this source ignores such a group inside a larger search"],
     });
-  });
-
-  it("leaves out the counterargument terms the way a plain source does, with the same words", () => {
-    const rendered = renderQuery(counterQuery(parseQuery("sleep memory"), ["limitation", "criticism"]), "boolean-flat");
-    expect(rendered.text).toBe("sleep AND memory");
-    expect(rendered.notes).toEqual([
-      "This source cannot ask for “any of these terms”, so it was sent only the rest of your search; its results that contain none of the terms rank lower",
-    ]);
   });
 
   it("leaves out a group to exclude", () => {

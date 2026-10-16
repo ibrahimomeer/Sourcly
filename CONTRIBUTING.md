@@ -26,6 +26,7 @@ pnpm version:check  # the version in package.json and CITATION.cff agree
 pnpm version:set 0.2.0   # change the version (the only place to change it)
 pnpm build          # builds apps/web/dist: index.html (one file) and config.js
 pnpm check:dist     # fails if index.html needs any file other than config.js
+pnpm eval:search    # live-network search benchmark (not part of CI); see "The benchmark"
 ```
 
 `pnpm --filter @sourcly/core test:live` is an opt-in smoke test against the real OpenAlex API. It is not part of `pnpm test`, so CI never depends on the network or spends OpenAlex's small keyless daily allowance. Please run it sparingly.
@@ -41,6 +42,30 @@ apps/web/        the React app and its plain CSS. Logic that is not about drawin
 docs/            methodology.md (how everything is worked out) and adding-a-source.md.
 scripts/         the single-file build checker and the version tools.
 ```
+
+## Adding to the thesaurus
+
+`packages/core/src/thesaurus.ts` is the curated list of alternatives a concept is matched by (`odor` also `odour`, `olfaction`; `AI` also `machine learning`). It is plain data, edited by hand; there is no model behind it. To add an entry, add one line to the `THESAURUS` array:
+
+```ts
+spelling("odor", "odour"),                                    // a US/UK pair or other spelling: works both ways
+abbreviation("GNN", "graph neural network"),                  // an abbreviation and what it stands for: works both ways
+synonym("odor", ["odorant", "olfaction", "sense of smell"], "the same subject; not aroma or flavor"),  // one way only
+```
+
+Rules (a pull request that breaks one is sent back):
+
+1. **Narrow, not broad.** A variant must be something a paper writes *instead of* the term, in the same sense. `odor` may stand for `olfaction` but not for `aroma` or `flavor`: a food paper about the aroma of apples is not about odor perception. A bare word that means something else in another field is written as a phrase or left out: `odor` brings `sense of smell` and not `smell`, because a *code smell* is a software term (in a live search for "How AI understand odor", 13 of the first 70 results were about code smells). When in doubt, leave it out, and check a few real abstracts.
+2. **Give the entry its type and a one-line note** saying why it is there. A synonym works one way (the term brings its variants, not the other way round), so `machine learning` does not bring `AI`.
+3. **Abbreviations of 2 to 6 capitals or digits** are matched with their capitals, as whole words. Do not add an abbreviation whose capitals are also an ordinary word in capitals-heavy text unless you accept that.
+4. **Word forms are listed, not stemmed.** Sourcly folds only a plural `-s`/`-es`. If `predicting` and `predicted` matter, they are entries (see `prediction`).
+5. **At most 8 variants per concept.** Phrases the thesaurus should join into one concept when typed next to each other (`climate change`) go in `KNOWN_PHRASES`.
+6. Generic words that are never worth requiring in any search ("understand", "using", "novel") go in `packages/core/src/softterms.ts`, not in the thesaurus; add one only if requiring it would be wrong for *every* subject.
+7. Add a test if the entry fixes a case, then run `pnpm --filter @sourcly/core test` (it checks the shape of every entry) and `pnpm eval:search` to see what the entry does to real results.
+
+## The benchmark
+
+`pnpm eval:search` runs the queries of `apps/web/eval/benchmark.json` against the live sources (it is not part of CI). To add a query, add it there with its `check` and the DOIs of papers a good search should find. **Check each DOI** (Crossref `works/<doi>`, or DataCite for an arXiv paper) resolves to the title you write, and never put a query, DOI or topic into the ranking code: the benchmark measures the search, it must not steer it.
 
 ## Rules for code
 

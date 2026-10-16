@@ -116,8 +116,8 @@ export interface ProviderHit {
   listSize: number;
   /** The provider's own relevance score, when it gives one. */
   score: number | null;
-  /** True when the work was returned by the second, expanded pass of a search and not by the strict first one. */
-  expanded?: true;
+  /** True when the work was returned by a fallback pass (one concept dropped) and not by the strict first pass. */
+  fallback?: true;
 }
 
 /** The single normalized record every provider produces. */
@@ -178,8 +178,6 @@ export interface SearchOptions {
   /** Maximum number of results to return from one provider. */
   limit: number;
   signal?: AbortSignal;
-  /** The expanded pass: ask in the provider's looser way (see `Provider.expandedSyntax`). */
-  expanded?: boolean;
 }
 
 export interface Provider {
@@ -192,14 +190,6 @@ export interface Provider {
    * looks in, how many results it asks for). Shown beside the query that was sent.
    */
   readonly requestNotes?: readonly string[];
-  /**
-   * Set when the provider takes part in the expanded pass that runs when a strict search finds few results
-   * that contain every word. It is how the query is written for that pass, and the provider's `search`
-   * is called with `expanded: true`. Left out when a second request would only repeat the first.
-   */
-  readonly expandedSyntax?: QuerySyntax;
-  /** Notes about the expanded request, shown beside the query it sent. */
-  readonly expandedRequestNotes?: readonly string[];
   /**
    * Resolves with normalized results, best match first. Throws `ProviderError`
    * when the provider cannot answer; callers decide what to show.
