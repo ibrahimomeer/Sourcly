@@ -22,7 +22,8 @@ import { LabelRows } from "./LabelRows";
 import { useSaved } from "./SavedContext";
 import { accessBadgeText, describeLexiconMatches, formatAuthors, formatNumber, reviewBadgeText } from "./format";
 import { Highlighted } from "./Highlighted";
-import { libraryUrl } from "./libraryLink";
+import { useLibraryName } from "./LibraryContext";
+import { libraryLabel, libraryUrl } from "./libraryLink";
 import { WhyThisRank } from "./WhyThisRank";
 
 /** “odor (odour, title)”: the concept, the variant that matched, and where. */
@@ -61,6 +62,7 @@ export function ResultCard({
   const { openAccess, retraction } = result;
   const title = result.title === "" ? "(untitled)" : result.title;
   const libraryHref = libraryUrl(libraryPrefix, result);
+  const libraryName = libraryLabel(useLibraryName());
   const notice = noticeKind(result);
   const reviewText = reviewBadgeText(result);
   const language = resolveLanguage(result);
@@ -143,7 +145,7 @@ export function ResultCard({
           </li>
         )}
         <li>
-          <Badge style={accessStyle}>{accessBadgeText(openAccess, libraryHref !== null)}</Badge>
+          <Badge style={accessStyle}>{accessBadgeText(openAccess, libraryHref !== null, libraryName)}</Badge>
         </li>
         <li>
           <Badge style={language.status === "detected" ? "faint" : "faint-dashed"} title={languageExplanation(language)}>
@@ -223,7 +225,7 @@ export function ResultCard({
         )}
         {libraryHref !== null && (
           <a className="button" href={libraryHref} target="_blank" rel="noopener noreferrer">
-            Access with UBC Library
+            Access with {libraryName}
           </a>
         )}
         {result.doi !== null && (
@@ -243,7 +245,7 @@ export function ResultCard({
         </button>
       </div>
       {libraryHref !== null && (
-        <p className="muted note">Access depends on UBC Library subscriptions; you may be asked to log in.</p>
+        <p className="muted note">Access depends on {libraryName} subscriptions; you may be asked to log in.</p>
       )}
 
       {result.abstract !== null && (

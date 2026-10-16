@@ -24,10 +24,10 @@ export function labelText(label: Label<SourceLevel | PeerReviewStatus>): string 
 
 /**
  * The access badge on a card: plain text, never a reason to hide or demote a
- * result. "try UBC Library" appears only when the card really has that link.
+ * result. "try <library name>" appears only when the card really has that link.
  */
-export function accessBadgeText(openAccess: OpenAccessInfo, hasLibraryLink: boolean): string {
-  const suffix = hasLibraryLink ? ", try UBC Library" : "";
+export function accessBadgeText(openAccess: OpenAccessInfo, hasLibraryLink: boolean, libraryName = "UBC Library"): string {
+  const suffix = hasLibraryLink ? `, try ${libraryName.trim() === "" ? "your library" : libraryName.trim()}` : "";
   if (openAccess.isOpen === true) {
     return openAccess.status === "unknown" ? "Open access" : `Open access (${openAccess.status})`;
   }

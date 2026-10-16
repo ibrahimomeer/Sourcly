@@ -24,8 +24,8 @@ pnpm test           # core and web unit tests
 pnpm test:scripts   # tests for the scripts in scripts/ (single-file check, version tools)
 pnpm version:check  # the version in package.json and CITATION.cff agree
 pnpm version:set 0.2.0   # change the version (the only place to change it)
-pnpm build          # builds apps/web/dist: index.html (one file) and config.js
-pnpm check:dist     # fails if index.html needs any file other than config.js
+pnpm build          # builds apps/web/dist/index.html: ONE self-contained file
+pnpm check:single-file   # fails if that file needs any other local file; prints its size
 pnpm eval:search    # live-network search benchmark (not part of CI); see "The benchmark"
 ```
 
@@ -80,7 +80,7 @@ Rules (a pull request that breaks one is sent back):
 
 - Work on `dev`. `main` receives reviewed, working states only, and the hosted site is built from it.
 - Commit messages follow [Conventional Commits](https://www.conventionalcommits.org): `feat:`, `fix:`, `docs:`, `chore:`, `test:`, `refactor:`.
-- Before you open a pull request, run `pnpm typecheck`, `pnpm test`, `pnpm test:scripts`, `pnpm build` and `pnpm check:dist`. CI runs the same.
+- Before you open a pull request, run `pnpm typecheck`, `pnpm test`, `pnpm test:scripts`, `pnpm build` and `pnpm check:single-file`. CI runs the same.
 - Try the change in a real browser, and try the built `dist/index.html` by double-clicking it (a page opened from a file is treated differently from one served by a server).
 
 ## Adding a data source
@@ -89,9 +89,13 @@ See [docs/adding-a-source.md](docs/adding-a-source.md). The short version: check
 
 ## Making a release
 
-1. Set the new version in **one place**, the `version` line of the root `package.json`, with `pnpm version:set 0.2.0` (it also updates `CITATION.cff`, the one file that repeats it). The footer ("v0.2.0"), the search protocol and the release zip name all read it from there; the other `package.json` files carry no version on purpose. `pnpm version:check` (also run by CI) fails if anything disagrees. Commit on `dev`, review, and merge to `main`.
-2. Tag the commit on `main`: `git tag v0.2.0 && git push origin v0.2.0`.
-3. The `Release` workflow typechecks, tests and builds, checks that `index.html` is a single file, checks that the tag equals the version, and attaches `sourcly-0.2.0.zip` (the site, `config.js`, a short README and the licence) to a GitHub Release. The footer's "Download" link points at `releases/latest`.
+People never build anything: the hosted site is built from `main`, and the offline copy is one HTML file attached to a GitHub Release.
+
+1. Set the new version in **one place**, the `version` line of the root `package.json`, with `pnpm version:set 0.2.0` (it also updates `CITATION.cff`, the one file that repeats it). The footer ("You are using v0.2.0"), the search protocol and the release file name all read it from there; the other `package.json` files carry no version on purpose. `pnpm version:check` (also run by CI) fails if anything disagrees. Commit on `dev`, review, and merge to `main`.
+2. Tag the commit on `main` with `v` plus the version, and push the tag: `git tag v0.2.0 && git push origin v0.2.0`.
+3. The `Release` workflow first checks that the tag is exactly `v` + the root `package.json` version (it fails with a clear message otherwise), then installs, typechecks, tests, builds and runs `pnpm check:single-file`, renames the built file to `sourcly-v0.2.0.html` and attaches it to the GitHub Release as the only asset (no zip). The release notes say the version and "Double-click the file to open it. If your browser blocks it, use <site address>." (the address is `siteUrl` in `apps/web/src/config.ts`).
+
+The site never asks GitHub for anything (a test checks this): its footer "Download offline copy (GitHub Releases)" is a plain link to `<repoUrl>/releases/latest`, and it is hidden in the offline copy, which shows "Newest version: <site address>" instead.
 
 ## Licence
 

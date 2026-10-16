@@ -222,4 +222,13 @@ export class ProviderError extends Error {
  */
 export type ProviderStatus =
   | { provider: ProviderId; state: "ok"; count: number; /** True when the answer came from this visit's cache. */ cached?: boolean }
-  | { provider: ProviderId; state: ProviderFailureKind | "skipped"; message: string };
+  | {
+      provider: ProviderId;
+      state: ProviderFailureKind | "skipped";
+      message: string;
+      /**
+       * True when the request itself failed in the browser (a fetch TypeError: offline, blocked by the browser, or refused for a
+       * page opened from a file), as opposed to the source answering with an error or a rate limit. Only "failed" sets it.
+       */
+      network?: true;
+    };

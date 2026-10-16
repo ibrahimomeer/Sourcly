@@ -56,10 +56,12 @@ export function findProblems({ packageVersion, cffText, workspaceVersions = {}, 
     if (version !== null) problems.push(`${path} has its own version (${version}). Remove it: the version lives only in the root package.json`);
   }
   if (tag !== null) {
-    const tagVersion = parseVersion(tag);
-    if (tagVersion === null) problems.push(`the tag "${tag}" is not a version tag like v1.2.3`);
-    else if (tagVersion !== packageVersion) {
-      problems.push(`the tag ${tag} does not match package.json version ${packageVersion}. Change the version, commit, and tag again`);
+    // The release workflow runs this first. The tag must be exactly "v" plus the version in the root package.json.
+    const expected = `v${packageVersion}`;
+    if (!/^v/.test(tag) || parseVersion(tag) === null) {
+      problems.push(`the tag "${tag}" is not a version tag like v1.2.3`);
+    } else if (tag !== expected) {
+      problems.push(`the tag ${tag} does not match package.json (version ${packageVersion}): the tag must be ${expected}. Fix the version with pnpm version:set, commit, and tag again`);
     }
   }
   return problems;

@@ -1,5 +1,7 @@
 import { PROVIDER_NAMES, type ProviderStatus } from "@sourcly/core";
 import { pluralize } from "./format";
+import { BlockedFromFileNotice, useRuntime } from "./RuntimeContext";
+import { looksBlockedFromFile } from "./runtime";
 import { orderedStatuses, type ActiveSearch } from "./searchState";
 
 function describe(status: ProviderStatus): string {
@@ -14,6 +16,7 @@ function describe(status: ProviderStatus): string {
  * in the results is never silent. Sources keep the order they were asked in.
  */
 export function ProviderStatuses({ search }: { search: ActiveSearch }) {
+  const { isLocalFile } = useRuntime();
   const answered = orderedStatuses(search);
   const byProvider = new Map(answered.map((status) => [status.provider, status]));
   const rows = [
@@ -23,7 +26,14 @@ export function ProviderStatuses({ search }: { search: ActiveSearch }) {
   ];
   if (rows.length === 0) return null;
 
+  const blocked = looksBlockedFromFile(
+    isLocalFile,
+    answered.flatMap((status) => (status.state === "ok" ? [] : [status])),
+  );
+
   return (
+    <>
+      {blocked && <BlockedFromFileNotice />}
     <ul className="statuses" aria-label="Source status">
       {rows.map(({ id, status }) => (
         <li
@@ -34,5 +44,6 @@ export function ProviderStatuses({ search }: { search: ActiveSearch }) {
         </li>
       ))}
     </ul>
+    </>
   );
 }

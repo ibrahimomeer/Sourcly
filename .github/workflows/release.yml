@@ -1,7 +1,8 @@
 name: Release
 
-# Pushing a tag such as v0.2.0 builds the site and attaches sourcly-0.2.0.zip to a GitHub Release.
-# The footer's "Download" link points at releases/latest, so it always finds the newest one.
+# Pushing a tag such as v0.1.5 builds the site and attaches ONE file, sourcly-v0.1.5.html, to a GitHub Release.
+# That file is the whole app: people download it and double-click it (no zip, no other file). The site itself offers
+# no download and sends nothing to GitHub: its footer only links to this Releases page.
 on:
   push:
     tags: ["v*"]
@@ -15,6 +16,11 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
+      # 1. The version is written once, in the root package.json. The tag must be "v" plus that version, and
+      #    CITATION.cff must agree. This runs first, so a wrong tag fails at once with a clear message.
+      - name: The tag must be v + the version in package.json
+        run: node scripts/version.mjs check "$GITHUB_REF_NAME"
+
       # Reads the pnpm version from "packageManager" in package.json.
       - uses: pnpm/action-setup@v6
 
@@ -23,33 +29,25 @@ jobs:
           node-version: 24
           cache: pnpm
 
+      # 2. Install, check, build, and check that the built page really is one self-contained file.
       - run: pnpm install --frozen-lockfile
       - run: pnpm typecheck
       - run: pnpm test
       - run: pnpm test:scripts
       - run: pnpm build
+      - run: pnpm check:single-file
 
-      # The zip is useful only if index.html really is one file (plus config.js).
-      - run: pnpm check:dist
+      # 3. The built file, renamed after the tag, is the release's only asset.
+      - name: Name the file after the tag
+        run: cp apps/web/dist/index.html "sourcly-${GITHUB_REF_NAME}.html"
 
-      # The version is written once, in the root package.json. The tag must be the same, and
-      # CITATION.cff must agree.
-      - name: The tag must match the app version
-        run: node scripts/version.mjs check "$GITHUB_REF_NAME"
-
-      - name: Make the zip
-        run: |
-          folder="sourcly-${GITHUB_REF_NAME#v}"
-          mkdir "$folder"
-          cp apps/web/dist/index.html apps/web/dist/config.js "$folder/"
-          cp apps/web/release/README.txt LICENSE "$folder/"
-          zip -r "$folder.zip" "$folder"
-          unzip -l "$folder.zip"
+      # 4. The release notes: the version and one line on how to open the file.
+      - name: Write the release notes
+        run: node scripts/release-notes.mjs "$GITHUB_REF_NAME" > release-notes.md
 
       - name: Publish the release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          version="${GITHUB_REF_NAME#v}"
-          gh release create "$GITHUB_REF_NAME" "sourcly-$version.zip" \
-            --title "Sourcly $version" --generate-notes
+          gh release create "$GITHUB_REF_NAME" "sourcly-${GITHUB_REF_NAME}.html" \
+            --title "Sourcly ${GITHUB_REF_NAME#v}" --notes-file release-notes.md

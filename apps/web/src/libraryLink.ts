@@ -40,3 +40,9 @@ export function libraryUrl(prefix: string, result: Pick<Result, "doi" | "url">):
   const target = libraryTarget(result);
   return target === null ? null : trimmed + encodeURIComponent(target);
 }
+
+/** The library's name for a label: the name as set, or "your library" when there is none. */
+export function libraryLabel(libraryName: string): string {
+  const name = libraryName.trim();
+  return name === "" ? "your library" : name;
+}

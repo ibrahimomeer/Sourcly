@@ -39,6 +39,8 @@ export interface LookupOutcome {
   sources: string[];
   /** What could not be done, in plain language (a source did not answer, Unpaywall needs a contact email, ...). */
   notes: string[];
+  /** True when a request failed in the browser itself (a fetch TypeError), not with an HTTP answer. */
+  network?: true;
 }
 
 const EMPTY: LookupOutcome = { result: null, openAlexId: null, relatedIds: [], sources: [], notes: [] };
@@ -55,11 +57,16 @@ async function getJson(fetchFn: Fetch, url: URL, name: string, signal: AbortSign
   }
 }
 
+/** The note lists of lookups in which a request failed in the browser itself, so the outcome can say so. */
+const networkFailures = new WeakSet<string[]>();
+const networkFlag = (notes: string[]) => (networkFailures.has(notes) ? { network: true as const } : {});
+
 /** Runs a lookup step; a failure of one source becomes a note, never an error of the whole lookup. */
 async function attempt<T>(name: string, notes: string[], step: () => Promise<T>): Promise<T | null> {
   try {
     return await step();
   } catch (error) {
+    if (error instanceof ProviderError && error.cause instanceof TypeError) networkFailures.add(notes);
     notes.push(error instanceof ProviderError ? error.message : `${name} could not be reached`);
     return null;
   }
@@ -245,7 +252,7 @@ export async function lookupWork(target: Exclude<DetectedInput, { kind: "keyword
   const merged = mergeResults(known)[0] ?? null;
   if (merged === null) {
     if (target.kind === "url") notes.push("Could not identify this link. Paste the DOI or the title.");
-    return { ...EMPTY, notes };
+    return { ...EMPTY, notes, ...networkFlag(notes) };
   }
   const result = unpaywall === null ? merged : withUnpaywall(merged, unpaywall);
   return {
@@ -254,6 +261,7 @@ export async function lookupWork(target: Exclude<DetectedInput, { kind: "keyword
     relatedIds: openAlex?.related ?? [],
     sources: [...new Set(used)],
     notes,
+    ...networkFlag(notes),
   };
 }
 

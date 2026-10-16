@@ -181,7 +181,8 @@ export async function searchProviders(
 
 function failureStatus(provider: Provider, error: unknown): ProviderStatus {
   if (error instanceof ProviderError) {
-    return { provider: provider.id, state: error.kind, message: error.message };
+    const network = error.kind === "failed" && error.cause instanceof TypeError;
+    return { provider: provider.id, state: error.kind, message: error.message, ...(network ? { network: true as const } : {}) };
   }
   const detail = error instanceof Error ? error.message : String(error);
   return { provider: provider.id, state: "failed", message: `${provider.name} failed unexpectedly: ${detail}` };

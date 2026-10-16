@@ -30,5 +30,6 @@ jobs:
       # package.json holds the one version; CITATION.cff must agree with it.
       - run: pnpm version:check
       - run: pnpm build
-      # The built site must be one self-contained index.html (plus config.js) so it works from a folder.
-      - run: pnpm check:dist
+      # The built site must be one self-contained index.html (config.js is an optional override), so the file
+      # that is hosted and downloaded works by double-click.
+      - run: pnpm check:single-file
