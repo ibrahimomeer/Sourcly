@@ -14,12 +14,21 @@ describe("resolveConfig", () => {
       siteName: "Sourcly",
       authorName: "Sourcly",
       institutionName: "UBC",
-      libraryName: "UBC Library",
+      libraries: [
+        {
+          name: "UBC Library",
+          proxyPrefix: "https://go.openathens.net/redirector/ubc.ca?url=",
+          searchUrl: "https://ubc.summon.serialssolutions.com/search?s.q=",
+        },
+        {
+          name: "UofT",
+          proxyPrefix: "https://myaccess.library.utoronto.ca/login?qurl=",
+          searchUrl: "https://librarysearch.library.utoronto.ca/nde/search?vid=01UTORONTO_INST:UTORONTO_NDE&query=",
+        },
+      ],
       repoUrl: "https://github.com/ibrahimomeer/Sourcly",
       siteUrl: "https://sourcly.getscove.com",
       contactEmail: "",
-      libraryProxyPrefix: "https://go.openathens.net/redirector/ubc.ca?url=",
-      librarySearchUrl: "https://ubc.summon.serialssolutions.com/search?s.q=",
     });
   });
 
@@ -28,41 +37,68 @@ describe("resolveConfig", () => {
     expect(DEFAULT_CONFIG.contactEmail).toBe("");
   });
 
+  it("gives the app its own copy of the libraries, so changing one never changes the defaults", () => {
+    const config = resolveConfig({});
+    config.libraries[0]!.name = "Changed";
+    expect(DEFAULT_CONFIG.libraries[0]?.name).toBe("UBC Library");
+    expect(resolveConfig({}).libraries[0]?.name).toBe("UBC Library");
+  });
+
   it("applies provided string values, trimmed", () => {
     const raw = {
       siteName: "  My Sources ",
       authorName: "Someone",
       institutionName: "Example University",
-      libraryName: "Example Library",
       contactEmail: "a@example.org",
       repoUrl: "https://example.org/repo",
       siteUrl: "https://example.org/site",
-      libraryProxyPrefix: "https://proxy.example.org/login?url=",
-      librarySearchUrl: "https://library.example.org/search?q=",
     };
-    expect(resolveConfig(raw)).toEqual({ ...raw, siteName: "My Sources" });
+    expect(resolveConfig(raw)).toEqual({ ...DEFAULT_CONFIG, ...raw, siteName: "My Sources" });
   });
 
   it("overrides only what config.js names; the rest keeps its default", () => {
-    const config = resolveConfig({ libraryName: "Example Library" });
-    expect(config).toEqual({ ...DEFAULT_CONFIG, libraryName: "Example Library" });
+    expect(resolveConfig({ institutionName: "Example University" })).toEqual({ ...DEFAULT_CONFIG, institutionName: "Example University" });
   });
 
-  it("names UBC and UBC Library by default", () => {
+  it("names UBC, with UBC Library and UofT as the libraries, by default", () => {
     expect(DEFAULT_CONFIG.institutionName).toBe("UBC");
-    expect(DEFAULT_CONFIG.libraryName).toBe("UBC Library");
+    expect(DEFAULT_CONFIG.libraries.map((library) => library.name)).toEqual(["UBC Library", "UofT"]);
   });
 
-  it("lets a fork name nothing, or hide a link, with an empty string, but not with spaces", () => {
-    expect(resolveConfig({ institutionName: "", libraryName: "" })).toMatchObject({ institutionName: "", libraryName: "" });
-    expect(resolveConfig({ libraryProxyPrefix: "", librarySearchUrl: "", repoUrl: "", siteUrl: "" })).toMatchObject({
-      libraryProxyPrefix: "",
-      librarySearchUrl: "",
-      repoUrl: "",
-      siteUrl: "",
-    });
+  it("builds the UofT link from University of Toronto Libraries' proxy, in its encoded (qurl) form", () => {
+    const uoft = DEFAULT_CONFIG.libraries[1];
+    expect(uoft?.proxyPrefix).toBe("https://myaccess.library.utoronto.ca/login?qurl=");
+    expect(uoft?.searchUrl.endsWith("&query=")).toBe(true);
+  });
+
+  it("lets a fork set its own libraries, in its own order", () => {
+    const libraries = [
+      { name: "Example Library", proxyPrefix: "https://proxy.example.org/login?url=", searchUrl: "https://library.example.org/search?q=" },
+      { name: "  Other  ", proxyPrefix: "", searchUrl: "https://other.example.org/?q=" },
+    ];
+    expect(resolveConfig({ libraries }).libraries).toEqual([libraries[0], { ...libraries[1], name: "Other" }]);
+  });
+
+  it("lets a fork have no library buttons with an empty list, but keeps the defaults for a list with nothing usable in it", () => {
+    expect(resolveConfig({ libraries: [] }).libraries).toEqual([]);
+    expect(resolveConfig({ libraries: [{ proxyPrefix: "https://x.org/?u=" }, 7, null, { name: "  " }] }).libraries).toEqual(DEFAULT_CONFIG.libraries);
+    expect(resolveConfig({ libraries: "UBC" }).libraries).toEqual(DEFAULT_CONFIG.libraries);
+  });
+
+  it("drops a library link that is not http(s) to empty, so that button or link is hidden instead of broken", () => {
+    const config = resolveConfig({ libraries: [{ name: "Example", proxyPrefix: "javascript:alert(1)", searchUrl: "ftp://x" }] });
+    expect(config.libraries).toEqual([{ name: "Example", proxyPrefix: "", searchUrl: "" }]);
+  });
+
+  it("allows at most six libraries", () => {
+    const many = Array.from({ length: 9 }, (_, i) => ({ name: `Library ${i}`, proxyPrefix: "", searchUrl: "" }));
+    expect(resolveConfig({ libraries: many }).libraries).toHaveLength(6);
+  });
+
+  it("lets a fork name no institution, or hide a link, with an empty string, but not with spaces", () => {
+    expect(resolveConfig({ institutionName: "" }).institutionName).toBe("");
+    expect(resolveConfig({ repoUrl: "", siteUrl: "" })).toMatchObject({ repoUrl: "", siteUrl: "" });
     expect(resolveConfig({ institutionName: "   " }).institutionName).toBe("UBC");
-    expect(resolveConfig({ libraryProxyPrefix: "  " }).libraryProxyPrefix).toBe(DEFAULT_CONFIG.libraryProxyPrefix);
     expect(resolveConfig({ siteName: "" }).siteName).toBe("Sourcly");
   });
 
@@ -71,21 +107,14 @@ describe("resolveConfig", () => {
   });
 
   it("ignores values that are not strings", () => {
-    const config = resolveConfig({ siteName: 42, authorName: null, repoUrl: {}, libraryProxyPrefix: false });
+    const config = resolveConfig({ siteName: 42, authorName: null, repoUrl: {}, institutionName: false });
     expect(config).toEqual(DEFAULT_CONFIG);
   });
 
   it("drops URL fields that are not http(s), back to the built-in link", () => {
-    const config = resolveConfig({
-      repoUrl: "javascript:alert(1)",
-      siteUrl: "example.org/site",
-      libraryProxyPrefix: "ftp://proxy.example.org/",
-      librarySearchUrl: "javascript:alert(1)",
-    });
+    const config = resolveConfig({ repoUrl: "javascript:alert(1)", siteUrl: "example.org/site" });
     expect(config.repoUrl).toBe(DEFAULT_CONFIG.repoUrl);
     expect(config.siteUrl).toBe(DEFAULT_CONFIG.siteUrl);
-    expect(config.libraryProxyPrefix).toBe(DEFAULT_CONFIG.libraryProxyPrefix);
-    expect(config.librarySearchUrl).toBe(DEFAULT_CONFIG.librarySearchUrl);
   });
 });
 

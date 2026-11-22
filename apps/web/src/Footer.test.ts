@@ -80,9 +80,9 @@ describe("the footer is plain text", () => {
   });
 
   it("names a fork's own institution and library instead of UBC", () => {
-    const fork = resolveConfig({ institutionName: "Example University", libraryName: "Example Library" });
+    const fork = resolveConfig({ institutionName: "Example University", libraries: [{ name: "Example Library", proxyPrefix: "", searchUrl: "" }] });
     const shown = text(render(fork));
     expect(shown).toContain("Not affiliated with or endorsed by Example University or Example Library.");
-    expect(shown).not.toContain("UBC");
+    expect(shown).not.toMatch(/UBC|UofT/);
   });
 });

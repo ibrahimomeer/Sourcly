@@ -41,9 +41,9 @@ Labels and rankings are heuristics based on metadata. Verify sources before citi
 7. Open "In-text citations" to copy the APA 7 in-text citation for each saved source, in brackets or in a sentence, such as `(Stickgold, 2005)` and `Stickgold (2005)`. They match your reference list.
 8. Press "Download search protocol (JSON)" to record the query, what each source received, the sources, filters, weights, date and how each source answered, so the search can be written up and repeated. It contains no API key.
 
-Each result can offer an "Open access PDF" button (when a free PDF is known), an "Access with UBC Library" button (on every result with a DOI or link; change the library name and link in Settings, or empty the link to hide the button), and a DOI button. Open access does not affect the ranking by default, so results are never pushed down for being behind a paywall.
+Each result can offer an "Open access PDF" button (when a free PDF is known), an "Access with UBC Library" button and an "Access with UofT" button (on every result with a DOI or link; change a library's name and link in Settings, or empty a link to hide that button), and a DOI button. Open access does not affect the ranking by default, so results are never pushed down for being behind a paywall.
 
-"Search elsewhere" links under the search box open the same query in Google Scholar, Google, DuckDuckGo and your library's search (UBC Library's by default; change it in Settings).
+"Search elsewhere" links under the search box open the same query in Google Scholar, Google, DuckDuckGo and each library's own search (UBC Library's and UofT's; change them in Settings).
 
 Every source that is asked gets a status line (ok, rate-limited, failed or skipped), so a gap in the results is never silent. The four default sources are the ones that give clean scholarly records; DataCite and Zenodo (anyone can upload), DOAJ, Wikipedia (at most 5 pages) and Semantic Scholar (its free shared pool is often busy) are off until you switch them on. arXiv is skipped because its API cannot be used from a browser; see [docs/methodology.md](docs/methodology.md) for the details of each source.
 
@@ -95,7 +95,7 @@ The built site is static, so any static host works. The `Dockerfile` builds it a
 
 ### Forks and the `config.js` override
 
-Every value (site name, institution and library names, repository and site addresses, the library link prefix and search address) has a built-in default in `apps/web/src/config.ts`. To change them for a fork without touching the code, edit `apps/web/public/config.js` (a template of commented examples that is copied next to the built page on the website, and is not needed by the offline file): uncomment a line and set it. **A fork should also change `institutionName` and `libraryName` and adapt the Disclaimer in this README and "About this project" in `docs/methodology.md`**, so the "not affiliated" notice never names an institution that is not yours.
+Every value (site name, institution name, the libraries with their link prefixes and search addresses, repository and site addresses) has a built-in default in `apps/web/src/config.ts`. To change them for a fork without touching the code, edit `apps/web/public/config.js` (a template of commented examples that is copied next to the built page on the website, and is not needed by the offline file): uncomment a line and set it. **A fork should also change `institutionName` and `libraryName` and adapt the Disclaimer in this README and "About this project" in `docs/methodology.md`**, so the "not affiliated" notice never names an institution that is not yours.
 
 Repository layout:
 

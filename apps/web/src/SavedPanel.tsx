@@ -11,31 +11,28 @@ import {
 import { useMemo, useState } from "react";
 import { copyRichText, downloadTextFile } from "./exportFiles";
 import { pluralize } from "./format";
-import { useLibraryName } from "./LibraryContext";
-import { libraryLabel, libraryUrl } from "./libraryLink";
+import { useLibraries } from "./LibraryContext";
+import { joinNames, libraryLinks } from "./libraryLink";
 
 /** The small links under a saved reference: open it through the library, or take it off the list. */
 function SavedLinks({
   result,
-  libraryPrefix,
   onRemove,
 }: {
   result: SavedItem["result"];
-  libraryPrefix: string;
   onRemove: (id: string) => void;
 }) {
-  const library = libraryUrl(libraryPrefix, result);
-  const libraryName = libraryLabel(useLibraryName());
+  const access = libraryLinks(useLibraries(), result);
   return (
     <>
-      {library !== null && (
-        <>
-          <a href={library} target="_blank" rel="noopener noreferrer">
-            Access with {libraryName}
+      {access.map((link) => (
+        <span key={link.name}>
+          <a href={link.url} target="_blank" rel="noopener noreferrer">
+            Access with {link.name}
           </a>
           {" · "}
-        </>
-      )}
+        </span>
+      ))}
       <button type="button" className="link-button" onClick={() => onRemove(result.id)}>
         Remove from list
       </button>
@@ -61,7 +58,6 @@ export function SavedPanel({
   onRemove,
   onClear,
   isStored,
-  libraryPrefix,
   open,
 }: {
   items: readonly SavedItem[];
@@ -69,13 +65,12 @@ export function SavedPanel({
   onClear: () => void;
   /** False when the browser would not store the list. */
   isStored: boolean;
-  /** config.libraryProxyPrefix; empty hides the library links. */
-  libraryPrefix: string;
   /** Whether the panel is showing. The button that opens it is in the toolbar. */
   open: boolean;
 }) {
   const [message, setMessage] = useState("");
-  const libraryName = libraryLabel(useLibraryName());
+  const libraries = useLibraries();
+  const accessNames = libraries.filter((library) => library.proxyPrefix.trim() !== "").map((library) => library.name.trim() || "your library");
 
   // Built when the list changes, in the order it is exported (alphabetical), and not before it is opened.
   const entries = useMemo(
@@ -142,7 +137,7 @@ export function SavedPanel({
                   )}
                   <p className="note muted">
                     Found by {entry.result.hits.map((hit) => PROVIDER_NAMES[hit.provider]).join(", ") || "an earlier search"}.{" "}
-                    <SavedLinks result={entry.result} libraryPrefix={libraryPrefix} onRemove={onRemove} />
+                    <SavedLinks result={entry.result} onRemove={onRemove} />
                   </p>
                 </li>
               ))}
@@ -162,9 +157,9 @@ export function SavedPanel({
             <p role="status" className="muted">
               {message}
             </p>
-            {libraryPrefix.trim() !== "" && (
+            {accessNames.length > 0 && (
               <p className="muted note">
-                “Access with {libraryName}” depends on {libraryName} subscriptions; you may be asked to log in.
+                The “Access with …” links depend on {joinNames(accessNames, "and")} subscriptions; you may be asked to log in.
               </p>
             )}
             <p className="muted note">

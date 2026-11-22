@@ -47,7 +47,6 @@ export function CounterPanel({
   view,
   referenceYear,
   overrides,
-  libraryPrefix,
   onOverrideChange,
   onClearFilters,
   onRecord,
@@ -66,7 +65,6 @@ export function CounterPanel({
   view: ViewSettings;
   referenceYear: number;
   overrides: ReadonlyMap<string, LabelOverride>;
-  libraryPrefix: string;
   onOverrideChange: (resultId: string, change: LabelOverride) => void;
   onClearFilters: () => void;
   /** Told about the finished counterargument search (or null when there is none), for the search protocol. */
@@ -253,7 +251,6 @@ export function CounterPanel({
               setPage(1);
             }}
             overrides={overrides}
-            libraryPrefix={libraryPrefix}
             onOverrideChange={onOverrideChange}
             onClearFilters={onClearFilters}
             usedLexicon={searched?.lexicon === true}
@@ -273,7 +270,6 @@ function CounterResults({
   panelView,
   onPanelViewChange,
   overrides,
-  libraryPrefix,
   onOverrideChange,
   onClearFilters,
   usedLexicon,
@@ -286,7 +282,6 @@ function CounterResults({
   panelView: CounterView;
   onPanelViewChange: (view: CounterView) => void;
   overrides: ReadonlyMap<string, LabelOverride>;
-  libraryPrefix: string;
   onOverrideChange: (resultId: string, change: LabelOverride) => void;
   onClearFilters: () => void;
   usedLexicon: boolean;
@@ -352,7 +347,6 @@ function CounterResults({
               position={current.offset + index + 1}
               scored={scored}
               override={overrides.get(scored.result.id)}
-              libraryPrefix={libraryPrefix}
               onOverrideChange={onOverrideChange}
               highlight={terms}
               section="main"
@@ -364,7 +358,6 @@ function CounterResults({
       <ResultSections
         ranked={ranked}
         overrides={overrides}
-        libraryPrefix={libraryPrefix}
         onOverrideChange={onOverrideChange}
         highlight={terms}
       />

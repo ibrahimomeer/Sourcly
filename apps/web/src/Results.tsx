@@ -17,8 +17,6 @@ export function Results({
   page,
   onPageChange,
   overrides,
-  libraryPrefix,
-  librarySearchUrl,
   onOverrideChange,
   onClearFilters,
   exportSlot,
@@ -32,10 +30,6 @@ export function Results({
   page: number;
   onPageChange: (page: number) => void;
   overrides: ReadonlyMap<string, LabelOverride>;
-  /** config.libraryProxyPrefix; empty hides the library button on every card. */
-  libraryPrefix: string;
-  /** config.librarySearchUrl; empty hides the library link in "Search elsewhere". */
-  librarySearchUrl: string;
   onOverrideChange: (resultId: string, change: LabelOverride) => void;
   onClearFilters: () => void;
   /** Shown under "Search elsewhere": the search protocol download. */
@@ -68,7 +62,7 @@ export function Results({
     <section id="results" className="results" aria-label="Results" aria-live="polite">
       <ProviderStatuses search={state} />
       <QueryNote search={state} />
-      <SearchElsewhere query={state.query} librarySearchUrl={librarySearchUrl} />
+      <SearchElsewhere query={state.query} />
       {exportSlot}
 
       {total === 0 && searching && <p>Searching for “{state.query}”…</p>}
@@ -148,7 +142,6 @@ export function Results({
               position={current.offset + index + 1}
               scored={scored}
               override={overrides.get(scored.result.id)}
-              libraryPrefix={libraryPrefix}
               onOverrideChange={onOverrideChange}
               section="main"
             />
@@ -157,7 +150,7 @@ export function Results({
       </ol>
       {pagination("Pages (bottom)")}
 
-      <ResultSections ranked={ranked} overrides={overrides} libraryPrefix={libraryPrefix} onOverrideChange={onOverrideChange} />
+      <ResultSections ranked={ranked} overrides={overrides} onOverrideChange={onOverrideChange} />
     </section>
   );
 }

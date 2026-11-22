@@ -22,8 +22,8 @@ import { LabelRows } from "./LabelRows";
 import { useSaved } from "./SavedContext";
 import { accessBadgeText, describeLexiconMatches, formatAuthors, formatNumber, reviewBadgeText } from "./format";
 import { Highlighted } from "./Highlighted";
-import { useLibraryName } from "./LibraryContext";
-import { libraryLabel, libraryUrl } from "./libraryLink";
+import { useLibraries } from "./LibraryContext";
+import { joinNames, libraryLinks } from "./libraryLink";
 import { WhyThisRank } from "./WhyThisRank";
 
 /** “odor (odour, title)”: the concept, the variant that matched, and where. */
@@ -35,7 +35,6 @@ export function ResultCard({
   position,
   scored,
   override,
-  libraryPrefix,
   onOverrideChange,
   highlight = [],
   section,
@@ -52,8 +51,6 @@ export function ResultCard({
   section?: SectionId;
   scored: ScoredResult;
   override: LabelOverride | undefined;
-  /** config.libraryProxyPrefix; empty hides the library button. */
-  libraryPrefix: string;
   onOverrideChange: (resultId: string, change: LabelOverride) => void;
   /** Counterargument terms to mark in the title and abstract. Empty (the default) marks nothing. */
   highlight?: readonly string[];
@@ -61,8 +58,9 @@ export function ResultCard({
   const { result, labels } = scored;
   const { openAccess, retraction } = result;
   const title = result.title === "" ? "(untitled)" : result.title;
-  const libraryHref = libraryUrl(libraryPrefix, result);
-  const libraryName = libraryLabel(useLibraryName());
+  // One "Access with ..." link for each library that has a link prefix (UBC Library and UofT by default).
+  const access = libraryLinks(useLibraries(), result);
+  const accessNames = access.map((link) => link.name);
   const notice = noticeKind(result);
   const reviewText = reviewBadgeText(result);
   const language = resolveLanguage(result);
@@ -145,7 +143,7 @@ export function ResultCard({
           </li>
         )}
         <li>
-          <Badge style={accessStyle}>{accessBadgeText(openAccess, libraryHref !== null, libraryName)}</Badge>
+          <Badge style={accessStyle}>{accessBadgeText(openAccess, accessNames)}</Badge>
         </li>
         <li>
           <Badge style={language.status === "detected" ? "faint" : "faint-dashed"} title={languageExplanation(language)}>
@@ -223,11 +221,11 @@ export function ResultCard({
             Open access PDF
           </a>
         )}
-        {libraryHref !== null && (
-          <a className="button" href={libraryHref} target="_blank" rel="noopener noreferrer">
-            Access with {libraryName}
+        {access.map((link) => (
+          <a key={link.name} className="button" href={link.url} target="_blank" rel="noopener noreferrer">
+            Access with {link.name}
           </a>
-        )}
+        ))}
         {result.doi !== null && (
           <a className="button" href={doiUrl(result.doi)} target="_blank" rel="noopener noreferrer">
             DOI
@@ -244,8 +242,8 @@ export function ResultCard({
           {isSaved ? "Saved (remove)" : "Save to list"}
         </button>
       </div>
-      {libraryHref !== null && (
-        <p className="muted note">Access depends on {libraryName} subscriptions; you may be asked to log in.</p>
+      {access.length > 0 && (
+        <p className="muted note">Access depends on {joinNames(accessNames, "and")} subscriptions; you may be asked to log in.</p>
       )}
 
       {result.abstract !== null && (

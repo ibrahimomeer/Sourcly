@@ -11,14 +11,13 @@ interface SectionProps {
   description: string;
   items: readonly ScoredResult[];
   overrides: ReadonlyMap<string, LabelOverride>;
-  libraryPrefix: string;
   onOverrideChange: (resultId: string, change: LabelOverride) => void;
   /** Counterargument terms to mark, in the counterargument panel. */
   highlight?: readonly string[];
 }
 
 /** One collapsed section under the main list. Nothing in it is deleted: it has the same cards, a count and its own pages. */
-function Section({ id, title, description, items, overrides, libraryPrefix, onOverrideChange, highlight }: SectionProps) {
+function Section({ id, title, description, items, overrides, onOverrideChange, highlight }: SectionProps) {
   const [page, setPage] = useState(1);
   if (items.length === 0) return null;
   const current = paginate(items, page);
@@ -37,7 +36,6 @@ function Section({ id, title, description, items, overrides, libraryPrefix, onOv
               position={current.offset + index + 1}
               scored={scored}
               override={overrides.get(scored.result.id)}
-              libraryPrefix={libraryPrefix}
               onOverrideChange={onOverrideChange}
               highlight={highlight}
               section={id}
@@ -57,17 +55,15 @@ function Section({ id, title, description, items, overrides, libraryPrefix, onOv
 export function ResultSections({
   ranked,
   overrides,
-  libraryPrefix,
   onOverrideChange,
   highlight,
 }: {
   ranked: RankedView;
   overrides: ReadonlyMap<string, LabelOverride>;
-  libraryPrefix: string;
   onOverrideChange: (resultId: string, change: LabelOverride) => void;
   highlight?: readonly string[];
 }) {
-  const common = { overrides, libraryPrefix, onOverrideChange, highlight };
+  const common = { overrides, onOverrideChange, highlight };
   return (
     <>
       <Section
