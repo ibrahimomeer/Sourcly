@@ -57,12 +57,10 @@ function Record({ result }: { result: Result }) {
 function List({
   items,
   overrides,
-  libraryPrefix,
   onOverrideChange,
 }: {
   items: readonly ScoredResult[];
   overrides: ReadonlyMap<string, LabelOverride>;
-  libraryPrefix: string;
   onOverrideChange: (resultId: string, change: LabelOverride) => void;
 }) {
   const [page, setPage] = useState(1);
@@ -77,7 +75,6 @@ function List({
               position={current.offset + index + 1}
               scored={scored}
               override={overrides.get(scored.result.id)}
-              libraryPrefix={libraryPrefix}
               onOverrideChange={onOverrideChange}
             />
           </li>
@@ -98,7 +95,6 @@ export function LookupPanel({
   onLoad,
   view,
   referenceYear,
-  libraryPrefix,
   onOverrideChange,
 }: {
   lookup: LookupState;
@@ -106,7 +102,6 @@ export function LookupPanel({
   onLoad: (kind: Neighbours) => void;
   view: ViewSettings;
   referenceYear: number;
-  libraryPrefix: string;
   onOverrideChange: (resultId: string, change: LabelOverride) => void;
 }) {
   const { isLocalFile } = useRuntime();
@@ -155,7 +150,6 @@ export function LookupPanel({
             position={1}
             scored={card}
             override={view.overrides.get(card.result.id)}
-            libraryPrefix={libraryPrefix}
             onOverrideChange={onOverrideChange}
             detailed
           />
@@ -181,7 +175,7 @@ export function LookupPanel({
               <p className="summary">
                 {neighbours.results.length === 0 ? active?.empty : `${neighbours.results.length} works from OpenAlex, most cited first and then ordered by the weighted score (no search words, so word matching does not apply).`}
               </p>
-              <List items={items} overrides={view.overrides} libraryPrefix={libraryPrefix} onOverrideChange={onOverrideChange} />
+              <List items={items} overrides={view.overrides} onOverrideChange={onOverrideChange} />
             </>
           )}
         </>
@@ -195,13 +189,11 @@ export function ClosestMatch({
   state,
   view,
   referenceYear,
-  libraryPrefix,
   onOverrideChange,
 }: {
   state: TitleMatchState;
   view: ViewSettings;
   referenceYear: number;
-  libraryPrefix: string;
   onOverrideChange: (resultId: string, change: LabelOverride) => void;
 }) {
   const card = useMemo(() => {
@@ -216,7 +208,6 @@ export function ClosestMatch({
       position={1}
       scored={card}
       override={view.overrides.get(card.result.id)}
-      libraryPrefix={libraryPrefix}
       onOverrideChange={onOverrideChange}
       detailed
       heading={`Closest match for this title (the titles are ${Math.round((state.phase === "done" ? (state.match?.similarity ?? 0) : 0) * 100)}% alike)`}

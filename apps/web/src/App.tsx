@@ -26,7 +26,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { browserStorage, loadApiKey, saveApiKey } from "./apiKey";
 import type { SourclyConfig } from "./config";
 import { Footer } from "./Footer";
-import { LibraryNameProvider } from "./LibraryContext";
+import { LibrariesProvider } from "./LibraryContext";
 import { runningFromFile } from "./runtime";
 import { RuntimeProvider } from "./RuntimeContext";
 import { CitationsPanel } from "./CitationsPanel";
@@ -44,12 +44,12 @@ import { SavedPanel } from "./SavedPanel";
 import { loadSavedList, persistSavedList } from "./savedStore";
 import { SearchBox } from "./SearchBox";
 import { toggleInList, withOverride } from "./settings";
-import { SettingsPanel, type LibraryChoices } from "./SettingsPanel";
+import { SettingsPanel } from "./SettingsPanel";
 import { SuggestedTerms } from "./SuggestedTerms";
 import { useLookup, useTitleMatch, type LookupTarget } from "./useLookup";
 import { isSearching } from "./searchState";
 import { useSearch } from "./useSearch";
-import { clearSettings, defaultUserSettings, effectiveConfig, loadSettings, saveSettings, type UserSettings } from "./userSettings";
+import { clearSettings, defaultUserSettings, effectiveConfig, loadSettings, saveSettings, withLibraryChoice, type LibraryChoice, type UserSettings } from "./userSettings";
 import { APP_VERSION } from "./version";
 
 const REFERENCE_YEAR = new Date().getFullYear();
@@ -64,25 +64,12 @@ export function App({ config: site }: { config: SourclyConfig }) {
   const [layout, setLayout] = useState<LayoutSettings>(initial.layout);
   const [enabledProviders, setEnabledProviders] = useState<ProviderId[]>(initial.enabledProviders);
   const [perSource, setPerSource] = useState(initial.perSource);
-  const [library, setLibrary] = useState<LibraryChoices>({
-    name: initial.libraryName,
-    prefix: initial.libraryProxyPrefix,
-    searchUrl: initial.librarySearchUrl,
-    email: initial.contactEmail,
-  });
+  const [libraryChoices, setLibraryChoices] = useState<LibraryChoice[]>(initial.libraries);
+  const [email, setEmail] = useState<string | null>(initial.contactEmail);
   // Opened from a file (double-clicked) or served: the footer and the "blocked request" notice differ.
   const runtime = useMemo(() => ({ isLocalFile: runningFromFile(), siteUrl: site.siteUrl }), [site.siteUrl]);
   // The site's values with the person's own choices on top: this is what the library links and the sources use.
-  const config = useMemo(
-    () =>
-      effectiveConfig(site, {
-        libraryName: library.name,
-        libraryProxyPrefix: library.prefix,
-        librarySearchUrl: library.searchUrl,
-        contactEmail: library.email,
-      }),
-    [site, library],
-  );
+  const config = useMemo(() => effectiveConfig(site, { libraries: libraryChoices, contactEmail: email }), [site, libraryChoices, email]);
   const [overrides, setOverrides] = useState<ReadonlyMap<string, LabelOverride>>(() => new Map());
   const [page, setPage] = useState(1);
   const [queryText, setQueryText] = useState("");
@@ -104,12 +91,10 @@ export function App({ config: site }: { config: SourclyConfig }) {
       layout,
       exact,
       synonyms,
-      libraryName: library.name,
-      libraryProxyPrefix: library.prefix,
-      librarySearchUrl: library.searchUrl,
-      contactEmail: library.email,
+      libraries: libraryChoices,
+      contactEmail: email,
     }),
-    [enabledProviders, perSource, scoring, layout, exact, synonyms, library],
+    [enabledProviders, perSource, scoring, layout, exact, synonyms, libraryChoices, email],
   );
   useEffect(() => {
     setSettingsAreStored(saveSettings(storage, chosen));
@@ -124,7 +109,8 @@ export function App({ config: site }: { config: SourclyConfig }) {
     setPerSource(defaults.perSource);
     setExact(defaults.exact);
     setSynonyms(defaults.synonyms);
-    setLibrary({ name: null, prefix: null, searchUrl: null, email: null });
+    setLibraryChoices([]);
+    setEmail(null);
     setFilters(defaultFilters());
     setApiKey("");
     clearSettings(storage);
@@ -302,7 +288,7 @@ export function App({ config: site }: { config: SourclyConfig }) {
 
   return (
     <RuntimeProvider value={runtime}>
-    <LibraryNameProvider value={config.libraryName}>
+    <LibrariesProvider value={config.libraries}>
     <SavedProvider value={savedApi}>
     <div className={counterOpen && state.phase !== "idle" ? "page page-wide" : "page"}>
       <Header config={site} />
@@ -377,8 +363,10 @@ export function App({ config: site }: { config: SourclyConfig }) {
 
           <SettingsPanel
             site={site}
-            library={library}
-            onLibraryChange={(change) => setLibrary((current) => ({ ...current, ...change }))}
+            libraryChoices={libraryChoices}
+            onLibraryChange={(index, change) => setLibraryChoices((current) => withLibraryChoice(current, index, change))}
+            email={email}
+            onEmailChange={setEmail}
             onResetAll={handleResetSettings}
             settingsAreStored={settingsAreStored}
             open={openPanels.settings}
@@ -407,7 +395,6 @@ export function App({ config: site }: { config: SourclyConfig }) {
             onRemove={(id) => setSaved((current) => removeSaved(current, id))}
             onClear={() => setSaved([])}
             isStored={savedIsStored}
-            libraryPrefix={config.libraryProxyPrefix}
             open={openPanels.saved}
           />
           <CitationsPanel items={saved} open={openPanels.citations} />
@@ -424,7 +411,6 @@ export function App({ config: site }: { config: SourclyConfig }) {
                 onLoad={lookup.load}
                 view={viewSettings}
                 referenceYear={REFERENCE_YEAR}
-                libraryPrefix={config.libraryProxyPrefix}
                 onOverrideChange={handleOverrideChange}
               />
             </div>
@@ -436,7 +422,6 @@ export function App({ config: site }: { config: SourclyConfig }) {
                 state={titleMatch.state}
                 view={viewSettings}
                 referenceYear={REFERENCE_YEAR}
-                libraryPrefix={config.libraryProxyPrefix}
                 onOverrideChange={handleOverrideChange}
               />
               <Results
@@ -445,8 +430,6 @@ export function App({ config: site }: { config: SourclyConfig }) {
                 page={page}
                 onPageChange={handlePageChange}
                 overrides={overrides}
-                libraryPrefix={config.libraryProxyPrefix}
-                librarySearchUrl={config.librarySearchUrl}
                 onOverrideChange={handleOverrideChange}
                 onClearFilters={() => setFilters(defaultFilters())}
                 exportSlot={<ProtocolExport build={buildProtocolText} />}
@@ -467,7 +450,6 @@ export function App({ config: site }: { config: SourclyConfig }) {
                   view={viewSettings}
                   referenceYear={REFERENCE_YEAR}
                   overrides={overrides}
-                  libraryPrefix={config.libraryProxyPrefix}
                   onOverrideChange={handleOverrideChange}
                   onClearFilters={() => setFilters(defaultFilters())}
                   onRecord={handleRecord}
@@ -482,7 +464,7 @@ export function App({ config: site }: { config: SourclyConfig }) {
       <Footer config={site} isLocalFile={runtime.isLocalFile} />
     </div>
     </SavedProvider>
-    </LibraryNameProvider>
+    </LibrariesProvider>
     </RuntimeProvider>
   );
 }

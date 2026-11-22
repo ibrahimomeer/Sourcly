@@ -1,5 +1,8 @@
+import type { LibraryLink } from "./config";
+import { libraryLabel } from "./libraryLink";
+
 export interface SearchLink {
-  id: "google-scholar" | "google" | "duckduckgo" | "library";
+  id: "google-scholar" | "google" | "duckduckgo" | `library-${number}`;
   label: string;
   url: string;
 }
@@ -9,12 +12,10 @@ export interface SearchLink {
  * elsewhere" row. They are plain links the person opens in a new tab: Sourcly
  * sends nothing to these sites itself.
  *
- * `librarySearchUrl` is config.librarySearchUrl: the library's search address up
- * to and including the query parameter (for UBC Library: its Summon search
- * `https://ubc.summon.serialssolutions.com/search?s.q=`). When it is empty the
- * library link is left out.
+ * Each library's `searchUrl` is its search address up to and including the query parameter (for UBC Library: its Summon
+ * search `https://ubc.summon.serialssolutions.com/search?s.q=`). A library whose address is empty has no link.
  */
-export function searchElsewhereLinks(query: string, librarySearchUrl: string, libraryName = "UBC Library"): SearchLink[] {
+export function searchElsewhereLinks(query: string, libraries: readonly Pick<LibraryLink, "name" | "searchUrl">[] = []): SearchLink[] {
   const q = encodeURIComponent(query.trim());
   if (q === "") return [];
 
@@ -23,7 +24,9 @@ export function searchElsewhereLinks(query: string, librarySearchUrl: string, li
     { id: "google", label: "Google", url: `https://www.google.com/search?q=${q}` },
     { id: "duckduckgo", label: "DuckDuckGo", url: `https://duckduckgo.com/?q=${q}` },
   ];
-  const library = librarySearchUrl.trim();
-  if (library !== "") links.push({ id: "library", label: `${libraryName.trim() === "" ? "Your library" : libraryName.trim()} search`, url: `${library}${q}` });
+  libraries.forEach((library, index) => {
+    const address = library.searchUrl.trim();
+    if (address !== "") links.push({ id: `library-${index}`, label: `${libraryLabel(library.name)} search`, url: `${address}${q}` });
+  });
   return links;
 }

@@ -60,32 +60,33 @@ describe("accessBadgeText", () => {
   const access = (isOpen: boolean | null, status: OaStatus) => ({ isOpen, status, url: null, pdfUrl: null });
 
   it("names the kind of open access", () => {
-    expect(accessBadgeText(access(true, "gold"), true)).toBe("Open access (gold)");
-    expect(accessBadgeText(access(true, "green"), false)).toBe("Open access (green)");
-    expect(accessBadgeText(access(true, "bronze"), true)).toBe("Open access (bronze)");
+    expect(accessBadgeText(access(true, "gold"), ["UBC Library"])).toBe("Open access (gold)");
+    expect(accessBadgeText(access(true, "green"), [])).toBe("Open access (green)");
+    expect(accessBadgeText(access(true, "bronze"), ["UBC Library"])).toBe("Open access (bronze)");
   });
 
   it("says plain 'Open access' when the kind is not known", () => {
-    expect(accessBadgeText(access(true, "unknown"), true)).toBe("Open access");
+    expect(accessBadgeText(access(true, "unknown"), ["UBC Library"])).toBe("Open access");
   });
 
-  it("names the library the person set, or 'your library' when none", () => {
-    expect(accessBadgeText(access(false, "closed"), true, "Example Library")).toBe("Not open access, try Example Library");
-    expect(accessBadgeText(access(null, "unknown"), true, "  ")).toBe("Open access status unknown, try your library");
-    expect(accessBadgeText(access(false, "closed"), false, "Example Library")).toBe("Not open access");
+  it("points to the library when a work is not open access", () => {
+    expect(accessBadgeText(access(false, "closed"), ["UBC Library"])).toBe("Not open access, try UBC Library");
   });
 
-  it("points to UBC Library for a work that is not open access", () => {
-    expect(accessBadgeText(access(false, "closed"), true)).toBe("Not open access, try UBC Library");
+  it("points to every library the card has a link for: A, A or B, A, B or C", () => {
+    expect(accessBadgeText(access(false, "closed"), ["UBC Library", "UofT"])).toBe("Not open access, try UBC Library or UofT");
+    expect(accessBadgeText(access(null, "unknown"), ["UBC Library", "UofT", "Example"])).toBe("Open access status unknown, try UBC Library, UofT or Example");
+    expect(accessBadgeText(access(false, "closed"), ["UofT"])).toBe("Not open access, try UofT");
+  });
+
+  it("names the library the person set, or 'your library' when the name is empty", () => {
+    expect(accessBadgeText(access(false, "closed"), ["Example Library"])).toBe("Not open access, try Example Library");
+    expect(accessBadgeText(access(null, "unknown"), ["  "])).toBe("Open access status unknown, try your library");
   });
 
   it("does not point to a library link the card does not have", () => {
-    expect(accessBadgeText(access(false, "closed"), false)).toBe("Not open access");
-    expect(accessBadgeText(access(null, "unknown"), false)).toBe("Open access status unknown");
-  });
-
-  it("does not claim a work is closed when the provider did not say", () => {
-    expect(accessBadgeText(access(null, "unknown"), true)).toBe("Open access status unknown, try UBC Library");
+    expect(accessBadgeText(access(false, "closed"), [])).toBe("Not open access");
+    expect(accessBadgeText(access(null, "unknown"))).toBe("Open access status unknown");
   });
 });
 

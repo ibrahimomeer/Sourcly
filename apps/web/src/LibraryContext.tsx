@@ -1,11 +1,11 @@
 import { createContext, useContext } from "react";
-import { DEFAULT_CONFIG } from "./config";
+import { DEFAULT_CONFIG, type LibraryLink } from "./config";
 
 /**
- * The library's name for the button and notes ("Access with UBC Library"), without every component passing it down.
- * It is the site's default, or the name the person typed in Settings.
+ * The libraries that get an "Access with ..." button and a search link, without every component passing them down.
+ * They are the site's own (UBC Library and UofT by default) with the person's choices from Settings on top.
  */
-const LibraryContext = createContext<string>(DEFAULT_CONFIG.libraryName);
+const LibrariesContext = createContext<readonly LibraryLink[]>(DEFAULT_CONFIG.libraries);
 
-export const LibraryNameProvider = LibraryContext.Provider;
-export const useLibraryName = (): string => useContext(LibraryContext);
+export const LibrariesProvider = LibrariesContext.Provider;
+export const useLibraries = (): readonly LibraryLink[] => useContext(LibrariesContext);

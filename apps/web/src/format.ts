@@ -1,4 +1,5 @@
 import type { Author, Label, LexiconMatch, OpenAccessInfo, PeerReviewStatus, Result, SourceLevel } from "@sourcly/core";
+import { joinNames, libraryLabel } from "./libraryLink";
 
 const MAX_AUTHORS_SHOWN = 6;
 
@@ -24,10 +25,10 @@ export function labelText(label: Label<SourceLevel | PeerReviewStatus>): string 
 
 /**
  * The access badge on a card: plain text, never a reason to hide or demote a
- * result. "try <library name>" appears only when the card really has that link.
+ * result. "try <library names>" appears only for the libraries the card really has a link for.
  */
-export function accessBadgeText(openAccess: OpenAccessInfo, hasLibraryLink: boolean, libraryName = "UBC Library"): string {
-  const suffix = hasLibraryLink ? `, try ${libraryName.trim() === "" ? "your library" : libraryName.trim()}` : "";
+export function accessBadgeText(openAccess: OpenAccessInfo, libraryNames: readonly string[] = []): string {
+  const suffix = libraryNames.length > 0 ? `, try ${joinNames(libraryNames.map(libraryLabel))}` : "";
   if (openAccess.isOpen === true) {
     return openAccess.status === "unknown" ? "Open access" : `Open access (${openAccess.status})`;
   }

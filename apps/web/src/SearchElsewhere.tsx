@@ -1,9 +1,9 @@
-import { useLibraryName } from "./LibraryContext";
+import { useLibraries } from "./LibraryContext";
 import { searchElsewhereLinks } from "./searchLinks";
 
-/** The same query on other search engines, each opening in a new tab. Sourcly sends nothing to them. */
-export function SearchElsewhere({ query, librarySearchUrl }: { query: string; librarySearchUrl: string }) {
-  const links = searchElsewhereLinks(query, librarySearchUrl, useLibraryName());
+/** The same query on other search engines and in each library's own search, each opening in a new tab. Sourcly sends nothing to them. */
+export function SearchElsewhere({ query }: { query: string }) {
+  const links = searchElsewhereLinks(query, useLibraries());
   if (links.length === 0) return null;
 
   return (

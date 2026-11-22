@@ -8,7 +8,7 @@ import {
   type ScoringSettings,
 } from "@sourcly/core";
 import type { KeyStorage } from "./apiKey";
-import type { SourclyConfig } from "./config";
+import type { LibraryLink, SourclyConfig } from "./config";
 import { DEFAULT_PROVIDERS, PROVIDER_OPTIONS } from "./providers";
 import { DEFAULT_PER_SOURCE, PER_SOURCE_CHOICES } from "./settings";
 
@@ -21,6 +21,29 @@ export const SETTINGS_KEY = "sourcly.settings";
 /** The OpenAlex key lives under its own key (see apiKey.ts); "Reset all settings" forgets it too. */
 const API_KEY_KEY = "sourcly.openalexApiKey";
 
+/** What the person typed for one library; `null` means "not chosen: use the site's value". */
+export interface LibraryChoice {
+  name: string | null;
+  prefix: string | null;
+  searchUrl: string | null;
+}
+
+export const NO_LIBRARY_CHOICE: LibraryChoice = { name: null, prefix: null, searchUrl: null };
+
+const isNoChoice = (choice: LibraryChoice) => choice.name === null && choice.prefix === null && choice.searchUrl === null;
+
+/**
+ * The choices with one library's changed. Gaps are filled with "no choice" and trailing "no choice" entries are cut, so a person
+ * who has chosen nothing has an empty list (the default) however many libraries the site has.
+ */
+export function withLibraryChoice(choices: readonly LibraryChoice[], index: number, change: Partial<LibraryChoice>): LibraryChoice[] {
+  const next = [...choices];
+  while (next.length <= index) next.push(NO_LIBRARY_CHOICE);
+  next[index] = { ...(next[index] ?? NO_LIBRARY_CHOICE), ...change };
+  while (next.length > 0 && isNoChoice(next[next.length - 1] as LibraryChoice)) next.pop();
+  return next;
+}
+
 /** The values the library, contact and search options can take; `null` for a text field means "not chosen: use the default". */
 export interface UserSettings {
   enabledProviders: ProviderId[];
@@ -31,9 +54,8 @@ export interface UserSettings {
   exact: boolean;
   /** "Expand with curated synonyms". */
   synonyms: boolean;
-  libraryName: string | null;
-  libraryProxyPrefix: string | null;
-  librarySearchUrl: string | null;
+  /** One entry for each library of the site, in its order; missing entries are "no choice". */
+  libraries: LibraryChoice[];
   contactEmail: string | null;
 }
 
@@ -45,9 +67,7 @@ export function defaultUserSettings(): UserSettings {
     layout: defaultLayoutSettings(),
     exact: false,
     synonyms: true,
-    libraryName: null,
-    libraryProxyPrefix: null,
-    librarySearchUrl: null,
+    libraries: [],
     contactEmail: null,
   };
 }
@@ -96,6 +116,22 @@ function sanitizeLayout(raw: unknown): LayoutSettings {
   return layout;
 }
 
+const MAX_LIBRARIES = 6;
+
+/** The library choices: the list as stored, or (from an earlier version, which had one library) its three single fields as the first. */
+function sanitizeLibraries(raw: Record<string, unknown>): LibraryChoice[] {
+  const choice = (item: unknown): LibraryChoice => {
+    const record = isRecord(item) ? item : {};
+    return { name: text(record.name), prefix: text(record.prefix), searchUrl: text(record.searchUrl) };
+  };
+  if (Array.isArray(raw.libraries)) {
+    const choices = raw.libraries.slice(0, MAX_LIBRARIES).map(choice);
+    return choices.reduce<LibraryChoice[]>((list, entry, index) => withLibraryChoice(list, index, entry), []);
+  }
+  const old = choice({ name: raw.libraryName, prefix: raw.libraryProxyPrefix, searchUrl: raw.librarySearchUrl });
+  return isNoChoice(old) ? [] : [old];
+}
+
 /**
  * The settings in a stored text, with every field checked. Anything missing, of the wrong type or out of range keeps its
  * default; text that is not JSON gives all defaults. Never throws.
@@ -120,9 +156,7 @@ export function parseSettings(stored: string | null): UserSettings {
   if ("layout" in raw) settings.layout = sanitizeLayout(raw.layout);
   if (typeof raw.exact === "boolean") settings.exact = raw.exact;
   if (typeof raw.synonyms === "boolean") settings.synonyms = raw.synonyms;
-  settings.libraryName = text(raw.libraryName);
-  settings.libraryProxyPrefix = text(raw.libraryProxyPrefix);
-  settings.librarySearchUrl = text(raw.librarySearchUrl);
+  settings.libraries = sanitizeLibraries(raw);
   settings.contactEmail = text(raw.contactEmail);
   return settings;
 }
@@ -176,11 +210,16 @@ export function clearSettings(storage: KeyStorage | null): boolean {
  * search address must be http(s) (an empty one is a choice: it hides that link), an email must look like an address, a
  * library name must not be blank. A choice that is not usable is ignored and the site's value stays.
  */
-export function effectiveConfig(base: SourclyConfig, user: Pick<UserSettings, "libraryName" | "libraryProxyPrefix" | "librarySearchUrl" | "contactEmail">): SourclyConfig {
-  const config = { ...base };
-  if (user.libraryName !== null && user.libraryName !== "") config.libraryName = user.libraryName;
-  if (user.libraryProxyPrefix !== null && (user.libraryProxyPrefix === "" || isHttpUrl(user.libraryProxyPrefix))) config.libraryProxyPrefix = user.libraryProxyPrefix;
-  if (user.librarySearchUrl !== null && (user.librarySearchUrl === "" || isHttpUrl(user.librarySearchUrl))) config.librarySearchUrl = user.librarySearchUrl;
+export function effectiveConfig(base: SourclyConfig, user: Pick<UserSettings, "libraries" | "contactEmail">): SourclyConfig {
+  const config: SourclyConfig = { ...base };
+  config.libraries = base.libraries.map((library, index): LibraryLink => {
+    const choice = user.libraries[index] ?? NO_LIBRARY_CHOICE;
+    return {
+      name: choice.name !== null && choice.name !== "" ? choice.name : library.name,
+      proxyPrefix: choice.prefix !== null && (choice.prefix === "" || isHttpUrl(choice.prefix)) ? choice.prefix : library.proxyPrefix,
+      searchUrl: choice.searchUrl !== null && (choice.searchUrl === "" || isHttpUrl(choice.searchUrl)) ? choice.searchUrl : library.searchUrl,
+    };
+  });
   if (user.contactEmail !== null && isEmailAddress(user.contactEmail)) config.contactEmail = user.contactEmail;
   return config;
 }

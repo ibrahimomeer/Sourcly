@@ -20,7 +20,7 @@ import {
 import { maskApiKey } from "./apiKey";
 import type { SourclyConfig } from "./config";
 import { libraryLinkNote } from "./disclaimer";
-import { textProblem } from "./userSettings";
+import { NO_LIBRARY_CHOICE, textProblem, type LibraryChoice } from "./userSettings";
 import { valueName } from "./format";
 import { NumberInput } from "./NumberInput";
 import { PROVIDER_OPTIONS, UNAVAILABLE_PROVIDERS } from "./providers";
@@ -43,14 +43,6 @@ const FACTOR_HELP: Record<FactorId, string> = {
     "The share of the sources that answered which returned this result. Found by all of them scores 1. Sources often share data, so treat agreement as a hint, not proof.",
   studyType: "Prefer some levels (primary, secondary, ...). Does nothing until you pick at least one.",
 };
-
-/** What the person typed for the library link and the contact email. */
-export interface LibraryChoices {
-  name: string | null;
-  prefix: string | null;
-  searchUrl: string | null;
-  email: string | null;
-}
 
 export interface SettingsPanelProps {
   scoring: ScoringSettings;
@@ -81,9 +73,12 @@ export interface SettingsPanelProps {
   keyIsStored: boolean;
   /** The site's own values (built-in defaults and config.js): shown as the placeholder of each library and contact field. */
   site: SourclyConfig;
-  /** The person's own choices for the library link and contact email; null = not chosen (the site's value is used). */
-  library: LibraryChoices;
-  onLibraryChange: (change: Partial<LibraryChoices>) => void;
+  /** The person's own choices for each library (null = not chosen: the site's value is used), in the order of the site's libraries. */
+  libraryChoices: readonly LibraryChoice[];
+  onLibraryChange: (index: number, change: Partial<LibraryChoice>) => void;
+  /** The person's contact email, or null. */
+  email: string | null;
+  onEmailChange: (email: string | null) => void;
   /** "Reset all settings": every choice back to its default, and the saved OpenAlex key forgotten. */
   onResetAll: () => void;
   /** False when the browser refused to keep the settings, so they last only for this visit. */
@@ -477,46 +472,54 @@ function ChoiceField({
   );
 }
 
-function LibrarySection({ site, library, onLibraryChange }: SettingsPanelProps) {
+function LibrarySection({ site, libraryChoices, onLibraryChange }: SettingsPanelProps) {
   return (
     <fieldset>
-      <legend>Library link</legend>
+      <legend>Library links</legend>
       <p className="muted">
-        The “Access with …” button on every result opens your library’s login for that work. Change the name and the link
-        here to use your own library.
+        Every result gets an “Access with …” button for each library below, which opens that library’s login for the work. Change
+        a name or a link to use your own library; empty a link prefix to hide that button.
       </p>
-      <ChoiceField
-        id="library-name"
-        label="Library name"
-        value={library.name}
-        placeholder={site.libraryName}
-        problem={null}
-        onChange={(name) => onLibraryChange({ name })}
-      />
-      <ChoiceField
-        id="library-prefix"
-        label="Library link prefix"
-        value={library.prefix}
-        placeholder={site.libraryProxyPrefix}
-        help="The link is this prefix followed by the work’s address. Empty hides the button."
-        problem={textProblem("libraryProxyPrefix", library.prefix ?? "")}
-        onChange={(prefix) => onLibraryChange({ prefix })}
-      />
-      <ChoiceField
-        id="library-search"
-        label="Library search address"
-        value={library.searchUrl}
-        placeholder={site.librarySearchUrl}
-        help="Used for the library link under “Search elsewhere”: this address followed by your search. Empty hides it."
-        problem={textProblem("librarySearchUrl", library.searchUrl ?? "")}
-        onChange={(searchUrl) => onLibraryChange({ searchUrl })}
-      />
+      {site.libraries.map((library, index) => {
+        const choice = libraryChoices[index] ?? NO_LIBRARY_CHOICE;
+        return (
+          <div key={index} className="library-block">
+            <h4>{library.name}</h4>
+            <ChoiceField
+              id={`library-name-${index}`}
+              label="Library name"
+              value={choice.name}
+              placeholder={library.name}
+              problem={null}
+              onChange={(name) => onLibraryChange(index, { name })}
+            />
+            <ChoiceField
+              id={`library-prefix-${index}`}
+              label="Library link prefix"
+              value={choice.prefix}
+              placeholder={library.proxyPrefix}
+              help="The link is this prefix followed by the work’s address. Empty hides the button."
+              problem={textProblem("libraryProxyPrefix", choice.prefix ?? "")}
+              onChange={(prefix) => onLibraryChange(index, { prefix })}
+            />
+            <ChoiceField
+              id={`library-search-${index}`}
+              label="Library search address"
+              value={choice.searchUrl}
+              placeholder={library.searchUrl}
+              help="Used for the library link under “Search elsewhere”: this address followed by your search. Empty hides it."
+              problem={textProblem("librarySearchUrl", choice.searchUrl ?? "")}
+              onChange={(searchUrl) => onLibraryChange(index, { searchUrl })}
+            />
+          </div>
+        );
+      })}
       <p>{libraryLinkNote(site)}</p>
     </fieldset>
   );
 }
 
-function ContactSection({ site, library, onLibraryChange }: SettingsPanelProps) {
+function ContactSection({ site, email, onEmailChange }: SettingsPanelProps) {
   return (
     <fieldset>
       <legend>Contact email (optional)</legend>
@@ -529,10 +532,10 @@ function ContactSection({ site, library, onLibraryChange }: SettingsPanelProps) 
         id="contact-email"
         label="Email"
         type="email"
-        value={library.email}
+        value={email}
         placeholder={site.contactEmail === "" ? "none" : "set by this site"}
-        problem={textProblem("contactEmail", library.email ?? "")}
-        onChange={(email) => onLibraryChange({ email })}
+        problem={textProblem("contactEmail", email ?? "")}
+        onChange={onEmailChange}
       />
     </fieldset>
   );

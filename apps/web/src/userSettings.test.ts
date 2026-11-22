@@ -2,6 +2,7 @@ import { defaultFilters, defaultLayoutSettings, defaultScoringSettings, protocol
 import { describe, expect, it } from "vitest";
 import type { KeyStorage } from "./apiKey";
 import { DEFAULT_CONFIG, resolveConfig } from "./config";
+import type { LibraryChoice } from "./userSettings";
 import { protocolInputFrom } from "./protocolRecord";
 import { DEFAULT_PROVIDERS } from "./providers";
 import {
@@ -10,11 +11,13 @@ import {
   defaultUserSettings,
   effectiveConfig,
   isEmailAddress,
+  NO_LIBRARY_CHOICE,
   loadSettings,
   parseSettings,
   saveSettings,
   serializeSettings,
   textProblem,
+  withLibraryChoice,
   type UserSettings,
 } from "./userSettings";
 
@@ -48,7 +51,8 @@ describe("the defaults", () => {
     expect(settings.scoring).toEqual(defaultScoringSettings());
     expect(settings.layout).toEqual(defaultLayoutSettings());
     expect([settings.exact, settings.synonyms]).toEqual([false, true]);
-    expect([settings.libraryName, settings.libraryProxyPrefix, settings.librarySearchUrl, settings.contactEmail]).toEqual([null, null, null, null]);
+    expect(settings.libraries).toEqual([]);
+    expect(settings.contactEmail).toBeNull();
   });
 
   it("give a fresh copy each time", () => {
@@ -75,9 +79,7 @@ describe("saving and loading", () => {
       layout: { preferredLanguages: ["en", "fr"], showNonArticleTypes: true },
       exact: true,
       synonyms: false,
-      libraryName: "Example Library",
-      libraryProxyPrefix: "https://proxy.example.org/login?url=",
-      librarySearchUrl: "",
+      libraries: [{ name: "Example Library", prefix: "https://proxy.example.org/login?url=", searchUrl: "" }],
       contactEmail: "me@example.org",
     });
     expect(saveSettings(storage, chosen)).toBe(true);
@@ -98,9 +100,9 @@ describe("saving and loading", () => {
   });
 
   it("keeps an empty library link (it hides the button) apart from no choice (the default)", () => {
-    const hidden = loadSettings(memory({ [SETTINGS_KEY]: JSON.stringify({ libraryProxyPrefix: "" }) }));
-    expect(hidden.libraryProxyPrefix).toBe("");
-    expect(loadSettings(memory()).libraryProxyPrefix).toBeNull();
+    const hidden = loadSettings(memory({ [SETTINGS_KEY]: JSON.stringify({ libraries: [{ prefix: "" }] }) }));
+    expect(hidden.libraries[0]?.prefix).toBe("");
+    expect(loadSettings(memory()).libraries[0]).toBeUndefined();
   });
 
   it("never stores the OpenAlex key with the settings", () => {
@@ -129,11 +131,11 @@ describe("a stored text that is old, edited by hand or damaged", () => {
   });
 
   it("ignores a field of the wrong type and keeps the rest", () => {
-    const settings = parseSettings(JSON.stringify({ perSource: "lots", exact: "yes", synonyms: false, libraryName: 7, contactEmail: ["x"] }));
+    const settings = parseSettings(JSON.stringify({ perSource: "lots", exact: "yes", synonyms: false, libraries: [{ name: 7 }], contactEmail: ["x"] }));
     expect(settings.perSource).toBe(100);
     expect(settings.exact).toBe(false);
     expect(settings.synonyms).toBe(false);
-    expect(settings.libraryName).toBeNull();
+    expect(settings.libraries).toEqual([]);
     expect(settings.contactEmail).toBeNull();
   });
 
@@ -172,7 +174,7 @@ describe("a stored text that is old, edited by hand or damaged", () => {
   });
 
   it("ignores text that is far too long", () => {
-    expect(parseSettings(JSON.stringify({ libraryName: "x".repeat(5000) })).libraryName).toBeNull();
+    expect(parseSettings(JSON.stringify({ libraries: [{ name: "x".repeat(5000) }] })).libraries).toEqual([]);
   });
 });
 
@@ -184,42 +186,95 @@ describe("clearSettings (Reset all settings)", () => {
   });
 });
 
+describe("library choices", () => {
+  const choice = (change: Partial<LibraryChoice>): LibraryChoice => ({ ...NO_LIBRARY_CHOICE, ...change });
+
+  it("sets one library's choice, filling the ones before it with 'no choice'", () => {
+    expect(withLibraryChoice([], 1, { name: "Example" })).toEqual([NO_LIBRARY_CHOICE, choice({ name: "Example" })]);
+    expect(withLibraryChoice([choice({ name: "A" })], 0, { prefix: "https://x.org/?u=" })).toEqual([choice({ name: "A", prefix: "https://x.org/?u=" })]);
+  });
+
+  it("cuts trailing 'no choice' entries, so having chosen nothing is the empty list (the default)", () => {
+    expect(withLibraryChoice([choice({ name: "A" })], 0, { name: null })).toEqual([]);
+    expect(withLibraryChoice([NO_LIBRARY_CHOICE, choice({ name: "B" })], 1, { name: null })).toEqual([]);
+    expect(serializeSettings(changed({ libraries: withLibraryChoice([choice({ name: "A" })], 0, { name: null }) }))).toBeNull();
+  });
+
+  it("does not change the list it was given", () => {
+    const given = [choice({ name: "A" })];
+    withLibraryChoice(given, 0, { name: "B" });
+    expect(given).toEqual([choice({ name: "A" })]);
+  });
+
+  it("keeps each library's own choice when saved and loaded", () => {
+    const storage = memory();
+    const libraries = [NO_LIBRARY_CHOICE, choice({ name: "UofT (mine)", prefix: "", searchUrl: "https://example.org/?q=" })];
+    saveSettings(storage, changed({ libraries }));
+    expect(loadSettings(storage).libraries).toEqual(libraries);
+  });
+
+  it("reads what an earlier version saved for its one library as the first library's choice", () => {
+    const settings = parseSettings(JSON.stringify({ libraryName: "My Library", libraryProxyPrefix: "https://proxy.example.org/?url=", librarySearchUrl: "" }));
+    expect(settings.libraries).toEqual([{ name: "My Library", prefix: "https://proxy.example.org/?url=", searchUrl: "" }]);
+    expect(parseSettings(JSON.stringify({ libraryName: 5 })).libraries).toEqual([]);
+  });
+
+  it("keeps at most six, and ignores an entry that is not an object", () => {
+    const stored = JSON.stringify({ libraries: [{ name: "A" }, 7, null, { name: "D" }, ...Array.from({ length: 9 }, () => ({ name: "X" }))] });
+    const { libraries } = parseSettings(stored);
+    expect(libraries.length).toBeLessThanOrEqual(6);
+    expect(libraries[0]?.name).toBe("A");
+    expect(libraries[1]).toEqual(NO_LIBRARY_CHOICE);
+    expect(libraries[3]?.name).toBe("D");
+  });
+});
+
 describe("effectiveConfig: the site's values with the person's own choices on top", () => {
-  const nothing = { libraryName: null, libraryProxyPrefix: null, librarySearchUrl: null, contactEmail: null };
+  const nothing = { libraries: [] as LibraryChoice[], contactEmail: null };
+  const choice = (change: Partial<LibraryChoice>): LibraryChoice => ({ ...NO_LIBRARY_CHOICE, ...change });
 
   it("is the site's own config when nothing was chosen", () => {
     expect(effectiveConfig(DEFAULT_CONFIG, nothing)).toEqual(DEFAULT_CONFIG);
   });
 
-  it("uses a library name, link prefix, search address and contact email the person typed", () => {
-    const config = effectiveConfig(DEFAULT_CONFIG, {
-      libraryName: "Example Library",
-      libraryProxyPrefix: "https://proxy.example.org/login?url=",
-      librarySearchUrl: "https://library.example.org/search?q=",
-      contactEmail: "me@example.org",
-    });
-    expect(config).toMatchObject({
-      libraryName: "Example Library",
-      libraryProxyPrefix: "https://proxy.example.org/login?url=",
-      librarySearchUrl: "https://library.example.org/search?q=",
-      contactEmail: "me@example.org",
-    });
+  it("changes only the library the person chose for: the other keeps the site's values", () => {
+    const config = effectiveConfig(DEFAULT_CONFIG, { ...nothing, libraries: [NO_LIBRARY_CHOICE, choice({ name: "My UofT", prefix: "https://proxy.example.org/?url=" })] });
+    expect(config.libraries[0]).toEqual(DEFAULT_CONFIG.libraries[0]);
+    expect(config.libraries[1]).toEqual({ ...DEFAULT_CONFIG.libraries[1], name: "My UofT", proxyPrefix: "https://proxy.example.org/?url=" });
   });
 
-  it("lets an empty prefix or search address hide the link", () => {
-    const config = effectiveConfig(DEFAULT_CONFIG, { ...nothing, libraryProxyPrefix: "", librarySearchUrl: "" });
-    expect([config.libraryProxyPrefix, config.librarySearchUrl]).toEqual(["", ""]);
+  it("uses a library name, link prefix and search address the person typed, and a contact email", () => {
+    const config = effectiveConfig(DEFAULT_CONFIG, {
+      libraries: [choice({ name: "Example Library", prefix: "https://proxy.example.org/login?url=", searchUrl: "https://library.example.org/search?q=" })],
+      contactEmail: "me@example.org",
+    });
+    expect(config.libraries[0]).toEqual({ name: "Example Library", proxyPrefix: "https://proxy.example.org/login?url=", searchUrl: "https://library.example.org/search?q=" });
+    expect(config.contactEmail).toBe("me@example.org");
+  });
+
+  it("lets an empty prefix or search address hide that library's button or link", () => {
+    const config = effectiveConfig(DEFAULT_CONFIG, { ...nothing, libraries: [choice({ prefix: "", searchUrl: "" })] });
+    expect([config.libraries[0]?.proxyPrefix, config.libraries[0]?.searchUrl]).toEqual(["", ""]);
+    expect(config.libraries[1]).toEqual(DEFAULT_CONFIG.libraries[1]);
   });
 
   it("ignores a link that is not http(s), an email that is not one, and a blank library name", () => {
-    const config = effectiveConfig(DEFAULT_CONFIG, { libraryName: "", libraryProxyPrefix: "javascript:alert(1)", librarySearchUrl: "ftp://x", contactEmail: "not an email" });
+    const config = effectiveConfig(DEFAULT_CONFIG, {
+      libraries: [choice({ name: "", prefix: "javascript:alert(1)", searchUrl: "ftp://x" })],
+      contactEmail: "not an email",
+    });
     expect(config).toEqual(DEFAULT_CONFIG);
+  });
+
+  it("ignores choices for libraries the site does not have", () => {
+    const config = effectiveConfig(DEFAULT_CONFIG, { ...nothing, libraries: [NO_LIBRARY_CHOICE, NO_LIBRARY_CHOICE, choice({ name: "Third" })] });
+    expect(config.libraries).toHaveLength(2);
   });
 
   it("does not change the site's config", () => {
     const site = resolveConfig({});
     const before = JSON.stringify(site);
-    effectiveConfig(site, { ...nothing, libraryName: "Other" });
+    effectiveConfig(site, { ...nothing, libraries: [choice({ name: "Other" })] });
     expect(JSON.stringify(site)).toBe(before);
   });
 });
