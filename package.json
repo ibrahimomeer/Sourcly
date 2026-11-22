@@ -1,6 +1,6 @@
 {
   "name": "sourcly",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "private": true,
   "description": "Transparent, tunable academic source discovery. Runs entirely in the browser.",
   "license": "MIT",
